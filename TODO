@@ -1,0 +1,99 @@
+# -*- org -*-
+* 1
+  - Two dimensions: thought vs. action, humanity vs. rationality.
+  - Physical simulation of a person is unnecessary for intelligence.
+    - Mind-body dualism of Descartes?
+  - Cognitive science brings together computer models from AI and
+    experimental techniques from psychology.
+  - Real cognitive science, however, is necessarily based on
+    experimental investigation of actual humans.
+  - The standard of rationality is mathematically well defined and
+    completely general.
+  - We will adopt the working hypothesis that perfect rationality is a
+    good starting point for analysis.
+  - Limited rationality: acting appropriately when there is not enough
+    time
+  - Materialism, which holds that the brain's operation according to
+    the laws of physicas constitutes the mind.
+  - Logical positivism
+  - Carnap, The Logical Structures of the World, was probably the
+    first theory of mind as a computational process.
+  - Intelligence requires action as well as reasoning.
+  - Actions are justified by a logical connection between goals and
+    knowledge of the action's outcome.
+  - Regression planning system
+  - The leap to a formal science required a level of mathematical
+    formalization: logic, computation, probability.
+  - The world is an extremely large problem instance.
+  - Models based on satisficing---making decisions that are "good
+    enough"---gave a better description of actual human behavior.
+  - Searle: brains cause minds.
+  - Behaviorism
+  - "A cognitive theory should be like a computer program."
+  - Intelligence and an artifact
+  - Parallelism---a curious convergence with the properties of the
+    brain.
+  - The state of a neuron was conceived of as "factually equivalent to
+    a proposition which proposed its adequate stimulus." McCulloch and
+    Pitts (1943)
+    - Neural events and the relations among them can be treated by
+      means of propositional logic.
+    - For any logical expression satisfying certain conditions, one
+      can find a net behaving in the fashion it describes.
+    - For every net behaving under one assumption, there exists
+      another net which behaves under the other and gives the same
+      results.
+  - Perhaps "computational rationality" would have been more precise
+    and less threatening, but "AI" stuck.
+  - AI from the start embraced the idea of duplicating human faculties
+    such as creativity.
+  - John McCarthy referred to this period as the "Look, Ma, no hands!"
+    era.
+  - "A physical symbol system has the necessary and sufficient means
+    for general intelligent action."
+  - 1958 . . . McCarthy define Lisp, which was to become the dominant
+    AI programming language for the next 30 years.
+  - It is useful to have a formal, explicit representation of the
+    world and its workings and to be able to maniplutae that
+    representation with deductive processes.
+  - McCarthy, Programs with Common Sense
+    - In this program the procedures will be described as much as
+      possible in the language itself and, in particular, the
+      heuristics are all so described.
+    - If one wants a machine to be able to discover an abstraction, it
+      seems most likely that the machine must be able to represent
+      this abstraction in some relatively simple way.
+    - The improving mechanism should be improvable.
+    - Must have or evolve concepts of partial success.
+      - Something about ~1995 that made for a cute blog.
+    - For example, to mest people, the number 3812 is not an object:
+      they have nothing to say about it except what can be deduced
+      from its structure. On the other hand, to most Americans the
+      number 1776 is an object because they have filed somewhere the
+      fact that it represents the year when the American Revolution
+      started.
+    - One might conjecture that division in man between conscious and
+      unconscious thought occurs at the boundary between
+      stimulus-response heuristics which do not have to be reasoned
+      about but only obeyed, and the others which have to serve as
+      premises in deductions.
+  - Machine evolution (genetic algorithms): Friedberg, 1958, 1959.
+    - Friedberg. 1958. A learning machine Part 1. IBM Journal of
+      Research and Development, 2, 2--13.
+    - Friedberg, Dunham, North. 1959. A learning machine, Part 2. IBM
+      Journal of Research and Development, 3, 282--287.
+  - Failure to come to grips with the "combinatorial explosion"
+  - The new back-propagation learning algorithms for multilayer
+    netwrks that were to cause an enormous resurgence in neural-net
+    research in the late 1980s were actually discovered first in 1969.
+  - Bruce Buchanan: a philosopher turned computer scientist
+  - DENDRAL was the first successful knowledge-intensive system
+    (expert system).
+  - AI Winter
+  - Parallel Distributed Processing (Rumelhart, McClelland. 1986)
+  - Connectionist models: competitors to symbols models and logicist
+    approach
+  - Ones that act rationally according to the laws of decision theory
+    and do not try to imitate the thought steps of human experts
+  - Control theory deals with designing devices that act optimally on
+    the basis of feedback from the environment.
