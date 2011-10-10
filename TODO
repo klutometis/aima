@@ -99,7 +99,8 @@
     and do not try to imitate the thought steps of human experts
   - Control theory deals with designing devices that act optimally on
     the basis of feedback from the environment.
-* TODO 1.1
+* DONE 1.1
+  CLOSED: [2011-10-10 Mon 03:03]
   - Intelligence :: A spontaneous faculty for associating impressions
                     (more general than ideas); synthesizing
                     abstractions from disparate stimuli; deducing
@@ -115,7 +116,26 @@
                    this includes the mechanical process of deduction,
                    as well as an ill-defined notion of common-sense.
   - Logical reasoning :: The mechanical aspect of rationality.
-* TODO 1.2
+* DONE 1.2
+  CLOSED: [2011-10-10 Mon 03:03]
+  The Mathematical Objection (3) still holds up: the halting problem;
+  on the other hands, humans are also susceptible to the halting
+  problem, aren't they? If one falls towards the humanity side of the
+  humanity-rationality AI-axis, this deficit is reducible.
+
+  Lady Lovelace's Objection (6) is interesting: it denies /ex nihilo/;
+  are genetic algorithms a counter-example?
+
+  The Argument from Informality of Behaviour (8) could be solved by
+  fuzzy dispatch.
+
+  A modern refutation might be that there are not enough graduate
+  students to make a satisfactory ontology of world-knowledge; thank
+  the gods, then, for mechanical turks and unsupervised learning!
+
+  We came pretty damn close to 30% in the 2008 [[http://en.wikipedia.org/wiki/Loebner_Prize#2008][Loebner prize]]; why not
+  double it to 60% in 2058? Despite Moore's law, let's say that AI
+  proceeds linearly.
 ** Turing, Computing Machinery and Intelligence
    - Can machines think?
    - It is A's object in the game to try and cause C to make the wrong
@@ -192,3 +212,59 @@
      do not think that this argument sufficiently substantial to
      require refutation. Consolation would would be more appropriate:
      perhaps this should be sought the transmigration of souls.
+   - There are limitations to the powers of discrete-state
+     machines. The best known of these results is known as Gödel's
+     theorem, and shows that in any sufficiently powerful logical
+     system statements can be formulated which can neither be proved
+     nor disproved within the system, unless possibly the system
+     itself is inconsistent.
+   - "Will this machine every answer 'Yes' to any question?" It can be
+     shown that the answer is either wrong or not forthcoming.
+   - The only way to know that a man thinks is to be that particular
+     man. It is in fact the solipsist point of view.
+   - I do not wish to give the impression that I think there is no
+     mystery about consciousness. There is, for instance, something of
+     a paradox connected with any attempt to localise it.
+   - When a burnt child fears the fire and shows that he fears it by
+     avoiding it, I should say that he was applying scientific
+     induction.
+   - It would deliberately introduce mistakes in a manner calculated
+     to confuse the interrogator.
+   - By observing the results of its own behaviour it can modify its
+     own programmes so as to achieve some purpose more effectively.
+   - This is the assumption that as soon as a fact is presented to a
+     mind all consequences of that fact spring into the mind
+     simultaneously with it.
+   - The undistributed middle is glaring.
+   - I would defy anyone to learn from these replies sufficint about
+     the programme to be able to predict any replies to untried
+     values.
+   - A smallish proportion are super-critical. An idea presented to
+     such a mind may give rise to a whole "theory" consisting of
+     secondary, tertiary and more remote ideas.
+     - Sponteneity
+   - These last two paragraphs should be described as "recitations
+     tending to produce belief."
+   - The only satisfactory support that can be given will be that
+     provided by waiting for the end of the century and then doing the
+     experiment described.
+   - Estimates for the storage capacity of the brain vary from $10^10$
+     to $10^15$ binary digits.
+     - Russell/Norvig (12): $10^13$ synapses
+   - At my present rate of working I produce about a thousand digits
+     of programme a day, so that about sixty workers, working steadily
+     through the fifty years might accomplish the job, if nothing went
+     into the waste-paper basket.
+     - Mythical man-month?
+   - The child-programme and the education process
+   - One might have a complete system of logical inference "built
+     in". The store would be largely occupied with definitions and
+     propositions. Certain propositions may be described as
+     "imperatives". As soon as an imperative is classed as
+     "well-established" the appropriate action takes place.
+     - Compare McCarthy, Programs with Common Sense, regarding
+       imperatives.
+   - These choices make the difference between a brilliant and a
+     footling reasoner.
+   - We can only see a short distance ahead, but we can see plenty
+     there that needs to be done.
