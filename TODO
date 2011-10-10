@@ -80,6 +80,8 @@
   - Machine evolution (genetic algorithms): Friedberg, 1958, 1959.
     - Friedberg. 1958. A learning machine Part 1. IBM Journal of
       Research and Development, 2, 2--13.
+      - From and intent, to be sure, are related quite discontinuously
+        in the compact, economical programs that programmers wrte.
     - Friedberg, Dunham, North. 1959. A learning machine, Part 2. IBM
       Journal of Research and Development, 3, 282--287.
   - Failure to come to grips with the "combinatorial explosion"
@@ -97,3 +99,96 @@
     and do not try to imitate the thought steps of human experts
   - Control theory deals with designing devices that act optimally on
     the basis of feedback from the environment.
+* TODO 1.1
+  - Intelligence :: A spontaneous faculty for associating impressions
+                    (more general than ideas); synthesizing
+                    abstractions from disparate stimuli; deducing
+                    conclusions from abstractions.
+
+                    Intelligence is an emergent property of simples
+                    like e.g. neurons.
+  - Artificial intelligence :: Mechanism for performing association,
+       abstraction, deduction which appears to be spontaneous; may
+       also be an emergent property of bit-pushing.
+  - Agent :: Self-contained, autonomous input-processing mechanism.
+  - Rationality :: The appropriate application of /λόγος/ or /ratio/;
+                   this includes the mechanical process of deduction,
+                   as well as an ill-defined notion of common-sense.
+  - Logical reasoning :: The mechanical aspect of rationality.
+* TODO 1.2
+** Turing, Computing Machinery and Intelligence
+   - Can machines think?
+   - It is A's object in the game to try and cause C to make the wrong
+     identification.
+     - Didn't realize there was an adversarial element to the Turing
+       test.
+   - What will happen when a machine takes the part of A in this game?
+   - . . . drawing a fairly sharp line between the physical and the
+     intellectual capacities of man.
+     - A reasonable dualism
+   - May not machines carry out something which ought to be described
+     as thinking but which is very different from what a man does?
+     - The humanity/rationality plane of AI?
+   - Imitation game
+     - Simulacrum sufficeth
+   - It is probably possible to rear a complete individual from a
+     single cell of the skin (say) of a man . . . but we would not be
+     inclined to regard it as a case of "constructing a thinking
+     machine".
+   - Digital computer:
+     1. Store
+     2. Executive unit
+     3. Control
+   - It is not normally possible to determine from observing a machine
+     whether it has a random element, for a similar effect can be
+     produced by such devices as making the choices depend on the
+     digits of the decimal for $\pi$.
+   - Discrete state machines: strictly speaking there are no such
+     machines. Everything really moves continuously.
+   - This is reminiscent of Laplace's view that from the complete
+     state of the universe at one moment of time, as described by the
+     positions and velocities of all particles, it should be possible
+     to predict all future states.
+   - This special property of digital computers, that they can mimic
+     any discrete state machine, is described by saying that they are
+     universal machines.
+   - "Are there imaginable digital computers which would do well in
+     the imitation game?" $\to$ "Are there discrete state machines
+     which would do well?"
+   - I believe that in about fifty years' time it will be possible to
+     programme computers, with a storage capacity of about $10^9$, to
+     make them play the imitation game so well that an average
+     interrogator will not have more than $70%$ chance of making the
+     right identification after five minutes of questioning.
+     - Russell/Norvig, 12: storage units: $10^15$
+     - [[http://en.wikipedia.org/wiki/Loebner_Prize#2008][Loebner prize]]:
+       #+BEGIN_QUOTE
+       Elbot of Artificial Solutions won the 2008 Loebner Prize bronze
+       award, for most human-like artificial conversational entity,
+       through fooling three of the twelve judges who interrogated it
+       (in the human-parallel comparisons) into believing it was
+       human. This is coming very close to the 30% traditionally
+       required to consider that a program has actually passed the
+       Turing test.
+       #+END_QUOTE
+       - From a [[http://technology.timesonline.co.uk/tol/news/tech_and_web/article4934858.ece][judge]]:
+         #+BEGIN_QUOTE
+         He predicted that by the end of the century, computers would
+         have a 30 per cent chance of being mistaken for a human being
+         in five minutes of text-based conversation.
+         #+END_QUOTE
+         I thought this was mistaken (should be $70$), but it is
+         indeed correct.
+     - In other words, a damn-good guess.
+   - Conjectures are of great importance since they suggest useful
+     lines of research.
+   - We might expect that He would only exercise this power in
+     conjunction with a mutation which provided the elephant with an
+     appropriately improved brain to minister to the needs of this
+     soul.
+   - We like to believe that Man is in some subtle way superior to the
+     rest of creation.
+   - "The consequences of machines thinking would be too dreadful." I
+     do not think that this argument sufficiently substantial to
+     require refutation. Consolation would would be more appropriate:
+     perhaps this should be sought the transmigration of souls.
