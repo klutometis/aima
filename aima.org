@@ -33,8 +33,8 @@
   students to make a satisfactory ontology of world-knowledge; thank
   the gods, then, for mechanical turks and unsupervised learning!
 
-  We came pretty damn close to 30% in the 2008 [[http://en.wikipedia.org/wiki/Loebner_Prize#2008][Loebner prize]]; why not
-  double it to 60% in 2058? Despite Moore's law, let's say that AI
+  We came pretty damn close to $30\%$ in the 2008 [[http://en.wikipedia.org/wiki/Loebner_Prize#2008][Loebner prize]]; why not
+  double it to $60\%$ in 2058? Despite Moore's law, let's say that AI
   proceeds linearly.
 ** Turing, Computing Machinery and Intelligence
    - Can machines think?
@@ -78,7 +78,7 @@
    - I believe that in about fifty years' time it will be possible to
      programme computers, with a storage capacity of about $10^9$, to
      make them play the imitation game so well that an average
-     interrogator will not have more than $70%$ chance of making the
+     interrogator will not have more than $70\%$ chance of making the
      right identification after five minutes of questioning.
      - Russell/Norvig, 12: storage units: $10^15$
      - [[http://en.wikipedia.org/wiki/Loebner_Prize#2008][Loebner prize]]:
@@ -87,7 +87,7 @@
        award, for most human-like artificial conversational entity,
        through fooling three of the twelve judges who interrogated it
        (in the human-parallel comparisons) into believing it was
-       human. This is coming very close to the 30% traditionally
+       human. This is coming very close to the $30\%$ traditionally
        required to consider that a program has actually passed the
        Turing test.
        #+END_QUOTE
