@@ -1,4 +1,4 @@
-# -*- org -*-
+#+TITLE: Some notes and solutions to Russell and Norvig's Artificial Intelligence: A Modern Approach (AIMA, 3rd edition)
 * DONE 1.1
   CLOSED: [2011-10-10 Mon 03:03]
   - Intelligence :: A spontaneous faculty for associating impressions
@@ -169,7 +169,8 @@
    - We can only see a short distance ahead, but we can see plenty
      there that needs to be done.
 
-* TODO 1.3
+* DONE 1.3
+  CLOSED: [2011-10-12 Wed 12:58]
   Reflex actions are rational in the sense that they are the result of
   induction on e.g. hot objects and the scientific method (see
   Turing); though the acquisition may require intelligence (induction,
