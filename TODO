@@ -175,7 +175,7 @@
   Turing); though the acquisition may require intelligence (induction,
   storage), the reflex itself is not intelligent in the sense that it
   requires no induction: it is immediate.
-  
+* TODO 1.4
   At the very least, a program that can score better on IQ tests; the
   mapping from IQ-test-scores has been debated (though the correlation
   to income is well established), leading to the multiplication of
@@ -314,3 +314,28 @@
      and do not try to imitate the thought steps of human experts
    - Control theory deals with designing devices that act optimally on
      the basis of feedback from the environment.
+
+** Lectures
+*** 1
+    - AI: mapping from sensors to actuators
+      - Voice, child-like engagement
+    - Fully vs. partially observable
+    - Deterministic vs. stochastic
+    - Discrete vs. continuous
+    - Benign vs. adversarial
+    - Uncertainty management
+*** 2
+    - Initial state
+    - $\texttt{actions}(state) \to {a_1, a_2, a_3, \dots}$
+    - $\texttt{result}(state, action) \to state^\prime$
+    - $\texttt{goal-test}(state) \to T|F$
+    - $\texttt{path-cost}(state \xrightarrow{action} state \xrightarrow{action} state) \to n$
+    - $\texttt{step-cost}(state, action, state^\prime) \to n$
+    - Navigate the state space by applying actions
+    - Separate state into three parts: ends of paths (frontier);
+      explored and unexplored regions.
+    - Step-cost
+    - Tree-search
+      - Family-resemlance; difference: which path to look at first.
+    - Depth-first search: shortest-first search
+    - 
