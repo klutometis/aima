@@ -189,6 +189,8 @@
   Is memory-updates/second merely memory / cycle time? In which case:
   20000 / 10^-9 =
 
+  10^5 neurons, cycle time: 10^{-3}; memory updates per second?
+
 * DONE 1.14
   CLOSED: [2011-10-10 Mon 03:52]
   1. The [[http://www.youtube.com/watch?v=NZZOgT8oct4][Japanese]] got this one; just a toy, though.
