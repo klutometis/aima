@@ -211,6 +211,23 @@
 
   That gives 10^6 memory updates per second; which means that a
   supercomputer houses the potential of 10^8 sea slugs.
+* DONE 1.6
+  CLOSED: [2012-05-28 Mon 21:43]
+  This post on the [[http://lesswrong.com/lw/6p6/the_limits_of_introspection/][limits of introspection]] posits that:
+
+  #+BEGIN_QUOTE
+  Mental processes are the results of opaque preferences, and . . .
+  our own "introspected" goals and preferences are a product of the
+  same machinery that infers goals and preferences in others in order
+  to predict their behavior.
+  #+END_QUOTE
+
+  Accordingly, introspection is accurate to the extent that we can
+  infer our own thoughts from the mental model we've extrapolated from
+  watching others.
+
+  In other words, the processes which lead to thought are to thought
+  opaque.
 * DONE 1.14
   CLOSED: [2011-10-10 Mon 03:52]
   1. The [[http://www.youtube.com/watch?v=NZZOgT8oct4][Japanese]] got this one; just a toy, though.
