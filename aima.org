@@ -180,7 +180,8 @@
   Tom Evan's ANALOGY is an ad-hoc geometric solver, and would not
   therefore program. In people, you might be able to generalize from
   IQ-tests to success; but not so with domain-specific AI.
-* TODO 1.5
+* DONE 1.5
+  CLOSED: [2012-05-28 Mon 21:35]
   Aplysia, Eric Kandel
 
   20,000 neurons; memory-updates/second: 10^-9; cycle time: 10^15,
@@ -189,8 +190,27 @@
   Is memory-updates/second merely memory / cycle time? In which case:
   20000 / 10^-9 =
 
-  10^5 neurons, cycle time: 10^{-3}; memory updates per second?
+  10^5 (20000) neurons, cycle time: 10^{-3}; memory updates per
+  second? Not sure what the relationship between operations/sec and
+  memory updates/sec; the former is an upper bound, though. Could it
+  be that memory updates/sec is also bounded, somehow, by storage
+  units? There is also the relationship between neuros and synapses.
 
+  In humans, [[http://en.wikipedia.org/wiki/Neurons#Connectivity][7,000 synapses per neuron]]; hence 10^14 from 10^11. How
+  many synapses per aplysia-neuron?
+
+  From [[http://learnmem.cshlp.org/content/10/5/387.full][this paper]]:
+
+  #+BEGIN_QUOTE
+  On average, we found 24 contacts per pair of neurons.
+  #+END_QUOTE
+
+  Let's say, then, that sea slugs have 10^6 synapses; let's also say
+  that, like humans, this is an upper bound on memory updates per
+  second due to the e.g. [[http://en.wikipedia.org/wiki/Action_potential#Refractory_period][refractory period]].
+
+  That gives 10^6 memory updates per second; which means that a
+  supercomputer houses the potential of 10^8 sea slugs.
 * DONE 1.14
   CLOSED: [2011-10-10 Mon 03:52]
   1. The [[http://www.youtube.com/watch?v=NZZOgT8oct4][Japanese]] got this one; just a toy, though.
