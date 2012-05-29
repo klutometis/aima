@@ -180,6 +180,7 @@
   Tom Evan's ANALOGY is an ad-hoc geometric solver, and would not
   therefore program. In people, you might be able to generalize from
   IQ-tests to success; but not so with domain-specific AI.
+* TODO 1.5
   At the very least, a program that can score better on IQ tests; the
   mapping from IQ-test-scores has been debated (though the correlation
   to income is well established), leading to the multiplication of
