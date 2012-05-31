@@ -302,6 +302,15 @@
   there is code that adapts to its environment; or a programmer can
   translate intelligence into code (bounded by the programmer's
   intelligence, of course).
+* DONE 1.13
+  CLOSED: [2012-05-31 Thu 02:48]
+  It's true that animals, humans and computers are bound by the laws
+  of physics; nevertheless, there is this bizarre phenomenon of
+  [[http://en.wikipedia.org/wiki/Emergence#Emergence_in_humanity][emergent behavior]] wherein the sum is more than its whole of parts.
+
+  Consciousness, after all, is an emergent behavior from the
+  propagation of current through neurons; and the world-wide-web has
+  emerged from a decentralized connection of web pages.
 * DONE 1.14
   CLOSED: [2011-10-10 Mon 03:52]
   1. The [[http://www.youtube.com/watch?v=NZZOgT8oct4][Japanese]] got this one; just a toy, though.
