@@ -282,6 +282,15 @@
   AI is engineering, on the other hand, in the sense that it inheres
   in the world; it must find solutions in messy situations: solutions
   which might be approximate but nevertheless useful.
+* DONE 1.11
+  CLOSED: [2012-05-31 Thu 02:35]
+  "Surely computers . . . can do only what their programmers tell
+  them" might have been the case, if it weren't for the fact that
+  programmers can program machines to do things even they couldn't do
+  (cf. chess programs that outstrip their masters).
+
+  This seems like a paradox I don't adequately know how to explain; if
+  it proceeds apace, prepare for the [[http://en.wikipedia.org/wiki/Technological_singularity][singularity]].
 * DONE 1.14
   CLOSED: [2011-10-10 Mon 03:52]
   1. The [[http://www.youtube.com/watch?v=NZZOgT8oct4][Japanese]] got this one; just a toy, though.
