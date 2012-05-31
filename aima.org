@@ -291,6 +291,17 @@
 
   This seems like a paradox I don't adequately know how to explain; if
   it proceeds apace, prepare for the [[http://en.wikipedia.org/wiki/Technological_singularity][singularity]].
+* DONE 1.12
+  CLOSED: [2012-05-31 Thu 02:41]
+  The relationship between nature and nurture is probably complex;
+  suffice to say: genes might provide an upper bound on the
+  intelligence of an animal that it has to strive to meet. Luck helps;
+  so does discipline.
+
+  There is a nature-nuture/code-intelligence analogy only insofar as
+  there is code that adapts to its environment; or a programmer can
+  translate intelligence into code (bounded by the programmer's
+  intelligence, of course).
 * DONE 1.14
   CLOSED: [2011-10-10 Mon 03:52]
   1. The [[http://www.youtube.com/watch?v=NZZOgT8oct4][Japanese]] got this one; just a toy, though.
