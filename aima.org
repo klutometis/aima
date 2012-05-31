@@ -287,7 +287,7 @@
   "Surely computers . . . can do only what their programmers tell
   them" might have been the case, if it weren't for the fact that
   programmers can program machines to do things even they couldn't do
-  (cf. chess programs that outstrip their masters).
+  (cf. chess programs that outstrip their masters).[fn:1]
 
   This seems like a paradox I don't adequately know how to explain; if
   it proceeds apace, prepare for the [[http://en.wikipedia.org/wiki/Technological_singularity][singularity]].
@@ -460,4 +460,11 @@
     - Tree-search
       - Family-resemlance; difference: which path to look at first.
     - Depth-first search: shortest-first search
-    - 
+    -
+* Footnotes
+
+[fn:1] See this [[http://linux.about.com/b/2007/05/16/google-machine-translation-system-beats-competition.htm][article from 2007]] on Google's machine translation
+  system: "Using a brute-force statistical approach, the Google
+  machine translation team has developed top performing translation
+  software to and from languages that not even one of the teams
+  members understands, such as Arabic and Chinese." 
