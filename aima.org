@@ -463,6 +463,277 @@
    - Control theory deals with designing devices that act optimally on
      the basis of feedback from the environment.
 
+** 2
+   - Rational agents
+   - Agents behaves as well as possible (utility function?)
+   - Agent perceives its environment through sensors and acts through
+     actuators.
+     - Hands are actuators and sensors.
+   - Percept :: agent's perceptual inputs at any given instant
+   - Agent's choice depends on percept sequence to date.
+   - Agent function :: maps percept sequence to action.
+   - External characterization of agent (agent function): table
+     mapping percept sequences to actions; internally: agent program.
+   - In a sense, all areas of engineering can be seen as designing
+     artifacts that intaract with the world.
+     - Trivializing agents to view e.g. calculators as such.
+   - Intelligent agents, on the other hand: non-trivial decision
+     making.
+   - Rational agents: does the right thing (utility).
+   - Performance measure
+     - (This all sounds reminiscent of [[http://www.cs.cmu.edu/~tom/mlbook.html][Mitchell]], by the way.)
+   - Sequence of actions causes the environment to go through states:
+     environmental states are distinct from agent states.
+     - Basing performance merely off of agent-states is a form of
+       coherentism.
+   - Design performance measures according to what one actually wants
+     in the environment.
+   - "We leave these question as an exercise for the diligent reader."
+     - Classic.
+   - Rationality: performance measure, agent's prior (i.e. /a priori/)
+     knowledge, agent's actions, agent's percept sequence.[fn:2]
+     - "Percept," it turns out, is the converse of "concept": "A
+       Percept or Intuition is a single representation . . . a Concept
+       is a collective (general or universal) representation of a
+       whole class of things." (F. C. Bowen Treat. Logic)
+   - For each percept sequence, a rational agent should select an
+     action that is expected to maximize its performance measure,
+     given its percept sequence and a priori knowledge.
+   - Omniscience vs. rationality
+   - Rationality maximizes /expected/ performance; perfection,
+     /actual/ performance.
+   - Our definition of rationality does not require omniscience.
+     - It's possible sometimes, by the way, to detect transitions in
+       authorship.
+   - Information gathering: actions in order to modify future
+     percepts.
+   - /a priori/ rather than percepts: lacks autonomy.
+   - Ration agent: autonomous; boostrap with /a priori/, though.
+   - Just as evolution provides animals with built-in reflexes to
+     survive long enough to learn for themselves
+   - Task environments
+   - PEAS :: Performance, Environment, Actuators, Sensors
+     - Mitchell has: task, performance measure, training experience,
+       target function, target function representation.
+   - Fully observable vs. partially observable environment.
+   - Task environment effectively fully observable if the sensors
+     detect all aspects that are /relevant/ to the choice of action,
+     performance measure.
+   - Single agent vs. multiagent
+   - Entity /may/ vs. /must/ be viewed as an agent.
+   - Competitive vs. cooperative multiagent environment
+   - Communication
+   - In some competitive environments, randomized behavior is rational
+     because it avoids predictability.
+   - Deterministic vs. stochastic environment
+   - "Uncertain" environment: not fully observable or not
+     deterministic
+   - Stochastic: uncertainty about outcomes quantified in terms of
+     probabilities; nondeterministic: actions characterized by
+     possible outcomes, no probabilities attached.
+   - Episodal vs. sequential: atomic episodes: receives percept and
+     performs single action; sequential: current decision affect all
+     future decisions.
+   - Static vs. dynamic: environment change while agent is
+     deliberating.
+   - Discrete vs. continuous: state of the environment, time,
+     percepts, actions.
+   - Known vs. unknown: "laws of physics" of the environment
+   - Hardest: partially observable, multiagent, stochastic,
+     sequential, dynamic, continuous, unknown.
+   - Code repository includes environment simulator that places one or
+     more agents in a simulated environment, observes their behavior
+     over time, evaluates them according to a given performance
+     measure.
+     - Shit: this is something we could implement in Scheme ([[http://code.google.com/p/aima-java/source/checkout][java]],
+       [[http://code.google.com/p/aima-python/source/checkout][python]], [[http://aima.cs.berkeley.edu/lisp/doc/overview.html][lisp]], [[http://code.google.com/p/aima-data/source/checkout][data]]); lot of work, though? Glory?
+       - A lot of the [[http://aima.cs.berkeley.edu/lisp/doc/overview-UTILITIES.html][utilities]] are in SRFI-1; e.g. =transpose= is
+         =zip=.
+       - Infinity is there.
+       - Might have to write =rms-error=; =ms-error=.
+       - =sample-with-replacement=; =sample-without-replacement=
+         - Combinatorics SRFI, anyone?
+       - =fuzz=
+       - =print-grid=, &c.
+       - =the-biggest=, =the-biggest-random-tie=, =the-biggest-that=,
+         &c.
+       - Binary tree stuff
+       - Queue
+       - Heap
+       - They did CLOS-like stuff
+     - Damn, they put some work in; could do it incrementally? Will be
+       ad-hoc, I guarantee it.
+     - Maybe we can program it, given the [[http://aima.cs.berkeley.edu/lisp/doc/overview-AGENTS.html][agents]] API.
+       - =run-environment= looks like something central.
+     - What would happen if we merely translated the code to Chicken?
+       Could do so, perhaps, without fully understanding it; write an
+       idiomatically Scheme-port later.
+     - In that case, find some alternative to CLOS; or use tinyCLOS?
+     - Also, beginning to think that we misnamed our repo: we're
+       calling it =aima=, but we'd like to write an =aima= egg; with
+       =aima-agents=, =aima-search=, =aima-logic=, =aima-planning=,
+       =aima-uncertainty=, =aima-learning=, =aima-language= modules.
+       - Call it =aima-egg=? =aima-chicken=?
+     - Translation seems like the way to go: relatively mechanical.
+     - [[http://aima.cs.berkeley.edu/lisp/doc/overview-LOGIC.html][Incidentally]], "We need a new language for logical expressions,
+       since we don't have all the nice characters (like upside-down
+       A) that we would like to use." We can use ∀ in Scheme, can't
+       we? Sure. Tough to type? Maybe. Also, think font-lock.
+     - May not be up-to-date for 3e; let's see; also, rife with
+       =defmethod= and other OOisms. Can ignore it, possibly, and its
+       type-checking; =defstructure= is similar, I think, to SRFI-9.
+     - Damn, they implemented unification.
+     - Not to mention: the learning stuff (e.g. decision trees).
+     - Man, should we implement this stuff ad-hoc; or otherwise depend
+       on the existing implementations?
+     - Path of least resistance: do it in Allegro? Ouch.
+   - The job of AI is to design an agent program that implements the
+     agent function, the mapping from percepts to actions.
+   - Agent = architecture + program
+   - The agent program takes the current percept as input; the agent
+     function, which takes the entire percept history.
+   - The agent function that the program embodies
+   - Write programs that produce rational behavior from a smallish
+     program rather than a vast table.
+   - Reflex agents; model-based reflex agents; goal-based agents;
+     utility-based agents.
+   - 
+     #+BEGIN_SRC org
+       ,- table-driven-agent percept
+       ,  - persistent
+       ,    - percepts ()
+       ,    - table
+       ,  - append percept to percepts
+       ,  - lookup percepts table
+       
+     #+END_SRC
+   - 
+     #+BEGIN_SRC org
+       ,- reflex-vacuum-agent location status
+       ,  - if dirty? status
+       ,    - suck
+       ,    - else if location = A
+       ,      - right
+       ,    - else
+       ,      - left
+     #+END_SRC
+   - Simple reflex agent: select actions on the basis of the current
+     precept
+     - Learned responses, innate reflexes
+     - 
+       #+BEGIN_SRC org
+         ,- simple-reflex-agent percept
+         ,  - persistent
+         ,    - rules
+         ,  - state = interpret-input(percept)
+         ,  - rule = rule-match(state rules)
+         ,  - rule.action
+       #+END_SRC
+     - Works only if the correct decision can be made on the current
+       percept: i.e. if the environment is fully observable.
+     - Escape from infinite loops is possible if the agent can randomize
+       its actions.
+     - In single-agent environments, randomization is usually not
+       rational.
+     - In most cases we can do better with more sophisticated
+       deterministic agents.
+   - Model-based reflex agents
+     - Partial observability: keep track of the part of the world it
+       can't see now.
+     - Internal state
+     - Knowledge of how world evolves independently from agent
+     - Knowledge of actions affect the world
+     - Model of the world
+     - 
+       #+BEGIN_SRC org
+         ,- model-based-reflex-agent percept
+         ,  - persistent
+         ,    - state
+         ,    - model
+         ,    - rules
+         ,    - action
+         ,  - state = update-state(state action percept model)
+         ,  - rule = rule-match(state)
+         ,  - (action rule)
+       #+END_SRC
+     - State of the world can contain goals.
+   - Goal-based agents
+     - In addition to current state, goal information that describes
+       situations that are desirable
+     - Search, planning
+     - Flexible, reason about world vis à vis goals
+   - Utility-based agents
+     - Whereas goals are happy/unhappy, more general performance
+       measure: utility
+     - Utility functional: internalization of performance measure
+     - This is not the only way to be rational: rational agent for
+       vacuum has no idea what its utility function is (see exercise
+       [[1.3]]).
+     - When there are conflicting goals, utility function opts for the
+       appropriate tradeoff.
+     - Partial observability, stochasticity: decision making under
+       uncertainty.
+     - Expected utility of the action outcomes: derive, given the
+       probabilities and utilities of each outcome.
+     - Any rational agent must behave as if it possesses a utility
+       function.
+     - An agent that possesses an explicit utility function can make
+       rational decisions with a general-purpose algorithm that does not
+       depend on the specific utility function being maximized.
+     - Global rationality: local constraint on rational-agent designs.
+     - Choosing utility-maximizing course of action
+   - Learning agents
+     - Now we're getting into some Mitchell-action: critic, learning
+       element, performance element, problem generator, &c.
+       - Need a book on big data?
+     - Operate in initially unknown environments and become more
+       competent.
+     - Learning element
+       - Making improvements
+     - Performance element
+       - Selecting external actions
+     - Critic
+       - How performance element should be modified vis à vis fixed
+         performance standard.
+       - Performance standard must be fixed (i.e. checkmate).
+       - Performance standard outside agent; conforms thereto.
+     - Problem generator
+       - Suggesting actions that will lead to new and informative
+         experiences.
+       - Suboptimal actions short run, better actions long run.
+     - Utility-based agents learning utility information
+     - Performance standard distinguishes percept as reward or
+       penalty.
+     - Process of modification of each component
+   - Atomic, factored, structured environments
+     - Atomic
+       - Each state of the world indivisible
+     - Factored
+       - Variables, attributes
+     - Structured
+       - Objects and relationships can be described explicitly
+     - Increasing expressiveness
+     - Intelligent systems: operate at all points along the
+       expressiveness-axis simultaneously.
+   - Agents perceives and acts; agent function maps percept seq ->
+     action.
+   - Performance measure evaluates behavior.
+   - Maximize expected performance measure.
+   - Task environment: performance measure, external environment,
+     actuators, sensors.
+   - Nicomachean Ethics
+   - McCarthy, Programs with Common Sense
+   - Newell and Simon, Human Problem Solving
+   - Horvitz suggests the use of rationality conceived as the
+     maximization of expected utility as the basis for AI.
+     Pearl, 1988.[fn:3]
+     - Horvitz, E., 1988. Reasoning Under Varying and Uncertain
+       Resource Constraints, Proc. of the 7th National Conference on
+       AI, Minneapolis, MN, Morgan Kauffman, pp:111-116.
+     - Horvitz, E. J., Breese, J.S., Henrion, M. 1988. Decision The-
+       ory in Expert Systems and Artificial Intelligence, Journal of
+       Approximate Reasoning, 2, pp247-302.
+
 ** Lectures
 *** 1
     - AI: mapping from sensors to actuators
@@ -486,7 +757,6 @@
     - Tree-search
       - Family-resemlance; difference: which path to look at first.
     - Depth-first search: shortest-first search
-    -
 * Footnotes
 
 [fn:1] See this [[http://linux.about.com/b/2007/05/16/google-machine-translation-system-beats-competition.htm][article from 2007]] on Google's machine translation
@@ -494,3 +764,9 @@
   machine translation team has developed top performing translation
   software to and from languages that not even one of the teams
   members understands, such as Arabic and Chinese." 
+
+[fn:2] Bizarre to me that a programmer is responsible for the /a
+  priori/; playing god, anyone?
+
+[fn:3] Which of these following papers do you think he's talking
+  about? Probably the latter: it carries an /et al./
