@@ -335,6 +335,27 @@
       [[http://en.wikipedia.org/wiki/Robotic_surgery#Timeline][this]], though, where "In May 2006 the first AI doctor-conducted
       unassisted robotic surgery on a 34 year old male to correct
       heart arythmia."
+* TODO 1.15
+  [[http://en.wikipedia.org/wiki/Text_Retrieval_Conference][TREC]] appears to dissolve tracks as they become "solved" (e.g. the
+  spam and terabyte tracks) and take new ones up as they emerge (e.g.
+  the microblog and crowdsourcing tracks).
+
+  The [[http://en.wikipedia.org/wiki/DARPA_Grand_Challenge][Grand Challenge]] is attempting to solve the problem of driverless
+  transportation (see Google's [[http://en.wikipedia.org/wiki/Google_driverless_car][driverless car]]); despite recent
+  [[http://www.driverlesscarhq.com/driverless-car-legislation-sweeps-california-senate-37-0/][legislation]] approving driverless cars (in e.g. California, Nevada,
+  New Jersey), it is still cutting edge.
+
+  [[http://icaps12.poli.usp.br/icaps12/ickeps][ICKEPS 2012]], for instance, has a track for planning solar array
+  operations on the ISS; seems relevant.
+
+  [[http://en.wikipedia.org/wiki/RoboCup][RoboCup]] is interesting in the sense that it requires advanced
+  perception and cooperation among autonomous agents; I suspect it
+  does not detract much from new ideas, despite the fact that it is
+  still wrestling with some of the oldest (and unsolved) problems in
+  AI (/vide supra/).
+
+  The [[http://www.loebner.net/Prizef/loebner-prize.html][Loebner Prize]], on the other hand, seems a little anachronistic;
+  do people care whether their AI counterparts really act human?
 * Notes
 ** 1
    - Two dimensions: thought vs. action, humanity vs. rationality.
