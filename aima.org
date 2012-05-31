@@ -272,6 +272,16 @@
 
   Maybe there's no distinction to be drawn there after all: ends
   justifying means.
+* DONE 1.10
+  CLOSED: [2012-05-31 Thu 02:28]
+  AI is science in the sense that it benefits from the scientific
+  method (work done, for instance, on the relationship between goals
+  and actions; cooperation; how brains cause minds; &c.) and precise
+  mathematics.
+
+  AI is engineering, on the other hand, in the sense that it inheres
+  in the world; it must find solutions in messy situations: solutions
+  which might be approximate but nevertheless useful.
 * DONE 1.14
   CLOSED: [2011-10-10 Mon 03:52]
   1. The [[http://www.youtube.com/watch?v=NZZOgT8oct4][Japanese]] got this one; just a toy, though.
