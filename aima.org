@@ -262,6 +262,16 @@
   neurons; vision system, on the other hand, don't have the advantage
   of fuzzy connections between analog neurons and have to simulate
   these biological heuristics with algorithms.
+* DONE 1.9
+  CLOSED: [2012-05-31 Thu 02:19]
+  Evolution might tend to result in systems that maximize certain
+  utility functions (e.g. propagate genes, to that end: stay alive for
+  a while; &c.); this process is pseudo-rational. Pseudo-rational in
+  the sense that it is not rational for rationality's sake; but
+  accidentally rational as it strives to maximize utility.
+
+  Maybe there's no distinction to be drawn there after all: ends
+  justifying means.
 * DONE 1.14
   CLOSED: [2011-10-10 Mon 03:52]
   1. The [[http://www.youtube.com/watch?v=NZZOgT8oct4][Japanese]] got this one; just a toy, though.
