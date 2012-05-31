@@ -357,6 +357,10 @@
 
   The [[http://www.loebner.net/Prizef/loebner-prize.html][Loebner Prize]], on the other hand, seems a little anachronistic;
   do people care whether their AI counterparts really act human?
+* TODO Should we try to release an e.g. Wumpus World egg?
+  I wonder if it would be worthwhile to study the canonical Lisp
+  examples.
+* TODO Personal notes as footnotes.
 * Notes
 ** 1
    - Two dimensions: thought vs. action, humanity vs. rationality.
