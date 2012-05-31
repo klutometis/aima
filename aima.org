@@ -234,7 +234,8 @@
 
   In other words, the processes which lead to thought are to thought
   opaque.
-* TODO 1.7
+* DONE 1.7
+  CLOSED: [2012-05-31 Thu 02:17]
   Bar code scanners should hopefully be a trivial mapping from codes
   to products; if, on the other hand, you could scan and select
   similar products someone might be interested in: well, then.
@@ -250,7 +251,8 @@
   they have environments (connection data), sensors (the ability to
   peer into network devices) and actuators (the ability to re-route
   traffic).
-* TODO 1.8
+* DONE 1.8
+  CLOSED: [2012-05-31 Thu 02:17]
   Isn't it the case that humans do do some kind of implicit
   calculation? Another example is the ability to catch a ball: there
   are complex physics at play, and yet the human has evolutionarily
