@@ -250,6 +250,16 @@
   they have environments (connection data), sensors (the ability to
   peer into network devices) and actuators (the ability to re-route
   traffic).
+* TODO 1.8
+  Isn't it the case that humans do do some kind of implicit
+  calculation? Another example is the ability to catch a ball: there
+  are complex physics at play, and yet the human has evolutionarily
+  honed and ad-hoc facilities to perform the same.
+
+  Something like Gaussian blur, in other words, is hard-coded into our
+  neurons; vision system, on the other hand, don't have the advantage
+  of fuzzy connections between analog neurons and have to simulate
+  these biological heuristics with algorithms.
 * DONE 1.14
   CLOSED: [2011-10-10 Mon 03:52]
   1. The [[http://www.youtube.com/watch?v=NZZOgT8oct4][Japanese]] got this one; just a toy, though.
