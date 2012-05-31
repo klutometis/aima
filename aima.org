@@ -335,7 +335,8 @@
       [[http://en.wikipedia.org/wiki/Robotic_surgery#Timeline][this]], though, where "In May 2006 the first AI doctor-conducted
       unassisted robotic surgery on a 34 year old male to correct
       heart arythmia."
-* TODO 1.15
+* DONE 1.15
+  CLOSED: [2012-05-31 Thu 03:05]
   [[http://en.wikipedia.org/wiki/Text_Retrieval_Conference][TREC]] appears to dissolve tracks as they become "solved" (e.g. the
   spam and terabyte tracks) and take new ones up as they emerge (e.g.
   the microblog and crowdsourcing tracks).
