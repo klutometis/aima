@@ -176,6 +176,12 @@
   Turing); though the acquisition may require intelligence (induction,
   storage), the reflex itself is not intelligent in the sense that it
   requires no induction: it is immediate.
+
+  Reflex actions are not irrational, either, in the sense that someone
+  does a cost-benefit analysis and decides to contravene it; let's
+  call reflex actions /pararational/, therefore: neither rational nor
+  irrational. There's no time to apply a utility function and behave
+  accordingly (or discordingly (sic)).
 * DONE 1.4
   Tom Evan's ANALOGY is an ad-hoc geometric solver, and would not
   therefore program. In people, you might be able to generalize from
