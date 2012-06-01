@@ -357,6 +357,9 @@
 
   The [[http://www.loebner.net/Prizef/loebner-prize.html][Loebner Prize]], on the other hand, seems a little anachronistic;
   do people care whether their AI counterparts really act human?
+* TODO Reimplement the Lisp environment in Scheme.
+  Should we try to map CLOS to [[http://wiki.call-cc.org/eggref/4/coops][coops]]? Or maybe [[http://wiki.call-cc.org/eggref/4/tinyclos][TinyCLOS]] would suffice.
+  This takes balls. See [[https://github.com/klutometis/aima-chicken][aima-chicken]].
 * TODO Should we try to release an e.g. Wumpus World egg?
   I wonder if it would be worthwhile to study the canonical Lisp
   examples.
