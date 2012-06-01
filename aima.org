@@ -36,139 +36,6 @@
   We came pretty damn close to $30\%$ in the 2008 [[http://en.wikipedia.org/wiki/Loebner_Prize#2008][Loebner prize]]; why not
   double it to $60\%$ in 2058? Despite Moore's law, let's say that AI
   proceeds linearly.
-** Turing, Computing Machinery and Intelligence
-   - Can machines think?
-   - It is A's object in the game to try and cause C to make the wrong
-     identification.
-     - Didn't realize there was an adversarial element to the Turing
-       test.
-   - What will happen when a machine takes the part of A in this game?
-   - . . . drawing a fairly sharp line between the physical and the
-     intellectual capacities of man.
-     - A reasonable dualism
-   - May not machines carry out something which ought to be described
-     as thinking but which is very different from what a man does?
-     - The humanity/rationality plane of AI?
-   - Imitation game
-     - Simulacrum sufficeth
-   - It is probably possible to rear a complete individual from a
-     single cell of the skin (say) of a man . . . but we would not be
-     inclined to regard it as a case of "constructing a thinking
-     machine".
-   - Digital computer:
-     1. Store
-     2. Executive unit
-     3. Control
-   - It is not normally possible to determine from observing a machine
-     whether it has a random element, for a similar effect can be
-     produced by such devices as making the choices depend on the
-     digits of the decimal for $\pi$.
-   - Discrete state machines: strictly speaking there are no such
-     machines. Everything really moves continuously.
-   - This is reminiscent of Laplace's view that from the complete
-     state of the universe at one moment of time, as described by the
-     positions and velocities of all particles, it should be possible
-     to predict all future states.
-   - This special property of digital computers, that they can mimic
-     any discrete state machine, is described by saying that they are
-     universal machines.
-   - "Are there imaginable digital computers which would do well in
-     the imitation game?" $\to$ "Are there discrete state machines
-     which would do well?"
-   - I believe that in about fifty years' time it will be possible to
-     programme computers, with a storage capacity of about $10^9$, to
-     make them play the imitation game so well that an average
-     interrogator will not have more than $70\%$ chance of making the
-     right identification after five minutes of questioning.
-     - Russell/Norvig, 12: storage units: $10^15$
-     - [[http://en.wikipedia.org/wiki/Loebner_Prize#2008][Loebner prize]]:
-       #+BEGIN_QUOTE
-       Elbot of Artificial Solutions won the 2008 Loebner Prize bronze
-       award, for most human-like artificial conversational entity,
-       through fooling three of the twelve judges who interrogated it
-       (in the human-parallel comparisons) into believing it was
-       human. This is coming very close to the $30\%$ traditionally
-       required to consider that a program has actually passed the
-       Turing test.
-       #+END_QUOTE
-       - From a [[http://technology.timesonline.co.uk/tol/news/tech_and_web/article4934858.ece][judge]]:
-         #+BEGIN_QUOTE
-         He predicted that by the end of the century, computers would
-         have a 30 per cent chance of being mistaken for a human being
-         in five minutes of text-based conversation.
-         #+END_QUOTE
-         I thought this was mistaken (should be $70$), but it is
-         indeed correct.
-     - In other words, a damn-good guess.
-   - Conjectures are of great importance since they suggest useful
-     lines of research.
-   - We might expect that He would only exercise this power in
-     conjunction with a mutation which provided the elephant with an
-     appropriately improved brain to minister to the needs of this
-     soul.
-   - We like to believe that Man is in some subtle way superior to the
-     rest of creation.
-   - "The consequences of machines thinking would be too dreadful." I
-     do not think that this argument sufficiently substantial to
-     require refutation. Consolation would would be more appropriate:
-     perhaps this should be sought the transmigration of souls.
-   - There are limitations to the powers of discrete-state
-     machines. The best known of these results is known as Gödel's
-     theorem, and shows that in any sufficiently powerful logical
-     system statements can be formulated which can neither be proved
-     nor disproved within the system, unless possibly the system
-     itself is inconsistent.
-   - "Will this machine every answer 'Yes' to any question?" It can be
-     shown that the answer is either wrong or not forthcoming.
-   - The only way to know that a man thinks is to be that particular
-     man. It is in fact the solipsist point of view.
-   - I do not wish to give the impression that I think there is no
-     mystery about consciousness. There is, for instance, something of
-     a paradox connected with any attempt to localise it.
-   - When a burnt child fears the fire and shows that he fears it by
-     avoiding it, I should say that he was applying scientific
-     induction.
-   - It would deliberately introduce mistakes in a manner calculated
-     to confuse the interrogator.
-   - By observing the results of its own behaviour it can modify its
-     own programmes so as to achieve some purpose more effectively.
-   - This is the assumption that as soon as a fact is presented to a
-     mind all consequences of that fact spring into the mind
-     simultaneously with it.
-   - The undistributed middle is glaring.
-   - I would defy anyone to learn from these replies sufficint about
-     the programme to be able to predict any replies to untried
-     values.
-   - A smallish proportion are super-critical. An idea presented to
-     such a mind may give rise to a whole "theory" consisting of
-     secondary, tertiary and more remote ideas.
-     - Sponteneity
-   - These last two paragraphs should be described as "recitations
-     tending to produce belief."
-   - The only satisfactory support that can be given will be that
-     provided by waiting for the end of the century and then doing the
-     experiment described.
-   - Estimates for the storage capacity of the brain vary from $10^10$
-     to $10^15$ binary digits.
-     - Russell/Norvig (12): $10^13$ synapses
-   - At my present rate of working I produce about a thousand digits
-     of programme a day, so that about sixty workers, working steadily
-     through the fifty years might accomplish the job, if nothing went
-     into the waste-paper basket.
-     - Mythical man-month?
-   - The child-programme and the education process
-   - One might have a complete system of logical inference "built
-     in". The store would be largely occupied with definitions and
-     propositions. Certain propositions may be described as
-     "imperatives". As soon as an imperative is classed as
-     "well-established" the appropriate action takes place.
-     - Compare McCarthy, Programs with Common Sense, regarding
-       imperatives.
-   - These choices make the difference between a brilliant and a
-     footling reasoner.
-   - We can only see a short distance ahead, but we can see plenty
-     there that needs to be done.
-
 * DONE 1.3
   CLOSED: [2011-10-12 Wed 12:58]
   Reflex actions are rational in the sense that they are the result of
@@ -753,6 +620,139 @@
     - Tree-search
       - Family-resemlance; difference: which path to look at first.
     - Depth-first search: shortest-first search
+** Turing, Computing Machinery and Intelligence
+   - Can machines think?
+   - It is A's object in the game to try and cause C to make the wrong
+     identification.
+     - Didn't realize there was an adversarial element to the Turing
+       test.
+   - What will happen when a machine takes the part of A in this game?
+   - . . . drawing a fairly sharp line between the physical and the
+     intellectual capacities of man.
+     - A reasonable dualism
+   - May not machines carry out something which ought to be described
+     as thinking but which is very different from what a man does?
+     - The humanity/rationality plane of AI?
+   - Imitation game
+     - Simulacrum sufficeth
+   - It is probably possible to rear a complete individual from a
+     single cell of the skin (say) of a man . . . but we would not be
+     inclined to regard it as a case of "constructing a thinking
+     machine".
+   - Digital computer:
+     1. Store
+     2. Executive unit
+     3. Control
+   - It is not normally possible to determine from observing a machine
+     whether it has a random element, for a similar effect can be
+     produced by such devices as making the choices depend on the
+     digits of the decimal for $\pi$.
+   - Discrete state machines: strictly speaking there are no such
+     machines. Everything really moves continuously.
+   - This is reminiscent of Laplace's view that from the complete
+     state of the universe at one moment of time, as described by the
+     positions and velocities of all particles, it should be possible
+     to predict all future states.
+   - This special property of digital computers, that they can mimic
+     any discrete state machine, is described by saying that they are
+     universal machines.
+   - "Are there imaginable digital computers which would do well in
+     the imitation game?" $\to$ "Are there discrete state machines
+     which would do well?"
+   - I believe that in about fifty years' time it will be possible to
+     programme computers, with a storage capacity of about $10^9$, to
+     make them play the imitation game so well that an average
+     interrogator will not have more than $70\%$ chance of making the
+     right identification after five minutes of questioning.
+     - Russell/Norvig, 12: storage units: $10^15$
+     - [[http://en.wikipedia.org/wiki/Loebner_Prize#2008][Loebner prize]]:
+       #+BEGIN_QUOTE
+       Elbot of Artificial Solutions won the 2008 Loebner Prize bronze
+       award, for most human-like artificial conversational entity,
+       through fooling three of the twelve judges who interrogated it
+       (in the human-parallel comparisons) into believing it was
+       human. This is coming very close to the $30\%$ traditionally
+       required to consider that a program has actually passed the
+       Turing test.
+       #+END_QUOTE
+       - From a [[http://technology.timesonline.co.uk/tol/news/tech_and_web/article4934858.ece][judge]]:
+         #+BEGIN_QUOTE
+         He predicted that by the end of the century, computers would
+         have a 30 per cent chance of being mistaken for a human being
+         in five minutes of text-based conversation.
+         #+END_QUOTE
+         I thought this was mistaken (should be $70$), but it is
+         indeed correct.
+     - In other words, a damn-good guess.
+   - Conjectures are of great importance since they suggest useful
+     lines of research.
+   - We might expect that He would only exercise this power in
+     conjunction with a mutation which provided the elephant with an
+     appropriately improved brain to minister to the needs of this
+     soul.
+   - We like to believe that Man is in some subtle way superior to the
+     rest of creation.
+   - "The consequences of machines thinking would be too dreadful." I
+     do not think that this argument sufficiently substantial to
+     require refutation. Consolation would would be more appropriate:
+     perhaps this should be sought the transmigration of souls.
+   - There are limitations to the powers of discrete-state
+     machines. The best known of these results is known as Gödel's
+     theorem, and shows that in any sufficiently powerful logical
+     system statements can be formulated which can neither be proved
+     nor disproved within the system, unless possibly the system
+     itself is inconsistent.
+   - "Will this machine every answer 'Yes' to any question?" It can be
+     shown that the answer is either wrong or not forthcoming.
+   - The only way to know that a man thinks is to be that particular
+     man. It is in fact the solipsist point of view.
+   - I do not wish to give the impression that I think there is no
+     mystery about consciousness. There is, for instance, something of
+     a paradox connected with any attempt to localise it.
+   - When a burnt child fears the fire and shows that he fears it by
+     avoiding it, I should say that he was applying scientific
+     induction.
+   - It would deliberately introduce mistakes in a manner calculated
+     to confuse the interrogator.
+   - By observing the results of its own behaviour it can modify its
+     own programmes so as to achieve some purpose more effectively.
+   - This is the assumption that as soon as a fact is presented to a
+     mind all consequences of that fact spring into the mind
+     simultaneously with it.
+   - The undistributed middle is glaring.
+   - I would defy anyone to learn from these replies sufficint about
+     the programme to be able to predict any replies to untried
+     values.
+   - A smallish proportion are super-critical. An idea presented to
+     such a mind may give rise to a whole "theory" consisting of
+     secondary, tertiary and more remote ideas.
+     - Sponteneity
+   - These last two paragraphs should be described as "recitations
+     tending to produce belief."
+   - The only satisfactory support that can be given will be that
+     provided by waiting for the end of the century and then doing the
+     experiment described.
+   - Estimates for the storage capacity of the brain vary from $10^10$
+     to $10^15$ binary digits.
+     - Russell/Norvig (12): $10^13$ synapses
+   - At my present rate of working I produce about a thousand digits
+     of programme a day, so that about sixty workers, working steadily
+     through the fifty years might accomplish the job, if nothing went
+     into the waste-paper basket.
+     - Mythical man-month?
+   - The child-programme and the education process
+   - One might have a complete system of logical inference "built
+     in". The store would be largely occupied with definitions and
+     propositions. Certain propositions may be described as
+     "imperatives". As soon as an imperative is classed as
+     "well-established" the appropriate action takes place.
+     - Compare McCarthy, Programs with Common Sense, regarding
+       imperatives.
+   - These choices make the difference between a brilliant and a
+     footling reasoner.
+   - We can only see a short distance ahead, but we can see plenty
+     there that needs to be done.
+
 * Tasks
 ** DONE Reimplement the Lisp environment in Scheme.
   CLOSED: [2012-06-01 Fri 03:09]
