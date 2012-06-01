@@ -754,6 +754,8 @@
      there that needs to be done.
 
 * Tasks
+** TODO Should we tangle to a bunch of text files?
+   Looking for an alternative to the big-ass pdf.
 ** DONE Reimplement the Lisp environment in Scheme.
   CLOSED: [2012-06-01 Fri 03:09]
   Should we try to map CLOS to [[http://wiki.call-cc.org/eggref/4/coops][coops]]? Or maybe [[http://wiki.call-cc.org/eggref/4/tinyclos][TinyCLOS]] would suffice.
