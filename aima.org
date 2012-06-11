@@ -255,6 +255,10 @@
   are pararational; which is not to say that you couldn't define
   another performance measure $u\prime$ depending upon another time
   $T\prime$.
+
+  See page 38, by the way, where the authors talk about rationality in
+  terms of expected performance; could it be that an agent transcends
+  $T$ with respect to expected performance?
 * Notes
 ** 1
    - Two dimensions: thought vs. action, humanity vs. rationality.
