@@ -224,6 +224,23 @@
 
   The [[http://www.loebner.net/Prizef/loebner-prize.html][Loebner Prize]], on the other hand, seems a little anachronistic;
   do people care whether their AI counterparts really act human?
+* DONE 2.1
+  CLOSED: [2012-06-11 Mon 00:51]
+  It follows directly from the definition of a rational agent, which
+  "maximizes its performance measure, given the evidence provided by
+  the percept sequence" (p. 37), that its action "depends . . . on the
+  time step it has reached."
+
+  This is because the lifetime of an agent is measured by the total
+  number of percepts it receives [fn:4] [fn:5].
+
+  Let $t$ be the time step the agent has reached; if $t \leq T$, the
+  agent's performence measure depends upon the time step it has
+  reached. If $t > T$, on the other hand, the rationality of the agent
+  is undefined; since its performance measure is undefined.
+
+  A rational agent's action, therefore, depends upon $t$ only insofar
+  as its performance measure depends upon $t$.
 * Notes
 ** 1
    - Two dimensions: thought vs. action, humanity vs. rationality.
@@ -783,3 +800,9 @@
 
 [fn:3] Which of these following papers do you think he's talking
   about? Probably the latter: it carries an /et al./
+
+[fn:4] "Let $T$ be the lifetime of the agent (the total number of
+  percepts it will receive)" (p. 47).
+
+[fn:5] The current state of the environment is the same as the current
+  percept, incidentally, if the environment is fully observable.
