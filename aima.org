@@ -239,8 +239,22 @@
   reached. If $t > T$, on the other hand, the rationality of the agent
   is undefined; since its performance measure is undefined.
 
+  At $t > T$, the agent has become pararational (neither rational nor
+  irrational).
+
   A rational agent's action, therefore, depends upon $t$ only insofar
   as its performance measure depends upon $t$.
+
+  Take [[http://en.wikipedia.org/wiki/Opportunity_rover][Opportunity]], for instance, which had a performance measure of
+  $T = 90\ \text{sol}$; as of 2012, it's overstepped $T$ by eight
+  years. If it fails after $T$ to e.g. characterize soil, could you
+  say that it acts rationally? In other words, is [[http://en.wikipedia.org/wiki/Spirit_rover][Spirit]] irrational;
+  now that it has failed to meet its original performance measure?
+
+  No: by their original performance measure, Opportunity and Spirit
+  are pararational; which is not to say that you couldn't define
+  another performance measure $u\prime$ depending upon another time
+  $T\prime$.
 * Notes
 ** 1
    - Two dimensions: thought vs. action, humanity vs. rationality.
