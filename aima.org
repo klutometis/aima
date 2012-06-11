@@ -802,7 +802,8 @@
   about? Probably the latter: it carries an /et al./
 
 [fn:4] "Let $T$ be the lifetime of the agent (the total number of
-  percepts it will receive)" (p. 47).
+  percepts it will receive)" (p. 47). Percepts are the granularity of
+  time.
 
 [fn:5] The current state of the environment is the same as the current
   percept, incidentally, if the environment is fully observable.
