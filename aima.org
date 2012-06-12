@@ -259,8 +259,29 @@
   See page 38, by the way, where the authors talk about rationality in
   terms of expected performance; could it be that an agent transcends
   $T$ with respect to expected performance?
-* TODO 2.2
-  
+* DONE 2.2
+  CLOSED: [2012-06-11 Mon 17:18]
+** DONE a
+   CLOSED: [2012-06-11 Mon 17:18]
+   Page 38 describes an environment which is partially observable,
+   deterministic and static; as such, the tabular agent in Fig. 2.3
+   can expect to maximize its utility in no more than four actions
+   (the worst case is A: dirty, B: dirty; which results in either
+   =suck, right, suck, left, ...= or =suck, left, suck, right, ...=).
+
+   There is no time to e.g. build a model of dirt, since the dirt
+   doesn't replentish itself.
+** DONE b
+   CLOSED: [2012-06-11 Mon 17:18]
+   The agent does require internal state: it should know, for
+   instance, whether it has cleaned every square; and, if so, should
+   stop.
+** DONE c
+   CLOSED: [2012-06-11 Mon 17:18]
+   It should learn the geography of its environment to avoid wasting
+   time trying to move off of it; it could maintain, furthermore, a
+   dirt-distribution across the grid and favor those squares that tend
+   to get dirty.
 * Notes
 ** 1
    - Two dimensions: thought vs. action, humanity vs. rationality.
