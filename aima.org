@@ -282,6 +282,14 @@
    time trying to move off of it; it could maintain, furthermore, a
    dirt-distribution across the grid and favor those squares that tend
    to get dirty.
+* Meetups
+** Tue Jun 12 03:59:25 PDT 2012
+   - Had to redefine the rational from "exercizing reason" to
+     "maximizing utility function" because they gave up an AI as
+     thinking machines in the 60s.
+   - Mitochondria were once autonomous agents; cells as composite
+     agents
+   - Thin vs. thick agents and skynet
 * Notes
 ** 1
    - Two dimensions: thought vs. action, humanity vs. rationality.
