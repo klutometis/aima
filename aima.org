@@ -321,6 +321,9 @@
    - Mitochondria were once autonomous agents; cells as composite
      agents
    - Thin vs. thick agents and skynet
+** Wed Jun 18 05:27:31 PDT 2012
+*** TODO Test a simple agent in each (Python, Java, Clojure) implementation.
+*** TODO See if we can use =xrandr= to get twin-view with an external HDMI.
 * Notes
 ** 1
    - Two dimensions: thought vs. action, humanity vs. rationality.
