@@ -954,3 +954,6 @@
 
 [fn:5] The current state of the environment is the same as the current
   percept, incidentally, if the environment is fully observable.
+
+[fn:6] The agent's minds are unobservable: we have to operate in
+  belief space.
