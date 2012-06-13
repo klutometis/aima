@@ -282,6 +282,37 @@
    time trying to move off of it; it could maintain, furthermore, a
    dirt-distribution across the grid and favor those squares that tend
    to get dirty.
+* DONE 2.3
+  CLOSED: [2012-06-13 Wed 05:40]
+# <<2.3a>>
+  - a :: False. Page 42 mentions that, even in unobservable
+         environments, "the agent's goals may still be achievable,
+         sometimes with certainty;" the reflexive vacuum agent on page
+         38 is an example.
+  - b :: True. In an unknown environment, there is no opportunity for
+         the reflex agent to learn the ``laws of physics'' of the
+         environment (p. 44); or for the programmer to endow the agent
+         with them /a priori/.
+  - c :: True. It's possible to imagine a task environment in which
+         there are no decisions to be made: merely existing, for
+         instance, satisfies the performance measure.
+  - d :: False. According to page 46, the agent program takes the
+         current percept; the agent function, on the other hand, takes
+         the entire percept history.
+  - e :: False. If the agent function is to e.g. determine whether a
+         program will return an answer or run forever (see p. 8); it
+         is not implementable by a program/machine combination.
+         Unless, of course, the author (or agent) has solved the
+         [[http://en.wikipedia.org/wiki/Halting_problem][halting problem]].
+  - f :: True. Take the performance measure, for instance, where an
+         agent is supposed to simulate the roll of a [[http://en.wikipedia.org/wiki/Halting_problem][fair-sided die]].
+  - g :: True. If an agent is a rational NxN tic-tac-toe player, it
+         will perform just as well in a 2x2 as in a 3x3 environment.
+  - h :: False. See [[2.3a][a]]: page 138 describes a sensorless vacuum agent
+         that knows the geography of its world; it's possible to
+         search its belief space and even coerce the world into
+         certain states.
+  - i :: False. Even rational poker-playing agents fall prey to luck.
 * Meetups
 ** Mon Jun 11 21:59:25 PDT 2012
    - Had to redefine the rational from "exercizing reason" to
