@@ -313,6 +313,67 @@
          search its belief space and even coerce the world into
          certain states.
   - i :: False. Even rational poker-playing agents fall prey to luck.
+* DONE 2.4
+  CLOSED: [2012-06-13 Wed 06:47]
+** Soccer
+  - Performance measure :: Score and defend
+  - Environment :: Field
+  - Actuators :: Kicking, thrwing, catching
+  - Sensors :: Topology, ball, agents
+  - Characteristics :: Fully observable, multiagent, stochastic,
+       sequential, dynamic, continuous, known
+** Titan
+  - Performance measure :: Like [[http://en.wikipedia.org/wiki/Titan_Mare_Explorer][TiME]] for surface lakes, it would
+       determine the presence of biological compounds.
+  - Environment :: Titan
+  - Actuators :: Drill, satellite, landing gear
+  - Sensors :: Mass spectrometer, camera
+  - Characteristics :: Partially observable, multiagent? stochastic,
+       sequential, dynamic, continuous, known
+** Shopping on the internet
+  - Performance measure :: Finding used AI books
+  - Environment :: The internet
+  - Actuators :: Form completion, HTTP request, cookie storage
+  - Sensors :: HTML parser
+  - Characteristics :: Partially observable, multiagent, stochastic,
+       sequential, dynamic, continuous, known
+# <<2.4-tennis>>
+** Playing a tennis match
+  - Performance measure :: Winning the match
+  - Environment :: Tennis court
+  - Actuators :: Tennis racket
+  - Sensors :: Location, trajectory of ball, opponent; topology
+  - Characteristics :: Fully observable, multiagent, stochastic,
+       sequential, dynamic, continuous, known
+** Practicing tennis against a wall
+  - Performance measure :: Length of rally
+  - Environment :: Half-court with wall
+  - Actuators :: See [[2.4-tennis][above]].
+  - Sensors :: See [[2.4-tennis][above]] (sans opponent).
+  - Characteristics :: Fully observable, single agent, stochastic,
+       sequential, dynamic, continuous, known
+** Performing a high jump
+  - Performance measure :: Height jumped
+  - Environment :: Measuring stick
+  - Actuators :: Spring
+  - Sensors :: Balance
+  - Characteristics :: Fully observable, single agent, deterministic,
+       episodic, static, continuous, known
+** Knitting a sweater
+  - Performance measure :: Consistency of stitch, conformance to the
+       recipient's body
+  - Environment :: Yarn, recipient's body
+  - Actuators :: Needle
+  - Sensors :: Yarn on needle
+  - Characteristics :: Fully observable, single agent, deterministic,
+       sequential, static, continuous, known
+** Bidding on an item
+  - Performance measure :: Win, save cash
+  - Environment :: Auction
+  - Actuators :: Signify bid
+  - Sensors :: See the artifact, understand the auctioneer
+  - Characteristics :: Partially observable [fn:6], stochastic,
+       sequential, dynamic, continuous, known
 * Meetups
 ** Mon Jun 11 21:59:25 PDT 2012
    - Had to redefine the rational from "exercizing reason" to
