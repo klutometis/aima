@@ -399,7 +399,8 @@
   - Learning agent :: Learning agents hone their sense of appropriate
                       actions by modifying the weights associated with
                       environmental features.
-* TODO 2.6
+* DONE 2.6
+  CLOSED: [2012-06-14 Thu 12:06]
   - a :: There are infinite agent programs that implement a given
          agent function; take, for instance, an agent that perceives
          flashes of light and maps them to some output (say, an
@@ -412,9 +413,16 @@
          determine whether a program stops or not cannot be
          implemented as a progrm (unless one first solves the Halting
          Problem).
-  - c :: 
+  - c :: Yes; which is to say: a program implements a mapping from
+         percepts to actions; to change the mapping, you have to
+         change the program.
   - d :: There would be $2^n$ possible agent programs on an $n$-bit
          machine (not all of them functional).
+         
+         (According to [[http://www.ics.uci.edu/~welling/teaching/ICS171fall10/cs171_hw1_solutions.pdf][this]], there are $a^{2^n}$ possible programs;
+         $2^n$ possible states and $a$ choices for each state. I don't
+         think they're factoring the program into the storage, are
+         they?)
   - e :: Speeding up the agent program does not change the agent
          function; they are orthogonal: the former is concrete, the
          latter abstract.
