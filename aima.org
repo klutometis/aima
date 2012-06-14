@@ -57,17 +57,16 @@
   CLOSED: [2012-05-28 Mon 21:35]
   Aplysia, Eric Kandel
 
-  20,000 neurons; memory-updates/second: 10^-9; cycle time: 10^15,
-  high end;
+  20,000 neurons; memory-updates/second: $10^{-9}$; cycle time:
+  $10^15$, high end;
 
   Is memory-updates/second merely memory / cycle time? In which case:
-  20000 / 10^-9 =
-
-  10^5 (20000) neurons, cycle time: 10^{-3}; memory updates per
-  second? Not sure what the relationship between operations/sec and
-  memory updates/sec; the former is an upper bound, though. Could it
-  be that memory updates/sec is also bounded, somehow, by storage
-  units? There is also the relationship between neuros and synapses.
+  $20000 / 10^-9 = 10^5 (20000)$ neurons, cycle time: $10^{-3}$;
+  memory updates per second? Not sure what the relationship between
+  operations/sec and memory updates/sec; the former is an upper bound,
+  though. Could it be that memory updates/sec is also bounded,
+  somehow, by storage units? There is also the relationship between
+  neuros and synapses.
 
   In humans, [[http://en.wikipedia.org/wiki/Neurons#Connectivity][7,000 synapses per neuron]]; hence 10^14 from 10^11. How
   many synapses per aplysia-neuron?
