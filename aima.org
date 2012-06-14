@@ -373,6 +373,32 @@
   - Sensors :: See the artifact, understand the auctioneer
   - Characteristics :: Partially observable [fn:6], stochastic,
        sequential, dynamic, continuous, known
+* DONE 2.5
+  CLOSED: [2012-06-14 Thu 06:44]
+  - Agent :: An agent is a black box with inputs and outputs that
+             conspires to perform something
+  - Agent function :: The agent function maps inputs to outputs.
+  - Agent program :: The agent program implements the agent function.
+  - Rationality :: Rationality usually means the application of
+                   reason; but because the authors have given up on AI
+                   as "thinking humanly" (p. 2), it has been cheapened
+                   to mean: "act in accordance with this performance
+                   measure we've set up."
+  - Autonomy :: Autonomy is the ability of an agent to select actions
+                beyond the /a priori/ programming of its maker.
+  - Reflex agent :: A reflex agent acts according to the immediate
+                    percept; it has amnesia.
+  - Model-based agent :: A model-based agent acts according to a model
+       of the world it has synthesized from percepts.
+  - Goal-based agent :: Not merely reacting to the environment (or its
+       model thereof), the goal-based agent has a Vorhaben (so to
+       speak) that can inform sequences of actions.
+  - Utility-based agent :: Utility-based agents have internalized
+       their own performance measure; and, as such, are able to decide
+       between conflicting goals.
+  - Learning agent :: Learning agents hone their sense of appropriate
+                      actions by modifying the weights associated with
+                      environmental features.
 * Meetups
 ** Mon Jun 11 21:59:25 PDT 2012
    - Had to redefine the rational from "exercizing reason" to
