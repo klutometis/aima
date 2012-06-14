@@ -399,6 +399,28 @@
   - Learning agent :: Learning agents hone their sense of appropriate
                       actions by modifying the weights associated with
                       environmental features.
+* TODO 2.6
+  - a :: There are infinite agent programs that implement a given
+         agent function; take, for instance, an agent that perceives
+         flashes of light and maps them to some output (say, an
+         integer).
+         
+         The percept sequence could be mapped as an integer encoded as
+         a bit-string of light and dark moments; or a bit-array
+         representing the same thing.
+  - b :: Yes; an agent function whose performance measure is to
+         determine whether a program stops or not cannot be
+         implemented as a progrm (unless one first solves the Halting
+         Problem).
+  - c :: 
+  - d :: There would be $2^n$ possible agent programs on an $n$-bit
+         machine (not all of them functional).
+  - e :: Speeding up the agent program does not change the agent
+         function; they are orthogonal: the former is concrete, the
+         latter abstract.
+         
+         If they don't behave like Hegelian dialectic, they are at
+         least Platonic forms and instantiations.
 * Meetups
 ** Mon Jun 11 21:59:25 PDT 2012
    - Had to redefine the rational from "exercizing reason" to
