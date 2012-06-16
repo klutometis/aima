@@ -429,6 +429,9 @@
          
          If they don't behave like Hegelian dialectic, they are at
          least Platonic forms and instantiations.
+* TODO 2.7
+  Clever: the goal-based agent mutates belief-space based on its best
+  guess; acts accordingly.
 * Meetups
 ** Mon Jun 11 21:59:25 PDT 2012
    - Had to redefine the rational from "exercizing reason" to
