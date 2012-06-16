@@ -982,6 +982,12 @@
      there that needs to be done.
 
 * Tasks
+** TODO Find a reasonable pseudocode package in \LaTeX.
+   See [[http://www.tex.ac.uk/cgi-bin/texfaq2htmllabel%3Dalgorithms][this survey]]. Algorithm2e isn't bad; doesn't seem to have a
+   function, though. [[http://www.math.washington.edu/tex-archive/help/Catalogue/entries/pseudocode.html][Pseudocode]] seems to be relatively natural; even
+   if the output is a little ugly.
+
+   The alternative, I suppose, is straight up lists.
 ** TODO Should we tangle to a bunch of text files?
    Looking for an alternative to the big-ass pdf.
 ** DONE Reimplement the Lisp environment in Scheme.
