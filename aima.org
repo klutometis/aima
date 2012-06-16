@@ -988,6 +988,10 @@
    if the output is a little ugly.
 
    The alternative, I suppose, is straight up lists.
+
+   Algorithm2e has to be wrapped in dollars, which sucks; also:
+   bizarre camel-case macros. Looks good, otherwise. Has no functions,
+   apparently, either.
 ** TODO Should we tangle to a bunch of text files?
    Looking for an alternative to the big-ass pdf.
 ** DONE Reimplement the Lisp environment in Scheme.
