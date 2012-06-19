@@ -469,13 +469,13 @@
      of mutation which will improve it.
      #+END_QUOTE
 *** TODO Test a simple agent in each (Python, Java, Clojure) implementation.
+*** TODO Get some standard cables to connect to the projector.
 *** DONE See if we can use =xrandr= to get twin-view with an external HDMI.
     CLOSED: [2012-06-15 Fri 06:04]
     #+BEGIN_SRC sh
       xrandr --output eDP1 --off
       xrandr --output HDMI1 --mode 1280x720
     #+END_SRC
-*** TODO Get some standard cables to connect to the projector.
 * Notes
 ** 1
    - Two dimensions: thought vs. action, humanity vs. rationality.
