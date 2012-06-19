@@ -444,6 +444,30 @@
      of the environment; requires a theory of mind to discern things
      like: "is he bluffing?"
 ** Wed Jun 18 05:27:31 PDT 2012
+   - David has the international version, which would have you write
+     an essay on evolution and autonomy; see e.g. Turing on child AI:
+     
+     #+BEGIN_QUOTE
+     We have thus divided our problem into two parts. The and
+     child-programme the education process. These two remain very
+     closely connected. We cannot expect to find a good child-machine
+     at the first attempt. One must experiment with teaching one such
+     machine and see how well it learns. One can then try another and
+     see if it is better or worse. There is an obvious connection
+     between this process and evolution, by the identifications
+
+     - Structure of the child machine :: Hereditary material
+     - Changes :: Mutations
+     - Natural selection :: Judgment of the experimenter
+
+     One may hope, however, that this process will be more expeditious
+     than evolution. The survival of the fittest is a slow method for
+     measuring advantages. The experimenter, by the exercise of
+     intelligence, should be able to speed it up. Equally important is
+     the fact that he is not restricted to random mutations. If he can
+     trace a cause for some weakness he can probably think of the kind
+     of mutation which will improve it.
+     #+END_QUOTE
 *** TODO Test a simple agent in each (Python, Java, Clojure) implementation.
 *** DONE See if we can use =xrandr= to get twin-view with an external HDMI.
     CLOSED: [2012-06-15 Fri 06:04]
