@@ -516,6 +516,7 @@
       xrandr --output HDMI1 --mode 1280x720
     #+END_SRC
 ** Mon Jun 25 2012
+*** TODO Get a minimal Clojure example up [[https://github.com/klutometis/aima-clojure][here]].
 *** TODO Set up =csrg.org= with a mailing list.
     This is an alternative to e.g. Google groups and whatever
     mechanism Meetup has.
