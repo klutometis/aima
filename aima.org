@@ -432,6 +432,19 @@
 * TODO 2.7
   Clever: the goal-based agent mutates belief-space based on its best
   guess; acts accordingly.
+** Goal-based agent
+   #+BEGIN_SRC org
+     ,- let
+     ,  - state
+     ,  - model
+     ,  - goals
+     ,  - action
+     ,    - define (goal-based-agent percept)
+     ,      - set! state (update-state state action percept model)
+     ,      - let
+     ,        - action-sequence (search goals state)
+     ,          - return (first action-sequence)
+   #+END_SRC
 * Meetups
 ** Mon Jun 11 21:59:25 PDT 2012
    - Had to redefine the rational from "exercizing reason" to
