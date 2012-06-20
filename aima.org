@@ -429,7 +429,8 @@
          
          If they don't behave like Hegelian dialectic, they are at
          least Platonic forms and instantiations.
-* TODO 2.7
+* DONE 2.7
+  CLOSED: [2012-06-20 Wed 03:52]
   Clever: the goal-based agent mutates belief-space based on its best
   guess; acts accordingly.
 ** Goal-based agent
@@ -442,8 +443,29 @@
      ,    - define (goal-based-agent percept)
      ,      - set! state (update-state state action percept model)
      ,      - let
+     ,        # Shouldn't we distinguish between many different
+     ,        action-sequences; and, if so, how to do so without a utility
+     ,        function: evaluate them against the performance measure?
      ,        - action-sequence (search goals state)
      ,          - return (first action-sequence)
+   #+END_SRC
+** Utility-based agent
+   #+BEGIN_SRC org
+     ,- let
+     ,  - state
+     ,  - model
+     ,  - goals
+     ,  - action
+     ,    - define (utility-based-agent percept)
+     ,      - set! state (update-state state action percept model)
+     ,      - let
+     ,        - probabilities (map probability goals)
+     ,        - utilities (map utility goals)
+     ,          - let
+     ,            - expected-utilities (map * probabilities utilities)
+     ,            - goal-of-maximum-expected-utility (max goals expected-utilities)
+     ,            - action-sequence (search goal-of-maximum-expected-utility state)
+     ,              - return (first action-sequence)
    #+END_SRC
 * Meetups
 ** Mon Jun 11 2012
