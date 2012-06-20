@@ -503,8 +503,12 @@
      trace a cause for some weakness he can probably think of the kind
      of mutation which will improve it.
      #+END_QUOTE
-*** TODO Test a simple agent in each (Python, Java, Clojure) implementation.
-*** TODO Get some standard cables to connect to the projector.
+*** CANCELED Test a simple agent in each (Python, Java, Clojure) implementation.
+    CLOSED: [2012-06-20 Wed 03:19]
+    - CLOSING NOTE [2012-06-20 Wed 03:19] \\
+      Looks like we're going to standardize on Clojure.
+*** DONE Get some standard cables to connect to the projector.
+    CLOSED: [2012-06-20 Wed 03:19]
 *** DONE See if we can use =xrandr= to get twin-view with an external HDMI.
     CLOSED: [2012-06-15 Fri 06:04]
     #+BEGIN_SRC sh
