@@ -521,7 +521,7 @@
     This is an alternative to e.g. Google groups and whatever
     mechanism Meetup has.
 
-    (Or is it =csrg.com=?)
+    (Or is it =csrg.com=? It is indeed =csrg.org=.)
 * Notes
 ** 1
    - Two dimensions: thought vs. action, humanity vs. rationality.
