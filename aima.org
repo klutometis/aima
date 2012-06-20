@@ -467,6 +467,95 @@
      ,            - action-sequence (search goal-of-maximum-expected-utility state)
      ,              - return (first action-sequence)
    #+END_SRC
+* TODO 2.8
+  #+BEGIN_SRC scheme
+    (use
+     debug
+     defstruct
+     vector-lib
+     )
+    
+    (define-record environment
+      terminal?
+      ;; Determine the percept to send to the agent.
+      percept
+      ;; Update the environment according to the agent action.
+      update!
+      performance-measure
+      ;; Update the performance-score according to the
+      ;; performance-measure.
+      score)
+    
+    (define (simulate environment agents)
+      (if (terminal? environment)
+          environment
+          (begin
+            (for-each
+                (lambda (agent)
+                  (let* ((percept (environment-percept environment agent))
+                         (action (agent percept)))
+                    (environment-update! environment action)))
+              agents)
+            (environment-score-set!
+             ((environment-performance-measure environment) environment))
+            (simulate environment agents))))
+    
+    (define-record environment
+      step
+      score)
+    
+    ;;; Maybe this should be abstract enough not to know about agents;
+    ;;; basically updates until terminal.
+    (define (simulate environment)
+      (let next-step
+          ((terminal? ((environment-step environment))))
+        (if terminal?
+            ((environment-score environment))
+            (next-step ((environment-step environment))))))
+    
+    (define-record agent
+      location
+      actuate)
+    
+    (define (make-vacuum-environment world agent)
+      (let ((current-step 0)
+            (lifetime 1000))
+        (make-environment
+          (lambda ()
+            (set! current-step (+ current-step 1))
+            (and (< current-step lifetime)
+                 (let* ((location (agent-location agent))
+                        (action ((agent-actuate agent)
+                                 location
+                                 (vector-ref world location))))
+                   (case action
+                     ((left) (agent-location-set!
+                              agent
+                              (max (- (agent-location agent) 1) 0)))
+                     ((right) (agent-location-set!
+                               agent
+                               (min (+ (agent-location agent) 1) 1)))
+                     ((suck) (vector-set! world (agent-location agent) #f))
+                     (else (error (string-append
+                                   "make-vacuum-environment:environment-step -- "
+                                   "Unknown action")
+                                  action))))))
+          (lambda ()
+            (vector-count (lambda (i x) (not x)) world)))))
+    
+    (simulate
+     (make-vacuum-environment
+      '#(#f #f)
+      (make-agent
+       0
+       (lambda (location dirty?)
+         (if dirty?
+             'suck
+             (if (zero? location)
+                 'right
+                 'left))))))
+    
+  #+END_SRC
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
