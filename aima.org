@@ -489,6 +489,12 @@
       xrandr --output eDP1 --off
       xrandr --output HDMI1 --mode 1280x720
     #+END_SRC
+** Mon Jun 25 2012
+*** TODO Set up =csrg.org= with a mailing list.
+    This is an alternative to e.g. Google groups and whatever
+    mechanism Meetup has.
+
+    (Or is it =csrg.com=?)
 * Notes
 ** 1
    - Two dimensions: thought vs. action, humanity vs. rationality.
