@@ -446,7 +446,7 @@
      ,          - return (first action-sequence)
    #+END_SRC
 * Meetups
-** Mon Jun 11 21:59:25 PDT 2012
+** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
      "maximizing utility function" because they gave up an AI as
      thinking machines in the 60s.
@@ -456,7 +456,7 @@
    - In games like poker, the mind of the adversarial agents are part
      of the environment; requires a theory of mind to discern things
      like: "is he bluffing?"
-** Wed Jun 18 05:27:31 PDT 2012
+** Mon Jun 18 2012
    - David has the international version, which would have you write
      an essay on evolution and autonomy; see e.g. Turing on child AI:
      
