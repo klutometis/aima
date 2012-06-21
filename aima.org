@@ -553,6 +553,10 @@
   I want environmental combinators, incidentally; such that I can
   compose an e.g. step-limited environment with an agent with a vacuum
   one.
+
+  We can compose steps; but how do you compose score: do you have to
+  specify a reducer of some kind; e.g. addition? Is it really
+  environment reduction we're talking about here?
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
