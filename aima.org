@@ -499,35 +499,40 @@
                                ((environment-score environment)))
                              environments)))))
     
-    (define (make-vacuum-environment world agent)
-      (let ((current-step 0)
-            (lifetime 1000))
+    (define (make-step-limited-environment steps)
+      (let ((current-step 0))
         (make-environment
           (lambda ()
             (set! current-step (+ current-step 1))
-            (and (< current-step lifetime)
-                 (let* ((location (agent-location agent))
-                        (action ((agent-actuate agent)
-                                 location
-                                 (vector-ref world location))))
-                   (case action
-                     ((left) (agent-location-set!
-                              agent
-                              (max (- (agent-location agent) 1) 0)))
-                     ((right) (agent-location-set!
-                               agent
-                               (min (+ (agent-location agent) 1) 1)))
-                     ((suck) (vector-set! world (agent-location agent) #f))
-                     (else (error (string-append
-                                   "make-vacuum-environment:environment-step -- "
-                                   "Unknown action")
-                                  action))))))
+            (< current-step steps))
           (lambda ()
-            (vector-count (lambda (i x) (not x)) world)))))
+            0))))
+    
     (define-record agent
       location
       actuate)
     
+    (define (make-vacuum-environment world agent)
+      (make-environment
+        (lambda ()
+          (let* ((location (agent-location agent))
+                 (action ((agent-actuate agent)
+                          location
+                          (vector-ref world location))))
+            (case action
+              ((left) (agent-location-set!
+                       agent
+                       (max (- (agent-location agent) 1) 0)))
+              ((right) (agent-location-set!
+                        agent
+                        (min (+ (agent-location agent) 1) 1)))
+              ((suck) (vector-set! world (agent-location agent) #f))
+              (else (error (string-append
+                            "make-vacuum-environment:environment-step -- "
+                            "Unknown action")
+                           action)))))
+        (lambda ()
+          (vector-count (lambda (i x) (not x)) world))))
     
     (simulate
      (make-vacuum-environment
