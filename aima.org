@@ -491,6 +491,16 @@
     (define-record agent
       location
       actuate)
+    (define (compose-environments . environments)
+      (make-environment
+        (lambda ()
+          (every values (map (lambda (environment)
+                               ((environment-step environment)))
+                             environments)))
+        (lambda ()
+          (reduce + 0 (map (lambda (environment)
+                               ((environment-score environment)))
+                             environments)))))
     
     (define (make-vacuum-environment world agent)
       (let ((current-step 0)
