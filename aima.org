@@ -535,16 +535,18 @@
           (vector-count (lambda (i x) (not x)) world))))
     
     (simulate
-     (make-vacuum-environment
-      '#(#f #f)
-      (make-agent
-       0
-       (lambda (location dirty?)
-         (if dirty?
-             'suck
-             (if (zero? location)
-                 'right
-                 'left))))))
+     (compose-environments
+      (make-step-limited-environment 1000)
+      (make-vacuum-environment
+       '#(#f #f)
+       (make-agent
+        0
+        (lambda (location dirty?)
+          (if dirty?
+              'suck
+              (if (zero? location)
+                  'right
+                  'left)))))))
     
   #+END_SRC
 
