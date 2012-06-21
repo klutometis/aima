@@ -467,11 +467,13 @@
      ,            - action-sequence (search goal-of-maximum-expected-utility state)
      ,              - return (first action-sequence)
    #+END_SRC
-* TODO 2.8
+* DONE 2.8
+  CLOSED: [2012-06-21 Thu 04:39]
+  - CLOSING NOTE [2012-06-21 Thu 04:39] \\
+    See [[https://github.com/klutometis/aima-chicken][aima-chicken]].
   #+BEGIN_SRC scheme
     (use
      debug
-     defstruct
      vector-lib
      )
     
@@ -479,14 +481,11 @@
       step
       score)
     
-    ;;; Maybe this should be abstract enough not to know about agents;
-    ;;; basically updates until terminal.
     (define (simulate environment)
-      (let next-step
-          ((terminal? ((environment-step environment))))
-        (if terminal?
-            ((environment-score environment))
-            (next-step ((environment-step environment))))))
+      (let next-step ((continue? ((environment-step environment))))
+        (if continue?
+            (next-step ((environment-step environment)))
+            ((environment-score environment)))))
     
     (define (compose-environments . environments)
       (make-environment
@@ -534,20 +533,22 @@
         (lambda ()
           (vector-count (lambda (i x) (not x)) world))))
     
+    (define (make-vacuum-agent location)
+      (make-agent
+       location
+       (lambda (location dirty?)
+         (if dirty?
+             'suck
+             (if (zero? location)
+                 'right
+                 'left)))))
+    
     (simulate
      (compose-environments
       (make-step-limited-environment 1000)
       (make-vacuum-environment
-       '#(#f #f)
-       (make-agent
-        0
-        (lambda (location dirty?)
-          (if dirty?
-              'suck
-              (if (zero? location)
-                  'right
-                  'left)))))))
-    
+       '#(#t #t)
+       (make-vacuum-agent 0))))
   #+END_SRC
 
   I want environmental combinators, incidentally; such that I can
