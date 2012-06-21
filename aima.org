@@ -476,31 +476,6 @@
      )
     
     (define-record environment
-      terminal?
-      ;; Determine the percept to send to the agent.
-      percept
-      ;; Update the environment according to the agent action.
-      update!
-      performance-measure
-      ;; Update the performance-score according to the
-      ;; performance-measure.
-      score)
-    
-    (define (simulate environment agents)
-      (if (terminal? environment)
-          environment
-          (begin
-            (for-each
-                (lambda (agent)
-                  (let* ((percept (environment-percept environment agent))
-                         (action (agent percept)))
-                    (environment-update! environment action)))
-              agents)
-            (environment-score-set!
-             ((environment-performance-measure environment) environment))
-            (simulate environment agents))))
-    
-    (define-record environment
       step
       score)
     
