@@ -488,9 +488,6 @@
             ((environment-score environment))
             (next-step ((environment-step environment))))))
     
-    (define-record agent
-      location
-      actuate)
     (define (compose-environments . environments)
       (make-environment
         (lambda ()
@@ -527,6 +524,10 @@
                                   action))))))
           (lambda ()
             (vector-count (lambda (i x) (not x)) world)))))
+    (define-record agent
+      location
+      actuate)
+    
     
     (simulate
      (make-vacuum-environment
