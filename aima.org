@@ -508,6 +508,12 @@
       actuate
       score)
     
+    (define clean #t)
+    (define clean? identity)
+    
+    (define dirty #f)
+    (define dirty? (complement clean?))
+    
     (define (make-vacuum-environment world agent)
       (make-environment
         (lambda ()
