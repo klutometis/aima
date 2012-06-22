@@ -490,6 +490,12 @@
                                ((environment-step environment)))
                              environments)))))
     
+    ;;; Add a performance-measuring environment; how to know that it
+    ;;; applies to the agent?
+    (define (make-performance-measuring-environment performance-measure)
+      (make-environment
+        performance-measure))
+    
     (define (make-step-limited-environment steps)
       (let ((current-step 0))
         (make-environment
@@ -533,12 +539,24 @@
                  'right
                  'left)))))
     
-    (simulate
-     (compose-environments
-      (make-step-limited-environment 1000)
-      (make-vacuum-environment
-       '#(#t #t)
-       (make-vacuum-agent 0))))
+    (let* ((vacuum-agent (make-vacuum-agent 0))
+           (vacuum-world '#(#t #t)))
+      (let ((vacuum-environment
+             (make-vacuum-environment
+              vacuum-world
+              vacuum-agent)))
+        (simulate
+         (compose-environments
+          (make-step-limited-environment 1000)
+          (make-performance-measuring-environment
+           (lambda ()
+             (let ((clean-squares
+                    (vector-count (lambda (i x) x) vacuum-world)))
+               (agent-score-set! vacuum-agent
+                                 (+ (agent-score vacuum-agent)
+                                    clean-squares)))))
+          vacuum-environment))
+        (agent-score vacuum-agent)))
   #+END_SRC
 
   I want environmental combinators, incidentally; such that I can
