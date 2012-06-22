@@ -507,7 +507,8 @@
     
     (define-record agent
       location
-      actuate)
+      actuate
+      score)
     
     (define (make-vacuum-environment world agent)
       (make-environment
