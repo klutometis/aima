@@ -539,6 +539,13 @@
              'suck))
        0))
     
+    (define (vacuum-performance-measure)
+      (let ((clean-squares
+             (vector-count (lambda (i x) x) vacuum-world)))
+        (agent-score-set! vacuum-agent
+                          (+ (agent-score vacuum-agent)
+                             clean-squares))))
+    
     (let* ((vacuum-agent (make-vacuum-agent 0))
            (vacuum-world '#(#t #t)))
       (let ((vacuum-environment
@@ -549,12 +556,7 @@
          (compose-environments
           (make-step-limited-environment 1000)
           (make-performance-measuring-environment
-           (lambda ()
-             (let ((clean-squares
-                    (vector-count (lambda (i x) x) vacuum-world)))
-               (agent-score-set! vacuum-agent
-                                 (+ (agent-score vacuum-agent)
-                                    clean-squares)))))
+           vacuum-performance-measure)
           vacuum-environment))
         (agent-score vacuum-agent)))
   #+END_SRC
