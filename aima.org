@@ -528,9 +528,7 @@
               (else (error (string-append
                             "make-vacuum-environment:environment-step -- "
                             "Unknown action")
-                           action)))))
-        (lambda ()
-          (vector-count (lambda (i x) (not x)) world))))
+                           action)))))))
     
     (define (make-vacuum-agent location)
       (make-agent
