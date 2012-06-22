@@ -612,6 +612,9 @@
   performance scores? In such cases, we'd have to rely on the
   imperfect self-judgement of the agent; and attempt to converge on
   rationality by internal coherence.
+
+  What I'm calling environments, incidentally, are now just functions:
+  step-functions, at that; and can be reduced by =every=.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
