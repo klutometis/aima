@@ -492,8 +492,6 @@
                                ((environment-step environment)))
                              environments)))))
     
-    ;;; Add a performance-measuring environment; how to know that it
-    ;;; applies to the agent?
     (define (make-performance-measuring-environment performance-measure)
       (make-environment
         performance-measure))
