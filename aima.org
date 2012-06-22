@@ -528,7 +528,7 @@
               ((right) (agent-location-set!
                         agent
                         (min (+ (agent-location agent) 1) 1)))
-              ((suck) (vector-set! world (agent-location agent) #t))
+              ((suck) (vector-set! world (agent-location agent) clean))
               (else (error (string-append
                             "make-vacuum-environment:environment-step -- "
                             "Unknown action")
