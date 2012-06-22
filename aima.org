@@ -533,12 +533,13 @@
     (define (make-vacuum-agent location)
       (make-agent
        location
-       (lambda (location dirty?)
-         (if dirty?
-             'suck
+       (lambda (location clean?)
+         (if clean?
              (if (zero? location)
                  'right
-                 'left)))))
+                 'left)
+             'suck))
+       0))
     
     (let* ((vacuum-agent (make-vacuum-agent 0))
            (vacuum-world '#(#t #t)))
