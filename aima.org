@@ -474,6 +474,8 @@
   #+BEGIN_SRC scheme
     (use
      debug
+     foof-loop
+     srfi-1
      vector-lib
      )
     
