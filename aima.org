@@ -553,7 +553,9 @@
                             (+ (agent-score vacuum-agent)
                                clean-squares)))))
     
-    (let ((vacuum-world '#(#t #t))
+    (define make-vacuum-world vector)
+    
+    (let ((vacuum-world (make-vacuum-world clean clean))
           (vacuum-agent (make-vacuum-agent 0)))
       (let ((vacuum-environment
              (make-vacuum-environment
