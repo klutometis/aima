@@ -509,8 +509,11 @@
             (set! current-step (+ current-step 1))
             (< current-step steps)))))
     
+    ;;; Do agent-composition here, too; for locationless agents. Most will
+    ;;; have program (actuate) and scores, though.
     (define-record agent
       location
+      ;; Program
       actuate
       score)
     
