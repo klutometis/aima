@@ -492,7 +492,7 @@
                              environments))))
     
     (define (make-performance-measuring-environment performance-measure)
-      performance-measure)
+      (let performance-measure))
     
     (define (make-step-limited-environment steps)
       (let ((current-step 0))
