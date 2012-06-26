@@ -514,6 +514,12 @@
     (define dirty #f)
     (define dirty? (complement clean?))
     
+    (define left 0)
+    (define left? zero?)
+    
+    (define right 1)
+    (define right? (complement zero?))
+    
     (define (make-vacuum-environment world agent)
       (lambda ()
         (let* ((location (agent-location agent))
@@ -538,7 +544,7 @@
        location
        (lambda (location clean?)
          (if clean?
-             (if (zero? location)
+             (if (left? location)
                  'right
                  'left)
              'suck))
@@ -555,7 +561,7 @@
     (define make-vacuum-world vector)
     
     (let ((vacuum-world (make-vacuum-world dirty clean))
-          (vacuum-agent (make-vacuum-agent 1)))
+          (vacuum-agent (make-vacuum-agent right)))
       (let ((vacuum-environment
              (make-vacuum-environment
               vacuum-world
