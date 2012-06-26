@@ -625,6 +625,24 @@
   Agent combinators are a little tough, though; the performance
   measure has to be aware of the combined features. Can we use some
   kind of message-passing mechanism?
+
+  What stops us, for instance, as modelling the agents as lambdas;
+  too? Part of the problem is the inversion of control: we'd have to
+  pass a message to the agent to store its score, as opposed to
+  manipulating the score directly.
+
+  Every agent would be a dispatch-mechanism that would manage its own
+  meta-variables (including score and e.g. location) on the basis of
+  messages. Is it problematic, however, to have agents managing their
+  own score? Could we have an agent->score mapping in the environment
+  itself? That way, agents only maintain state according to its
+  percepts.
+
+  Score, for instance, is not a percept in the vacuum world; location,
+  however, is. Agents, then, are functions with closures; functions
+  which take as many parameters as their percepts have components. The
+  performance-measuring-environment, therefore, maintains an
+  agent->score table. Yes!
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
