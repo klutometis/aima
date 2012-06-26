@@ -483,7 +483,7 @@
          vector-lib)
     
     (define (simulate environment)
-      (loop ((while ((environment-step environment))))))
+      (loop ((while (environment)))))
     
     (define (compose-environments . environments)
       (make-environment
