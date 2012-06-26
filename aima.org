@@ -477,15 +477,12 @@
   - CLOSING NOTE [2012-06-21 Thu 04:39] \\
     See [[https://github.com/klutometis/aima-chicken][aima-chicken]].
   #+BEGIN_SRC scheme
-    (use
-     debug
-     foof-loop
-     srfi-1
-     vector-lib
-     )
-    
     (define-record environment
       step)
+    (use debug
+         foof-loop
+         srfi-1
+         vector-lib)
     
     (define (simulate environment)
       (loop ((while ((environment-step environment))))))
