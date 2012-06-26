@@ -621,6 +621,10 @@
 
   What I'm calling environments, incidentally, are now just functions:
   step-functions, at that; and can be reduced by =every=.
+
+  Agent combinators are a little tough, though; the performance
+  measure has to be aware of the combined features. Can we use some
+  kind of message-passing mechanism?
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
