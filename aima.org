@@ -669,6 +669,28 @@
       xrandr --output HDMI1 --mode 1280x720
     #+END_SRC
 ** Mon Jun 25 2012
+*** Discussion
+**** 2.1
+     Change performance measure; utility-based agent aware of its own
+     performance measure: can react accordingly? Not a reflex agent,
+     though, that's pre-programmed.
+
+     Example: given a penalty for each move, a reflex agent's expected
+     performance would be just as good as any other's given T = 2; but
+     not when T = 1000 (it would require a state-based agent to
+     realize that the world is clean and stop moving).
+**** 2.2
+     - c :: Memory, motor, bump sensor (or penalty); learn geography,
+            probability of becoming dirty. Clustering algorithm:
+            centers of mass for dirt.
+**** 2.3
+     - a :: Best action given available information.
+     - c :: One-square, not dirty.
+     - d :: Page 51 (program) vs. page 36 (function).
+     - f :: See *c* above.
+     - g :: Stochastic vs. deterministic vacuum world: reflex agents
+            are still rational. Performance measure still the same.
+     - i :: Even an omniscient poker player is subject to luck.
 *** TODO Get a minimal Clojure example up [[https://github.com/klutometis/aima-clojure][here]].
 *** TODO Set up =csrg.org= with a mailing list.
     This is an alternative to e.g. Google groups and whatever
