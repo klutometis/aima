@@ -258,6 +258,11 @@
   See page 38, by the way, where the authors talk about rationality in
   terms of expected performance; could it be that an agent transcends
   $T$ with respect to expected performance?
+
+  Example: given a penalty for each move, a reflex agent's expected
+  performance would be just as good as any other's given T = 2; but
+  not when T = 1000 (it would require a state-based agent to realize
+  that the world is clean and stop moving).
 * DONE 2.2
   CLOSED: [2012-06-11 Mon 17:18]
 ** DONE a
