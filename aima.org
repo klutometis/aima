@@ -486,12 +486,10 @@
       (loop ((while (environment)))))
     
     (define (compose-environments . environments)
-      (make-environment
-        (lambda ()
-          ;; Use `identity' instead.
-          (every values (map (lambda (environment)
-                               ((environment-step environment)))
-                             environments)))))
+      (lambda ()
+        (every identity (map (lambda (environment)
+                               (environment))
+                             environments))))
     
     (define (make-performance-measuring-environment performance-measure)
       (make-environment
