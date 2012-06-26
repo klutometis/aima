@@ -581,6 +581,7 @@
             vacuum-agent))
           vacuum-environment))
         (agent-score vacuum-agent)))
+    
   #+END_SRC
 
   I want environmental combinators, incidentally; such that I can
