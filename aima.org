@@ -496,10 +496,9 @@
     
     (define (make-step-limited-environment steps)
       (let ((current-step 0))
-        (make-environment
-          (lambda ()
-            (set! current-step (+ current-step 1))
-            (< current-step steps)))))
+        (lambda ()
+          (set! current-step (+ current-step 1))
+          (< current-step steps))))
     
     ;;; Do agent-composition here, too; for locationless agents. Most will
     ;;; have program (actuate) and scores, though.
@@ -516,26 +515,23 @@
     (define dirty? (complement clean?))
     
     (define (make-vacuum-environment world agent)
-      (make-environment
-        (lambda ()
-          (let* ((location (agent-location agent))
-                 (action ((agent-actuate agent)
-                          location
-                          (vector-ref world location))))
-            (case action
-              ((left) (agent-location-set!
-                       agent
-                       ;; Is always 0.
-                       (max (- (agent-location agent) 1) 0)))
-              ((right) (agent-location-set!
-                        agent
-                        ;; Is always 1.
-                        (min (+ (agent-location agent) 1) 1)))
-              ((suck) (vector-set! world (agent-location agent) clean))
-              (else (error (string-append
-                            "make-vacuum-environment:environment-step -- "
-                            "Unknown action")
-                           action)))))))
+      (lambda ()
+        (let* ((location (agent-location agent))
+               (action ((agent-actuate agent)
+                        location
+                        (vector-ref world location))))
+          (case action
+            ((left) (agent-location-set!
+                     agent
+                     left))
+            ((right) (agent-location-set!
+                      agent
+                      right))
+            ((suck) (vector-set! world (agent-location agent) clean))
+            (else (error (string-append
+                          "make-vacuum-environment:environment-step -- "
+                          "Unknown action")
+                         action))))))
     
     (define (make-vacuum-agent location)
       (make-agent
