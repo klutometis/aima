@@ -560,8 +560,8 @@
     
     (define make-vacuum-world vector)
     
-    (let ((vacuum-world (make-vacuum-world clean clean))
-          (vacuum-agent (make-vacuum-agent 0)))
+    (let ((vacuum-world (make-vacuum-world dirty clean))
+          (vacuum-agent (make-vacuum-agent 1)))
       (let ((vacuum-environment
              (make-vacuum-environment
               vacuum-world
