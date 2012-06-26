@@ -533,9 +533,11 @@
             (case action
               ((left) (agent-location-set!
                        agent
+                       ;; Is always 0.
                        (max (- (agent-location agent) 1) 0)))
               ((right) (agent-location-set!
                         agent
+                        ;; Is always 1.
                         (min (+ (agent-location agent) 1) 1)))
               ((suck) (vector-set! world (agent-location agent) clean))
               (else (error (string-append
