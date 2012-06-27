@@ -690,6 +690,38 @@
 
   How to make the performance measure part of the environment, so that
   we can relieve the agent from metadata?
+
+  By taking the metadata out of the agent, we have to maintain agent
+  \to metadata mappings in the environment; this is kind of a pain in
+  the ass.
+
+  By maintaining agents-as-lambda, we get a certain flexibility; on
+  the other hand, we shunt some complexity onto the environment: as it
+  has to maintain agent-metadata: score, location, &c.
+
+  Is this an acceptable tradeoff? The alternative, where I need to
+  guess what agents need (program, score, location) seems onerous; for
+  some reason. In practice, however, it may be simpler. We haven't
+  even solved the agent-hashing-problem, for instance (wherein hashing
+  fails if we mutate a field).
+
+  Can we hash closures?
+
+  I want to follow this environment-maintains-agent->metadata-mapping
+  thing and see how far it goes. (I see now why objects are
+  interesting; closures, of course, do the same thing.)
+
+  If =make-*-environment= returned multiple values: the thunk followed
+  by e.g. =agent->score=, =agent->location=; you can ignore the latter
+  values, if you want to.
+
+  Or, we can demand that the user furnish them; better yet, we can
+  give the user the option of furnishing and ignoring them.
+
+  Also, shouldn't we be able to name agents at some point? This would
+  also have to fall within an external data structure. Maybe the
+  record solution isn't problematic if we create ad-hoc agents for
+  each problem.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
