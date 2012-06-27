@@ -704,6 +704,14 @@
   time its program is invoked). The problem with that is that I have
   to pass a percept in to access its state, or store its state some
   other way.
+
+  To avoid namespacing everything (like e.g. =vacuum-agent=, &c.), I'd
+  like to have separate modules; that way, if we need to, we can
+  import with a prefix.
+
+  For learning purposes, we should allow the student to specify no
+  more than the agent program; worry about all the bootstrapping on
+  the back end.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
