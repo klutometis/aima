@@ -480,6 +480,8 @@
     (use debug
          foof-loop
          srfi-1
+         srfi-8
+         srfi-69
          vector-lib)
     
     (define (simulate environment)
@@ -491,8 +493,20 @@
                                (environment))
                              environments))))
     
-    (define (make-performance-measuring-environment performance-measure)
-      (let performance-measure))
+    (define (make-performance-measuring-environment
+             agent->score
+             initial-score
+             update-score
+             performance-measure)
+      (lambda ()
+        (receive (agent score)
+          (performance-measure)
+          (hash-table-update!/default
+           agent->score
+           agent
+           (lambda (current-score)
+             (update-score score current-score))
+           initial-score))))
     
     (define (make-step-limited-environment steps)
       (let ((current-step 0))
@@ -553,15 +567,14 @@
     (define (make-vacuum-performance-measure vacuum-world vacuum-agent)
       (lambda ()
         (let ((clean-squares
-               (vector-count (lambda (i x) x) vacuum-world)))
-          (agent-score-set! vacuum-agent
-                            (+ (agent-score vacuum-agent)
-                               clean-squares)))))
+               (vector-count (lambda (i square) (clean? square)) vacuum-world)))
+          (values vacuum-agent clean-squares))))
     
     (define make-vacuum-world vector)
     
     (let ((vacuum-world (make-vacuum-world dirty clean))
-          (vacuum-agent (make-vacuum-agent right)))
+          (vacuum-agent (make-vacuum-agent right))
+          (agent->score (make-hash-table)))
       (let ((vacuum-environment
              (make-vacuum-environment
               vacuum-world
@@ -570,11 +583,17 @@
          (compose-environments
           (make-step-limited-environment 1000)
           (make-performance-measuring-environment
+           agent->score
+           0
+           +
+           ;; Does this make sense for multi-agents? We'd have to have one
+           ;; performance-measure per agent. If the performance measure
+           ;; were also responsible for updating, we could pull it off.
            (make-vacuum-performance-measure
             vacuum-world
             vacuum-agent))
           vacuum-environment))
-        (agent-score vacuum-agent)))
+        (hash-table->alist agent->score)))
     
   #+END_SRC
 
@@ -643,6 +662,13 @@
   which take as many parameters as their percepts have components. The
   performance-measuring-environment, therefore, maintains an
   agent->score table. Yes!
+
+  Problem is, though, that we'd have to break the nice contract we
+  have: environments are niladic lambdas. To maintain the performance
+  measure table, we'd have to receive the agent and the new score.
+
+  How to make the performance measure part of the environment, so that
+  we can relieve the agent from metadata?
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
