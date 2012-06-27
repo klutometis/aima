@@ -634,7 +634,7 @@
   Every agent would be a dispatch-mechanism that would manage its own
   meta-variables (including score and e.g. location) on the basis of
   messages. Is it problematic, however, to have agents managing their
-  own score? Could we have an agent->score mapping in the environment
+  own score? Could we have an agent \to score mapping in the environment
   itself? That way, agents only maintain state according to its
   percepts.
 
@@ -642,7 +642,7 @@
   however, is. Agents, then, are functions with closures; functions
   which take as many parameters as their percepts have components. The
   performance-measuring-environment, therefore, maintains an
-  agent->score table. Yes!
+  =agent->score= table. Yes!
 
   Problem is, though, that we'd have to break the nice contract we
   have: environments are niladic lambdas. To maintain the performance
