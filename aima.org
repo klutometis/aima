@@ -494,8 +494,11 @@
                                (environment))
                              environments))))
     
-    (define (make-performance-measuring-environment performance-measure)
-      performance-measure)
+    ;;; It would be nice if we could do some update logic here and
+    ;;; separate that from the performance measure.
+    (define (make-performance-measuring-environment update-score
+                                                    performance-measure)
+      (update-score (performance-measure)))
     
     (define (make-step-limited-environment steps)
       (let ((current-step 0))
@@ -552,13 +555,13 @@
                  'left)
              'suck))))
     
-    (define (make-vacuum-performance-measure world agent)
-      (lambda ()
-        (let ((clean-squares
-               (vector-count (lambda (i square) (clean? square)) world)))
-          (vacuum-agent-score-set!
-           agent
-           (+ (vacuum-agent-score agent) clean-squares)))))
+    (define (make-vacuum-performance-measure world)
+      (vector-count (lambda (i square) (clean? square)) world))
+    
+    (define (make-vacuum-score-updater agent)
+      (lambda (score)
+        (vacuum-agent-score-set! agent (+ (vacuum-agent-score agent)
+                                          score))))
     
     (let ((world (make-vacuum-world dirty clean))
           (agent (make-reflex-vacuum-agent right)))
@@ -570,9 +573,8 @@
          (compose-environments
           (make-step-limited-environment 1000)
           (make-performance-measuring-environment
-           (make-vacuum-performance-measure
-            world
-            agent))
+           (make-vacuum-performance-measure world)
+           (make-vacuum-score-update agent))
           vacuum-environment))
         (vacuum-agent-score agent)))
     
