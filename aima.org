@@ -720,6 +720,16 @@
   For learning purposes, we should allow the student to specify no
   more than the agent program; worry about all the bootstrapping on
   the back end.
+
+  We may have to copy worlds, incidentally, to compare how e.g.
+  reflex- vs. state-agents behave; thank goodness for =vector-copy=.
+  (Copy by default?)
+
+  To give feedback to students, should have an e.g.
+  =environment-print= that we can pass around (this sort of
+  function-passing, incidentally, is what Norvig sought to avoid);
+  =environment-print= might happen at every step in e.g. =simulate=.
+  Oh, =make-debugging-environment=.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
