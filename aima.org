@@ -501,12 +501,24 @@
       (lambda ()
         (receive (agent score)
           (performance-measure)
-          (hash-table-update!/default
+          (hash-table-update!
            agent->score
            agent
            (lambda (current-score)
              (update-score score current-score))
-           initial-score))))
+           (lambda ()
+             #;
+             (debug (agent-location agent)
+                    (agent-actuate agent)
+                    (agent-score agent)
+                    (hash-table-keys agent->score)
+                    (map (lambda (table-agent) (eq? table-agent agent))
+                         (hash-table-keys agent->score))
+                    (hash-table-ref/default agent->score agent 2)
+                    (hash agent)
+                    (hash-by-identity agent))
+             (debug agent)
+             initial-score)))))
     
     (define (make-step-limited-environment steps)
       (let ((current-step 0))
@@ -534,35 +546,44 @@
     (define right 1)
     (define right? (complement zero?))
     
-    (define (make-vacuum-environment world agent)
-      (lambda ()
-        (let* ((location (agent-location agent))
-               (action ((agent-actuate agent)
-                        location
-                        (vector-ref world location))))
-          (case action
-            ((left) (agent-location-set!
-                     agent
-                     left))
-            ((right) (agent-location-set!
-                      agent
-                      right))
-            ((suck) (vector-set! world (agent-location agent) clean))
-            (else (error (string-append
-                          "make-vacuum-environment:environment-step -- "
-                          "Unknown action")
-                         action))))))
+    (define make-vacuum-environment
+      (case-lambda
+       ((world agent)
+        (make-vacuum-environment world agent agent->location))
+       ((world agent agent->location)
+        (lambda ()
+          (let* ((location
+                  (hash-table-ref agent->location
+                                  agent
+                                  (lambda ()
+                                    (error
+                                     (string-join
+                                      "make-vacuum-environment --"
+                                      "Couldn't find agent"
+                                      agent)))))
+                 (action ((agent-actuate agent)
+                          location
+                          (vector-ref world location))))
+            (case action
+              ((left) (agent-location-set!
+                       agent
+                       left))
+              ((right) (agent-location-set!
+                        agent
+                        right))
+              ((suck) (vector-set! world (agent-location agent) clean))
+              (else (error (string-join
+                            "make-vacuum-environment:environment-step --"
+                            "Unknown action")
+                           action))))))))
     
     (define (make-vacuum-agent location)
-      (make-agent
-       location
-       (lambda (location clean?)
-         (if clean?
-             (if (left? location)
-                 'right
-                 'left)
-             'suck))
-       0))
+      (lambda (location clean?)
+        (if clean?
+            (if (left? location)
+                'right
+                'left)
+            'suck)))
     
     (define (make-vacuum-performance-measure vacuum-world vacuum-agent)
       (lambda ()
@@ -574,14 +595,14 @@
     
     (let ((vacuum-world (make-vacuum-world dirty clean))
           (vacuum-agent (make-vacuum-agent right))
-          (agent->score (make-hash-table)))
+          (agent->score (make-hash-table eq? hash-by-identity)))
       (let ((vacuum-environment
              (make-vacuum-environment
               vacuum-world
               vacuum-agent)))
         (simulate
          (compose-environments
-          (make-step-limited-environment 1000)
+          (make-step-limited-environment 10)
           (make-performance-measuring-environment
            agent->score
            0
@@ -593,7 +614,7 @@
             vacuum-world
             vacuum-agent))
           vacuum-environment))
-        (hash-table->alist agent->score)))
+        (map agent-score (hash-table-keys agent->score))))
     
   #+END_SRC
 
