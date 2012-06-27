@@ -545,16 +545,22 @@
                           "Unknown action")
                          action))))))
     
-    (define (make-reflex-vacuum-agent location)
-      (make-vacuum-agent
-       location
-       0
-       (lambda (location clean?)
-         (if clean?
-             (if (left? location)
-                 'right
-                 'left)
-             'suck))))
+    (define (reflex-vacuum-agent-program location clean?)
+      (if clean?
+          (if (left? location)
+              'right
+              'left)
+          'suck))
+    
+    (define make-reflex-vacuum-agent
+      (case-lambda
+       ((location)
+        (make-reflex-vacuum-agent location reflex-vacuum-agent-program))
+       ((location program)
+        (make-vacuum-agent
+         location
+         0
+         program))))
     
     (define (make-vacuum-performance-measure world)
       (lambda ()
@@ -565,8 +571,7 @@
         (vacuum-agent-score-set! agent (+ (vacuum-agent-score agent)
                                           score))))
     
-    (let ((world (make-vacuum-world dirty clean))
-          (agent (make-reflex-vacuum-agent right)))
+    (define (simulate-vacuum world agent)
       (simulate
        (compose-environments
         (make-step-limited-environment 1000)
@@ -575,6 +580,9 @@
          (make-vacuum-score-update! agent))
         (make-vacuum-environment world agent)))
       (vacuum-agent-score agent))
+    
+    (simulate-vacuum (make-vacuum-world dirty clean)
+                     (make-reflex-vacuum-agent right))
     
   #+END_SRC
 
