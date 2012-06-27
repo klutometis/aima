@@ -682,6 +682,28 @@
   also have to fall within an external data structure. Maybe the
   record solution isn't problematic if we create ad-hoc agents for
   each problem.
+
+  If we really need to decouple the program from the agent metadata
+  (do we?), one solution is to have an agent->metadata table in the
+  environment; the metadata would be a record containing location,
+  score, name, &c.
+
+  This metadata table, on the other hand, would have to be passed to
+  each subenvironment for composition. Seems like a pain.
+
+  We found that, since environments consist of a step function, we
+  could reduce them to a lambda; let's see if this continues to be the
+  case. For the time being, however, I think using agent-records is
+  simplifying.
+
+  I wouldn't mind agents being lambdas with closures; problem is:
+  can't access the closure without some kind of message passing.
+  (Message passing simulates records.) We could possibly do it with
+  some kind of multiple-return-values hack, in which the subsequent
+  values are ignored (the agent effectively does a state dump every
+  time its program is invoked). The problem with that is that I have
+  to pass a percept in to access its state, or store its state some
+  other way.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
