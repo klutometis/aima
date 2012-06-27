@@ -481,6 +481,7 @@
          foof-loop
          srfi-1
          srfi-8
+         srfi-13
          srfi-69
          vector-lib)
     
@@ -493,46 +494,14 @@
                                (environment))
                              environments))))
     
-    (define (make-performance-measuring-environment
-             agent->score
-             initial-score
-             update-score
-             performance-measure)
-      (lambda ()
-        (receive (agent score)
-          (performance-measure)
-          (hash-table-update!
-           agent->score
-           agent
-           (lambda (current-score)
-             (update-score score current-score))
-           (lambda ()
-             #;
-             (debug (agent-location agent)
-                    (agent-actuate agent)
-                    (agent-score agent)
-                    (hash-table-keys agent->score)
-                    (map (lambda (table-agent) (eq? table-agent agent))
-                         (hash-table-keys agent->score))
-                    (hash-table-ref/default agent->score agent 2)
-                    (hash agent)
-                    (hash-by-identity agent))
-             (debug agent)
-             initial-score)))))
+    (define (make-performance-measuring-environment performance-measure)
+      performance-measure)
     
     (define (make-step-limited-environment steps)
       (let ((current-step 0))
         (lambda ()
           (set! current-step (+ current-step 1))
           (< current-step steps))))
-    
-    ;;; Do agent-composition here, too; for locationless agents. Most will
-    ;;; have program (actuate) and scores, though.
-    (define-record agent
-      location
-      ;; Program
-      actuate
-      score)
     
     (define clean #t)
     (define clean? identity)
@@ -546,75 +515,66 @@
     (define right 1)
     (define right? (complement zero?))
     
-    (define make-vacuum-environment
-      (case-lambda
-       ((world agent)
-        (make-vacuum-environment world agent agent->location))
-       ((world agent agent->location)
-        (lambda ()
-          (let* ((location
-                  (hash-table-ref agent->location
-                                  agent
-                                  (lambda ()
-                                    (error
-                                     (string-join
-                                      "make-vacuum-environment --"
-                                      "Couldn't find agent"
-                                      agent)))))
-                 (action ((agent-actuate agent)
-                          location
-                          (vector-ref world location))))
-            (case action
-              ((left) (agent-location-set!
-                       agent
-                       left))
-              ((right) (agent-location-set!
-                        agent
-                        right))
-              ((suck) (vector-set! world (agent-location agent) clean))
-              (else (error (string-join
-                            "make-vacuum-environment:environment-step --"
-                            "Unknown action")
-                           action))))))))
-    
-    (define (make-vacuum-agent location)
-      (lambda (location clean?)
-        (if clean?
-            (if (left? location)
-                'right
-                'left)
-            'suck)))
-    
-    (define (make-vacuum-performance-measure vacuum-world vacuum-agent)
-      (lambda ()
-        (let ((clean-squares
-               (vector-count (lambda (i square) (clean? square)) vacuum-world)))
-          (values vacuum-agent clean-squares))))
-    
     (define make-vacuum-world vector)
     
-    (let ((vacuum-world (make-vacuum-world dirty clean))
-          (vacuum-agent (make-vacuum-agent right))
-          (agent->score (make-hash-table eq? hash-by-identity)))
+    (define vacuum-world-location vector-ref)
+    
+    (define vacuum-world-location-set! vector-set!)
+    
+    (define-record vacuum-agent
+      location
+      score
+      program)
+    
+    (define (make-vacuum-environment world agent)
+      (lambda ()
+        (let* ((location (vacuum-agent-location agent))
+               (action ((vacuum-agent-program agent)
+                        location
+                        (vacuum-world-location world location))))
+          (case action
+            ((left) (vacuum-agent-location-set! agent left))
+            ((right) (vacuum-agent-location-set! agent right))
+            ((suck) (vacuum-world-location-set! world location clean))
+            (else (error (string-join
+                          "make-vacuum-environment --"
+                          "Unknown action")
+                         action))))))
+    
+    (define (make-reflex-vacuum-agent location)
+      (make-vacuum-agent
+       location
+       0
+       (lambda (location clean?)
+         (if clean?
+             (if (left? location)
+                 'right
+                 'left)
+             'suck))))
+    
+    (define (make-vacuum-performance-measure world agent)
+      (lambda ()
+        (let ((clean-squares
+               (vector-count (lambda (i square) (clean? square)) world)))
+          (vacuum-agent-score-set!
+           agent
+           (+ (vacuum-agent-score agent) clean-squares)))))
+    
+    (let ((world (make-vacuum-world dirty clean))
+          (agent (make-reflex-vacuum-agent right)))
       (let ((vacuum-environment
              (make-vacuum-environment
-              vacuum-world
-              vacuum-agent)))
+              world
+              agent)))
         (simulate
          (compose-environments
-          (make-step-limited-environment 10)
+          (make-step-limited-environment 1000)
           (make-performance-measuring-environment
-           agent->score
-           0
-           +
-           ;; Does this make sense for multi-agents? We'd have to have one
-           ;; performance-measure per agent. If the performance measure
-           ;; were also responsible for updating, we could pull it off.
            (make-vacuum-performance-measure
-            vacuum-world
-            vacuum-agent))
+            world
+            agent))
           vacuum-environment))
-        (map agent-score (hash-table-keys agent->score))))
+        (vacuum-agent-score agent)))
     
   #+END_SRC
 
