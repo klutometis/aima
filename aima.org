@@ -513,6 +513,14 @@
        ((object display)
         (lambda () (display object)))))
     
+    (define (vacuum-world-display world)
+      (pp
+       (vector-append '#(world)
+                      (vector-map
+                       (lambda (i clean?)
+                         (if clean? 'clean 'dirty))
+                       world))))
+    
     (define clean #t)
     (define clean? identity)
     
