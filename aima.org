@@ -594,20 +594,24 @@
         (vacuum-agent-score-set! agent (+ (vacuum-agent-score agent)
                                           score))))
     
-    (define (simulate-vacuum world agent)
-      (simulate
-       (compose-environments
-        (make-step-limited-environment 1000)
-        (make-performance-measuring-environment
-         (make-vacuum-performance-measure world)
-         (make-vacuum-score-update! agent))
-        (make-debug-environment agent)
-        (make-debug-environment world)
-        (make-vacuum-environment world agent)))
-      (vacuum-agent-score agent))
+    (define simulate-vacuum
+      (case-lambda
+       ((world agent) (simulate-vacuum world agent 1000))
+       ((world agent steps)
+        (simulate
+         (compose-environments
+          (make-step-limited-environment steps)
+          (make-performance-measuring-environment
+           (make-vacuum-performance-measure world)
+           (make-vacuum-score-update! agent))
+          (make-debug-environment agent)
+          (make-debug-environment world vacuum-world-display)
+          (make-vacuum-environment world agent)))
+        (vacuum-agent-score agent))))
     
     (simulate-vacuum (make-vacuum-world dirty clean)
-                     (make-reflex-vacuum-agent right))
+                     (make-reflex-vacuum-agent right)
+                     10)
     
   #+END_SRC
 
