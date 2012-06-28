@@ -615,7 +615,6 @@
                       (lambda (location clean?)
                         'right))
                      10)
-    
   #+END_SRC
 
   I want environmental combinators, incidentally; such that I can
