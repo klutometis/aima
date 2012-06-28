@@ -494,8 +494,6 @@
                                (environment))
                              environments))))
     
-    ;;; It would be nice if we could do some update logic here and
-    ;;; separate that from the performance measure.
     (define (make-performance-measuring-environment
              measure-performance
              score-update!)
