@@ -610,7 +610,10 @@
         (vacuum-agent-score agent))))
     
     (simulate-vacuum (make-vacuum-world dirty clean)
-                     (make-reflex-vacuum-agent right)
+                     (make-reflex-vacuum-agent
+                      left
+                      (lambda (location clean?)
+                        'right))
                      10)
     
   #+END_SRC
