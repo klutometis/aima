@@ -546,12 +546,12 @@
     
     (define-record-printer vacuum-agent
       (lambda (vacuum-agent output)
-        #;
         (format output
-                "#,(agent ~a ~a)"
-                (vacuum-agent-location vacuum-agent)
-                (vacuum-agent-score vacuum-agent))
-        (pp (record->vector vacuum-agent) output)))
+                "#(agent ~a ~a)"
+                (if (left? (vacuum-agent-location vacuum-agent))
+                    'left
+                    'right)
+                (vacuum-agent-score vacuum-agent))))
     
     (define (make-vacuum-environment world agent)
       (lambda ()
