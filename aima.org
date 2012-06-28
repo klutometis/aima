@@ -479,6 +479,7 @@
   #+BEGIN_SRC scheme
     (use debug
          foof-loop
+         lolevel
          srfi-1
          srfi-8
          srfi-13
@@ -505,6 +506,13 @@
           (set! current-step (+ current-step 1))
           (< current-step steps))))
     
+    ;;; What about pairs of objects and optional display things.
+    (define make-debug-environment
+      (case-lambda
+       ((object) (make-debug-environment object pp))
+       ((object display)
+        (lambda () (display object)))))
+    
     (define clean #t)
     (define clean? identity)
     
@@ -527,6 +535,15 @@
       location
       score
       program)
+    
+    (define-record-printer vacuum-agent
+      (lambda (vacuum-agent output)
+        #;
+        (format output
+                "#,(agent ~a ~a)"
+                (vacuum-agent-location vacuum-agent)
+                (vacuum-agent-score vacuum-agent))
+        (pp (record->vector vacuum-agent) output)))
     
     (define (make-vacuum-environment world agent)
       (lambda ()
@@ -576,6 +593,8 @@
         (make-performance-measuring-environment
          (make-vacuum-performance-measure world)
          (make-vacuum-score-update! agent))
+        (make-debug-environment agent)
+        (make-debug-environment world)
         (make-vacuum-environment world agent)))
       (vacuum-agent-score agent))
     
