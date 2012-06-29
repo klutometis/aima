@@ -799,7 +799,13 @@
          average-score)))
   #+END_SRC
 * TODO 2.10
-** TODO a
+** DONE a
+   CLOSED: [2012-06-29 Fri 13:29]
+   With a partially observable environment, a simple reflex agent will
+   not be rational (in the sense that its expected performance is not
+   as good as any other's); in other words, it should be scoring about
+   twice as much as this:
+
    #+BEGIN_SRC scheme
      (use aima-vacuum
           test)
@@ -811,6 +817,9 @@
                                   (make-reflex-agent left)))
      
    #+END_SRC
+
+   The reflex agent would require state to determine that e.g. the
+   world was clean and that it didn't need to move anymore.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
