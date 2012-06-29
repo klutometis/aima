@@ -814,8 +814,7 @@
       "Penalizing vacuum with reflex agent"
       998
       (simulate-penalizing-vacuum (make-world dirty dirty)
-                                  (make-reflex-agent left)))
-     
+                                  (make-reflex-agent left)))     
    #+END_SRC
 
    The reflex agent would require state to determine that e.g. the
@@ -867,6 +866,7 @@
                           'left
                           'right)))
                 'suck))))))
+     
    #+END_SRC
 * Meetups
 ** Mon Jun 11 2012
