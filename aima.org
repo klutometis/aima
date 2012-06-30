@@ -798,7 +798,8 @@
          1998.25
          average-score)))
   #+END_SRC
-* TODO 2.10
+* DONE 2.10
+  CLOSED: [2012-06-29 Fri 17:52]
 ** DONE a
    CLOSED: [2012-06-29 Fri 13:29]
    With a partially observable environment, a simple reflex agent will
@@ -819,7 +820,8 @@
 
    The reflex agent would require state to determine that e.g. the
    world was clean and that it didn't need to move anymore.
-** TODO b
+** DONE b
+   CLOSED: [2012-06-29 Fri 17:52]
    #+BEGIN_SRC scheme
      (use aima
           aima-vacuum
@@ -879,7 +881,10 @@
        (make-stateful-reflex-agent left)))
      
    #+END_SRC
-** TODO c
+** DONE c
+   CLOSED: [2012-06-29 Fri 17:52]
+   - CLOSING NOTE [2012-06-29 Fri 17:52] \\
+     Should we actually implement it?
    If the simple and stateful reflex agents are omniscient w.r.t. the
    environment, they are equivalent; the stateful agent will simply
    update its state according to its omniscient percept and the simple
