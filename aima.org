@@ -821,9 +821,12 @@
    world was clean and that it didn't need to move anymore.
 ** TODO b
    #+BEGIN_SRC scheme
-     (use aima-vacuum
+     (use aima
+          aima-vacuum
           test
           vector-lib)
+     
+     (debug? #f)
      
      (define-record unknown)
      
@@ -843,11 +846,12 @@
         ;; We could also make an initial pessimistic hypothesis of all-dirty.
         (let ((world (make-world unknown unknown)))
           (lambda (location clean?)
-            ;; Extra work here every time; otherwise, we'd have an extra
-            ;; `all-clean?' check after we set the state. `vector-set!', I'd
-            ;; wager, is cheaper than `all-clean?'.
             (if clean?
                 (begin
+                  ;; Extra work here every time; otherwise, we'd have an
+                  ;; extra `all-clean?' check after we set the state.
+                  ;; `vector-set!', I'd wager, is cheaper than
+                  ;; `all-clean?'.
                   (vector-set! world location clean)
                   (if (all-clean? world)
                       ;; Symbols appropriate here, or should we have predefined
@@ -866,6 +870,13 @@
                           'left
                           'right)))
                 'suck))))))
+     
+     (test
+      "Stateful agent in penalizing environment (from the egg)"
+      1995
+      (simulate-penalizing-vacuum
+       (make-world dirty dirty)
+       (make-stateful-reflex-agent left)))
      
    #+END_SRC
 * Meetups
