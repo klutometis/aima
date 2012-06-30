@@ -879,6 +879,11 @@
        (make-stateful-reflex-agent left)))
      
    #+END_SRC
+** TODO c
+   If the simple and stateful reflex agents are omniscient w.r.t. the
+   environment, they are equivalent; the stateful agent will simply
+   update its state according to its omniscient percept and the simple
+   one will simply act accordingly.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
