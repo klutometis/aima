@@ -889,6 +889,27 @@
    environment, they are equivalent; the stateful agent will simply
    update its state according to its omniscient percept and the simple
    one will simply act accordingly.
+* TODO 2.11
+** TODO a
+    A simple reflex agent wouldn't be able to explore an environment of
+    unknown extent without exhausting all possible paths of the
+    corresponding $n \times n$ space; given sufficient time, such an
+    exhaustive agent would asymptotically approach rationality toward $t
+    = \infty$.
+
+    Given reasonable time constraints, however, or e.g. penalties for
+    moving, such an agent would not be rational; if it maintained all
+    possible paths in a table, it would also contravene the directive on
+    p. 47:
+
+    #+BEGIN_QUOTE
+    The key challenge for AI is to find out how to write programs that,
+    to the extent possible, produce rational behavior from a smallish
+    program rather than from a vast table.
+    #+END_QUOTE
+
+    More fundamentally, an agent wouldn't be able to exhaust the space
+    without maintaining some sort of state (e.g. paths traversed).
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
