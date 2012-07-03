@@ -910,6 +910,28 @@
 
     More fundamentally, an agent wouldn't be able to exhaust the space
     without maintaining some sort of state (e.g. paths traversed).
+
+    Even more fundamentally, however, the agent can't discern whether
+    it's hit a wall; this changes in [[2.12]], however, when the agent
+    gets a bump sensor.
+** TODO b
+   #+BEGIN_SRC scheme
+     (use aima-vacuum
+          debug
+          srfi-25)
+     
+     
+   #+END_SRC
+
+   #+BEGIN_EXAMPLE
+   ┌─┬┐
+   │ ││
+   └─┴┘
+   #+END_EXAMPLE
+
+   If we get too fancy, it's going to take us a while; why not just
+   draw a couple random barriers in a box? Not enough to probably
+   block access, &c.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
