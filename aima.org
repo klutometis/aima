@@ -987,6 +987,11 @@
     mechanism Meetup has.
 
     (Or is it =csrg.com=? It is indeed =csrg.org=.)
+** Mon Jul  2 2012
+   - Each parameter in the agent-program corresponds to a sensor.
+   - Should we pass a status-variable into the sensor instead of a
+     boolean? Might be more consistent with the singletons. Nah, fuck
+     it.
 * Notes
 ** 1
    - Two dimensions: thought vs. action, humanity vs. rationality.
