@@ -985,6 +985,23 @@
    romantic, however; and their effect should fall prey to the law of
    large numbers if we repeat it enough times.
 
+   We are, of course, constrained by the relative directions up, down,
+   left and right; the degree of any node is therefore $\leq 4$. In
+   that sense, maybe the matrix is a reasonable representation?
+   Barabási-Albert isn't going to be able to create hubs with that
+   sort of upper bound. Push forward anyway, or capitulate to grid?
+
+   I like the idea of a graph, each of whose nodes contains $0 \leq
+   neighbors \leq 4$; which are assigned the arbitrary designations
+   =up=, =down=, =left= and =right=. The only problem is that, for
+   experimentation, we're going to have to generate a complete
+   grid-like world. That is a pain in the ass.
+
+   I take that back: can we create something like a torus or a sphere
+   where the grid wraps around; that is, where every square is totally
+   connected (edges being connected to the opposite edge)? A random
+   reflex-vacuum might be able to do well there.
+
    #+BEGIN_SRC scheme
      (use debug
           srfi-1
