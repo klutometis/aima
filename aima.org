@@ -1002,8 +1002,27 @@
    connected (edges being connected to the opposite edge)? A random
    reflex-vacuum might be able to do well there.
 
+   If with modified Barabási-Albert we're going to have disconnected
+   nodes, by the way, if e.g. $p_i$ is false for every node; or are we
+   guaranteed to connect $m$ nodes every time? See [[http://eaton.math.rpi.edu/CSUMS/Papers/ScaleFree/Scale-Free%2520Networks.pdf][e.g.]]:
+
+   #+BEGIN_QUOTE
+   The generalized creation process of a scale-free-network is defined
+   by Barabasi and Albert [BaBo03]: Start with a small number of nodes
+   $m0$. During each step, insert a new node with connections to $m
+   \leq m0$ existing nodes. The probability $P_v$ of node $v$ being
+   connected to a new node depends on its degree $j_v$. The higher its
+   degree, the greater the probability that it will receive new
+   connections ("the rich get richer").
+   #+END_QUOTE
+
+   Since there's an [[http://www.bsse.ethz.ch/cobi/education/Math_Mod_basic/ex8_2011.pdf][upper bound]] on the dividend, we're going to
+   degenerate into a network whose edges are picked at random; and,
+   worse yet, might end up with many unconnected nodes.
+
    #+BEGIN_SRC scheme
      (use debug
+          random-bsd
           srfi-1
           srfi-69)
      
@@ -1021,6 +1040,11 @@
      
      (define make-node gensym)
      
+     (define (sum-degrees graph)
+       (hash-table-fold graph
+                        (lambda (from to sum) (+ (length to) sum))
+                        0))
+     
      ;;; See this note on cardinality, by the way
      ;;; (<http://en.wikipedia.org/wiki/Cardinality>): "The cardinality of
      ;;; a set A is usually denoted | A |. Alternatively, the cardinality
@@ -1031,7 +1055,9 @@
        (debug (hash-table->alist graph))
        (do ((n-nodes n-nodes (- n-nodes 1)))
            ((zero? n-nodes))
-         ))
+         (do ((m 1 (- m 1)))
+             ((zero? m))
+           )))
      
    #+END_SRC
 * Meetups
