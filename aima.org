@@ -932,6 +932,91 @@
    If we get too fancy, it's going to take us a while; why not just
    draw a couple random barriers in a box? Not enough to probably
    block access, &c.
+
+   The world should be a graph; we'll search on that graph and thereby
+   anticipate chapter 3. Debug output can produce an animated graph
+   over graphviz (see e.g. the Iraq project). Show how the agent moves
+   and the squares clean?
+
+   If we want to create a random graph, but not necessarily a maze
+   that fills up a given extent, we can specify e.g. the number of
+   nodes. We have to have some condition for backtracking, though:
+   random? The fill-up-an-extent maze-algorithm backtracks when it has
+   no unseen neighbors; I suppose we can weight backtrack vs. branch
+   differently and see what happens. I wonder whether e.g. 50/50 will
+   produce a graph with a lot of shallow paths and high branching.
+   Make backtracking and branching relatively expensive, then.
+
+   The random reflex agent might do well in a completely connected
+   graph, incidentally, since it doesn't have to make any decisions
+   about where to go; it might fair poorly in a linear environment,
+   since at least half of the time it will be unable to move.
+
+   It turns out that [[http://en.wikipedia.org/wiki/Random_graph][random graphs]] are an open topic of research; with
+   the [[http://en.wikipedia.org/wiki/Erd%C5%91s%E2%80%93R%C3%A9nyi_model][Erdős–Rényi]], [[Watts-Strogatz]], [[http://en.wikipedia.org/wiki/Barab%C3%A1si%E2%80%93Albert_model][Barabási–Albert]] models. Let's go
+   with Barabási–Albert: it looks relatively easy to implement and has
+   interesting clustering properties (power-law degree-distributions).
+
+   Confer [[http://igraph.sourceforge.net/doc/R/ba.game.html][Gabor Csardi's implementation of Barabási-Albert]], which has
+   zero-appeal and power-of-preferential-attachment parameters; it
+   also begins with one node. It can dispense with the two nodes from
+   WP because of the zero-appeal parameter. It also does directed and
+   undirected; and distinguishes, somehow, between in- and both
+   in-and-out-degrees. It also does not divide by the total number of
+   nodes (or is it the total number of edges?).
+
+   (Holy shit: [[http://www.drdobbs.com/architecture-and-design/simulating-small-world-networks/184405611][this chick]] implements all three in Perl; she claims
+   that you divide by all the degrees in the graph, which is
+   consistent with WP's notation. With Gabor Csardi, she also has a
+   parameter $m$ of edges to add at each time; her graph also starts
+   with no edges, but has $m_0$ nodes at $t_0$; they both discuss the
+   problem of multiple edges: it may not suffice to merely not
+   generate them, you should detect and ignore them. No, wait; she's
+   talking about something different: "To keep the code simple, I
+   don't test whether the $m$ nodes that are connecting to the new
+   node are all different." Gabor, on other hand, talks about an
+   algorithm which "never generates multiple edges." Wait again: she's
+   talking about the same thing. Should we ignore duplicate links and
+   add another; or just refrain from duplicating? Damn.)
+
+   It sounds like we can create a connected-graph if we start with the
+   seed-graph-of-degree-one hack; using zero-appeal, we might have
+   disconnected but dirty squares. Disconnected but dirty squares are
+   romantic, however; and their effect should fall prey to the law of
+   large numbers if we repeat it enough times.
+
+   #+BEGIN_SRC scheme
+     (use debug
+          srfi-1
+          srfi-69)
+     
+     (define (connect! graph connectend connector)
+       (hash-table-update!/default
+        graph
+        connectend
+        (lambda (neighbors)
+          (lset-adjoin eq? neighbors connector))
+        '()))
+     
+     (define (biconnect! graph connectend connector)
+       (connect! graph connectend connector)
+       (connect! graph connector connectend))
+     
+     (define make-node gensym)
+     
+     ;;; See this note on cardinality, by the way
+     ;;; (<http://en.wikipedia.org/wiki/Cardinality>): "The cardinality of
+     ;;; a set A is usually denoted | A |. Alternatively, the cardinality
+     ;;; of a set A may be denoted by n(A), A, or # A."
+     (let ((graph (make-hash-table))
+           (n-nodes 10))
+       (biconnect! graph (make-node) (make-node))
+       (debug (hash-table->alist graph))
+       (do ((n-nodes n-nodes (- n-nodes 1)))
+           ((zero? n-nodes))
+         ))
+     
+   #+END_SRC
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
