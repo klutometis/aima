@@ -1123,6 +1123,10 @@
                          (biconnect! graph from new-node)))))))
            graph))))
      
+     (with-output-to-file "graph.pdf"
+       (lambda () (write-graph-as-pdf (barabási-albert-graph))))
+     
+     (display-pdf "graph.pdf")
      
    #+END_SRC
 * Meetups
