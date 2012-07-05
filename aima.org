@@ -1022,6 +1022,8 @@
 
    #+BEGIN_SRC scheme
      (use debug
+          extras
+          posix
           random-bsd
           srfi-1
           srfi-69)
@@ -1045,19 +1047,42 @@
                         (lambda (from to sum) (+ (length to) sum))
                         0))
      
+     (define (display-graph graph)
+       (display "digraph G {")
+       (for-each (lambda (from) (format #t "~a;" from))
+         (hash-table-keys graph))
+       (hash-table-walk
+        graph
+        (lambda (from to)
+          (for-each (lambda (to) (format #t "~a->~a;" from to)) to)))
+       (display "}\n"))
+     
      ;;; See this note on cardinality, by the way
      ;;; (<http://en.wikipedia.org/wiki/Cardinality>): "The cardinality of
      ;;; a set A is usually denoted | A |. Alternatively, the cardinality
      ;;; of a set A may be denoted by n(A), A, or # A."
      (let ((graph (make-hash-table))
-           (n-nodes 10))
+           (n-nodes 1000))
        (biconnect! graph (make-node) (make-node))
        (debug (hash-table->alist graph))
        (do ((n-nodes n-nodes (- n-nodes 1)))
            ((zero? n-nodes))
-         (do ((m 1 (- m 1)))
-             ((zero? m))
-           )))
+         (let ((new-node (make-node)))
+           (do ((from (hash-table-keys graph) (cdr from))
+                (m 2 (- m 1)))
+               ((or (null? from) (zero? m)))
+             (let ((sum-degrees (sum-degrees graph)))
+               (let* ((from (car from))
+                      (degrees-from (length (hash-table-ref graph from))))
+                 ;; (debug from degrees-from)
+                 (if (and (< degrees-from 4)
+                          (< (random-real) (/ degrees-from sum-degrees)))
+                     (biconnect! graph from new-node)))))))
+       (with-output-to-pipe
+        "dot -Tpng > graph.png"
+        (lambda ()
+          (display-graph graph)))
+       (system "display graph.png"))
      
    #+END_SRC
 * Meetups
