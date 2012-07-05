@@ -1047,20 +1047,18 @@
                         (lambda (from to sum) (+ (length to) sum))
                         0))
      
-     (define (display-graph graph)
-       (display "digraph G {")
-       (for-each (lambda (from) (format #t "~a;" from))
-         (hash-table-keys graph))
-       (hash-table-walk
-        graph
-        (lambda (from to)
-          (for-each (lambda (to) (format #t "~a->~a;" from to)) to)))
-       (display "}\n"))
+     (define (write-graph-as-dot graph)
+       (let ((graph (hash-table-copy graph)))
+         (display "digraph G {")
+         (for-each (lambda (from) (format #t "~a;" from))
+           (hash-table-keys graph))
+         (hash-table-walk
+          graph
+          (lambda (from to)
+            (for-each
+                (lambda (to) (format #t "~a->~a;" from to)) to)))
+         (display "}\n")))
      
-     ;;; See this note on cardinality, by the way
-     ;;; (<http://en.wikipedia.org/wiki/Cardinality>): "The cardinality of
-     ;;; a set A is usually denoted | A |. Alternatively, the cardinality
-     ;;; of a set A may be denoted by n(A), A, or # A."
      (let ((graph (make-hash-table))
            (n-nodes 1000))
        (biconnect! graph (make-node) (make-node))
@@ -1083,6 +1081,22 @@
         (lambda ()
           (display-graph graph)))
        (system "display graph.png"))
+     (define (write-graph-as-pdf graph)
+       (receive (input output id)
+         (process "neato -Tpdf")
+         (with-output-to-port output
+           (lambda () (write-graph-as-dot graph)))
+         (close-output-port output)
+         (with-input-from-port input
+           (lambda ()
+             (do ((line (read-line) (read-line)))
+                 ((eof-object? line))
+               (write-line line))))
+         (close-input-port input)))
+     
+     (define (display-pdf pdf)
+       (system* "evince ~a" pdf))
+     
      
    #+END_SRC
 * Meetups
