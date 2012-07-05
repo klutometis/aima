@@ -1097,6 +1097,32 @@
      (define (display-pdf pdf)
        (system* "evince ~a" pdf))
      
+     ;;; Number of nodes to try and join to the seed.
+     (define default-n-nodes (make-parameter 1000))
+     
+     ;;; Number of edges to attempt to create per step.
+     (define default-m (make-parameter 4))
+     
+     (define barabási-albert-graph
+       (case-lambda
+        (() (barabási-albert-graph (default-n-nodes) (default-m)))
+        ((n-nodes m)
+         (let ((graph (make-hash-table)))
+           (biconnect! graph (make-node) (make-node))
+           (do ((n-nodes n-nodes (- n-nodes 1)))
+               ((zero? n-nodes))
+             (let ((new-node (make-node)))
+               (do ((from (hash-table-keys graph) (cdr from))
+                    (m m (- m 1)))
+                   ((or (null? from) (zero? m)))
+                 (let ((sum-degrees (sum-degrees graph)))
+                   (let* ((from (car from))
+                          (degrees-from (length (hash-table-ref graph from))))
+                     (if (and (< degrees-from 4)
+                              (< (random-real) (/ degrees-from sum-degrees)))
+                         (biconnect! graph from new-node)))))))
+           graph))))
+     
      
    #+END_SRC
 * Meetups
