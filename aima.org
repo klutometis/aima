@@ -1081,6 +1081,30 @@
      ;;; Number of edges to attempt to create per step.
      (define default-m (make-parameter 4))
      
+     ;;; We're going to have to maintain the e.g. clean-dirty data in
+     ;;; separate structures if the graph merely expresses node
+     ;;; relationships.
+     ;;;
+     ;;; That's fine: let's maintain a second hash-table for `node ->
+     ;;; clean?'; so-called obstacles are merely lack of passage.
+     ;;;
+     ;;; We need a mapping from nodes to up, down, left, right; however.
+     ;;; Can we assign this randomly, somehow? Otherwise, we'll get an
+     ;;; up-biased graph; or, rather: an up-, down-, left-, right-biased
+     ;;; graph (in that order).
+     ;;;
+     ;;; Yet another hash-table that assigns direction?
+     ;;;
+     ;;; No: one hash table that expresses the graph structure, another
+     ;;; that maps symbols to objects; which objects contain: status,
+     ;;; relative direction. Problem is: the same node can be linked to
+     ;;; more than once from different relative directions (the graph has
+     ;;; loops; doesn't it? Yes it does: but they're relatively rare. In
+     ;;; this sense: Barabási-Albert graphs are probably different from
+     ;;; grids with sparse obstactles).
+     ;;;
+     ;;; Fuck it: let's have an up-biased graph; maybe the reflex agent can
+     ;;; use that knowledge to its advantage.
      (define barabási-albert-graph
        (case-lambda
         (() (barabási-albert-graph (default-n-nodes) (default-m)))
