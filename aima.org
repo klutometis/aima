@@ -1021,8 +1021,11 @@
    worse yet, might end up with many unconnected nodes.
 
    #+BEGIN_SRC scheme
-     (use debug
+     (use aima
+          aima-vacuum
+          debug
           extras
+          lolevel
           posix
           random-bsd
           srfi-1
@@ -1125,10 +1128,48 @@
                          (biconnect! graph from new-node)))))))
            graph))))
      
-     (with-output-to-file "graph.pdf"
-       (lambda () (write-graph-as-pdf (barabási-albert-graph))))
+     ;; (with-output-to-file "graph.pdf"
+     ;;   (lambda () (write-graph-as-pdf (barabási-albert-graph))))
      
-     (display-pdf "graph.pdf")
+     ;; (display-pdf "graph.pdf")
+     
+     (define-record location
+       clean?
+       up
+       down
+       left
+       right)
+     
+     (define (random-node graph)
+       (let ((nodes (hash-table-keys graph)))
+         (list-ref nodes (random-integer (length nodes)))))
+     
+     (define (graph->world graph)
+       )
+     
+     (let* ((world (barabási-albert-graph))
+            (start (random-node world))
+            (agent (make-reflex-agent
+                    start
+                    (lambda (location clean?) 'right))))
+       (simulate
+        (compose-environments
+         (make-step-limited-environment 10)
+         ;; (make-debug-environment world hash-table->alist)
+         (make-debug-environment agent)
+         (lambda ()
+           (let* ((location (agent-location agent))
+                  (action ((agent-program agent)
+                           location
+                           #t)))
+             (debug-print "agent-action" action)
+             (case action
+               ((left))
+               ((right) (debug-print 'location (hash-table-ref world location)))
+               ((up))
+               ((down))
+               ((noop))
+               (else (error "graph-environment -- Unknown action"))))))))
      
    #+END_SRC
 * Meetups
