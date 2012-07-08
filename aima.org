@@ -1038,6 +1038,7 @@
           aima-vacuum
           debug
           extras
+          files
           lolevel
           posix
           random-bsd
