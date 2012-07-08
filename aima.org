@@ -1355,7 +1355,8 @@
        ;; TODO: make-equilibrium-limited-environment.
        (system* "convert $(find ~a -type f | sort -k 1.~a -n) -loop 0 graph.gif"
                 directory
-                (+ (string-length directory) 2)))
+                (+ (string-length directory) 2))
+       (system "mencoder graph.gif -ovc lavc -o graph.avi"))
      
    #+END_SRC
 
