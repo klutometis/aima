@@ -1284,9 +1284,24 @@
        ;; (display-pdf "world.pdf")
        (simulate
         (compose-environments
-         (make-step-limited-environment 1)
-         (make-debug-environment world hash-table->alist)
-         ;; (make-debug-environment agent)
+         (make-step-limited-environment 1000)
+         ;; (make-debug-environment world hash-table->alist)
+         (make-debug-environment agent)
+         ;; Damn: do we need finalizers for environments, too? In which
+         ;; case: bye-bye environment-as-lambda. Might use initializers, too, in
+         ;; that case.
+         ;;
+         ;; We can protect the user from that complexity by allowing them
+         ;; merely to specify the program in e.g.; wait, never mind: it's
+         ;; requisite complexity.
+         ;;
+         ;; It would be nice if, say, simulate had some finalizers; but we
+         ;; can just run these after simulate.
+         (let ((frame 0))
+           (lambda ()
+             (let ((gif (make-pathname directory (number->string frame) "gif")))
+               (write-world-as-gif world agent frame gif))
+             (set! frame (+ frame 1))))
          (lambda ()
            (let* ((location (agent-location agent))
                   (action ((agent-program agent)
