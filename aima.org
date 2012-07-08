@@ -1173,8 +1173,16 @@
      
      ;;; Labels on edges: left, right, up, down; colors on nodes: white =>
      ;;; clean, gray => dirty, green => agent.
-     (define (write-world-as-dot world agent)
-       (display "digraph G {node [style=filled, fontname=monospace]; edge[fontname=monospace];")
+     ;;;
+     ;;; Can step be part of the world object? It's currently only a
+     ;;; hash-table.
+     (define (write-world-as-dot world agent step)
+       (display "digraph G {")
+       (display "node [style=filled, fontname=monospace];")
+       (display "edge[fontname=monospace];")
+       (format #t "graph [label=\"Score: ~a; step: ~a\"];"
+               (agent-score agent)
+               step)
        (hash-table-walk
         world
         (lambda (name location)
