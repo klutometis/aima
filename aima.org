@@ -1029,6 +1029,10 @@
 
    It's a weird world, though.
 
+   I want to have an environment that spits out an animated graph of
+   where the agent is (green), which cells are dirty (grey), which are
+   clean (white).
+
    #+BEGIN_SRC scheme
      (use aima
           aima-vacuum
