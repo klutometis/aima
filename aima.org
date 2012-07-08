@@ -1330,6 +1330,14 @@
                 (location-status-set! (hash-table-ref world location) clean))
                (else (error "graph-environment -- Unknown action")))))))
        (system "rm -fv graph.gif")
+       ;; Optionally, -resize 50%; &c. Never mind: even at 50%, it's 38 MB
+       ;; (normally 44 MB). At 25%, you're 8 MB; but it's illegible.
+       ;;
+       ;; Might give you the idea, on the other hand; also: state-based
+       ;; agents should reach equilibrium pretty soon, and don't need the
+       ;; full 1000 steps.
+       ;;
+       ;; TODO: make-equilibrium-limited-environment.
        (system* "convert $(find ~a -type f | sort -k 1.~a -n) -loop 0 graph.gif"
                 directory
                 (+ (string-length directory) 2)))
