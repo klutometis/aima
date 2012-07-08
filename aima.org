@@ -1020,6 +1020,15 @@
    degenerate into a network whose edges are picked at random; and,
    worse yet, might end up with many unconnected nodes.
 
+   Can't we just create the world initially, by the way, instead of
+   creating the graph and then the world? Interestingly, the relative
+   directions won't meet up: =up= is paired with =left=, &c. Is such a
+   world physically possible? Yes, if the relative directions for each
+   location are different; they're relative, after all. It shouldn't
+   matter to the agents.
+
+   It's a weird world, though.
+
    #+BEGIN_SRC scheme
      (use aima
           aima-vacuum
