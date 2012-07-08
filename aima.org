@@ -1220,81 +1220,15 @@
             (let* ((rest (make-list (- 4 (length to)) no-passage))
                    (to (append to rest))
                    (to (shuffle to (lambda (x) (random (length to))))))
-              (let ((left (list-ref to left))
-                    (right (list-ref to right))
-                    (up (list-ref to up))
-                    (down (list-ref to down)))
-                (if (passage? left)
-                    (hash-table-update!/default
-                     world
-                     left
-                     (lambda (left)
-                       (debug (location-right left))
-                       (if (no-passage? (location-right left))
-                           (location-right-set! left from))
-                       left)
-                     (make-location (if (< (random-real) 0.5) clean dirty)
-                                    no-passage
-                                    from
-                                    no-passage
-                                    no-passage)))
-                (if (passage? right)
-                    (hash-table-update!/default
-                     world
-                     right
-                     (lambda (right)
-                       (debug (location-left right))
-                       (if (no-passage? (location-left right))
-                           (location-left-set! right from))
-                       right)
-                     (make-location (if (< (random-real) 0.5) clean dirty)
-                                    from
-                                    no-passage
-                                    no-passage
-                                    no-passage)))
-                (if (passage? up)
-                    (hash-table-update!/default
-                     world
-                     up
-                     (lambda (up)
-                       (debug (location-down up))
-                       (if (no-passage? (location-down up))
-                           (location-down-set! up from))
-                       up)
-                     (make-location (if (< (random-real) 0.5) clean dirty)
-                                    no-passage
-                                    no-passage
-                                    no-passage
-                                    from)))
-                (if (passage? down)
-                    (hash-table-update!/default
-                     world
-                     down
-                     (lambda (down)
-                       (debug (location-up down))
-                       (if (no-passage? (location-up down))
-                           (location-up-set! down from))
-                       down)
-                     (make-location (if (< (random-real) 0.5) clean dirty)
-                                    no-passage
-                                    no-passage
-                                    from
-                                    no-passage)))
-                (let ((location
-                       (make-location (if (< (random-real) 0.5)
-                                          clean
-                                          dirty)
-                                      left
-                                      right
-                                      up
-                                      down)))             
-                  (hash-table-update!/default
-                   world
-                   from
-                   (lambda (location)
-     
-                     location)
-                   location))))))
+              (let ((location
+                     (make-location (if (< (random-real) 0.5)
+                                        clean
+                                        dirty)
+                                    (list-ref to left)
+                                    (list-ref to right)
+                                    (list-ref to up)
+                                    (list-ref to down))))             
+                (hash-table-set! world from location)))))
          world))
      
      (define (random-start world)
