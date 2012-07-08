@@ -1180,9 +1180,19 @@
        (display "digraph G {")
        (display "node [style=filled, fontname=monospace];")
        (display "edge[fontname=monospace];")
-       (format #t "graph [label=\"Score: ~a; step: ~a\"];"
-               (agent-score agent)
-               step)
+       ;; Phew: viewports are specified in points at 72 per inch; size is
+       ;; specified in pixels at 96 per inch.
+       (let ((width 1600)
+             (height 900))
+         (let ((width-in-inches (/ width 96))
+               (height-in-inches (/ height 96)))
+           (format #t "graph [fontsize=48.0, viewport=\"~a,~a\", ratio=fill, size=\"~a,~a!\", label=\"Score: ~a; step: ~a\"];"
+                   (* width-in-inches 72)
+                   (* height-in-inches 72)
+                   width-in-inches
+                   height-in-inches
+                   (agent-score agent)
+                   step)))
        (hash-table-walk
         world
         (lambda (name location)
