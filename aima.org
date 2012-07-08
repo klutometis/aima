@@ -1089,7 +1089,7 @@
          (close-input-port input)))
      
      (define (display-pdf pdf)
-       (system* "evince ~a" pdf))
+       (system* "evince -s ~a" pdf))
      
      ;;; Number of nodes to try and join to the seed.
      (define default-n-nodes (make-parameter 1000))
