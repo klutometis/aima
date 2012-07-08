@@ -1121,6 +1121,9 @@
      ;;;
      ;;; Fuck it: let's have an up-biased graph; maybe the reflex agent can
      ;;; use that knowledge to its advantage.
+     ;;;
+     ;;; Should we allow an optional seed here, so we can reproduce the
+     ;;; input?
      (define barabási-albert-graph
        (case-lambda
         (() (barabási-albert-graph (default-n-nodes) (default-m)))
