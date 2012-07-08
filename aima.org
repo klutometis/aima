@@ -1257,13 +1257,15 @@
               (let ((location
                      ;; TODO: An all-dirty world to really differentiate
                      ;; scores.
-                     (make-location (if (< (random-real) 0.5)
-                                        clean
-                                        dirty)
-                                    (list-ref to left)
-                                    (list-ref to right)
-                                    (list-ref to up)
-                                    (list-ref to down))))             
+                     (make-location
+                      ;; (if (< (random-real) 0.5)
+                      ;;     clean
+                      ;;     dirty)
+                      dirty
+                      (list-ref to left)
+                      (list-ref to right)
+                      (list-ref to up)
+                      (list-ref to down))))             
                 (hash-table-set! world from location)))))
          world))
      
