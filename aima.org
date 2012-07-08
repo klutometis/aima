@@ -1170,9 +1170,6 @@
        (lambda (location output)
          (display (record->vector location) output)))
      
-     (define (random-node graph)
-       (let ((nodes (hash-table-keys graph)))
-         (list-ref nodes (random-integer (length nodes)))))
      ;;; Labels on edges: left, right, up, down; colors on nodes: white =>
      ;;; clean, gray => dirty, green => agent.
      (define (write-world-as-dot world agent)
@@ -1220,6 +1217,9 @@
      
      (let* ((world (barabási-albert-graph))
             (start (random-node world))
+     (define (random-start world)
+       (let ((locations (hash-table-keys world)))
+         (list-ref locations (random-integer (length locations)))))
             (agent (make-reflex-agent
                     start
                     (lambda (location clean?) 'right))))
