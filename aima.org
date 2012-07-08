@@ -1221,6 +1221,31 @@
                (write-line line))))
          (close-input-port input)))
      
+     (define (write-world-as-gif world agent)
+       (receive (input output id)
+         (process "neato -Tgif")
+         (with-output-to-port output
+           (lambda () (write-world-as-dot world agent)))
+         ;; (flush-output output)
+         (close-output-port output)
+         (with-input-from-port input
+           (lambda ()
+             (do ((line (read-line) (read-line)))
+                 ((eof-object? line))
+               (write-line line))))
+         ;; (flush-input input)
+         ;; (close-input-port input)
+         ))
+     
+     (define (write-world-as-gif world agent frame gif)
+       (receive (input output id)
+         (process "neato" `("-Tgif" "-o" ,gif))
+         (with-output-to-port output
+           (lambda () (write-world-as-dot world agent frame)))
+         (flush-output output)
+         (close-output-port output)
+         (close-input-port input)))
+     
      (define (graph->world graph)
        (let ((world (make-hash-table)))
          (hash-table-walk
