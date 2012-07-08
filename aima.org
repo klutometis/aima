@@ -1460,6 +1460,11 @@
    #+BEGIN_SRC sh
      mencoder graph.gif -ovc lavc -o graph.avi
    #+END_SRC
+*** DONE TODO: Figure out the correct aspect ratio for [[http://support.google.com/youtube/bin/static.pyhl%3Den&guide%3D1728585&topic%3D1728569&page%3Dguide.cs][youtube]].
+    CLOSED: [2012-07-08 Sun 05:42]
+    - CLOSING NOTE [2012-07-08 Sun 05:42] \\
+      Involves the viewport, &c.
+    Ideally, this would start at graphviz.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
