@@ -1173,6 +1173,34 @@
      (define (random-node graph)
        (let ((nodes (hash-table-keys graph)))
          (list-ref nodes (random-integer (length nodes)))))
+     ;;; Labels on edges: left, right, up, down; colors on nodes: white =>
+     ;;; clean, gray => dirty, green => agent.
+     (define (write-world-as-dot world agent)
+       (display "digraph G {node [style=filled, fontname=monospace]; edge[fontname=monospace];")
+       (hash-table-walk
+        world
+        (lambda (name location)
+          (let ((color
+                 (cond ((eq? (agent-location agent) name) "green")
+                       ((clean? (location-status location)) "white")
+                       (else "gray"))))
+            (format #t "~a [fillcolor=~a];" name color))))
+       (hash-table-walk
+        world
+        (lambda (name location)
+          (let ((left (location-left location))
+                (right (location-right location))
+                (up (location-up location))
+                (down (location-down location)))
+            (if (passage? left)
+                (format #t "~a->~a [label=l];" name left))
+            (if (passage? right)
+                (format #t "~a->~a [label=r];" name right))
+            (if (passage? up)
+                (format #t "~a->~a [label=u];" name up))
+            (if (passage? down)
+                (format #t "~a->~a [label=d];" name down)))))
+       (display "}\n"))
      
      (define (graph->world graph)
        )
