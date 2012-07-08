@@ -1255,6 +1255,8 @@
                    (to (append to rest))
                    (to (shuffle to (lambda (x) (random (length to))))))
               (let ((location
+                     ;; TODO: An all-dirty world to really differentiate
+                     ;; scores.
                      (make-location (if (< (random-real) 0.5)
                                         clean
                                         dirty)
