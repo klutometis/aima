@@ -1153,6 +1153,12 @@
      (define no-passage (make-no-passage))
      (define passage? (complement no-passage?))
      
+     (define up 2)
+     (define up? (cute = <> 2))
+     
+     (define down 3)
+     (define down? (cute = <> 3))
+     
      (define-record location
        clean?
        up
