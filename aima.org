@@ -1330,7 +1330,7 @@
                 (location-status-set! (hash-table-ref world location) clean))
                (else (error "graph-environment -- Unknown action")))))))
        (system "rm -fv graph.gif")
-       (system* "convert $(find ~a -type f | sort -k 1.~a -n) -resize 25% -loop 0 graph.gif"
+       (system* "convert $(find ~a -type f | sort -k 1.~a -n) -loop 0 graph.gif"
                 directory
                 (+ (string-length directory) 2)))
      
