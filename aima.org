@@ -1160,11 +1160,15 @@
      (define down? (cute = <> 3))
      
      (define-record location
-       clean?
-       up
-       down
+       status
        left
-       right)
+       right
+       up
+       down)
+     
+     (define-record-printer location
+       (lambda (location output)
+         (display (record->vector location) output)))
      
      (define (random-node graph)
        (let ((nodes (hash-table-keys graph)))
