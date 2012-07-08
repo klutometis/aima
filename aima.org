@@ -1306,7 +1306,7 @@
            (let* ((location (agent-location agent))
                   (action ((agent-program agent)
                            location
-                           #t)))
+                           (clean? (location-status (hash-table-ref world location))))))
              (debug-print "agent-action" action)
              (case action
                ((left)
