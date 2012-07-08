@@ -1297,19 +1297,24 @@
                    location))))))
          world))
      
-     (let* ((world (barabási-albert-graph))
-            (start (random-node world))
      (define (random-start world)
        (let ((locations (hash-table-keys world)))
          (list-ref locations (random-integer (length locations)))))
+     
+     (let* ((world (graph->world (barabási-albert-graph)))
+            (start (random-start world))
             (agent (make-reflex-agent
                     start
                     (lambda (location clean?) 'right))))
+       (write-world-as-dot world agent)
+       (with-output-to-file "world.pdf"
+         (lambda () (write-world-as-pdf world agent)))
+       (display-pdf "world.pdf")
        (simulate
         (compose-environments
-         (make-step-limited-environment 10)
-         ;; (make-debug-environment world hash-table->alist)
-         (make-debug-environment agent)
+         (make-step-limited-environment 1)
+         (make-debug-environment world hash-table->alist)
+         ;; (make-debug-environment agent)
          (lambda ()
            (let* ((location (agent-location agent))
                   (action ((agent-program agent)
