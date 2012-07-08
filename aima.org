@@ -1366,6 +1366,7 @@
        (system* "convert $(find ~a -type f | sort -k 1.~a -n) -loop 0 graph.gif"
                 directory
                 (+ (string-length directory) 2))
+       (system* "identify ~a/0.gif" directory)
        (system "mencoder graph.gif -ovc lavc -o graph.avi"))
      
    #+END_SRC
