@@ -1329,6 +1329,13 @@
                ((suck)
                 (location-status-set! (hash-table-ref world location) clean))
                (else (error "graph-environment -- Unknown action")))))))
+       (system "rm -fv graph.gif")
+       ;; (system* "find ~a -type f | sort -k 1.~a -n"
+       ;;          directory
+       ;;          (+ (string-length directory) 2)) 
+       (system* "convert $(find ~a -type f | sort -k 1.~a -n) -resize 25% -loop 0 graph.gif"
+                directory
+                (+ (string-length directory) 2)))
      
    #+END_SRC
 
