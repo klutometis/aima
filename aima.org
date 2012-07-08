@@ -1273,11 +1273,15 @@
             (start (random-start world))
             (agent (make-reflex-agent
                     start
-                    (lambda (location clean?) 'right))))
-       (write-world-as-dot world agent)
-       (with-output-to-file "world.pdf"
-         (lambda () (write-world-as-pdf world agent)))
-       (display-pdf "world.pdf")
+                    (lambda (location clean?)
+                      (if clean?
+                          (list-ref '(left right up down) (random 4))
+                          'suck))))
+            (directory (create-temporary-directory)))
+       ;; (write-world-as-dot world agent)
+       ;; (with-output-to-file "world.pdf"
+       ;;   (lambda () (write-world-as-pdf world agent)))
+       ;; (display-pdf "world.pdf")
        (simulate
         (compose-environments
          (make-step-limited-environment 1)
