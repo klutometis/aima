@@ -1833,6 +1833,15 @@
       (define (display-pdf pdf)
         (system* "evince -s ~a" pdf))
       
+      (define (write-world-as-gif world agent frame gif)
+        (receive (input output id)
+          (process "neato" `("-Tgif" "-o" ,gif))
+          (with-output-to-port output
+            (lambda () (write-world-as-dot world agent frame)))
+          (flush-output output)
+          (close-output-port output)
+          (close-input-port input)))
+      
       
     #+END_SRC
 *** TODO Stateful graph agent
