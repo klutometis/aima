@@ -1484,6 +1484,310 @@
    #+BEGIN_SRC sh
      mencoder graph.gif -ovc lavc -o graph.avi
    #+END_SRC
+*** TODO Depth-first graph constructor
+    Like Barabási-Albert, the probability of branching is relative to
+    the degree of the current node (plus some probability for
+    degreeless nodes); otherwise, follow a random branch; otherwise,
+    backtrack.
+
+    #+BEGIN_SRC org
+      ,- make-seed-world
+      ,  - let
+      ,    - world make-hash-table
+      ,    - root make-node
+      ,    - child make-node
+      ,      - biconnect! world root child (random 4)
+      ,      - values world root
+      ,- # Let's recreate location-left{,-set!}, &c.
+      ,- make-preferential-depth-first-world n-nodes
+      ,  - receive world root
+      ,    - make-seed-world
+      ,    - let iter
+      ,      - node root
+      ,      - n-nodes n-nodes
+      ,      - n-degrees 0
+      ,        - if zero? n-nodes
+      ,          - world
+      ,          - hash-table-update
+      ,            - world
+      ,            - node
+      ,            - lambda location
+      ,              - # Wouldn't we make it easier on ourselves by having
+      ,                the children of location be a tetradic vector with
+      ,                left, right, up and down? Yes, a thousand times yes!
+      ,              - # If barabási dictates add a child, add it; otherwise,
+      ,                take a random path. This random path could backtrack,
+      ,                or it could continue on.
+      ,              - # Keep adding until we have the requisite number of
+      ,                nodes.
+      ,              - let
+      ,                - degrees-from
+      ,                  - vector-fold
+      ,                  - lambda (i degrees passage) if (no-passage? passage)
+      ,                    degrees (+ degrees 1)
+      ,                  - 0
+      ,                  - location-passages location
+      ,                - if
+      ,                  - and
+      ,                    - < degrees-from 4
+      ,                    - < (random-real) (/ degrees-from n-degress)
+      ,                  - let
+      ,                    - directions-from
+      ,                      - vector-fold
+      ,                        - lambda (direction directions-from passage) if
+      ,                          (no-passage? passage) (cons direction
+      ,                          directions-from) directions-from
+      ,                        - '()
+      ,                        - location-passages location
+      ,                    - direction (list-ref directions-from (random
+      ,                      (length directions-from)))
+      ,                      - let new-node (make-node)
+      ,                        - # Maybe biconnect! can take care of adding the
+      ,                          node to the world?
+      ,                        - biconnect! world node new-node direction
+      ,                        - iter new-node (- n-nodes 1) (+ n-degrees 2)
+      ,                  - let
+      ,                    - passages-from
+      ,                      - vector-fold
+      ,                        - lambda (direction passages-from passage) if
+      ,                          (passage? passage) (cons passage
+      ,                          passages-from) passages-from
+      ,                        - '()
+      ,                        - location-passages location
+      ,                    - passage (list-ref
+      ,            - make-location
+      ,              - dirty
+      ,              - #(no-passage no-passage no-passage no-passage)
+    #+END_SRC
+
+    #+BEGIN_SRC scheme
+      (use aima
+           aima-vacuum
+           debug
+           random-bsd
+           vector-lib)
+      
+      (define-record no-passage)
+      (define no-passage (make-no-passage))
+      (define passage? (complement no-passage?))
+      
+      (define up 2)
+      (define up? (cute = <> 2))
+      
+      (define down 3)
+      (define down? (cute = <> 3))
+      
+      (define-record location
+        status
+        neighbors)
+      
+      (define-record-printer location
+        (lambda (location output)
+          (display (record->vector location) output)))
+      
+      (define make-node gensym)
+      
+      (define (random-direction) (random 4))
+      
+      (define (make-seed-world)
+        (let ((world (make-hash-table))
+              (start (make-node))
+              (neighbor (make-node)))
+          (connect! world start neighbor (random-direction))
+          world))
+      
+      (define (random-start world)
+        (let ((nodes (hash-table-keys world)))
+          (list-ref nodes (random-integer (length nodes)))))
+      
+      (define (make-dirty-location)
+        (make-location dirty
+                       (vector no-passage
+                               no-passage
+                               no-passage
+                               no-passage)))
+      
+      (define (count-nodes world)
+        (length (hash-table-keys world)))
+      
+      (define (count-degrees world)
+        (hash-table-fold
+         world
+         (lambda (node location n-degrees)
+           (+ n-degrees (vector-count
+                         (lambda (direction neighbor)
+                           (passage? neighbor))
+                         (location-neighbors location))))
+         0))
+      
+      (define (connect! world connectend connector direction)
+        (let ((counter-direction
+               (cond ((left? direction) right)
+                     ((right? direction) left)
+                     ((up? direction) down)
+                     ((down? direction) up))))
+          (hash-table-update!/default
+           world
+           connectend
+           (lambda (location)
+             (vector-set! (location-neighbors location) direction connector)
+             location)
+           (make-dirty-location))
+          (hash-table-update!/default
+           world
+           connector
+           (lambda (location)
+             (vector-set! (location-neighbors location) counter-direction connectend)
+             location)
+           (make-dirty-location))))
+      
+      ;;; This, of course, won't produce any cycles.
+      (define (make-preferential-depth-first-world n-nodes)
+        (let* ((world (make-seed-world))
+               (start (random-start world)))
+          (let iter ((node start)
+                     (n-nodes
+                      (max 0 (- n-nodes (count-nodes world))))
+                     (n-degrees (count-degrees world)))
+            (if (zero? n-nodes)
+                world
+                (let ((location
+                       (hash-table-ref/default
+                        world
+                        node
+                        (make-dirty-location))))
+                  (let ((n-neighbors
+                         (vector-fold
+                          (lambda (direction n-neighbors neighbor)
+                            (if (no-passage? neighbor)
+                                n-neighbors
+                                (+ n-neighbors 1)))
+                          0
+                          (location-neighbors location))))
+                    (if (and (< n-neighbors 4)
+                             (< (random-real) (/ n-neighbors n-degrees)))
+                        (let* ((new-directions
+                                (vector-fold
+                                 (lambda (direction directions neighbor)
+                                   (if (no-passage? neighbor)
+                                       (cons direction directions)
+                                       directions))
+                                 '()
+                                 (location-neighbors location)))
+                               (new-direction
+                                (list-ref
+                                 new-directions
+                                 (random (length new-directions)))))
+                          ;; To make this Barabási-like, we could try to
+                          ;; pick a preëxisting node; and, failing that,
+                          ;; produce one.
+                          (let ((new-node (make-node)))
+                            (connect! world node new-node new-direction)
+                            (iter new-node (- n-nodes 1) (+ n-degrees 2))))
+                        (let* ((neighbors
+                                (vector-fold
+                                 (lambda (direction neighbors neighbor)
+                                   (if (passage? neighbor)
+                                       (cons neighbor neighbors)
+                                       neighbors))
+                                 '()
+                                 (location-neighbors location)))
+                               (neighbor
+                                (list-ref neighbors
+                                          (random (length neighbors)))))
+                          (iter neighbor n-nodes n-degrees)))))))))
+      
+      (define default-width (make-parameter 1600))
+      
+      (define default-height (make-parameter 900))
+      
+      ;;; Height and width are in pixels.
+      (define write-dot-preamble
+        (case-lambda
+         ((agent step)
+          (write-dot-preamble agent step (default-height) (default-width)))
+         ((agent step height width)
+          (display "digraph G {")
+          (display "node [style=filled, fontname=monospace];")
+          (display "edge [fontname=monospace];")
+          (if (and height width)
+              (begin
+                (display "graph [fontsize=48.0, ratio=fill];")
+                ;; Phew: viewports are specified in points at 72 per inch;
+                ;; size is specified in pixels at 96 per inch.
+                (let ((width-in-inches (/ width 96))
+                      (height-in-inches (/ height 96)))
+                  (format #t "graph [viewport=\"~a,~a\", size=\"~a,~a!\"];"
+                          (* width-in-inches 72)
+                          (* height-in-inches 72)
+                          width-in-inches
+                          height-in-inches))))
+          (if step
+              (format #t "graph [label=\"Score: ~a; step: ~a\"]"
+                      (agent-score agent)
+                      step)))))
+      
+      (define (write-dot-nodes world agent)
+        (hash-table-walk
+         world
+         (lambda (name location)
+           (let ((color
+                  (cond ((eq? (agent-location agent) name) "green")
+                        ((clean? (location-status location)) "white")
+                        (else "gray"))))
+             (format #t "~a [fillcolor=~a];" name color)))))
+      
+      (define (write-dot-edges world)
+        (hash-table-walk
+         world
+         (lambda (name location)
+           (let ((left (vector-ref (location-neighbors location) left))
+                 (right (vector-ref (location-neighbors location) right))
+                 (up (vector-ref (location-neighbors location) up))
+                 (down (vector-ref (location-neighbors location) down)))
+             (if (passage? left)
+                 (format #t "~a->~a [label=l];" name left))
+             (if (passage? right)
+                 (format #t "~a->~a [label=r];" name right))
+             (if (passage? up)
+                 (format #t "~a->~a [label=u];" name up))
+             (if (passage? down)
+                 (format #t "~a->~a [label=d];" name down))))))
+      
+      (define (write-dot-postscript) (display "}\n"))
+      
+      (define write-world-as-dot
+        (case-lambda
+         ((world agent) (write-world-as-dot world agent #f))
+         ((world agent step)
+          (write-world-as-dot world agent step (default-height) (default-width)))
+         ((world agent step height width)
+          (write-dot-preamble agent step height width)
+          (write-dot-nodes world agent)
+          (write-dot-edges world)
+          (write-dot-postscript))))
+      
+      (define (write-world-as-pdf world agent pdf)
+        (receive (input output id)
+          (process "neato" `("-Tpdf" "-o" ,pdf))
+          (with-output-to-port output
+            ;; Do we really need a blank label, for some reason?
+            (lambda () (write-world-as-dot world agent #f #f #f)))
+          (flush-output output)
+          (close-output-port output)
+          (close-input-port input)))
+      
+      (write-world-as-pdf
+       (make-preferential-depth-first-world 25)
+       (make-reflex-agent 'harro (lambda (location clean?) 2))
+       "world.pdf")
+      
+      (define (display-pdf pdf)
+        (system* "evince -s ~a" pdf))
+      
+      (display-pdf "world.pdf")
+      
+    #+END_SRC
 *** TODO Stateful graph agent
     The stateful graph agent has to divine indirectly that it
     encountered an obstacle based on whether or not the last action
