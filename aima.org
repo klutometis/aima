@@ -1793,6 +1793,38 @@
     encountered an obstacle based on whether or not the last action
     was movement and whether or not it's in the same position (this
     will change slightly with the bump sensor in [[2.12]]).
+    
+    #+BEGIN_SRC org
+      ,- let
+      ,  - world make-hash-table
+      ,    # This is going to have to be a stack: we're iterating here, after
+      ,    all. Ah, the problem is that we can't recurse back up the tree
+      ,    because the relative directions are asymmetrical.
+      
+      ,    I knew this would bite me in the ass; or is there a more expensive
+      ,    way to backtrack? Can't e.g. try random directions because there's
+      ,    no way back.
+      
+      ,    Is it possible, somehow, to progress through the world via random
+      ,    walk; turning away when we encounter a taken path? No, we need to
+      ,    be able to backtrack.
+      ,  - last-action #f
+      ,  - last-location #f
+      ,  - lambda location clean?
+      ,    - hash-table-update!/default
+      ,      - world
+      ,      - location
+      ,      - lambda location
+      ,        - location-status-set! location (if clean? clean dirty)
+      ,        - if eq? last-location location
+      ,          - case last-action
+      ,            - left location-set-left! my-location left no-passage
+      ,            - right location-set-left! my-location right no-passage
+      ,            - up location-set-left! my-location up no-passage
+      ,            - down location-set-left! my-location down no-passage
+      ,      - make-location unknown unknown unknown unknown unknown
+      
+    #+END_SRC
 *** TODO =make-equilibrium-limited-environment=
     Compare the delta on scores for some sort of equilibrium; or lack
     of movement?
