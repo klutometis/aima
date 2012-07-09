@@ -1323,6 +1323,19 @@
      
      (define (make-graph-world) (graph->world (barabási-albert-graph)))
      
+     (define (make-graph-performance-measure world agent)
+       (lambda ()
+         (let ((clean-locations
+                ;; Quicker with map and apply?
+                (hash-table-fold
+                 world
+                 (lambda (name location clean-locations)
+                   (if (clean? (location-status location))
+                       (+ clean-locations 1)
+                       clean-locations))
+                 0)))
+           (agent-score-set! agent (+ (agent-score agent) clean-locations)))))
+     
             (start (random-start world))
             (agent (make-reflex-agent
                     start
