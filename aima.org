@@ -1359,6 +1359,14 @@
         (let ((world (make-hash-table)))
           (lambda (location clean?)
             'right))))
+     
+     (define (make-finalizing-environment finalizer final-step)
+       (let ((step 0))
+         (lambda ()
+           (set! step (+ step 1))
+           (let ((continue? (< step final-step)))
+             (if (not continue?) (finalizer))
+             continue?))))
          (system "rm -fv graph.gif")
          (system* "convert $(find ~a -type f | sort -k 1.~a -n) -loop 0 graph.gif"
                   directory
