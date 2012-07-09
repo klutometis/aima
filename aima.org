@@ -1320,6 +1320,9 @@
              ((suck)
               (location-status-set! (hash-table-ref world location) clean))
              (else (error "graph-environment -- Unknown action"))))))
+     
+     (define (make-graph-world) (graph->world (barabási-albert-graph)))
+     
             (start (random-start world))
             (agent (make-reflex-agent
                     start
