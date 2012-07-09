@@ -1681,6 +1681,17 @@
                           ;; To make this Barabási-like, we could try to
                           ;; pick a preëxisting node; and, failing that,
                           ;; produce one.
+                          ;;
+                          ;; Why not just produce a direction-sensitive
+                          ;; Barabási? Now that we have neighbors as a
+                          ;; vector, it should be less unpleasant.
+                          ;;
+                          ;; To connect this node to a preëxisting one,
+                          ;; however; we'd have to find nodes with
+                          ;; compatible, available directions.
+                          ;;
+                          ;; We could produce a tree, of course, and
+                          ;; randomly create appropriate cycles.
                           (let ((new-node (make-node)))
                             (connect! world node new-node new-direction)
                             (iter new-node (- n-nodes 1) (+ n-degrees 2))))
