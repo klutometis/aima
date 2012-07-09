@@ -1171,28 +1171,6 @@
        (lambda (location output)
          (display (record->vector location) output)))
      
-     ;;; Labels on edges: left, right, up, down; colors on nodes: white =>
-     ;;; clean, gray => dirty, green => agent.
-     ;;;
-     ;;; Can step be part of the world object? It's currently only a
-     ;;; hash-table.
-     (define (write-world-as-dot world agent step)
-       (display "digraph G {")
-       (display "node [style=filled, fontname=monospace];")
-       (display "edge[fontname=monospace];")
-       ;; Phew: viewports are specified in points at 72 per inch; size is
-       ;; specified in pixels at 96 per inch.
-       (let ((width 1600)
-             (height 900))
-         (let ((width-in-inches (/ width 96))
-               (height-in-inches (/ height 96)))
-           (format #t "graph [fontsize=48.0, viewport=\"~a,~a\", ratio=fill, size=\"~a,~a!\", label=\"Score: ~a; step: ~a\"];"
-                   (* width-in-inches 72)
-                   (* height-in-inches 72)
-                   width-in-inches
-                   height-in-inches
-                   (agent-score agent)
-                   step)))
      (define default-width (make-parameter 1600))
      
      (define default-height (make-parameter 900))
