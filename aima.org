@@ -1367,6 +1367,9 @@
            (let ((continue? (< step final-step)))
              (if (not continue?) (finalizer))
              continue?))))
+     
+     (define (make-animation-finalizer directory)
+       (lambda ()
          (system "rm -fv graph.gif")
          (system* "convert $(find ~a -type f | sort -k 1.~a -n) -loop 0 graph.gif"
                   directory
