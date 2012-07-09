@@ -1197,6 +1197,31 @@
      
      (define default-height (make-parameter 900))
      
+     ;;; Height and width are in pixels.
+     (define write-dot-preamble
+       (case-lambda
+        ((agent step)
+         (write-dot-preamble agent step (default-height) (default-width)))
+        ((agent step height width)
+         (display "digraph G {")
+         (display "node [style=filled, fontname=monospace];")
+         (display "edge [fontname=monospace];")
+         (if (and height width)
+             (begin
+               (display "graph [fontsize=48.0, ratio=fill];")
+               ;; Phew: viewports are specified in points at 72 per inch;
+               ;; size is specified in pixels at 96 per inch.
+               (let ((width-in-inches (/ width 96))
+                     (height-in-inches (/ height 96)))
+                 (format #t "graph [viewport=\"~a,~a\", size=\"~a,~a!\"];"
+                         (* width-in-inches 72)
+                         (* height-in-inches 72)
+                         width-in-inches
+                         height-in-inches))))
+         (if step
+             (format #t "graph [label=\"Score: ~a; step: ~a\"]"
+                     (agent-score agent)
+                     step)))))
        (hash-table-walk
         world
         (lambda (name location)
