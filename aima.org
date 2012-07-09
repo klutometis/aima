@@ -1842,6 +1842,78 @@
           (close-output-port output)
           (close-input-port input)))
       
+      (define (make-graph-environment world agent)
+        (lambda ()
+          (let* ((node (agent-location agent))
+                 (location (hash-table-ref world node))
+                 (action ((agent-program agent)
+                          node
+                          (clean? (location-status location)))))
+            (debug-print "agent-action" action)
+            (case action
+              ((left)
+               (let ((left (vector-ref (location-neighbors location) left)))
+                 (if (passage? left)
+                     (agent-location-set! agent left))))
+              ((right)
+               (let ((right (vector-ref (location-neighbors location) right)))
+                 (if (passage? right)
+                     (agent-location-set! agent right))))
+              ((up)
+               (let ((up (vector-ref (location-neighbors location) up)))
+                 (if (passage? up)
+                     (agent-location-set! agent up))))
+              ((down)
+               (let ((down (vector-ref (location-neighbors location) down)))
+                 (if (passage? down)
+                     (agent-location-set! agent down))))
+              ((noop))
+              ((suck)
+               (location-status-set! (hash-table-ref world node) clean))
+              (else (error "graph-environment -- Unknown action"))))))
+      
+      (define (make-graph-performance-measure world agent)
+        (lambda ()
+          (let ((clean-locations
+                 ;; Quicker with map and apply?
+                 (hash-table-fold
+                  world
+                  (lambda (name location clean-locations)
+                    (if (clean? (location-status location))
+                        (+ clean-locations 1)
+                        clean-locations))
+                  0)))
+            (agent-score-set! agent (+ (agent-score agent) clean-locations)))))
+      
+      (define (make-graph-animating-environment world agent directory)
+        (let ((frame 0))
+          (lambda ()
+            (let ((gif (make-pathname directory (number->string frame) "gif")))
+              (write-world-as-gif world agent frame gif))
+            (set! frame (+ frame 1)))))
+      
+      ;;; I think make-step-limited-environment is a special case of
+      ;;; make-finalizing-environment with noop.
+      ;;;
+      ;;; This probably belongs in aima; should we preserve the
+      ;;; step-limited-environment as a specialization of this?
+      (define (make-finalizing-environment finalizer final-step)
+        (let ((step 0))
+          (lambda ()
+            (set! step (+ step 1))
+            (let ((continue? (< step final-step)))
+              (if (not continue?) (finalizer))
+              continue?))))
+      
+      (define (make-animation-finalizer directory)
+        (lambda ()
+          (system "rm -fv graph.gif")
+          (system* "convert $(find ~a -type f | sort -k 1.~a -n) -loop 0 graph.gif"
+                   directory
+                   (+ (string-length directory) 2))
+          (system* "identify ~a/0.gif" directory)
+          (system "mencoder graph.gif -ovc lavc -o graph.avi")))
+      
       
     #+END_SRC
 *** TODO Stateful graph agent
