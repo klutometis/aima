@@ -1830,15 +1830,9 @@
           (close-output-port output)
           (close-input-port input)))
       
-      (write-world-as-pdf
-       (make-preferential-depth-first-world 25)
-       (make-reflex-agent 'harro (lambda (location clean?) 2))
-       "world.pdf")
-      
       (define (display-pdf pdf)
         (system* "evince -s ~a" pdf))
       
-      (display-pdf "world.pdf")
       
     #+END_SRC
 *** TODO Stateful graph agent
