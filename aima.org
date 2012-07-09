@@ -1353,6 +1353,12 @@
            (make-graph-animating-environment world agent directory)
            (make-graph-performance-measure world agent)
            (make-graph-environment world agent)))
+     (define (make-stateful-graph-agent start)
+       (make-reflex-agent
+        start
+        (let ((world (make-hash-table)))
+          (lambda (location clean?)
+            'right))))
          (system "rm -fv graph.gif")
          (system* "convert $(find ~a -type f | sort -k 1.~a -n) -loop 0 graph.gif"
                   directory
