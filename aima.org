@@ -1342,13 +1342,11 @@
              (write-world-as-gif world agent frame gif))
            (set! frame (+ frame 1)))))
      
-     (define (make-stateful-graph-agent start)
-       (make-reflex-agent
-        start
-        (let ((world (make-hash-table)))
-          (lambda (location clean?)
-            'right))))
-     
+     ;;; I think make-step-limited-environment is a special case of
+     ;;; make-finalizing-environment with noop.
+     ;;;
+     ;;; This probably belongs in aima; should we preserve the
+     ;;; step-limited-environment as a specialization of this?
      (define (make-finalizing-environment finalizer final-step)
        (let ((step 0))
          (lambda ()
