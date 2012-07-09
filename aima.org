@@ -1211,6 +1211,7 @@
                        (else "gray"))))
             (format #t "~a [fillcolor=~a];" name color)))))
      
+     (define (write-dot-edges world)
        (hash-table-walk
         world
         (lambda (name location)
@@ -1225,8 +1226,7 @@
             (if (passage? up)
                 (format #t "~a->~a [label=u];" name up))
             (if (passage? down)
-                (format #t "~a->~a [label=d];" name down)))))
-       (display "}\n"))
+                (format #t "~a->~a [label=d];" name down))))))
      
      (define (write-world-as-pdf world agent)
        (receive (input output id)
