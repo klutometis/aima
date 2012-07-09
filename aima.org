@@ -1591,6 +1591,27 @@
       
       (define (random-direction) (random 4))
       
+      (define (connect! world connectend connector direction)
+        (let ((counter-direction
+               (cond ((left? direction) right)
+                     ((right? direction) left)
+                     ((up? direction) down)
+                     ((down? direction) up))))
+          (hash-table-update!/default
+           world
+           connectend
+           (lambda (location)
+             (vector-set! (location-neighbors location) direction connector)
+             location)
+           (make-dirty-location))
+          (hash-table-update!/default
+           world
+           connector
+           (lambda (location)
+             (vector-set! (location-neighbors location) counter-direction connectend)
+             location)
+           (make-dirty-location))))
+      
       (define (make-seed-world)
         (let ((world (make-hash-table))
               (start (make-node))
@@ -1621,27 +1642,6 @@
                            (passage? neighbor))
                          (location-neighbors location))))
          0))
-      
-      (define (connect! world connectend connector direction)
-        (let ((counter-direction
-               (cond ((left? direction) right)
-                     ((right? direction) left)
-                     ((up? direction) down)
-                     ((down? direction) up))))
-          (hash-table-update!/default
-           world
-           connectend
-           (lambda (location)
-             (vector-set! (location-neighbors location) direction connector)
-             location)
-           (make-dirty-location))
-          (hash-table-update!/default
-           world
-           connector
-           (lambda (location)
-             (vector-set! (location-neighbors location) counter-direction connectend)
-             location)
-           (make-dirty-location))))
       
       ;;; This, of course, won't produce any cycles.
       (define (make-preferential-depth-first-world n-nodes)
