@@ -1364,20 +1364,34 @@
          (system* "identify ~a/0.gif" directory)
          (system "mencoder graph.gif -ovc lavc -o graph.avi")))
      
+     (define (make-stateful-graph-agent start)
+       (make-reflex-agent
+        start
+        (let ((world (make-hash-table)))
+          (lambda (location clean?)
+            'right))))
+     
      (let* ((world (make-graph-world))
             (start (random-start world))
             (agent (make-stateful-graph-agent start)))
        (let ((directory (create-temporary-directory))
              (steps 20))
+         (write-world-as-pdf world agent "world.pdf")
+         (display-pdf "world.pdf")
+         #;
          (simulate
           (compose-environments
+           (make-step-limited-environment 10)
            (make-graph-environment world agent)
            (make-debug-environment agent)
            (make-graph-performance-measure world agent)
-           (make-graph-animating-environment world agent directory)
-           (make-finalizing-environment
-            (make-animation-finalizer directory)
-            steps)))))
+           ;; Can't this contain its finalizer? Maybe even give it the
+           ;; terminal frame?
+           ;; (make-graph-animating-environment world agent directory)
+           ;; (make-finalizing-environment
+           ;;  (make-animation-finalizer directory)
+           ;;  steps)
+           ))))
      
    #+END_SRC
 
