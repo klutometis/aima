@@ -1259,6 +1259,8 @@
                  ((eof-object? line))
                (write-line line))))
          (close-input-port input)))
+     (define (write-dot-postscript) (display "}\n"))
+     
      
      (define (write-world-as-gif world agent)
        (receive (input output id)
