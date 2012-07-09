@@ -1200,6 +1200,8 @@
              (format #t "graph [label=\"Score: ~a; step: ~a\"]"
                      (agent-score agent)
                      step)))))
+     
+     (define (write-dot-nodes world agent)
        (hash-table-walk
         world
         (lambda (name location)
@@ -1207,7 +1209,8 @@
                  (cond ((eq? (agent-location agent) name) "green")
                        ((clean? (location-status location)) "white")
                        (else "gray"))))
-            (format #t "~a [fillcolor=~a];" name color))))
+            (format #t "~a [fillcolor=~a];" name color)))))
+     
        (hash-table-walk
         world
         (lambda (name location)
