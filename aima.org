@@ -1283,6 +1283,14 @@
          (list-ref locations (random-integer (length locations)))))
      
      (let* ((world (graph->world (barabási-albert-graph)))
+     (define (make-randomized-reflex-graph-agent start)
+       (make-reflex-agent
+        start
+        (lambda (location clean?)
+          (if clean?
+              (list-ref '(left right up down) (random 4))
+              'suck))))
+     
             (start (random-start world))
             (agent (make-reflex-agent
                     start
