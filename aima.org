@@ -1623,6 +1623,14 @@
         (let ((nodes (hash-table-keys world)))
           (list-ref nodes (random-integer (length nodes)))))
       
+      (define (make-randomized-reflex-graph-agent start)
+        (make-reflex-agent
+         start
+         (lambda (location clean?)
+           (if clean?
+               (list-ref '(left right up down) (random 4))
+               'suck))))
+      
       (define (make-dirty-location)
         (make-location dirty
                        (vector no-passage
