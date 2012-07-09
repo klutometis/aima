@@ -2446,6 +2446,13 @@
      there that needs to be done.
 
 * Tasks
+** TODO Should we structure this somehow as a blog instead of an org-doc?
+   Can we create a jekyll-based blog from this org-doc and push it to
+   the github pages?
+
+   /That/ would be beautiful: we could get rid of the generated pdf
+   and might not be confined to the relative obscurity of org
+   (relative to, say, html).
 ** TODO Some sort of blog post or other publicity?
 ** TODO Find a reasonable pseudocode package in \LaTeX.
    See [[http://www.tex.ac.uk/cgi-bin/texfaq2htmllabel%3Dalgorithms][this survey]]. Algorithm2e isn't bad; doesn't seem to have a
