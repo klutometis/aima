@@ -1228,18 +1228,6 @@
             (if (passage? down)
                 (format #t "~a->~a [label=d];" name down))))))
      
-     (define (write-world-as-pdf world agent)
-       (receive (input output id)
-         (process "neato -Tpdf")
-         (with-output-to-port output
-           (lambda () (write-world-as-dot world agent)))
-         (close-output-port output)
-         (with-input-from-port input
-           (lambda ()
-             (do ((line (read-line) (read-line)))
-                 ((eof-object? line))
-               (write-line line))))
-         (close-input-port input)))
      (define (write-dot-postscript) (display "}\n"))
      
      (define write-world-as-dot
@@ -1253,21 +1241,15 @@
          (write-dot-edges world)
          (write-dot-postscript))))
      
-     (define (write-world-as-gif world agent)
+     (define (write-world-as-pdf world agent pdf)
        (receive (input output id)
-         (process "neato -Tgif")
+         (process "neato" `("-Tpdf" "-o" ,pdf))
          (with-output-to-port output
-           (lambda () (write-world-as-dot world agent)))
-         ;; (flush-output output)
+           ;; Do we really need a blank label, for some reason?
+           (lambda () (write-world-as-dot world agent #f #f #f)))
+         (flush-output output)
          (close-output-port output)
-         (with-input-from-port input
-           (lambda ()
-             (do ((line (read-line) (read-line)))
-                 ((eof-object? line))
-               (write-line line))))
-         ;; (flush-input input)
-         ;; (close-input-port input)
-         ))
+         (close-input-port input)))
      
      (define (write-world-as-gif world agent frame gif)
        (receive (input output id)
