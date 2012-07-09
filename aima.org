@@ -1914,6 +1914,13 @@
           (system* "identify ~a/0.gif" directory)
           (system "mencoder graph.gif -ovc lavc -o graph.avi")))
       
+      (define (make-stateful-graph-agent start)
+        (make-reflex-agent
+         start
+         (let ((world (make-hash-table)))
+           (lambda (location clean?)
+             'right))))
+      
       
     #+END_SRC
 *** TODO Stateful graph agent
