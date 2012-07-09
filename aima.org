@@ -1261,6 +1261,16 @@
          (close-input-port input)))
      (define (write-dot-postscript) (display "}\n"))
      
+     (define write-world-as-dot
+       (case-lambda
+        ((world agent) (write-world-as-dot world agent #f))
+        ((world agent step)
+         (write-world-as-dot world agent step (default-height) (default-width)))
+        ((world agent step height width)
+         (write-dot-preamble agent step height width)
+         (write-dot-nodes world agent)
+         (write-dot-edges world)
+         (write-dot-postscript))))
      
      (define (write-world-as-gif world agent)
        (receive (input output id)
