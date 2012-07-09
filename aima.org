@@ -1708,6 +1708,38 @@
                                           (random (length neighbors)))))
                           (iter neighbor n-nodes n-degrees)))))))))
       
+      (define (make-barabási-albert-world n-nodes m)
+        (let* ((world (make-seed-world))
+               (start (random-start world)))
+          (do ((current-n-nodes (count-nodes world) (count-nodes world)))
+              ((= current-n-nodes n-nodes) world)
+            (let ((new-node (make-node)))
+              (let iter ((nodes (hash-table-keys world))
+                         (m m))
+                (if (and (pair? nodes)
+                         (positive? m))
+                    (let* ((node (car nodes))
+                           (location (hash-table-ref world node))
+                           (neighbors
+                            (vector-fold
+                             (lambda (direction neighbors neighbor)
+                               (if (passage? neighbor)
+                                   (cons neighbor neighbors)
+                                   neighbors))
+                             '()
+                             (location-neighbors location)))
+                           (n-neighbors (length neighbors)))
+                      (if (and (< n-neighbors 4)
+                               (< (random-real)
+                                  (/ n-neighbors (count-degrees world))))
+                          (begin
+                            ;; (let ((connect?
+                            ;;        (connect world node new-node)))
+                            ;;   &c.)
+                            (connect! world)
+                            (iter (cdr nodes) (- m 1)))
+                          (iter (cdr nodes) m)))))))))
+      
       (define default-width (make-parameter 1600))
       
       (define default-height (make-parameter 900))
