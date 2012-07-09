@@ -1336,6 +1336,13 @@
                  0)))
            (agent-score-set! agent (+ (agent-score agent) clean-locations)))))
      
+     (define (make-graph-animating-environment world agent directory)
+       (let ((frame 0))
+         (lambda ()
+           (let ((gif (make-pathname directory (number->string frame) "gif")))
+             (write-world-as-gif world agent frame gif))
+           (set! frame (+ frame 1)))))
+     
             (start (random-start world))
             (agent (make-reflex-agent
                     start
