@@ -1564,6 +1564,8 @@
       (use aima
            aima-vacuum
            debug
+           files
+           posix
            random-bsd
            vector-lib)
       
