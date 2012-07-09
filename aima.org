@@ -1282,7 +1282,6 @@
        (let ((locations (hash-table-keys world)))
          (list-ref locations (random-integer (length locations)))))
      
-     (let* ((world (graph->world (barabási-albert-graph)))
      (define (make-randomized-reflex-graph-agent start)
        (make-reflex-agent
         start
@@ -1343,85 +1342,18 @@
              (write-world-as-gif world agent frame gif))
            (set! frame (+ frame 1)))))
      
+     (let* ((world (make-graph-world))
             (start (random-start world))
-            (agent (make-reflex-agent
-                    start
-                    (lambda (location clean?)
-                      (if clean?
-                          (list-ref '(left right up down) (random 4))
-                          'suck))))
+            (agent (make-randomized-reflex-graph-agent start))
             (directory (create-temporary-directory)))
-       ;; (write-world-as-dot world agent)
-       ;; (with-output-to-file "world.pdf"
-       ;;   (lambda () (write-world-as-pdf world agent)))
-       ;; (display-pdf "world.pdf")
        (simulate
         (compose-environments
-         (make-step-limited-environment 1000)
-         ;; (make-debug-environment world hash-table->alist)
+         (make-step-limited-environment 20)
          (make-debug-environment agent)
-         ;; Damn: do we need finalizers for environments, too? In which
-         ;; case: bye-bye environment-as-lambda. Might use initializers, too, in
-         ;; that case.
-         ;;
-         ;; We can protect the user from that complexity by allowing them
-         ;; merely to specify the program in e.g.; wait, never mind: it's
-         ;; requisite complexity.
-         ;;
-         ;; It would be nice if, say, simulate had some finalizers; but we
-         ;; can just run these after simulate.
-         (let ((frame 0))
-           (lambda ()
-             (let ((gif (make-pathname directory (number->string frame) "gif")))
-               (write-world-as-gif world agent frame gif))
-             (set! frame (+ frame 1))))
-         (lambda ()
-           (let ((clean-locations
-                  ;; Quicker with map and apply?
-                  (hash-table-fold
-                   world
-                   (lambda (name location clean-locations)
-                     (if (clean? (location-status location))
-                         (+ clean-locations 1)
-                         clean-locations))
-                   0)))
-             (agent-score-set! agent (+ (agent-score agent) clean-locations))))
-         (lambda ()
-           (let* ((location (agent-location agent))
-                  (action ((agent-program agent)
-                           location
-                           (clean? (location-status (hash-table-ref world location))))))
-             (debug-print "agent-action" action)
-             (case action
-               ((left)
-                (let ((left (location-left (hash-table-ref world location))))
-                  (if (passage? left)
-                      (agent-location-set! agent left))))
-               ((right)
-                (let ((right (location-right (hash-table-ref world location))))
-                  (if (passage? right)
-                      (agent-location-set! agent right))))
-               ((up)
-                (let ((up (location-up (hash-table-ref world location))))
-                  (if (passage? up)
-                      (agent-location-set! agent up))))
-               ((down)
-                (let ((down (location-down (hash-table-ref world location))))
-                  (if (passage? down)
-                      (agent-location-set! agent down))))
-               ((noop))
-               ((suck)
-                (location-status-set! (hash-table-ref world location) clean))
-               (else (error "graph-environment -- Unknown action")))))))
+         (make-graph-animating-environment world agent directory)
+         (make-graph-performance-measure world agent)
+         (make-graph-environment world agent)))
        (system "rm -fv graph.gif")
-       ;; Optionally, -resize 50%; &c. Never mind: even at 50%, it's 38 MB
-       ;; (normally 44 MB). At 25%, you're 8 MB; but it's illegible.
-       ;;
-       ;; Might give you the idea, on the other hand; also: state-based
-       ;; agents should reach equilibrium pretty soon, and don't need the
-       ;; full 1000 steps.
-       ;;
-       ;; TODO: make-equilibrium-limited-environment.
        (system* "convert $(find ~a -type f | sort -k 1.~a -n) -loop 0 graph.gif"
                 directory
                 (+ (string-length directory) 2))
