@@ -1951,34 +1951,64 @@
     will change slightly with the bump sensor in [[2.12]]).
     
     #+BEGIN_SRC org
-      ,- let
-      ,  - world make-hash-table
-      ,    # This is going to have to be a stack: we're iterating here, after
-      ,    all. Ah, the problem is that we can't recurse back up the tree
-      ,    because the relative directions are asymmetrical.
-      
-      ,    I knew this would bite me in the ass; or is there a more expensive
-      ,    way to backtrack? Can't e.g. try random directions because there's
-      ,    no way back.
-      
-      ,    Is it possible, somehow, to progress through the world via random
-      ,    walk; turning away when we encounter a taken path? No, we need to
-      ,    be able to backtrack.
-      ,  - last-action #f
-      ,  - last-location #f
-      ,  - lambda location clean?
-      ,    - hash-table-update!/default
-      ,      - world
-      ,      - location
-      ,      - lambda location
-      ,        - location-status-set! location (if clean? clean dirty)
-      ,        - if eq? last-location location
-      ,          - case last-action
-      ,            - left location-set-left! my-location left no-passage
-      ,            - right location-set-left! my-location right no-passage
-      ,            - up location-set-left! my-location up no-passage
-      ,            - down location-set-left! my-location down no-passage
-      ,      - make-location unknown unknown unknown unknown unknown
+      ,- make-stateful-graph-agent start
+      ,  - let
+      ,    - world make-hash-table
+      ,      - # This is going to have to be a stack: we're iterating here,
+      ,        after all. Ah, the problem is that we can't recurse back up the
+      ,        tree because the relative directions are asymmetrical.
+      ,      - # I knew this would bite me in the ass; or is there a more
+      ,        expensive way to backtrack? Can't e.g. try random directions
+      ,        because there's no way back.
+      ,      - # Is it possible, somehow, to progress through the world via
+      ,        random walk; turning away when we encounter a taken path? No, we
+      ,        need to be able to backtrack.
+      ,      - # Fuck it: just wrote a preferential depth-first world-generator
+      ,        that's not quite as good as Barabási-Albert in the sense that it
+      ,        doesn't generate cycles.
+      ,      - # On the other hand, wouldn't it have been equivalent to store
+      ,        the desirable node and the direction required to get there? I
+      ,        still need the inverse of the current direction to backtrack, I
+      ,        believe.
+      ,      - # It would appear as though we're going to have to push a list
+      ,        of interesting vertices onto the stack as well as the actions
+      ,        required to get here; this notion, therefore, of visit node
+      ,        entails: back-tracking until we find it.
+      ,    - path ()
+      ,    - visitanda (start)
+      ,    - last-action #f
+      ,    - lambda node clean?
+      ,      - if null? visitanda
+      ,        - noop
+      ,        - if dirty?
+      ,          - # This is where pre-/post-order becomes interesting;
+      ,            pre-order it, so we can maximize our score.
+      ,          - clean
+      ,          - begin
+      ,            - hash-table-update!/default
+      ,              - world
+      ,              - node
+      ,              - lambda location
+      ,                - location-set-status (if clean? clean dirty)
+      ,                - let*
+      ,                  - neighbors (location-neighbors location)
+      ,                    - if eq? last-node node
+      ,                      - case last-action
+      ,                        - left vector-set! neighbors left no-passage
+      ,                        - right vector-set! neighbors right no-passage
+      ,                        - up vector-set! neighbors up no-passage
+      ,                        - down vector-set! neighbors down no-passage
+      ,                      - let last-node (car visitandum)
+      ,                        - case last-action
+      ,                          - left vector-set! neighbors right last-node
+      ,                          - right vector-set! neighbors left last-node
+      ,                          - up vector-set! neighbors down last-node
+      ,                          - down vector-set! neighbors up last-node
+      ,                        - set! visitanda (cons node visitanda)
+      ,                - location
+      ,              - # Let's nominate this make-unknown-location (as opposed to:
+      ,                make-dirty-location).
+      ,              - make-location clean? #(unknown unknown unknown unknown)
       
     #+END_SRC
 *** TODO =make-equilibrium-limited-environment=
