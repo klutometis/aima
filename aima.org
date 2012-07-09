@@ -1193,6 +1193,10 @@
                    height-in-inches
                    (agent-score agent)
                    step)))
+     (define default-width (make-parameter 1600))
+     
+     (define default-height (make-parameter 900))
+     
        (hash-table-walk
         world
         (lambda (name location)
