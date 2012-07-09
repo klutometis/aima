@@ -1472,6 +1472,11 @@
    #+BEGIN_SRC sh
      mencoder graph.gif -ovc lavc -o graph.avi
    #+END_SRC
+*** TODO Stateful graph agent
+    The stateful graph agent has to divine indirectly that it
+    encountered an obstacle based on whether or not the last action
+    was movement and whether or not it's in the same position (this
+    will change slightly with the bump sensor in [[2.12]]).
 *** TODO =make-equilibrium-limited-environment=
     Compare the delta on scores for some sort of equilibrium; or lack
     of movement?
