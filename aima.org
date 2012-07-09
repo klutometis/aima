@@ -1344,21 +1344,21 @@
      
      (let* ((world (make-graph-world))
             (start (random-start world))
-            (agent (make-randomized-reflex-graph-agent start))
-            (directory (create-temporary-directory)))
-       (simulate
-        (compose-environments
-         (make-step-limited-environment 20)
-         (make-debug-environment agent)
-         (make-graph-animating-environment world agent directory)
-         (make-graph-performance-measure world agent)
-         (make-graph-environment world agent)))
-       (system "rm -fv graph.gif")
-       (system* "convert $(find ~a -type f | sort -k 1.~a -n) -loop 0 graph.gif"
-                directory
-                (+ (string-length directory) 2))
-       (system* "identify ~a/0.gif" directory)
-       (system "mencoder graph.gif -ovc lavc -o graph.avi"))
+            (agent (make-randomized-reflex-graph-agent start)))
+       (let ((directory (create-temporary-directory)))
+         (simulate
+          (compose-environments
+           (make-step-limited-environment 20)
+           (make-debug-environment agent)
+           (make-graph-animating-environment world agent directory)
+           (make-graph-performance-measure world agent)
+           (make-graph-environment world agent)))
+         (system "rm -fv graph.gif")
+         (system* "convert $(find ~a -type f | sort -k 1.~a -n) -loop 0 graph.gif"
+                  directory
+                  (+ (string-length directory) 2))
+         (system* "identify ~a/0.gif" directory)
+         (system "mencoder graph.gif -ovc lavc -o graph.avi")))
      
    #+END_SRC
 
