@@ -1679,14 +1679,7 @@
                         world
                         node
                         (make-dirty-location))))
-                  (let ((n-neighbors
-                         (vector-fold
-                          (lambda (direction n-neighbors neighbor)
-                            (if (no-passage? neighbor)
-                                n-neighbors
-                                (+ n-neighbors 1)))
-                          0
-                          (location-neighbors location))))
+                  (let ((n-neighbors (n-neighbors location)))
                     (if (and (< n-neighbors 4)
                              (< (random-real) (/ n-neighbors n-degrees)))
                         (let* ((new-directions
