@@ -1938,6 +1938,9 @@
           ((up) 'down)
           ((down) 'up)))
       
+      (define (direction->move direction)
+        (list-ref '(left right up down) direction))
+      
       (define (make-stateful-graph-agent start)
         (make-reflex-agent
          start
