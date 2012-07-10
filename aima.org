@@ -1967,38 +1967,73 @@
                  'noop
                  (if (not clean?)
                      'suck
-                     (let* ((location (hash-table-ref/default world node (make-unknown-node clean?)))
-                            ;; TODO: We have to munge the location with a
-                            ;; previous node (if any) before calculating new-moves.
-                            (new-moves (map direction->move (undiscovered-directions location))))
-                       (debug location new-moves)
-                       (if (null? new-moves)
-                           (begin
-                             (stack-pop! nodes)
-                             (reverse-move (stack-pop! moves)))
-                           (begin
-                             (if (and (eq? (stack-peek nodes) node)
-                                      (not (stack-empty? moves)))
-                                 (let ((last-direction (move->direction (stack-pop! moves))))
-                                   (debug `(vector-set! ,(location-neighbors location) ,last-direction ,no-passage))
-                                   (vector-set! (location-neighbors location) last-direction no-passage))
-                                 ;; This is redundant if this isn't a new
-                                 ;; location; should do an update instead?
-                                 (begin
-                                   (debug `(hash-table-set! ,world ,node ,location))
-                                   (hash-table-set! world node location)
-                                   (if (not (stack-empty? moves))
-                                       (let* ((last-node (stack-peek nodes))
-                                              (last-location (hash-table-ref world last-node)))
-                                         (let ((last-direction (move->direction (stack-peek moves))))
-                                           (vector-set! (location-neighbors last-location)
-                                                        last-direction
-                                                        node)
-                                           (vector-set! (location-neighbors location)
-                                                        (reverse-direction last-direction)
-                                                        last-node))))))
+                     (let ((location (hash-table-ref/default world node (make-unknown-location clean?))))
+                       ;; The following is general house-keeping on the state.
+                       (if (stack-empty? moves)
+                           ;; We're dealing with an uninitialized agent: set
+                           ;; the world. This could also be a terminal
+                           ;; agent, couldn't it? Is there a better place to
+                           ;; initialize?
+                           (hash-table-set! world node location)
+                           ;; We need to distinguish the case, apparently,
+                           ;; where we've just backtracked; this isn't quite
+                           ;; the same as a fail-to-move.
+                           ;;
+                           ;; In 2.12, when we're dealing with a bump
+                           ;; sensor, when don't have to play these games
+                           ;; with an implicit bump.
+                           (let ((last-move (stack-peek moves)))
+                             (if (eq? last-move 'backtrack)
+                                 ;; Our position is the result of
+                                 ;; backtracking; remove the special
+                                 ;; backtracking move.
+                                 (stack-pop! moves)
+                                 (if (eq? (stack-peek nodes) node)
+                                     ;; We tried to move but could not; mark the
+                                     ;; last direction as no-passage.
+                                     (let ((last-move (stack-pop! moves)))
+                                       (vector-set! (location-neighbors location)
+                                                    (move->direction last-move)
+                                                    no-passage))
+                                     ;; Cycle detection goes below.
+                                     (let* ((last-node (stack-peek nodes))
+                                            ;; Need to replace hash-table-ref, &c.
+                                            ;; with something more germane.
+                                            (last-location (hash-table-ref world last-node)))
+                                       ;; This is a new node: add it to the world.
+                                       (hash-table-set! world node location)
+                                       ;; Also, add it to the list of
+                                       ;; interesting nodes.
+                                       (stack-push! nodes node)
+                                       ;; This location's reverse-move points to
+                                       ;; the last node.
+                                       (vector-set! (location-neighbors location)
+                                                    (move->direction (reverse-move last-move))
+                                                    last-node)
+                                       ;; The last location's move points to
+                                       ;; this node.
+                                       (vector-set! (location-neighbors last-location)
+                                                    (move->direction last-move)
+                                                    node))))))
+                       ;; Are there any other undiscovered passages?
+                       (let ((new-moves (map direction->move (undiscovered-directions location))))
+                         (if (null? new-moves)
+                             (begin
+                               ;; Remove this node from the interesting
+                               ;; nodes: it's been thoroughly explored.
+                               (stack-pop! nodes)
+                               (if (stack-empty? moves)
+                                   ;; No moves lest; let's rest. This may change
+                                   'noop
+                                   (let ((move (stack-pop! moves)))
+                                     ;; Push the special backtrack move onto the
+                                     ;; stack; this helps us distinguish the
+                                     ;; backtracking case from the case where
+                                     ;; we've hit a wall.
+                                     (stack-push! moves 'backtrack)
+                                     ;; Go back the way we came.
+                                     (reverse-move move)))) 
                              (let ((move (list-ref new-moves (random (length new-moves)))))
-                               (debug move)
                                (stack-push! moves move)
                                move))))))))))
       
