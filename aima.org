@@ -1922,6 +1922,15 @@
         (make-location (if clean? clean dirty)
                        (vector unknown unknown unknown unknown)))
       
+      (define (undiscovered-directions location)
+        (vector-fold
+         (lambda (direction undiscovered-directions neighbor)
+           (if (unknown? neighbor)
+               (cons direction undiscovered-directions)
+               undiscovered-directions))
+         '()
+         (location-neighbors location)))
+      
       (define (make-stateful-graph-agent start)
         (make-reflex-agent
          start
