@@ -1931,6 +1931,13 @@
          '()
          (location-neighbors location)))
       
+      (define (reverse-move move)
+        (case move
+          ((left) 'right)
+          ((right) 'left)
+          ((up) 'down)
+          ((down) 'up)))
+      
       (define (make-stateful-graph-agent start)
         (make-reflex-agent
          start
