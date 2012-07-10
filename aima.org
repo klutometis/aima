@@ -1948,12 +1948,51 @@
           ((up) up)
           ((down) down)))
       
+      ;;; Dealing with all this move-location punning makes things complex.
       (define (make-stateful-graph-agent start)
         (make-reflex-agent
          start
-         (let ((world (make-hash-table)))
-           (lambda (location clean?)
-             'right))))
+         (let ((world (make-hash-table))
+               (nodes (list->stack (list start)))
+               (moves (make-stack)))
+           (lambda (node clean?)
+             (debug (hash-table->alist world) nodes moves)
+             (if (null? nodes)
+                 'noop
+                 (if (not clean?)
+                     'suck
+                     (let* ((location (hash-table-ref/default world node (make-unknown-node clean?)))
+                            (new-moves (map direction->move (undiscovered-directions location))))
+                       (debug location new-moves)
+                       (if (null? new-moves)
+                           (begin
+                             (stack-pop! nodes)
+                             (reverse-move (stack-pop! moves)))
+                           (begin
+                             (if (and (eq? (stack-peek nodes) node)
+                                      (not (stack-empty? moves)))
+                                 (let ((last-direction (move->direction (stack-pop! moves))))
+                                   (debug `(vector-set! ,(location-neighbors location) ,last-direction ,no-passage))
+                                   (vector-set! (location-neighbors location) last-direction no-passage))
+                                 ;; This is redundant if this isn't a new
+                                 ;; location; should do an update instead?
+                                 (begin
+                                   (debug `(hash-table-set! ,world ,node ,location))
+                                   (hash-table-set! world node location)
+                                   (if (not (stack-empty? moves))
+                                       (let* ((last-node (stack-peek nodes))
+                                              (last-location (hash-table-ref world last-node)))
+                                         (let ((last-direction (move->direction (stack-peek moves))))
+                                           (vector-set! (location-neighbors last-location)
+                                                        last-direction
+                                                        node)
+                                           (vector-set! (location-neighbors location)
+                                                        (reverse-direction last-direction)
+                                                        last-node))))))
+                             (let ((move (list-ref new-moves (random (length new-moves)))))
+                               (debug move)
+                               (stack-push! moves move)
+                               move))))))))))
       
       (let* ((world (make-preferential-depth-first-world 20))
              (start (random-start world))
