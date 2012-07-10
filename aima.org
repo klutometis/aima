@@ -1764,12 +1764,12 @@
       (define write-dot-preamble
         (case-lambda
          ((agent step)
-          (write-dot-preamble agent step (default-height) (default-width)))
-         ((agent step height width)
+          (write-dot-preamble agent step (default-width) (default-height)))
+         ((agent step width height)
           (display "digraph G {")
           (display "node [style=filled, fontname=monospace];")
           (display "edge [fontname=monospace];")
-          (if (and height width)
+          (if (and width height)
               (begin
                 (display "graph [fontsize=48.0, ratio=fill];")
                 ;; Phew: viewports are specified in points at 72 per inch;
@@ -1819,9 +1819,9 @@
         (case-lambda
          ((world agent) (write-world-as-dot world agent #f))
          ((world agent step)
-          (write-world-as-dot world agent step (default-height) (default-width)))
-         ((world agent step height width)
-          (write-dot-preamble agent step height width)
+          (write-world-as-dot world agent step (default-width) (default-height)))
+         ((world agent step width height)
+          (write-dot-preamble agent step width height)
           (write-dot-nodes world agent)
           (write-dot-edges world)
           (write-dot-postscript))))
@@ -1839,14 +1839,18 @@
       (define (display-pdf pdf)
         (system* "evince -s ~a" pdf))
       
-      (define (write-world-as-gif world agent frame gif)
-        (receive (input output id)
-          (process "neato" `("-Tgif" "-o" ,gif))
-          (with-output-to-port output
-            (lambda () (write-world-as-dot world agent frame)))
-          (flush-output output)
-          (close-output-port output)
-          (close-input-port input)))
+      (define write-world-as-gif
+        (case-lambda
+         ((world agent frame gif)
+          (write-world-as-gif world agent frame gif (default-width) (default-height)))
+         ((world agent frame gif width height)
+          (receive (input output id)
+            (process "neato" `("-Tgif" "-o" ,gif))
+            (with-output-to-port output
+              (lambda () (write-world-as-dot world agent frame width height)))
+            (flush-output output)
+            (close-output-port output)
+            (close-input-port input)))))
       
       (define (make-graph-environment world agent)
         (lambda ()
@@ -1891,12 +1895,16 @@
                   0)))
             (agent-score-set! agent (+ (agent-score agent) clean-locations)))))
       
-      (define (make-graph-animating-environment world agent directory)
-        (let ((frame 0))
-          (lambda ()
-            (let ((gif (make-pathname directory (number->string frame) "gif")))
-              (write-world-as-gif world agent frame gif))
-            (set! frame (+ frame 1)))))
+      (define make-graph-animating-environment
+        (case-lambda
+         ((world agent directory)
+          (make-graph-animating-environment world agent directory (default-width) (default-height)))
+         ((world agent directory width height)
+          (let ((frame 0))
+            (lambda ()
+              (let ((gif (make-pathname directory (number->string frame) "gif")))
+                (write-world-as-gif world agent frame gif width height))
+              (set! frame (+ frame 1)))))))
       
       ;;; I think make-step-limited-environment is a special case of
       ;;; make-finalizing-environment with noop.
