@@ -2062,18 +2062,16 @@
              )
         (let ((directory (create-temporary-directory))
               (steps 50))
-          ;; (write-world-as-pdf world agent "world.pdf")
-          ;; (display-pdf "world.pdf")
           (simulate
            ;; Order of composition matters, apparently; be thoughtful.
            (compose-environments
             (make-step-limited-environment steps)
             ;; Can't this contain its finalizer? Maybe even give it the
             ;; terminal frame?
-            ;; (make-graph-animating-environment world agent directory)
-            ;; (make-finalizing-environment
-            ;;  (make-animation-finalizer directory)
-            ;;  steps)
+            (make-graph-animating-environment world agent directory)
+            (make-finalizing-environment
+             (make-animation-finalizer directory)
+             steps)
             (make-debug-environment agent)
             (make-graph-environment world agent)
             (make-graph-performance-measure world agent)
