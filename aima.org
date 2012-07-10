@@ -2072,14 +2072,15 @@
           (connect! world 'f 'a down)
           world))
       
-      (let* (
-             ;; (world (make-preferential-depth-first-world 20))
-             ;; (start (random-start world))
-             (world (make-known-world))
-             (start 'a)
+      (let* ((world (make-preferential-depth-first-world 20))
+             (start (random-start world))
+             ;; (world (make-known-world))
+             ;; (start 'a)
              (agent (make-stateful-graph-agent start))
              ;; (agent (make-randomized-reflex-graph-agent start))
              )
+        ;; (write-world-as-pdf world agent "graph.pdf")
+        ;; (display-pdf "graph.pdf")
         (let ((directory (create-temporary-directory))
               (steps 50))
           (simulate
@@ -2088,7 +2089,7 @@
             (make-step-limited-environment steps)
             ;; Can't this contain its finalizer? Maybe even give it the
             ;; terminal frame?
-            (make-graph-animating-environment world agent directory)
+            (make-graph-animating-environment world agent directory 800 900)
             (make-finalizing-environment
              (make-animation-finalizer directory)
              steps)
