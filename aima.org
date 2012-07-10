@@ -1994,8 +1994,6 @@
                                (stack-push! moves move)
                                move))))))))))
       
-      (let* ((world (make-preferential-depth-first-world 20))
-             (start (random-start world))
       (define (make-known-world)
         (let ((world (make-hash-table))
               (a (make-node))
@@ -2011,25 +2009,32 @@
           (connect! world 'e 'f down)
           world))
       
+      (let* (
+             ;; (world (make-preferential-depth-first-world 20))
+             (world (make-known-world))
+             ;; (start (random-start world))
+             (start 'a)
              (agent (make-stateful-graph-agent start))
              ;; (agent (make-randomized-reflex-graph-agent start))
              )
         (let ((directory (create-temporary-directory))
-              (steps 20))
+              (steps 50))
           ;; (write-world-as-pdf world agent "world.pdf")
           ;; (display-pdf "world.pdf")
           (simulate
+           ;; Order of composition matters, apparently; be thoughtful.
            (compose-environments
             (make-step-limited-environment steps)
-            (make-graph-environment world agent)
-            (make-debug-environment agent)
-            (make-graph-performance-measure world agent)
             ;; Can't this contain its finalizer? Maybe even give it the
             ;; terminal frame?
-            (make-graph-animating-environment world agent directory)
-            (make-finalizing-environment
-             (make-animation-finalizer directory)
-             steps)))))
+            ;; (make-graph-animating-environment world agent directory)
+            ;; (make-finalizing-environment
+            ;;  (make-animation-finalizer directory)
+            ;;  steps)
+            (make-debug-environment agent)
+            (make-graph-environment world agent)
+            (make-graph-performance-measure world agent)
+            ))))
       
     #+END_SRC
 *** TODO Stateful graph agent
