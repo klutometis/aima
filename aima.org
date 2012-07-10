@@ -1962,6 +1962,8 @@
                  (if (not clean?)
                      'suck
                      (let* ((location (hash-table-ref/default world node (make-unknown-node clean?)))
+                            ;; TODO: We have to munge the location with a
+                            ;; previous node (if any) before calculating new-moves.
                             (new-moves (map direction->move (undiscovered-directions location))))
                        (debug location new-moves)
                        (if (null? new-moves)
