@@ -1948,7 +1948,13 @@
           ((up) up)
           ((down) down)))
       
-      ;;; Dealing with all this move-location punning makes things complex.
+      ;;; Dealing with all this move-location punning makes things complex;
+      ;;; we can clean this up a little bit by writing some germane
+      ;;; abstractions on the world.
+      ;;;
+      ;;; We're not dealing with cycles yet, by the way; does this entail
+      ;;; determining whether or not a new node is accounted for in the
+      ;;; world? I believe so.
       (define (make-stateful-graph-agent start)
         (make-reflex-agent
          start
