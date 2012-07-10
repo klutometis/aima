@@ -1610,9 +1610,11 @@
            world
            connector
            (lambda (location)
-             (vector-set! (location-neighbors location) counter-direction connectend)
+             (vector-set! (location-neighbors location)
+                          (reverse-direction direction)
+                          connectend)
              location)
-           (make-dirty-location))))
+           (make-dirty-location)))
       
       (define (make-seed-world)
         (let ((world (make-hash-table))
