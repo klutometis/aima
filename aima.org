@@ -2058,12 +2058,14 @@
           (connect! world 'b 'd right)
           (connect! world 'd 'e down)
           (connect! world 'e 'f down)
+          (connect! world 'f 'e right)
+          (connect! world 'f 'a down)
           world))
       
       (let* (
              ;; (world (make-preferential-depth-first-world 20))
-             (world (make-known-world))
              ;; (start (random-start world))
+             (world (make-known-world))
              (start 'a)
              (agent (make-stateful-graph-agent start))
              ;; (agent (make-randomized-reflex-graph-agent start))
