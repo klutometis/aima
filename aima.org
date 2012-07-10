@@ -1918,7 +1918,7 @@
           (system* "identify ~a/0.gif" directory)
           (system "mencoder graph.gif -ovc lavc -o graph.avi")))
       
-      (define (make-unknown-node clean?)
+      (define (make-unknown-location clean?)
         (make-location (if clean? clean dirty)
                        (vector unknown unknown unknown unknown)))
       
