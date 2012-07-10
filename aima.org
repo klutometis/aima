@@ -1592,12 +1592,13 @@
       
       (define (random-direction) (random 4))
       
+      (define (reverse-direction direction)
+        (cond ((left? direction) right)
+              ((right? direction) left)
+              ((up? direction) down)
+              ((down? direction) up)))
+      
       (define (connect! world connectend connector direction)
-        (let ((counter-direction
-               (cond ((left? direction) right)
-                     ((right? direction) left)
-                     ((up? direction) down)
-                     ((down? direction) up))))
           (hash-table-update!/default
            world
            connectend
