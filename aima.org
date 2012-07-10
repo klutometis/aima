@@ -1998,16 +1998,20 @@
                                        (vector-set! (location-neighbors location)
                                                     (move->direction last-move)
                                                     no-passage))
-                                     ;; Cycle detection goes below.
                                      (let* ((last-node (stack-peek nodes))
                                             ;; Need to replace hash-table-ref, &c.
                                             ;; with something more germane.
                                             (last-location (hash-table-ref world last-node)))
-                                       ;; This is a new node: add it to the world.
-                                       (hash-table-set! world node location)
-                                       ;; Also, add it to the list of
-                                       ;; interesting nodes.
-                                       (stack-push! nodes node)
+                                       (if (hash-table-exists? world node)
+                                           ;; Cycle detected! Push the cycle-sentinel.
+                                           (stack-push! nodes cycle)
+                                           (begin
+                                             ;; This is a new node: add it
+                                             ;; to the world.
+                                             (hash-table-set! world node location)
+                                             ;; Also, add it to the list of
+                                             ;; interesting nodes.
+                                             (stack-push! nodes node)))
                                        ;; This location's reverse-move points to
                                        ;; the last node.
                                        (vector-set! (location-neighbors location)
@@ -2020,7 +2024,8 @@
                                                     node))))))
                        ;; Are there any other undiscovered passages?
                        (let ((new-moves (map direction->move (undiscovered-directions location))))
-                         (if (null? new-moves)
+                         (if (or (cycle? (stack-peek nodes))
+                                 (null? new-moves))
                              (begin
                                ;; Remove this node from the interesting
                                ;; nodes: it's been thoroughly explored.
