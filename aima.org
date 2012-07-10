@@ -1963,7 +1963,7 @@
                (moves (make-stack)))
            (lambda (node clean?)
              (debug (hash-table->alist world) nodes moves)
-             (if (null? nodes)
+             (if (stack-empty? nodes)
                  'noop
                  (if (not clean?)
                      'suck
