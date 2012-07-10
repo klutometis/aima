@@ -1948,6 +1948,9 @@
           ((up) up)
           ((down) down)))
       
+      (define-record cycle)
+      (define cycle (make-cycle))
+      
       ;;; Dealing with all this move-location punning makes things complex;
       ;;; we can clean this up a little bit by writing some germane
       ;;; abstractions on the world.
