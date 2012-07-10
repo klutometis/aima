@@ -1655,6 +1655,15 @@
                          (location-neighbors location))))
          0))
       
+      (define (n-neighbors location)
+        (vector-fold
+         (lambda (direction n-neighbors neighbor)
+           (if (no-passage? neighbor)
+               n-neighbors
+               (+ n-neighbors 1)))
+         0
+         (location-neighbors location)))
+      
       ;;; This, of course, won't produce any cycles.
       (define (make-preferential-depth-first-world n-nodes)
         (let* ((world (make-seed-world))
