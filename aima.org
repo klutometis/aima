@@ -1982,14 +1982,15 @@
               (if (not continue?) (finalizer))
               continue?))))
       
-      (define (make-animation-finalizer directory)
+      (define (make-animation-finalizer directory file)
         (lambda ()
-          (system "rm -fv graph.gif")
-          (system* "convert $(find ~a -type f | sort -k 1.~a -n) -loop 0 graph.gif"
+          (system* "rm -fv ~a.gif" file)
+          (system* "convert $(find ~a -type f | sort -k 1.~a -n) -loop 0 ~a.gif"
                    directory
-                   (+ (string-length directory) 2))
+                   (+ (string-length directory) 2)
+                   file)
           (system* "identify ~a/0.gif" directory)
-          (system "mencoder graph.gif -ovc lavc -o graph.avi")))
+          (system* "mencoder ~a.gif -ovc lavc -o ~a.avi" file file)))
       
       (define (make-unknown-location clean?)
         (make-location (if clean? clean dirty)
@@ -2042,7 +2043,11 @@
                  'noop
                  (if (not clean?)
                      'suck
-                     (let ((location (hash-table-ref/default world node (make-unknown-location clean?))))
+                     (let ((location
+                            (hash-table-ref/default
+                             world
+                             node
+                             (make-unknown-location clean?))))
                        ;; The following is general house-keeping on the state.
                        (if (stack-empty? moves)
                            ;; We're dealing with an uninitialized agent: set
