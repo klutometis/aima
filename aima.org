@@ -1781,18 +1781,27 @@
       
       (define default-height (make-parameter 900))
       
+      (define default-font-size (make-parameter 48.0))
+      
+      (define default-title (make-parameter #f))
+      
       ;;; Height and width are in pixels.
       (define write-dot-preamble
         (case-lambda
          ((agent step)
-          (write-dot-preamble agent step (default-width) (default-height)))
-         ((agent step width height)
+          (write-dot-preamble agent
+                              step
+                              (default-width)
+                              (default-height)
+                              (default-font-size)
+                              (default-title)))
+         ((agent step width height font-size title)
           (display "digraph G {")
           (display "node [style=filled, fontname=monospace];")
           (display "edge [fontname=monospace];")
           (if (and width height)
               (begin
-                (display "graph [fontsize=48.0, ratio=fill];")
+                (format #t "graph [fontsize=~a, ratio=fill];" font-size)
                 ;; Phew: viewports are specified in points at 72 per inch;
                 ;; size is specified in pixels at 96 per inch.
                 (let ((width-in-inches (/ width 96))
@@ -1803,7 +1812,8 @@
                           width-in-inches
                           height-in-inches))))
           (if step
-              (format #t "graph [label=\"Score: ~a; step: ~a\"]"
+              (format #t "graph [label=\"~aScore: ~a; step: ~a\"]"
+                      (if title (format "~a\\n" title) "")
                       (agent-score agent)
                       step)))))
       
@@ -1840,9 +1850,15 @@
         (case-lambda
          ((world agent) (write-world-as-dot world agent #f))
          ((world agent step)
-          (write-world-as-dot world agent step (default-width) (default-height)))
-         ((world agent step width height)
-          (write-dot-preamble agent step width height)
+          (write-world-as-dot world
+                              agent
+                              step
+                              (default-width)
+                              (default-height)
+                              (default-font-size)
+                              (default-title)))
+         ((world agent step width height font-size title)
+          (write-dot-preamble agent step width height font-size title)
           (write-dot-nodes world agent)
           (write-dot-edges world)
           (write-dot-postscript))))
@@ -1863,12 +1879,25 @@
       (define write-world-as-gif
         (case-lambda
          ((world agent frame gif)
-          (write-world-as-gif world agent frame gif (default-width) (default-height)))
-         ((world agent frame gif width height)
+          (write-world-as-gif world
+                              agent
+                              frame
+                              gif
+                              (default-width)
+                              (default-height)
+                              (default-font-size)
+                              (default-title)))
+         ((world agent frame gif width height font-size title)
           (receive (input output id)
             (process "neato" `("-Tgif" "-o" ,gif))
             (with-output-to-port output
-              (lambda () (write-world-as-dot world agent frame width height)))
+              (lambda () (write-world-as-dot world
+                                        agent
+                                        frame
+                                        width
+                                        height
+                                        font-size
+                                        title)))
             (flush-output output)
             (close-output-port output)
             (close-input-port input)))))
@@ -1919,12 +1948,25 @@
       (define make-graph-animating-environment
         (case-lambda
          ((world agent directory)
-          (make-graph-animating-environment world agent directory (default-width) (default-height)))
-         ((world agent directory width height)
+          (make-graph-animating-environment world
+                                            agent
+                                            directory
+                                            (default-width)
+                                            (default-height)
+                                            (default-font-size)
+                                            (default-title)))
+         ((world agent directory width height font-size title)
           (let ((frame 0))
             (lambda ()
               (let ((gif (make-pathname directory (number->string frame) "gif")))
-                (write-world-as-gif world agent frame gif width height))
+                (write-world-as-gif world
+                                    agent
+                                    frame
+                                    gif
+                                    width
+                                    height
+                                    font-size
+                                    title))
               (set! frame (+ frame 1)))))))
       
       ;;; I think make-step-limited-environment is a special case of
