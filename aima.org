@@ -2145,31 +2145,76 @@
           (connect! world 'f 'a down)
           world))
       
+      (define default-file (make-parameter "graph"))
+      
+      (define simulate-graph
+        (case-lambda
+         ((world agent)
+          (simulate-graph world agent (default-steps)))
+         ((world agent steps)
+          (simulate-graph world
+                          agent
+                          steps
+                          (default-width)
+                          (default-height)
+                          (default-font-size)
+                          (default-title)
+                          (default-file)))
+         ((world agent steps width height font-size title file)
+          (let ((directory (create-temporary-directory)))
+            (simulate
+             ;; Order of composition matters, apparently; be thoughtful.
+             (compose-environments
+              (make-step-limited-environment steps)
+              ;; Can't this contain its finalizer? Maybe even give it the
+              ;; terminal frame?
+              (make-graph-animating-environment world
+                                                agent
+                                                directory
+                                                width
+                                                height 
+                                                font-size
+                                                title)
+              (make-finalizing-environment
+               (make-animation-finalizer directory file)
+               steps)
+              (make-debug-environment agent)
+              (make-graph-environment world agent)
+              (make-graph-performance-measure world agent)))
+            directory))))
+      
       (let* ((world (make-preferential-depth-first-world 20))
-             (start (random-start world))
-             ;; (world (make-known-world))
-             ;; (start 'a)
-             (agent (make-stateful-graph-agent start))
-             ;; (agent (make-randomized-reflex-graph-agent start))
-             )
-        ;; (write-world-as-pdf world agent "graph.pdf")
-        ;; (display-pdf "graph.pdf")
-        (let ((directory (create-temporary-directory))
-              (steps 50))
-          (simulate
-           ;; Order of composition matters, apparently; be thoughtful.
-           (compose-environments
-            (make-step-limited-environment steps)
-            ;; Can't this contain its finalizer? Maybe even give it the
-            ;; terminal frame?
-            (make-graph-animating-environment world agent directory 800 900)
-            (make-finalizing-environment
-             (make-animation-finalizer directory)
-             steps)
-            (make-debug-environment agent)
-            (make-graph-environment world agent)
-            (make-graph-performance-measure world agent)
-            ))))
+             (start (random-start world)))
+        (let ((stateful-agent (make-stateful-graph-agent start))
+              (random-agent (make-randomized-reflex-graph-agent start))
+              (width 800)
+              (height 900)
+              (steps 1000)
+              (font-size 24))
+          (let ((stateful-directory
+                 (simulate-graph (copy-world world)
+                                 stateful-agent
+                                 steps
+                                 width
+                                 height
+                                 font-size
+                                 "Stateful agent"
+                                 "stateful-agent"))
+                (random-directory
+                 (simulate-graph world
+                                 random-agent
+                                 steps
+                                 width
+                                 height
+                                 font-size
+                                 "Randomized agent"
+                                 "random-agent")))
+            (let ((composite-directory (create-temporary-directory)))
+              (system* "cd ~a && for i in *; do echo $i; convert +append $i ~a/$i ~a/$i; done"
+                       stateful-directory
+                       random-directory
+                       composite-directory)
+              ((make-animation-finalizer composite-directory "composite-agent"))))))
       
     #+END_SRC
 *** TODO Stateful graph agent
