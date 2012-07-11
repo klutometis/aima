@@ -1567,6 +1567,7 @@
            files
            posix
            random-bsd
+           srfi-69
            stack
            vector-lib)
       
