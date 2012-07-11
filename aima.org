@@ -1680,6 +1680,8 @@
          0
          (location-neighbors location)))
       
+      (define default-n-nodes (make-parameter 20))
+      
       ;;; This, of course, won't produce any cycles.
       (define (make-preferential-depth-first-world n-nodes)
         (let* ((world (make-seed-world))
