@@ -2078,9 +2078,11 @@
                                      (let* ((last-node (stack-peek nodes))
                                             ;; Need to replace hash-table-ref, &c.
                                             ;; with something more germane.
-                                            (last-location (hash-table-ref world last-node)))
+                                            (last-location
+                                             (hash-table-ref world last-node)))
                                        (if (hash-table-exists? world node)
-                                           ;; Cycle detected! Push the cycle-sentinel.
+                                           ;; Cycle detected! Push the
+                                           ;; cycle-sentinel.
                                            (stack-push! nodes cycle)
                                            (begin
                                              ;; This is a new node: add it
@@ -2092,15 +2094,18 @@
                                        ;; This location's reverse-move points to
                                        ;; the last node.
                                        (vector-set! (location-neighbors location)
-                                                    (move->direction (reverse-move last-move))
+                                                    (move->direction
+                                                     (reverse-move last-move))
                                                     last-node)
                                        ;; The last location's move points to
                                        ;; this node.
-                                       (vector-set! (location-neighbors last-location)
+                                       (vector-set! (location-neighbors
+                                                     last-location)
                                                     (move->direction last-move)
                                                     node))))))
                        ;; Are there any other undiscovered passages?
-                       (let ((new-moves (map direction->move (undiscovered-directions location))))
+                       (let ((new-moves (map direction->move
+                                             (undiscovered-directions location))))
                          (if (or (cycle? (stack-peek nodes))
                                  (null? new-moves))
                              (begin
@@ -2118,7 +2123,8 @@
                                      (stack-push! moves 'backtrack)
                                      ;; Go back the way we came.
                                      (reverse-move move)))) 
-                             (let ((move (list-ref new-moves (random (length new-moves)))))
+                             (let ((move (list-ref new-moves
+                                                   (random (length new-moves)))))
                                (stack-push! moves move)
                                move))))))))))
       
