@@ -1683,64 +1683,67 @@
       (define default-n-nodes (make-parameter 20))
       
       ;;; This, of course, won't produce any cycles.
-      (define (make-preferential-depth-first-world n-nodes)
-        (let* ((world (make-seed-world))
-               (start (random-start world)))
-          (let iter ((node start)
-                     (n-nodes
-                      (max 0 (- n-nodes (count-nodes world))))
-                     (n-degrees (count-degrees world)))
-            (if (zero? n-nodes)
-                world
-                (let ((location
-                       (hash-table-ref/default
-                        world
-                        node
-                        (make-dirty-location))))
-                  (let ((n-neighbors (n-neighbors location)))
-                    (if (and (< n-neighbors 4)
-                             (< (random-real) (/ n-neighbors n-degrees)))
-                        (let* ((new-directions
-                                (vector-fold
-                                 (lambda (direction directions neighbor)
-                                   (if (no-passage? neighbor)
-                                       (cons direction directions)
-                                       directions))
-                                 '()
-                                 (location-neighbors location)))
-                               (new-direction
-                                (list-ref
-                                 new-directions
-                                 (random (length new-directions)))))
-                          ;; To make this Barabási-like, we could try to
-                          ;; pick a preëxisting node; and, failing that,
-                          ;; produce one.
-                          ;;
-                          ;; Why not just produce a direction-sensitive
-                          ;; Barabási? Now that we have neighbors as a
-                          ;; vector, it should be less unpleasant.
-                          ;;
-                          ;; To connect this node to a preëxisting one,
-                          ;; however; we'd have to find nodes with
-                          ;; compatible, available directions.
-                          ;;
-                          ;; We could produce a tree, of course, and
-                          ;; randomly create appropriate cycles.
-                          (let ((new-node (make-node)))
-                            (connect! world node new-node new-direction)
-                            (iter new-node (- n-nodes 1) (+ n-degrees 2))))
-                        (let* ((neighbors
-                                (vector-fold
-                                 (lambda (direction neighbors neighbor)
-                                   (if (passage? neighbor)
-                                       (cons neighbor neighbors)
-                                       neighbors))
-                                 '()
-                                 (location-neighbors location)))
-                               (neighbor
-                                (list-ref neighbors
-                                          (random (length neighbors)))))
-                          (iter neighbor n-nodes n-degrees)))))))))
+      (define make-preferential-depth-first-world
+        (case-lambda
+         (() (make-preferential-depth-first-world (default-n-nodes)))
+         ((n-nodes)
+          (let* ((world (make-seed-world))
+                 (start (random-start world)))
+            (let iter ((node start)
+                       (n-nodes
+                        (max 0 (- n-nodes (count-nodes world))))
+                       (n-degrees (count-degrees world)))
+              (if (zero? n-nodes)
+                  world
+                  (let ((location
+                         (hash-table-ref/default
+                          world
+                          node
+                          (make-dirty-location))))
+                    (let ((n-neighbors (n-neighbors location)))
+                      (if (and (< n-neighbors 4)
+                               (< (random-real) (/ n-neighbors n-degrees)))
+                          (let* ((new-directions
+                                  (vector-fold
+                                   (lambda (direction directions neighbor)
+                                     (if (no-passage? neighbor)
+                                         (cons direction directions)
+                                         directions))
+                                   '()
+                                   (location-neighbors location)))
+                                 (new-direction
+                                  (list-ref
+                                   new-directions
+                                   (random (length new-directions)))))
+                            ;; To make this Barabási-like, we could try to
+                            ;; pick a preëxisting node; and, failing that,
+                            ;; produce one.
+                            ;;
+                            ;; Why not just produce a direction-sensitive
+                            ;; Barabási? Now that we have neighbors as a
+                            ;; vector, it should be less unpleasant.
+                            ;;
+                            ;; To connect this node to a preëxisting one,
+                            ;; however; we'd have to find nodes with
+                            ;; compatible, available directions.
+                            ;;
+                            ;; We could produce a tree, of course, and
+                            ;; randomly create appropriate cycles.
+                            (let ((new-node (make-node)))
+                              (connect! world node new-node new-direction)
+                              (iter new-node (- n-nodes 1) (+ n-degrees 2))))
+                          (let* ((neighbors
+                                  (vector-fold
+                                   (lambda (direction neighbors neighbor)
+                                     (if (passage? neighbor)
+                                         (cons neighbor neighbors)
+                                         neighbors))
+                                   '()
+                                   (location-neighbors location)))
+                                 (neighbor
+                                  (list-ref neighbors
+                                            (random (length neighbors)))))
+                            (iter neighbor n-nodes n-degrees)))))))))))
       
       (define (make-barabási-albert-world n-nodes m)
         (let* ((world (make-seed-world))
