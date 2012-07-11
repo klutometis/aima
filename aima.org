@@ -1588,6 +1588,21 @@
         (lambda (location output)
           (display (record->vector location) output)))
       
+      (define (copy-location location)
+        (make-location (location-status location)
+                       (vector-copy (location-neighbors location))))
+      
+      (define (copy-world world)
+        (let ((world (hash-table-copy world)))
+          (hash-table-walk
+           world
+           (lambda (name location)
+             (hash-table-update!
+              world
+              name
+              copy-location)))
+          world))
+      
       (define make-node gensym)
       
       (define (random-direction) (random 4))
