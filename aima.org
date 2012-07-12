@@ -2120,6 +2120,9 @@
                                      ;; stack; this helps us distinguish the
                                      ;; backtracking case from the case where
                                      ;; we've hit a wall.
+                                     ;;
+                                     ;; The bump-sensor should obviate the
+                                     ;; need for this, I think; or not.
                                      (stack-push! moves 'backtrack)
                                      ;; Go back the way we came.
                                      (reverse-move move)))) 
