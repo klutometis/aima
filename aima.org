@@ -1982,6 +1982,14 @@
               (if (not continue?) (finalizer))
               continue?))))
       
+      (define (make-composite-animation-finalizer combinandum combinator file)
+        (let ((composite-directory (create-temporary-directory)))
+          (system* "cd ~a && for i in *; do echo $i; convert +append $i ~a/$i ~a/$i; done"
+                   combinandum
+                   combinator
+                   composite-directory)
+          (make-animation-finalizer composite-directory file)))
+      
       (define (make-animation-finalizer directory file)
         (lambda ()
           (system* "rm -fv ~a.gif" file)
@@ -2186,38 +2194,84 @@
               (make-graph-performance-measure world agent)))
             directory))))
       
+      (define (simulate-comparatively world agent steps width height font-size title)
+        (let ((directory (create-temporary-directory)))
+          (simulate
+           ;; Order of composition matters, apparently; be thoughtful.
+           (compose-environments
+            (make-step-limited-environment steps)
+            ;; Can't this contain its finalizer? Maybe even give it the
+            ;; terminal frame?
+            (make-graph-animating-environment world
+                                              agent
+                                              directory
+                                              width
+                                              height 
+                                              font-size
+                                              title)
+            (make-debug-environment agent)
+            (make-graph-environment world agent)
+            (make-graph-performance-measure world agent)))
+          directory))
+      
+      ;;; We should generalize this.
+      (define compare-graphs
+        (case-lambda
+         ((world agent-one title-one agent-two title-two composite-file)
+          (compare-graphs world
+                          agent-one
+                          title-one
+                          agent-two
+                          title-two
+                          composite-file
+                          (default-steps)
+                          (/ (default-width) 2)
+                          (default-height)
+                          (/ (default-font-size) 2)))
+         ((world
+           agent-one
+           title-one
+           agent-two
+           title-two
+           composite-file
+           steps
+           width
+           height
+           font-size)
+          (let ((directory-one
+                 (simulate-comparatively (copy-world world)
+                                         agent-one
+                                         steps
+                                         width
+                                         height
+                                         font-size
+                                         title-one))
+                (directory-two
+                 (simulate-comparatively world
+                                         agent-two
+                                         steps
+                                         width
+                                         height
+                                         font-size
+                                         title-two)))
+            (let ((composite-directory (create-temporary-directory)))
+              (system* "cd ~a && for i in *; do echo $i; convert +append $i ~a/$i ~a/$i; done"
+                       directory-one
+                       directory-two
+                       composite-directory)
+              ((make-animation-finalizer composite-directory composite-file)))))))
+      
       (let* ((world (make-preferential-depth-first-world 20))
              (start (random-start world)))
         (let ((stateful-agent (make-stateful-graph-agent start))
-              (random-agent (make-randomized-reflex-graph-agent start))
-              (width 800)
-              (height 900)
-              (steps 1000)
-              (font-size 24))
-          (let ((stateful-directory
-                 (simulate-graph (copy-world world)
-                                 stateful-agent
-                                 steps
-                                 width
-                                 height
-                                 font-size
-                                 "Stateful agent"
-                                 "stateful-agent"))
-                (random-directory
-                 (simulate-graph world
-                                 random-agent
-                                 steps
-                                 width
-                                 height
-                                 font-size
-                                 "Randomized agent"
-                                 "random-agent")))
-            (let ((composite-directory (create-temporary-directory)))
-              (system* "cd ~a && for i in *; do echo $i; convert +append $i ~a/$i ~a/$i; done"
-                       stateful-directory
-                       random-directory
-                       composite-directory)
-              ((make-animation-finalizer composite-directory "composite-agent"))))))
+              (random-agent (make-randomized-reflex-graph-agent start)))
+          (parameterize ((default-steps 10))
+            (compare-graphs world
+                            stateful-agent
+                            "Stateful agent"
+                            random-agent
+                            "Random agent"
+                            "composite-agent-harro"))))
       
     #+END_SRC
 *** TODO Allow specification of random-seeds
