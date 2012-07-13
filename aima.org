@@ -2220,6 +2220,7 @@
               ((make-animation-finalizer composite-directory "composite-agent"))))))
       
     #+END_SRC
+*** TODO Allow specification of random-seeds
 *** TODO Stateful graph agent
     The stateful graph agent has to divine indirectly that it
     encountered an obstacle based on whether or not the last action
