@@ -2177,6 +2177,30 @@
              ;; Order of composition matters, apparently; be thoughtful.
              (compose-environments
               (make-step-limited-environment steps)
+              (make-debug-environment agent)
+              (make-graph-environment world agent)
+              (make-graph-performance-measure world agent)))
+            directory))))
+      
+      (define simulate-graph/animation
+        (case-lambda
+         ((world agent)
+          (simulate-graph/animation world agent (default-steps)))
+         ((world agent steps)
+          (simulate-graph/animation world
+                          agent
+                          steps
+                          (default-width)
+                          (default-height)
+                          (default-font-size)
+                          (default-title)
+                          (default-file)))
+         ((world agent steps width height font-size title file)
+          (let ((directory (create-temporary-directory)))
+            (simulate
+             ;; Order of composition matters, apparently; be thoughtful.
+             (compose-environments
+              (make-step-limited-environment steps)
               ;; Can't this contain its finalizer? Maybe even give it the
               ;; terminal frame?
               (make-graph-animating-environment world
