@@ -1950,14 +1950,6 @@
               (if (not continue?) (finalizer))
               continue?))))
       
-      (define (make-composite-animation-finalizer combinandum combinator file)
-        (let ((composite-directory (create-temporary-directory)))
-          (system* "cd ~a && for i in *; do echo $i; convert +append $i ~a/$i ~a/$i; done"
-                   combinandum
-                   combinator
-                   composite-directory)
-          (make-animation-finalizer composite-directory file)))
-      
       (define (make-animation-finalizer directory file)
         (lambda ()
           (system* "rm -fv ~a.gif" file)
@@ -1967,6 +1959,14 @@
                    file)
           (system* "identify ~a/0.gif" directory)
           (system* "mencoder ~a.gif -ovc lavc -o ~a.avi" file file)))
+      
+      (define (make-composite-animation-finalizer combinandum combinator file)
+        (let ((composite-directory (create-temporary-directory)))
+          (system* "cd ~a && for i in *; do echo $i; convert +append $i ~a/$i ~a/$i; done"
+                   combinandum
+                   combinator
+                   composite-directory)
+          (make-animation-finalizer composite-directory file)))
       
       (define (make-unknown-location clean?)
         (make-location (if clean? clean dirty)
