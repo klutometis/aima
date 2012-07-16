@@ -943,568 +943,1206 @@
           (/ (apply + scores) (length scores)))))
    #+END_SRC
 
-   #+BEGIN_EXAMPLE
-   ┌─┬┐
-   │ ││
-   └─┴┘
-   #+END_EXAMPLE
-
-   If we get too fancy, it's going to take us a while; why not just
-   draw a couple random barriers in a box? Not enough to probably
-   block access, &c.
-
-   The world should be a graph; we'll search on that graph and thereby
-   anticipate chapter 3. Debug output can produce an animated graph
-   over graphviz (see e.g. the Iraq project). Show how the agent moves
-   and the squares clean?
-
-   If we want to create a random graph, but not necessarily a maze
-   that fills up a given extent, we can specify e.g. the number of
-   nodes. We have to have some condition for backtracking, though:
-   random? The fill-up-an-extent maze-algorithm backtracks when it has
-   no unseen neighbors; I suppose we can weight backtrack vs. branch
-   differently and see what happens. I wonder whether e.g. 50/50 will
-   produce a graph with a lot of shallow paths and high branching.
-   Make backtracking and branching relatively expensive, then.
-
-   The random reflex agent might do well in a completely connected
-   graph, incidentally, since it doesn't have to make any decisions
-   about where to go; it might fair poorly in a linear environment,
-   since at least half of the time it will be unable to move.
-
-   It turns out that [[http://en.wikipedia.org/wiki/Random_graph][random graphs]] are an open topic of research; with
-   the [[http://en.wikipedia.org/wiki/Erd%C5%91s%E2%80%93R%C3%A9nyi_model][Erdős–Rényi]], [[Watts-Strogatz]], [[http://en.wikipedia.org/wiki/Barab%C3%A1si%E2%80%93Albert_model][Barabási–Albert]] models. Let's go
-   with Barabási–Albert: it looks relatively easy to implement and has
-   interesting clustering properties (power-law degree-distributions).
-
-   Confer [[http://igraph.sourceforge.net/doc/R/ba.game.html][Gabor Csardi's implementation of Barabási-Albert]], which has
-   zero-appeal and power-of-preferential-attachment parameters; it
-   also begins with one node. It can dispense with the two nodes from
-   WP because of the zero-appeal parameter. It also does directed and
-   undirected; and distinguishes, somehow, between in- and both
-   in-and-out-degrees. It also does not divide by the total number of
-   nodes (or is it the total number of edges?).
-
-   (Holy shit: [[http://www.drdobbs.com/architecture-and-design/simulating-small-world-networks/184405611][this chick]] implements all three in Perl; she claims
-   that you divide by all the degrees in the graph, which is
-   consistent with WP's notation. With Gabor Csardi, she also has a
-   parameter $m$ of edges to add at each time; her graph also starts
-   with no edges, but has $m_0$ nodes at $t_0$; they both discuss the
-   problem of multiple edges: it may not suffice to merely not
-   generate them, you should detect and ignore them. No, wait; she's
-   talking about something different: "To keep the code simple, I
-   don't test whether the $m$ nodes that are connecting to the new
-   node are all different." Gabor, on other hand, talks about an
-   algorithm which "never generates multiple edges." Wait again: she's
-   talking about the same thing. Should we ignore duplicate links and
-   add another; or just refrain from duplicating? Damn.)
-
-   It sounds like we can create a connected-graph if we start with the
-   seed-graph-of-degree-one hack; using zero-appeal, we might have
-   disconnected but dirty squares. Disconnected but dirty squares are
-   romantic, however; and their effect should fall prey to the law of
-   large numbers if we repeat it enough times.
-
-   We are, of course, constrained by the relative directions up, down,
-   left and right; the degree of any node is therefore $\leq 4$. In
-   that sense, maybe the matrix is a reasonable representation?
-   Barabási-Albert isn't going to be able to create hubs with that
-   sort of upper bound. Push forward anyway, or capitulate to grid?
-
-   I like the idea of a graph, each of whose nodes contains $0 \leq
-   neighbors \leq 4$; which are assigned the arbitrary designations
-   =up=, =down=, =left= and =right=. The only problem is that, for
-   experimentation, we're going to have to generate a complete
-   grid-like world. That is a pain in the ass.
-
-   I take that back: can we create something like a torus or a sphere
-   where the grid wraps around; that is, where every square is totally
-   connected (edges being connected to the opposite edge)? A random
-   reflex-vacuum might be able to do well there.
-
-   If with modified Barabási-Albert we're going to have disconnected
-   nodes, by the way, if e.g. $p_i$ is false for every node; or are we
-   guaranteed to connect $m$ nodes every time? See [[http://eaton.math.rpi.edu/CSUMS/Papers/ScaleFree/Scale-Free%2520Networks.pdf][e.g.]]:
-
-   #+BEGIN_QUOTE
-   The generalized creation process of a scale-free-network is defined
-   by Barabasi and Albert [BaBo03]: Start with a small number of nodes
-   $m0$. During each step, insert a new node with connections to $m
-   \leq m0$ existing nodes. The probability $P_v$ of node $v$ being
-   connected to a new node depends on its degree $j_v$. The higher its
-   degree, the greater the probability that it will receive new
-   connections ("the rich get richer").
-   #+END_QUOTE
-
-   Since there's an [[http://www.bsse.ethz.ch/cobi/education/Math_Mod_basic/ex8_2011.pdf][upper bound]] on the dividend, we're going to
-   degenerate into a network whose edges are picked at random; and,
-   worse yet, might end up with many unconnected nodes.
-
-   Can't we just create the world initially, by the way, instead of
-   creating the graph and then the world? Interestingly, the relative
-   directions won't meet up: =up= is paired with =left=, &c. Is such a
-   world physically possible? Yes, if the relative directions for each
-   location are different; they're relative, after all. It shouldn't
-   matter to the agents.
-
-   It's a weird world, though.
-
-   I want to have an environment that spits out an animated graph of
-   where the agent is (green), which cells are dirty (grey), which are
-   clean (white).
-
    #+BEGIN_SRC scheme
-     (use aima
-          aima-vacuum
-          debug
-          extras
-          files
-          lolevel
-          posix
-          random-bsd
-          srfi-1
-          srfi-69)
+     (use aima aima-vacuum debug test)
      
-     (define (connect! graph connectend connector)
-       (hash-table-update!/default
-        graph
-        connectend
-        (lambda (neighbors)
-          (lset-adjoin eq? neighbors connector))
-        '()))
      
-     (define (biconnect! graph connectend connector)
-       (connect! graph connectend connector)
-       (connect! graph connector connectend))
+   #+END_SRC
+* Meetups
+** Mon Jun 11 2012
+   - Had to redefine the rational from "exercizing reason" to
+     "maximizing utility function" because they gave up an AI as
+     thinking machines in the 60s.
+   - Mitochondria were once autonomous agents; cells as composite
+     agents
+   - Thin vs. thick agents and skynet
+   - In games like poker, the mind of the adversarial agents are part
+     of the environment; requires a theory of mind to discern things
+     like: "is he bluffing?"
+** Mon Jun 18 2012
+   - David has the international version, which would have you write
+     an essay on evolution and autonomy; see e.g. Turing on child AI:
      
-     (define make-node gensym)
-     
-     (define (sum-degrees graph)
-       (hash-table-fold graph
-                        (lambda (from to sum) (+ (length to) sum))
-                        0))
-     
-     (define (write-graph-as-dot graph)
-       (let ((graph (hash-table-copy graph)))
-         (display "digraph G {")
-         (for-each (lambda (from) (format #t "~a;" from))
-           (hash-table-keys graph))
-         (hash-table-walk
-          graph
-          (lambda (from to)
-            (for-each
-                (lambda (to) (format #t "~a->~a;" from to)) to)))
-         (display "}\n")))
-     
-     (define (write-graph-as-pdf graph)
-       (receive (input output id)
-         (process "neato -Tpdf")
-         (with-output-to-port output
-           (lambda () (write-graph-as-dot graph)))
-         (close-output-port output)
-         (with-input-from-port input
-           (lambda ()
-             (do ((line (read-line) (read-line)))
-                 ((eof-object? line))
-               (write-line line))))
-         (close-input-port input)))
-     
-     (define (display-pdf pdf)
-       (system* "evince -s ~a" pdf))
-     
-     ;;; Number of nodes to try and join to the seed.
-     (define default-n-nodes (make-parameter 1000))
-     
-     ;;; Number of edges to attempt to create per step.
-     (define default-m (make-parameter 4))
-     
-     ;;; We're going to have to maintain the e.g. clean-dirty data in
-     ;;; separate structures if the graph merely expresses node
-     ;;; relationships.
-     ;;;
-     ;;; That's fine: let's maintain a second hash-table for `node ->
-     ;;; clean?'; so-called obstacles are merely lack of passage.
-     ;;;
-     ;;; We need a mapping from nodes to up, down, left, right; however.
-     ;;; Can we assign this randomly, somehow? Otherwise, we'll get an
-     ;;; up-biased graph; or, rather: an up-, down-, left-, right-biased
-     ;;; graph (in that order).
-     ;;;
-     ;;; Yet another hash-table that assigns direction?
-     ;;;
-     ;;; No: one hash table that expresses the graph structure, another
-     ;;; that maps symbols to objects; which objects contain: status,
-     ;;; relative direction. Problem is: the same node can be linked to
-     ;;; more than once from different relative directions (the graph has
-     ;;; loops; doesn't it? Yes it does: but they're relatively rare. In
-     ;;; this sense: Barabási-Albert graphs are probably different from
-     ;;; grids with sparse obstactles).
-     ;;;
-     ;;; Fuck it: let's have an up-biased graph; maybe the reflex agent can
-     ;;; use that knowledge to its advantage.
-     ;;;
-     ;;; Should we allow an optional seed here, so we can reproduce the
-     ;;; input?
-     (define barabási-albert-graph
-       (case-lambda
-        (() (barabási-albert-graph (default-n-nodes) (default-m)))
-        ((n-nodes m)
-         (let ((graph (make-hash-table)))
-           (biconnect! graph (make-node) (make-node))
-           (do ((n-nodes n-nodes (- n-nodes 1)))
-               ((zero? n-nodes))
-             (let ((new-node (make-node)))
-               (do ((from (hash-table-keys graph) (cdr from))
-                    (m m (- m 1)))
-                   ((or (null? from) (zero? m)))
-                 (let ((sum-degrees (sum-degrees graph)))
-                   (let* ((from (car from))
-                          (degrees-from (length (hash-table-ref graph from))))
-                     (if (and (< degrees-from 4)
-                              (< (random-real) (/ degrees-from sum-degrees)))
-                         (biconnect! graph from new-node)))))))
-           graph))))
-     
-     ;; (with-output-to-file "graph.pdf"
-     ;;   (lambda () (write-graph-as-pdf (barabási-albert-graph))))
-     
-     ;; (display-pdf "graph.pdf")
-     
-     (define-record no-passage)
-     (define no-passage (make-no-passage))
-     (define passage? (complement no-passage?))
-     
-     (define up 2)
-     (define up? (cute = <> 2))
-     
-     (define down 3)
-     (define down? (cute = <> 3))
-     
-     (define-record location
-       status
-       left
-       right
-       up
-       down)
-     
-     (define-record-printer location
-       (lambda (location output)
-         (display (record->vector location) output)))
-     
-     (define default-width (make-parameter 1600))
-     
-     (define default-height (make-parameter 900))
-     
-     ;;; Height and width are in pixels.
-     (define write-dot-preamble
-       (case-lambda
-        ((agent step)
-         (write-dot-preamble agent step (default-height) (default-width)))
-        ((agent step height width)
-         (display "digraph G {")
-         (display "node [style=filled, fontname=monospace];")
-         (display "edge [fontname=monospace];")
-         (if (and height width)
-             (begin
-               (display "graph [fontsize=48.0, ratio=fill];")
-               ;; Phew: viewports are specified in points at 72 per inch;
-               ;; size is specified in pixels at 96 per inch.
-               (let ((width-in-inches (/ width 96))
-                     (height-in-inches (/ height 96)))
-                 (format #t "graph [viewport=\"~a,~a\", size=\"~a,~a!\"];"
-                         (* width-in-inches 72)
-                         (* height-in-inches 72)
-                         width-in-inches
-                         height-in-inches))))
-         (if step
-             (format #t "graph [label=\"Score: ~a; step: ~a\"]"
-                     (agent-score agent)
-                     step)))))
-     
-     (define (write-dot-nodes world agent)
-       (hash-table-walk
-        world
-        (lambda (name location)
-          (let ((color
-                 (cond ((eq? (agent-location agent) name) "green")
-                       ((clean? (location-status location)) "white")
-                       (else "gray"))))
-            (format #t "~a [fillcolor=~a];" name color)))))
-     
-     (define (write-dot-edges world)
-       (hash-table-walk
-        world
-        (lambda (name location)
-          (let ((left (location-left location))
-                (right (location-right location))
-                (up (location-up location))
-                (down (location-down location)))
-            (if (passage? left)
-                (format #t "~a->~a [label=l];" name left))
-            (if (passage? right)
-                (format #t "~a->~a [label=r];" name right))
-            (if (passage? up)
-                (format #t "~a->~a [label=u];" name up))
-            (if (passage? down)
-                (format #t "~a->~a [label=d];" name down))))))
-     
-     (define (write-dot-postscript) (display "}\n"))
-     
-     (define write-world-as-dot
-       (case-lambda
-        ((world agent) (write-world-as-dot world agent #f))
-        ((world agent step)
-         (write-world-as-dot world agent step (default-height) (default-width)))
-        ((world agent step height width)
-         (write-dot-preamble agent step height width)
-         (write-dot-nodes world agent)
-         (write-dot-edges world)
-         (write-dot-postscript))))
-     
-     (define (write-world-as-pdf world agent pdf)
-       (receive (input output id)
-         (process "neato" `("-Tpdf" "-o" ,pdf))
-         (with-output-to-port output
-           ;; Do we really need a blank label, for some reason?
-           (lambda () (write-world-as-dot world agent #f #f #f)))
-         (flush-output output)
-         (close-output-port output)
-         (close-input-port input)))
-     
-     (define (write-world-as-gif world agent frame gif)
-       (receive (input output id)
-         (process "neato" `("-Tgif" "-o" ,gif))
-         (with-output-to-port output
-           (lambda () (write-world-as-dot world agent frame)))
-         (flush-output output)
-         (close-output-port output)
-         (close-input-port input)))
-     
-     (define (graph->world graph)
-       (let ((world (make-hash-table)))
-         (hash-table-walk
-          graph
-          (lambda (from to)       
-            (let* ((rest (make-list (- 4 (length to)) no-passage))
-                   (to (append to rest))
-                   (to (shuffle to (lambda (x) (random (length to))))))
-              (let ((location
-                     (make-location
-                      dirty
-                      (list-ref to left)
-                      (list-ref to right)
-                      (list-ref to up)
-                      (list-ref to down))))             
-                (hash-table-set! world from location)))))
-         world))
-     
-     (define (random-start world)
-       (let ((locations (hash-table-keys world)))
-         (list-ref locations (random-integer (length locations)))))
-     
-     (define (make-randomized-reflex-graph-agent start)
-       (make-reflex-agent
-        start
-        (lambda (location clean?)
-          (if clean?
-              (list-ref '(left right up down) (random 4))
-              'suck))))
-     
-     (define (make-graph-environment world agent)
-       (lambda ()
-         (let* ((location (agent-location agent))
-                (action ((agent-program agent)
-                         location
-                         (clean? (location-status
-                                  (hash-table-ref world location))))))
-           (debug-print "agent-action" action)
-           (case action
-             ((left)
-              (let ((left (location-left (hash-table-ref world location))))
-                (if (passage? left)
-                    (agent-location-set! agent left))))
-             ((right)
-              (let ((right (location-right (hash-table-ref world location))))
-                (if (passage? right)
-                    (agent-location-set! agent right))))
-             ((up)
-              (let ((up (location-up (hash-table-ref world location))))
-                (if (passage? up)
-                    (agent-location-set! agent up))))
-             ((down)
-              (let ((down (location-down (hash-table-ref world location))))
-                (if (passage? down)
-                    (agent-location-set! agent down))))
-             ((noop))
-             ((suck)
-              (location-status-set! (hash-table-ref world location) clean))
-             (else (error "graph-environment -- Unknown action"))))))
-     
-     (define (make-graph-world) (graph->world (barabási-albert-graph)))
-     
-     (define (make-graph-performance-measure world agent)
-       (lambda ()
-         (let ((clean-locations
-                ;; Quicker with map and apply?
-                (hash-table-fold
-                 world
-                 (lambda (name location clean-locations)
-                   (if (clean? (location-status location))
-                       (+ clean-locations 1)
-                       clean-locations))
-                 0)))
-           (agent-score-set! agent (+ (agent-score agent) clean-locations)))))
-     
-     (define (make-graph-animating-environment world agent directory)
-       (let ((frame 0))
-         (lambda ()
-           (let ((gif (make-pathname directory (number->string frame) "gif")))
-             (write-world-as-gif world agent frame gif))
-           (set! frame (+ frame 1)))))
-     
-     ;;; I think make-step-limited-environment is a special case of
-     ;;; make-finalizing-environment with noop.
-     ;;;
-     ;;; This probably belongs in aima; should we preserve the
-     ;;; step-limited-environment as a specialization of this?
-     (define (make-finalizing-environment finalizer final-step)
-       (let ((step 0))
-         (lambda ()
-           (set! step (+ step 1))
-           (let ((continue? (< step final-step)))
-             (if (not continue?) (finalizer))
-             continue?))))
-     
-     (define (make-animation-finalizer directory)
-       (lambda ()
-         (system "rm -fv graph.gif")
-         (system* "convert $(find ~a -type f | sort -k 1.~a -n) -loop 0 graph.gif"
-                  directory
-                  (+ (string-length directory) 2))
-         (system* "identify ~a/0.gif" directory)
-         (system "mencoder graph.gif -ovc lavc -o graph.avi")))
-     
-     (define (make-stateful-graph-agent start)
-       (make-reflex-agent
-        start
+     #+BEGIN_QUOTE
+     We have thus divided our problem into two parts. The and
+     child-programme the education process. These two remain very
+     closely connected. We cannot expect to find a good child-machine
+     at the first attempt. One must experiment with teaching one such
+     machine and see how well it learns. One can then try another and
+     see if it is better or worse. There is an obvious connection
+     between this process and evolution, by the identifications
+
+     - Structure of the child machine :: Hereditary material
+     - Changes :: Mutations
+     - Natural selection :: Judgment of the experimenter
+
+     One may hope, however, that this process will be more expeditious
+     than evolution. The survival of the fittest is a slow method for
+     measuring advantages. The experimenter, by the exercise of
+     intelligence, should be able to speed it up. Equally important is
+     the fact that he is not restricted to random mutations. If he can
+     trace a cause for some weakness he can probably think of the kind
+     of mutation which will improve it.
+     #+END_QUOTE
+*** CANCELED Test a simple agent in each (Python, Java, Clojure) implementation.
+    CLOSED: [2012-06-20 Wed 03:19]
+    - CLOSING NOTE [2012-06-20 Wed 03:19] \\
+      Looks like we're going to standardize on Clojure.
+*** DONE Get some standard cables to connect to the projector.
+    CLOSED: [2012-06-20 Wed 03:19]
+*** DONE See if we can use =xrandr= to get twin-view with an external HDMI.
+    CLOSED: [2012-06-15 Fri 06:04]
+    #+BEGIN_SRC sh
+      xrandr --output eDP1 --off
+      xrandr --output HDMI1 --mode 1280x720
+    #+END_SRC
+** Mon Jun 25 2012
+*** Discussion
+**** 2.1
+     Change performance measure; utility-based agent aware of its own
+     performance measure: can react accordingly? Not a reflex agent,
+     though, that's pre-programmed.
+
+     Example: given a penalty for each move, a reflex agent's expected
+     performance would be just as good as any other's given T = 2; but
+     not when T = 1000 (it would require a state-based agent to
+     realize that the world is clean and stop moving).
+**** 2.2
+     - c :: Memory, motor, bump sensor (or penalty); learn geography,
+            probability of becoming dirty. Clustering algorithm:
+            centers of mass for dirt.
+**** 2.3
+     - a :: Best action given available information.
+     - c :: One-square, not dirty.
+     - d :: Page 51 (program) vs. page 36 (function).
+     - f :: See *c* above.
+     - g :: Stochastic vs. deterministic vacuum world: reflex agents
+            are still rational. Performance measure still the same.
+     - i :: Even an omniscient poker player is subject to luck.
+*** TODO Get a minimal Clojure example up [[https://github.com/klutometis/aima-clojure][here]].
+*** TODO Set up =csrg.org= with a mailing list.
+    This is an alternative to e.g. Google groups and whatever
+    mechanism Meetup has.
+
+    (Or is it =csrg.com=? It is indeed =csrg.org=.)
+** Mon Jul  2 2012
+   - Each parameter in the agent-program corresponds to a sensor.
+   - Should we pass a status-variable into the sensor instead of a
+     boolean? Might be more consistent with the singletons. Nah, fuck
+     it.
+* Notes
+** 1
+   - Two dimensions: thought vs. action, humanity vs. rationality.
+   - Physical simulation of a person is unnecessary for intelligence.
+     - Mind-body dualism of Descartes?
+   - Cognitive science brings together computer models from AI and
+     experimental techniques from psychology.
+   - Real cognitive science, however, is necessarily based on
+     experimental investigation of actual humans.
+   - The standard of rationality is mathematically well defined and
+     completely general.
+   - We will adopt the working hypothesis that perfect rationality is a
+     good starting point for analysis.
+   - Limited rationality: acting appropriately when there is not enough
+     time
+   - Materialism, which holds that the brain's operation according to
+     the laws of physicas constitutes the mind.
+   - Logical positivism
+   - Carnap, The Logical Structures of the World, was probably the
+     first theory of mind as a computational process.
+   - Intelligence requires action as well as reasoning.
+   - Actions are justified by a logical connection between goals and
+     knowledge of the action's outcome.
+   - Regression planning system
+   - The leap to a formal science required a level of mathematical
+     formalization: logic, computation, probability.
+   - The world is an extremely large problem instance.
+   - Models based on satisficing---making decisions that are "good
+     enough"---gave a better description of actual human behavior.
+   - Searle: brains cause minds.
+   - Behaviorism
+   - "A cognitive theory should be like a computer program."
+   - Intelligence and an artifact
+   - Parallelism---a curious convergence with the properties of the
+     brain.
+   - The state of a neuron was conceived of as "factually equivalent to
+     a proposition which proposed its adequate stimulus." McCulloch and
+     Pitts (1943)
+     - Neural events and the relations among them can be treated by
+       means of propositional logic.
+     - For any logical expression satisfying certain conditions, one
+       can find a net behaving in the fashion it describes.
+     - For every net behaving under one assumption, there exists
+       another net which behaves under the other and gives the same
+       results.
+   - Perhaps "computational rationality" would have been more precise
+     and less threatening, but "AI" stuck.
+   - AI from the start embraced the idea of duplicating human faculties
+     such as creativity.
+   - John McCarthy referred to this period as the "Look, Ma, no hands!"
+     era.
+   - "A physical symbol system has the necessary and sufficient means
+     for general intelligent action."
+   - 1958 . . . McCarthy define Lisp, which was to become the dominant
+     AI programming language for the next 30 years.
+   - It is useful to have a formal, explicit representation of the
+     world and its workings and to be able to maniplutae that
+     representation with deductive processes.
+   - McCarthy, Programs with Common Sense
+     - In this program the procedures will be described as much as
+       possible in the language itself and, in particular, the
+       heuristics are all so described.
+     - If one wants a machine to be able to discover an abstraction, it
+       seems most likely that the machine must be able to represent
+       this abstraction in some relatively simple way.
+     - The improving mechanism should be improvable.
+     - Must have or evolve concepts of partial success.
+       - Something about ~1995 that made for a cute blog.
+     - For example, to mest people, the number 3812 is not an object:
+       they have nothing to say about it except what can be deduced
+       from its structure. On the other hand, to most Americans the
+       number 1776 is an object because they have filed somewhere the
+       fact that it represents the year when the American Revolution
+       started.
+     - One might conjecture that division in man between conscious and
+       unconscious thought occurs at the boundary between
+       stimulus-response heuristics which do not have to be reasoned
+       about but only obeyed, and the others which have to serve as
+       premises in deductions.
+   - Machine evolution (genetic algorithms): Friedberg, 1958, 1959.
+     - Friedberg. 1958. A learning machine Part 1. IBM Journal of
+       Research and Development, 2, 2--13.
+       - From and intent, to be sure, are related quite discontinuously
+         in the compact, economical programs that programmers wrte.
+     - Friedberg, Dunham, North. 1959. A learning machine, Part 2. IBM
+       Journal of Research and Development, 3, 282--287.
+   - Failure to come to grips with the "combinatorial explosion"
+   - The new back-propagation learning algorithms for multilayer
+     netwrks that were to cause an enormous resurgence in neural-net
+     research in the late 1980s were actually discovered first in 1969.
+   - Bruce Buchanan: a philosopher turned computer scientist
+   - DENDRAL was the first successful knowledge-intensive system
+     (expert system).
+   - AI Winter
+   - Parallel Distributed Processing (Rumelhart, McClelland. 1986)
+   - Connectionist models: competitors to symbols models and logicist
+     approach
+   - Ones that act rationally according to the laws of decision theory
+     and do not try to imitate the thought steps of human experts
+   - Control theory deals with designing devices that act optimally on
+     the basis of feedback from the environment.
+
+** 2
+   - Rational agents
+   - Agents behaves as well as possible (utility function?)
+   - Agent perceives its environment through sensors and acts through
+     actuators.
+     - Hands are actuators and sensors.
+   - Percept :: agent's perceptual inputs at any given instant
+   - Agent's choice depends on percept sequence to date.
+   - Agent function :: maps percept sequence to action.
+   - External characterization of agent (agent function): table
+     mapping percept sequences to actions; internally: agent program.
+   - In a sense, all areas of engineering can be seen as designing
+     artifacts that intaract with the world.
+     - Trivializing agents to view e.g. calculators as such.
+   - Intelligent agents, on the other hand: non-trivial decision
+     making.
+   - Rational agents: does the right thing (utility).
+   - Performance measure
+     - (This all sounds reminiscent of [[http://www.cs.cmu.edu/~tom/mlbook.html][Mitchell]], by the way.)
+   - Sequence of actions causes the environment to go through states:
+     environmental states are distinct from agent states.
+     - Basing performance merely off of agent-states is a form of
+       coherentism.
+   - Design performance measures according to what one actually wants
+     in the environment.
+   - "We leave these question as an exercise for the diligent reader."
+     - Classic.
+   - Rationality: performance measure, agent's prior (i.e. /a priori/)
+     knowledge, agent's actions, agent's percept sequence.[fn:2]
+     - "Percept," it turns out, is the converse of "concept": "A
+       Percept or Intuition is a single representation . . . a Concept
+       is a collective (general or universal) representation of a
+       whole class of things." (F. C. Bowen Treat. Logic)
+   - For each percept sequence, a rational agent should select an
+     action that is expected to maximize its performance measure,
+     given its percept sequence and a priori knowledge.
+   - Omniscience vs. rationality
+   - Rationality maximizes /expected/ performance; perfection,
+     /actual/ performance.
+   - Our definition of rationality does not require omniscience.
+     - It's possible sometimes, by the way, to detect transitions in
+       authorship.
+   - Information gathering: actions in order to modify future
+     percepts.
+   - /a priori/ rather than percepts: lacks autonomy.
+   - Ration agent: autonomous; boostrap with /a priori/, though.
+   - Just as evolution provides animals with built-in reflexes to
+     survive long enough to learn for themselves
+   - Task environments
+   - PEAS :: Performance, Environment, Actuators, Sensors
+     - Mitchell has: task, performance measure, training experience,
+       target function, target function representation.
+   - Fully observable vs. partially observable environment.
+   - Task environment effectively fully observable if the sensors
+     detect all aspects that are /relevant/ to the choice of action,
+     performance measure.
+   - Single agent vs. multiagent
+   - Entity /may/ vs. /must/ be viewed as an agent.
+   - Competitive vs. cooperative multiagent environment
+   - Communication
+   - In some competitive environments, randomized behavior is rational
+     because it avoids predictability.
+   - Deterministic vs. stochastic environment
+   - "Uncertain" environment: not fully observable or not
+     deterministic
+   - Stochastic: uncertainty about outcomes quantified in terms of
+     probabilities; nondeterministic: actions characterized by
+     possible outcomes, no probabilities attached.
+   - Episodal vs. sequential: atomic episodes: receives percept and
+     performs single action; sequential: current decision affect all
+     future decisions.
+   - Static vs. dynamic: environment change while agent is
+     deliberating.
+   - Discrete vs. continuous: state of the environment, time,
+     percepts, actions.
+   - Known vs. unknown: "laws of physics" of the environment
+   - Hardest: partially observable, multiagent, stochastic,
+     sequential, dynamic, continuous, unknown.
+   - Code repository includes environment simulator that places one or
+     more agents in a simulated environment, observes their behavior
+     over time, evaluates them according to a given performance
+     measure.
+     - Shit: this is something we could implement in Scheme ([[http://code.google.com/p/aima-java/source/checkout][java]],
+       [[http://code.google.com/p/aima-python/source/checkout][python]], [[http://aima.cs.berkeley.edu/lisp/doc/overview.html][lisp]], [[http://code.google.com/p/aima-data/source/checkout][data]]); lot of work, though? Glory?
+       - A lot of the [[http://aima.cs.berkeley.edu/lisp/doc/overview-UTILITIES.html][utilities]] are in SRFI-1; e.g. =transpose= is
+         =zip=.
+       - Infinity is there.
+       - Might have to write =rms-error=; =ms-error=.
+       - =sample-with-replacement=; =sample-without-replacement=
+         - Combinatorics SRFI, anyone?
+       - =fuzz=
+       - =print-grid=, &c.
+       - =the-biggest=, =the-biggest-random-tie=, =the-biggest-that=,
+         &c.
+       - Binary tree stuff
+       - Queue
+       - Heap
+       - They did CLOS-like stuff
+     - Damn, they put some work in; could do it incrementally? Will be
+       ad-hoc, I guarantee it.
+     - Maybe we can program it, given the [[http://aima.cs.berkeley.edu/lisp/doc/overview-AGENTS.html][agents]] API.
+       - =run-environment= looks like something central.
+     - What would happen if we merely translated the code to Chicken?
+       Could do so, perhaps, without fully understanding it; write an
+       idiomatically Scheme-port later.
+     - In that case, find some alternative to CLOS; or use tinyCLOS?
+     - Also, beginning to think that we misnamed our repo: we're
+       calling it =aima=, but we'd like to write an =aima= egg; with
+       =aima-agents=, =aima-search=, =aima-logic=, =aima-planning=,
+       =aima-uncertainty=, =aima-learning=, =aima-language= modules.
+       - Call it =aima-egg=? =aima-chicken=?
+     - Translation seems like the way to go: relatively mechanical.
+     - [[http://aima.cs.berkeley.edu/lisp/doc/overview-LOGIC.html][Incidentally]], "We need a new language for logical expressions,
+       since we don't have all the nice characters (like upside-down
+       A) that we would like to use." We can use ∀ in Scheme, can't
+       we? Sure. Tough to type? Maybe. Also, think font-lock.
+     - May not be up-to-date for 3e; let's see; also, rife with
+       =defmethod= and other OOisms. Can ignore it, possibly, and its
+       type-checking; =defstructure= is similar, I think, to SRFI-9.
+     - Damn, they implemented unification.
+     - Not to mention: the learning stuff (e.g. decision trees).
+     - Man, should we implement this stuff ad-hoc; or otherwise depend
+       on the existing implementations?
+     - Path of least resistance: do it in Allegro? Ouch.
+   - The job of AI is to design an agent program that implements the
+     agent function, the mapping from percepts to actions.
+   - Agent = architecture + program
+   - The agent program takes the current percept as input; the agent
+     function, which takes the entire percept history.
+   - The agent function that the program embodies
+   - Write programs that produce rational behavior from a smallish
+     program rather than a vast table.
+   - Reflex agents; model-based reflex agents; goal-based agents;
+     utility-based agents.
+   - 
+     #+BEGIN_SRC org
+       ,- table-driven-agent percept
+       ,  - persistent
+       ,    - percepts ()
+       ,    - table
+       ,  - append percept to percepts
+       ,  - lookup percepts table
+       
+     #+END_SRC
+   - 
+     #+BEGIN_SRC org
+       ,- reflex-vacuum-agent location status
+       ,  - if dirty? status
+       ,    - suck
+       ,    - else if location = A
+       ,      - right
+       ,    - else
+       ,      - left
+     #+END_SRC
+   - Simple reflex agent: select actions on the basis of the current
+     precept
+     - Learned responses, innate reflexes
+     - 
+       #+BEGIN_SRC org
+         ,- simple-reflex-agent percept
+         ,  - persistent
+         ,    - rules
+         ,  - state = interpret-input(percept)
+         ,  - rule = rule-match(state rules)
+         ,  - rule.action
+       #+END_SRC
+     - Works only if the correct decision can be made on the current
+       percept: i.e. if the environment is fully observable.
+     - Escape from infinite loops is possible if the agent can randomize
+       its actions.
+     - In single-agent environments, randomization is usually not
+       rational.
+     - In most cases we can do better with more sophisticated
+       deterministic agents.
+   - Model-based reflex agents
+     - Partial observability: keep track of the part of the world it
+       can't see now.
+     - Internal state
+     - Knowledge of how world evolves independently from agent
+     - Knowledge of actions affect the world
+     - Model of the world
+     - 
+       #+BEGIN_SRC org
+         ,- model-based-reflex-agent percept
+         ,  - persistent
+         ,    - state
+         ,    - model
+         ,    - rules
+         ,    - action
+         ,  - state = update-state(state action percept model)
+         ,  - rule = rule-match(state)
+         ,  - (action rule)
+       #+END_SRC
+     - State of the world can contain goals.
+   - Goal-based agents
+     - In addition to current state, goal information that describes
+       situations that are desirable
+     - Search, planning
+     - Flexible, reason about world vis à vis goals
+   - Utility-based agents
+     - Whereas goals are happy/unhappy, more general performance
+       measure: utility
+     - Utility functional: internalization of performance measure
+     - This is not the only way to be rational: rational agent for
+       vacuum has no idea what its utility function is (see exercise
+       [[1.3]]).
+     - When there are conflicting goals, utility function opts for the
+       appropriate tradeoff.
+     - Partial observability, stochasticity: decision making under
+       uncertainty.
+     - Expected utility of the action outcomes: derive, given the
+       probabilities and utilities of each outcome.
+     - Any rational agent must behave as if it possesses a utility
+       function.
+     - An agent that possesses an explicit utility function can make
+       rational decisions with a general-purpose algorithm that does not
+       depend on the specific utility function being maximized.
+     - Global rationality: local constraint on rational-agent designs.
+     - Choosing utility-maximizing course of action
+   - Learning agents
+     - Now we're getting into some Mitchell-action: critic, learning
+       element, performance element, problem generator, &c.
+       - Need a book on big data?
+     - Operate in initially unknown environments and become more
+       competent.
+     - Learning element
+       - Making improvements
+     - Performance element
+       - Selecting external actions
+     - Critic
+       - How performance element should be modified vis à vis fixed
+         performance standard.
+       - Performance standard must be fixed (i.e. checkmate).
+       - Performance standard outside agent; conforms thereto.
+     - Problem generator
+       - Suggesting actions that will lead to new and informative
+         experiences.
+       - Suboptimal actions short run, better actions long run.
+     - Utility-based agents learning utility information
+     - Performance standard distinguishes percept as reward or
+       penalty.
+     - Process of modification of each component
+   - Atomic, factored, structured environments
+     - Atomic
+       - Each state of the world indivisible
+     - Factored
+       - Variables, attributes
+     - Structured
+       - Objects and relationships can be described explicitly
+     - Increasing expressiveness
+     - Intelligent systems: operate at all points along the
+       expressiveness-axis simultaneously.
+   - Agents perceives and acts; agent function maps percept seq ->
+     action.
+   - Performance measure evaluates behavior.
+   - Maximize expected performance measure.
+   - Task environment: performance measure, external environment,
+     actuators, sensors.
+   - Nicomachean Ethics
+   - McCarthy, Programs with Common Sense
+   - Newell and Simon, Human Problem Solving
+   - Horvitz suggests the use of rationality conceived as the
+     maximization of expected utility as the basis for AI.
+     Pearl, 1988.[fn:3]
+     - Horvitz, E., 1988. Reasoning Under Varying and Uncertain
+       Resource Constraints, Proc. of the 7th National Conference on
+       AI, Minneapolis, MN, Morgan Kauffman, pp:111-116.
+     - Horvitz, E. J., Breese, J.S., Henrion, M. 1988. Decision The-
+       ory in Expert Systems and Artificial Intelligence, Journal of
+       Approximate Reasoning, 2, pp247-302.
+
+** Lectures
+*** 1
+    - AI: mapping from sensors to actuators
+      - Voice, child-like engagement
+    - Fully vs. partially observable
+    - Deterministic vs. stochastic
+    - Discrete vs. continuous
+    - Benign vs. adversarial
+    - Uncertainty management
+*** 2
+    - Initial state
+    - $\texttt{actions}(state) \to {a_1, a_2, a_3, \dots}$
+    - $\texttt{result}(state, action) \to state^\prime$
+    - $\texttt{goal-test}(state) \to T|F$
+    - $\texttt{path-cost}(state \xrightarrow{action} state \xrightarrow{action} state) \to n$
+    - $\texttt{step-cost}(state, action, state^\prime) \to n$
+    - Navigate the state space by applying actions
+    - Separate state into three parts: ends of paths (frontier);
+      explored and unexplored regions.
+    - Step-cost
+    - Tree-search
+      - Family-resemlance; difference: which path to look at first.
+    - Depth-first search: shortest-first search
+** Turing, Computing Machinery and Intelligence
+   - Can machines think?
+   - It is A's object in the game to try and cause C to make the wrong
+     identification.
+     - Didn't realize there was an adversarial element to the Turing
+       test.
+   - What will happen when a machine takes the part of A in this game?
+   - . . . drawing a fairly sharp line between the physical and the
+     intellectual capacities of man.
+     - A reasonable dualism
+   - May not machines carry out something which ought to be described
+     as thinking but which is very different from what a man does?
+     - The humanity/rationality plane of AI?
+   - Imitation game
+     - Simulacrum sufficeth
+   - It is probably possible to rear a complete individual from a
+     single cell of the skin (say) of a man . . . but we would not be
+     inclined to regard it as a case of "constructing a thinking
+     machine".
+   - Digital computer:
+     1. Store
+     2. Executive unit
+     3. Control
+   - It is not normally possible to determine from observing a machine
+     whether it has a random element, for a similar effect can be
+     produced by such devices as making the choices depend on the
+     digits of the decimal for $\pi$.
+   - Discrete state machines: strictly speaking there are no such
+     machines. Everything really moves continuously.
+   - This is reminiscent of Laplace's view that from the complete
+     state of the universe at one moment of time, as described by the
+     positions and velocities of all particles, it should be possible
+     to predict all future states.
+   - This special property of digital computers, that they can mimic
+     any discrete state machine, is described by saying that they are
+     universal machines.
+   - "Are there imaginable digital computers which would do well in
+     the imitation game?" $\to$ "Are there discrete state machines
+     which would do well?"
+   - I believe that in about fifty years' time it will be possible to
+     programme computers, with a storage capacity of about $10^9$, to
+     make them play the imitation game so well that an average
+     interrogator will not have more than $70\%$ chance of making the
+     right identification after five minutes of questioning.
+     - Russell/Norvig, 12: storage units: $10^15$
+     - [[http://en.wikipedia.org/wiki/Loebner_Prize#2008][Loebner prize]]:
+       #+BEGIN_QUOTE
+       Elbot of Artificial Solutions won the 2008 Loebner Prize bronze
+       award, for most human-like artificial conversational entity,
+       through fooling three of the twelve judges who interrogated it
+       (in the human-parallel comparisons) into believing it was
+       human. This is coming very close to the $30\%$ traditionally
+       required to consider that a program has actually passed the
+       Turing test.
+       #+END_QUOTE
+       - From a [[http://technology.timesonline.co.uk/tol/news/tech_and_web/article4934858.ece][judge]]:
+         #+BEGIN_QUOTE
+         He predicted that by the end of the century, computers would
+         have a 30 per cent chance of being mistaken for a human being
+         in five minutes of text-based conversation.
+         #+END_QUOTE
+         I thought this was mistaken (should be $70$), but it is
+         indeed correct.
+     - In other words, a damn-good guess.
+   - Conjectures are of great importance since they suggest useful
+     lines of research.
+   - We might expect that He would only exercise this power in
+     conjunction with a mutation which provided the elephant with an
+     appropriately improved brain to minister to the needs of this
+     soul.
+   - We like to believe that Man is in some subtle way superior to the
+     rest of creation.
+   - "The consequences of machines thinking would be too dreadful." I
+     do not think that this argument sufficiently substantial to
+     require refutation. Consolation would would be more appropriate:
+     perhaps this should be sought the transmigration of souls.
+   - There are limitations to the powers of discrete-state
+     machines. The best known of these results is known as Gödel's
+     theorem, and shows that in any sufficiently powerful logical
+     system statements can be formulated which can neither be proved
+     nor disproved within the system, unless possibly the system
+     itself is inconsistent.
+   - "Will this machine every answer 'Yes' to any question?" It can be
+     shown that the answer is either wrong or not forthcoming.
+   - The only way to know that a man thinks is to be that particular
+     man. It is in fact the solipsist point of view.
+   - I do not wish to give the impression that I think there is no
+     mystery about consciousness. There is, for instance, something of
+     a paradox connected with any attempt to localise it.
+   - When a burnt child fears the fire and shows that he fears it by
+     avoiding it, I should say that he was applying scientific
+     induction.
+   - It would deliberately introduce mistakes in a manner calculated
+     to confuse the interrogator.
+   - By observing the results of its own behaviour it can modify its
+     own programmes so as to achieve some purpose more effectively.
+   - This is the assumption that as soon as a fact is presented to a
+     mind all consequences of that fact spring into the mind
+     simultaneously with it.
+   - The undistributed middle is glaring.
+   - I would defy anyone to learn from these replies sufficint about
+     the programme to be able to predict any replies to untried
+     values.
+   - A smallish proportion are super-critical. An idea presented to
+     such a mind may give rise to a whole "theory" consisting of
+     secondary, tertiary and more remote ideas.
+     - Sponteneity
+   - These last two paragraphs should be described as "recitations
+     tending to produce belief."
+   - The only satisfactory support that can be given will be that
+     provided by waiting for the end of the century and then doing the
+     experiment described.
+   - Estimates for the storage capacity of the brain vary from $10^10$
+     to $10^15$ binary digits.
+     - Russell/Norvig (12): $10^13$ synapses
+   - At my present rate of working I produce about a thousand digits
+     of programme a day, so that about sixty workers, working steadily
+     through the fifty years might accomplish the job, if nothing went
+     into the waste-paper basket.
+     - Mythical man-month?
+   - The child-programme and the education process
+   - One might have a complete system of logical inference "built
+     in". The store would be largely occupied with definitions and
+     propositions. Certain propositions may be described as
+     "imperatives". As soon as an imperative is classed as
+     "well-established" the appropriate action takes place.
+     - Compare McCarthy, Programs with Common Sense, regarding
+       imperatives.
+   - These choices make the difference between a brilliant and a
+     footling reasoner.
+   - We can only see a short distance ahead, but we can see plenty
+     there that needs to be done.
+
+* TODOs
+** TODO Blog about barabási-albert vs. depth-first graph-creation.
+   The former produces nice hubs and cycles, but the problem of
+   aligning complementary directions (like graph-coloring?) is
+   NP-complete. Resorting to depth-first with no cycles; would have to
+   have an exponential adjunct for cycles.
+
+   Way to quantify the difference between the two with respect to e.g.
+   average degree of nodes?
+** DONE 2.11
+   CLOSED: [2012-07-16 Mon 12:57]
+*** DONE Graph world
+    CLOSED: [2012-07-16 Mon 12:44]
+    #+BEGIN_SRC scheme
+      (use aima-vacuum
+           debug
+           srfi-25)
+
+
+    #+END_SRC
+
+    #+BEGIN_EXAMPLE
+    ┌─┬┐
+    │ ││
+    └─┴┘
+    #+END_EXAMPLE
+
+    If we get too fancy, it's going to take us a while; why not just
+    draw a couple random barriers in a box? Not enough to probably
+    block access, &c.
+
+    The world should be a graph; we'll search on that graph and thereby
+    anticipate chapter 3. Debug output can produce an animated graph
+    over graphviz (see e.g. the Iraq project). Show how the agent moves
+    and the squares clean?
+
+    If we want to create a random graph, but not necessarily a maze
+    that fills up a given extent, we can specify e.g. the number of
+    nodes. We have to have some condition for backtracking, though:
+    random? The fill-up-an-extent maze-algorithm backtracks when it has
+    no unseen neighbors; I suppose we can weight backtrack vs. branch
+    differently and see what happens. I wonder whether e.g. 50/50 will
+    produce a graph with a lot of shallow paths and high branching.
+    Make backtracking and branching relatively expensive, then.
+
+    The random reflex agent might do well in a completely connected
+    graph, incidentally, since it doesn't have to make any decisions
+    about where to go; it might fair poorly in a linear environment,
+    since at least half of the time it will be unable to move.
+
+    It turns out that [[http://en.wikipedia.org/wiki/Random_graph][random graphs]] are an open topic of research; with
+    the [[http://en.wikipedia.org/wiki/Erd%C5%91s%E2%80%93R%C3%A9nyi_model][Erdős–Rényi]], [[Watts-Strogatz]], [[http://en.wikipedia.org/wiki/Barab%C3%A1si%E2%80%93Albert_model][Barabási–Albert]] models. Let's go
+    with Barabási–Albert: it looks relatively easy to implement and has
+    interesting clustering properties (power-law degree-distributions).
+
+    Confer [[http://igraph.sourceforge.net/doc/R/ba.game.html][Gabor Csardi's implementation of Barabási-Albert]], which has
+    zero-appeal and power-of-preferential-attachment parameters; it
+    also begins with one node. It can dispense with the two nodes from
+    WP because of the zero-appeal parameter. It also does directed and
+    undirected; and distinguishes, somehow, between in- and both
+    in-and-out-degrees. It also does not divide by the total number of
+    nodes (or is it the total number of edges?).
+
+    (Holy shit: [[http://www.drdobbs.com/architecture-and-design/simulating-small-world-networks/184405611][this chick]] implements all three in Perl; she claims
+    that you divide by all the degrees in the graph, which is
+    consistent with WP's notation. With Gabor Csardi, she also has a
+    parameter $m$ of edges to add at each time; her graph also starts
+    with no edges, but has $m_0$ nodes at $t_0$; they both discuss the
+    problem of multiple edges: it may not suffice to merely not
+    generate them, you should detect and ignore them. No, wait; she's
+    talking about something different: "To keep the code simple, I
+    don't test whether the $m$ nodes that are connecting to the new
+    node are all different." Gabor, on other hand, talks about an
+    algorithm which "never generates multiple edges." Wait again: she's
+    talking about the same thing. Should we ignore duplicate links and
+    add another; or just refrain from duplicating? Damn.)
+
+    It sounds like we can create a connected-graph if we start with the
+    seed-graph-of-degree-one hack; using zero-appeal, we might have
+    disconnected but dirty squares. Disconnected but dirty squares are
+    romantic, however; and their effect should fall prey to the law of
+    large numbers if we repeat it enough times.
+
+    We are, of course, constrained by the relative directions up, down,
+    left and right; the degree of any node is therefore $\leq 4$. In
+    that sense, maybe the matrix is a reasonable representation?
+    Barabási-Albert isn't going to be able to create hubs with that
+    sort of upper bound. Push forward anyway, or capitulate to grid?
+
+    I like the idea of a graph, each of whose nodes contains $0 \leq
+    neighbors \leq 4$; which are assigned the arbitrary designations
+    =up=, =down=, =left= and =right=. The only problem is that, for
+    experimentation, we're going to have to generate a complete
+    grid-like world. That is a pain in the ass.
+
+    I take that back: can we create something like a torus or a sphere
+    where the grid wraps around; that is, where every square is totally
+    connected (edges being connected to the opposite edge)? A random
+    reflex-vacuum might be able to do well there.
+
+    If with modified Barabási-Albert we're going to have disconnected
+    nodes, by the way, if e.g. $p_i$ is false for every node; or are we
+    guaranteed to connect $m$ nodes every time? See [[http://eaton.math.rpi.edu/CSUMS/Papers/ScaleFree/Scale-Free%2520Networks.pdf][e.g.]]:
+
+    #+BEGIN_QUOTE
+    The generalized creation process of a scale-free-network is defined
+    by Barabasi and Albert [BaBo03]: Start with a small number of nodes
+    $m0$. During each step, insert a new node with connections to $m
+    \leq m0$ existing nodes. The probability $P_v$ of node $v$ being
+    connected to a new node depends on its degree $j_v$. The higher its
+    degree, the greater the probability that it will receive new
+    connections ("the rich get richer").
+    #+END_QUOTE
+
+    Since there's an [[http://www.bsse.ethz.ch/cobi/education/Math_Mod_basic/ex8_2011.pdf][upper bound]] on the dividend, we're going to
+    degenerate into a network whose edges are picked at random; and,
+    worse yet, might end up with many unconnected nodes.
+
+    Can't we just create the world initially, by the way, instead of
+    creating the graph and then the world? Interestingly, the relative
+    directions won't meet up: =up= is paired with =left=, &c. Is such a
+    world physically possible? Yes, if the relative directions for each
+    location are different; they're relative, after all. It shouldn't
+    matter to the agents.
+
+    It's a weird world, though.
+
+    I want to have an environment that spits out an animated graph of
+    where the agent is (green), which cells are dirty (grey), which are
+    clean (white).
+
+    #+BEGIN_SRC scheme
+      (use aima
+           aima-vacuum
+           debug
+           extras
+           files
+           lolevel
+           posix
+           random-bsd
+           srfi-1
+           srfi-69)
+
+      (define (connect! graph connectend connector)
+        (hash-table-update!/default
+         graph
+         connectend
+         (lambda (neighbors)
+           (lset-adjoin eq? neighbors connector))
+         '()))
+
+      (define (biconnect! graph connectend connector)
+        (connect! graph connectend connector)
+        (connect! graph connector connectend))
+
+      (define make-node gensym)
+
+      (define (sum-degrees graph)
+        (hash-table-fold graph
+                         (lambda (from to sum) (+ (length to) sum))
+                         0))
+
+      (define (write-graph-as-dot graph)
+        (let ((graph (hash-table-copy graph)))
+          (display "digraph G {")
+          (for-each (lambda (from) (format #t "~a;" from))
+            (hash-table-keys graph))
+          (hash-table-walk
+           graph
+           (lambda (from to)
+             (for-each
+                 (lambda (to) (format #t "~a->~a;" from to)) to)))
+          (display "}\n")))
+
+      (define (write-graph-as-pdf graph)
+        (receive (input output id)
+          (process "neato -Tpdf")
+          (with-output-to-port output
+            (lambda () (write-graph-as-dot graph)))
+          (close-output-port output)
+          (with-input-from-port input
+            (lambda ()
+              (do ((line (read-line) (read-line)))
+                  ((eof-object? line))
+                (write-line line))))
+          (close-input-port input)))
+
+      (define (display-pdf pdf)
+        (system* "evince -s ~a" pdf))
+
+      ;;; Number of nodes to try and join to the seed.
+      (define default-n-nodes (make-parameter 1000))
+
+      ;;; Number of edges to attempt to create per step.
+      (define default-m (make-parameter 4))
+
+      ;;; We're going to have to maintain the e.g. clean-dirty data in
+      ;;; separate structures if the graph merely expresses node
+      ;;; relationships.
+      ;;;
+      ;;; That's fine: let's maintain a second hash-table for `node ->
+      ;;; clean?'; so-called obstacles are merely lack of passage.
+      ;;;
+      ;;; We need a mapping from nodes to up, down, left, right; however.
+      ;;; Can we assign this randomly, somehow? Otherwise, we'll get an
+      ;;; up-biased graph; or, rather: an up-, down-, left-, right-biased
+      ;;; graph (in that order).
+      ;;;
+      ;;; Yet another hash-table that assigns direction?
+      ;;;
+      ;;; No: one hash table that expresses the graph structure, another
+      ;;; that maps symbols to objects; which objects contain: status,
+      ;;; relative direction. Problem is: the same node can be linked to
+      ;;; more than once from different relative directions (the graph has
+      ;;; loops; doesn't it? Yes it does: but they're relatively rare. In
+      ;;; this sense: Barabási-Albert graphs are probably different from
+      ;;; grids with sparse obstactles).
+      ;;;
+      ;;; Fuck it: let's have an up-biased graph; maybe the reflex agent can
+      ;;; use that knowledge to its advantage.
+      ;;;
+      ;;; Should we allow an optional seed here, so we can reproduce the
+      ;;; input?
+      (define barabási-albert-graph
+        (case-lambda
+         (() (barabási-albert-graph (default-n-nodes) (default-m)))
+         ((n-nodes m)
+          (let ((graph (make-hash-table)))
+            (biconnect! graph (make-node) (make-node))
+            (do ((n-nodes n-nodes (- n-nodes 1)))
+                ((zero? n-nodes))
+              (let ((new-node (make-node)))
+                (do ((from (hash-table-keys graph) (cdr from))
+                     (m m (- m 1)))
+                    ((or (null? from) (zero? m)))
+                  (let ((sum-degrees (sum-degrees graph)))
+                    (let* ((from (car from))
+                           (degrees-from (length (hash-table-ref graph from))))
+                      (if (and (< degrees-from 4)
+                               (< (random-real) (/ degrees-from sum-degrees)))
+                          (biconnect! graph from new-node)))))))
+            graph))))
+
+      ;; (with-output-to-file "graph.pdf"
+      ;;   (lambda () (write-graph-as-pdf (barabási-albert-graph))))
+
+      ;; (display-pdf "graph.pdf")
+
+      (define-record no-passage)
+      (define no-passage (make-no-passage))
+      (define passage? (complement no-passage?))
+
+      (define up 2)
+      (define up? (cute = <> 2))
+
+      (define down 3)
+      (define down? (cute = <> 3))
+
+      (define-record location
+        status
+        left
+        right
+        up
+        down)
+
+      (define-record-printer location
+        (lambda (location output)
+          (display (record->vector location) output)))
+
+      (define default-width (make-parameter 1600))
+
+      (define default-height (make-parameter 900))
+
+      ;;; Height and width are in pixels.
+      (define write-dot-preamble
+        (case-lambda
+         ((agent step)
+          (write-dot-preamble agent step (default-height) (default-width)))
+         ((agent step height width)
+          (display "digraph G {")
+          (display "node [style=filled, fontname=monospace];")
+          (display "edge [fontname=monospace];")
+          (if (and height width)
+              (begin
+                (display "graph [fontsize=48.0, ratio=fill];")
+                ;; Phew: viewports are specified in points at 72 per inch;
+                ;; size is specified in pixels at 96 per inch.
+                (let ((width-in-inches (/ width 96))
+                      (height-in-inches (/ height 96)))
+                  (format #t "graph [viewport=\"~a,~a\", size=\"~a,~a!\"];"
+                          (* width-in-inches 72)
+                          (* height-in-inches 72)
+                          width-in-inches
+                          height-in-inches))))
+          (if step
+              (format #t "graph [label=\"Score: ~a; step: ~a\"]"
+                      (agent-score agent)
+                      step)))))
+
+      (define (write-dot-nodes world agent)
+        (hash-table-walk
+         world
+         (lambda (name location)
+           (let ((color
+                  (cond ((eq? (agent-location agent) name) "green")
+                        ((clean? (location-status location)) "white")
+                        (else "gray"))))
+             (format #t "~a [fillcolor=~a];" name color)))))
+
+      (define (write-dot-edges world)
+        (hash-table-walk
+         world
+         (lambda (name location)
+           (let ((left (location-left location))
+                 (right (location-right location))
+                 (up (location-up location))
+                 (down (location-down location)))
+             (if (passage? left)
+                 (format #t "~a->~a [label=l];" name left))
+             (if (passage? right)
+                 (format #t "~a->~a [label=r];" name right))
+             (if (passage? up)
+                 (format #t "~a->~a [label=u];" name up))
+             (if (passage? down)
+                 (format #t "~a->~a [label=d];" name down))))))
+
+      (define (write-dot-postscript) (display "}\n"))
+
+      (define write-world-as-dot
+        (case-lambda
+         ((world agent) (write-world-as-dot world agent #f))
+         ((world agent step)
+          (write-world-as-dot world agent step (default-height) (default-width)))
+         ((world agent step height width)
+          (write-dot-preamble agent step height width)
+          (write-dot-nodes world agent)
+          (write-dot-edges world)
+          (write-dot-postscript))))
+
+      (define (write-world-as-pdf world agent pdf)
+        (receive (input output id)
+          (process "neato" `("-Tpdf" "-o" ,pdf))
+          (with-output-to-port output
+            ;; Do we really need a blank label, for some reason?
+            (lambda () (write-world-as-dot world agent #f #f #f)))
+          (flush-output output)
+          (close-output-port output)
+          (close-input-port input)))
+
+      (define (write-world-as-gif world agent frame gif)
+        (receive (input output id)
+          (process "neato" `("-Tgif" "-o" ,gif))
+          (with-output-to-port output
+            (lambda () (write-world-as-dot world agent frame)))
+          (flush-output output)
+          (close-output-port output)
+          (close-input-port input)))
+
+      (define (graph->world graph)
         (let ((world (make-hash-table)))
-          (lambda (location clean?)
-            'right))))
-     
-     (let* ((world (make-graph-world))
-            (start (random-start world))
-            (agent (make-stateful-graph-agent start)))
-       (let ((directory (create-temporary-directory))
-             (steps 20))
-         (write-world-as-pdf world agent "world.pdf")
-         (display-pdf "world.pdf")
-         #;
-         (simulate
-          (compose-environments
-           (make-step-limited-environment 10)
-           (make-graph-environment world agent)
-           (make-debug-environment agent)
-           (make-graph-performance-measure world agent)
-           ;; Can't this contain its finalizer? Maybe even give it the
-           ;; terminal frame?
-           ;; (make-graph-animating-environment world agent directory)
-           ;; (make-finalizing-environment
-           ;;  (make-animation-finalizer directory)
-           ;;  steps)
-           ))))
-     
-   #+END_SRC
+          (hash-table-walk
+           graph
+           (lambda (from to)       
+             (let* ((rest (make-list (- 4 (length to)) no-passage))
+                    (to (append to rest))
+                    (to (shuffle to (lambda (x) (random (length to))))))
+               (let ((location
+                      (make-location
+                       dirty
+                       (list-ref to left)
+                       (list-ref to right)
+                       (list-ref to up)
+                       (list-ref to down))))             
+                 (hash-table-set! world from location)))))
+          world))
 
-   This is a cool graph with a large ring, incidentally; I don't know
-   what the random seed was, unfortunately:
+      (define (random-start world)
+        (let ((locations (hash-table-keys world)))
+          (list-ref locations (random-integer (length locations)))))
 
-   #+BEGIN_SRC graphviz-dot
-     digraph G {
-       node [style=filled, fontname=monospace]
-       edge[fontname=monospace]
-       g17263 [fillcolor=white]
-       g17270 [fillcolor=white]
-       g17273 [fillcolor=white]
-       g17278 [fillcolor=white]
-       g17298 [fillcolor=white]
-       g17310 [fillcolor=gray]
-       g17316 [fillcolor=white]
-       g17329 [fillcolor=gray]
-       g17336 [fillcolor=gray]
-       g17357 [fillcolor=white]
-       g17226 [fillcolor=white]
-       g17227 [fillcolor=gray]
-       g17229 [fillcolor=white]
-       g17231 [fillcolor=gray]
-       g17232 [fillcolor=green]
-       g17234 [fillcolor=gray]
-       g17235 [fillcolor=gray]
-       g17237 [fillcolor=gray]
-       g17238 [fillcolor=white]
-       g17239 [fillcolor=gray]
-       g17245 [fillcolor=white]
-       g17258 [fillcolor=white]
-       g17259 [fillcolor=gray]
-       g17262 [fillcolor=gray]
-       g17263->g17258 [label=d]
-       g17270->g17262 [label=l]
-       g17273->g17245 [label=u]
-       g17278->g17245 [label=l]
-       g17298->g17262 [label=u]
-       g17310->g17258 [label=l]
-       g17310->g17262 [label=u]
-       g17316->g17259 [label=l]
-       g17329->g17258 [label=u]
-       g17336->g17259 [label=u]
-       g17357->g17259 [label=u]
-       g17226->g17229 [label=l]
-       g17226->g17227 [label=r]
-       g17227->g17226 [label=d]
-       g17229->g17226 [label=l]
-       g17229->g17234 [label=r]
-       g17229->g17232 [label=u]
-       g17229->g17231 [label=d]
-       g17231->g17229 [label=l]
-       g17232->g17229 [label=l]
-       g17232->g17238 [label=u]
-       g17234->g17235 [label=l]
-       g17234->g17229 [label=r]
-       g17234->g17239 [label=u]
-       g17234->g17237 [label=d]
-       g17235->g17234 [label=u]
-       g17237->g17245 [label=l]
-       g17237->g17234 [label=r]
-       g17237->g17239 [label=u]
-       g17238->g17259 [label=l]
-       g17238->g17258 [label=u]
-       g17238->g17232 [label=d]
-       g17239->g17234 [label=l]
-       g17239->g17237 [label=r]
-       g17245->g17278 [label=l]
-       g17245->g17273 [label=r]
-       g17245->g17262 [label=u]
-       g17245->g17237 [label=d]
-       g17258->g17310 [label=l]
-       g17258->g17263 [label=r]
-       g17258->g17329 [label=u]
-       g17258->g17238 [label=d]
-       g17259->g17357 [label=l]
-       g17259->g17336 [label=r]
-       g17259->g17316 [label=u]
-       g17259->g17238 [label=d]
-       g17262->g17245 [label=l]
-       g17262->g17310 [label=r]
-       g17262->g17298 [label=u]
-       g17262->g17270 [label=d]
-     }
-   #+END_SRC
+      (define (make-randomized-reflex-graph-agent start)
+        (make-reflex-agent
+         start
+         (lambda (location clean?)
+           (if clean?
+               (list-ref '(left right up down) (random 4))
+               'suck))))
 
-   Converting the =gif= output to an =avi= à la =mencoder=:
+      (define (make-graph-environment world agent)
+        (lambda ()
+          (let* ((location (agent-location agent))
+                 (action ((agent-program agent)
+                          location
+                          (clean? (location-status
+                                   (hash-table-ref world location))))))
+            (debug-print "agent-action" action)
+            (case action
+              ((left)
+               (let ((left (location-left (hash-table-ref world location))))
+                 (if (passage? left)
+                     (agent-location-set! agent left))))
+              ((right)
+               (let ((right (location-right (hash-table-ref world location))))
+                 (if (passage? right)
+                     (agent-location-set! agent right))))
+              ((up)
+               (let ((up (location-up (hash-table-ref world location))))
+                 (if (passage? up)
+                     (agent-location-set! agent up))))
+              ((down)
+               (let ((down (location-down (hash-table-ref world location))))
+                 (if (passage? down)
+                     (agent-location-set! agent down))))
+              ((noop))
+              ((suck)
+               (location-status-set! (hash-table-ref world location) clean))
+              (else (error "graph-environment -- Unknown action"))))))
 
-   #+BEGIN_SRC sh
-     mencoder graph.gif -ovc lavc -o graph.avi
-   #+END_SRC
-*** TODO Depth-first graph constructor
+      (define (make-graph-world) (graph->world (barabási-albert-graph)))
+
+      (define (make-graph-performance-measure world agent)
+        (lambda ()
+          (let ((clean-locations
+                 ;; Quicker with map and apply?
+                 (hash-table-fold
+                  world
+                  (lambda (name location clean-locations)
+                    (if (clean? (location-status location))
+                        (+ clean-locations 1)
+                        clean-locations))
+                  0)))
+            (agent-score-set! agent (+ (agent-score agent) clean-locations)))))
+
+      (define (make-graph-animating-environment world agent directory)
+        (let ((frame 0))
+          (lambda ()
+            (let ((gif (make-pathname directory (number->string frame) "gif")))
+              (write-world-as-gif world agent frame gif))
+            (set! frame (+ frame 1)))))
+
+      ;;; I think make-step-limited-environment is a special case of
+      ;;; make-finalizing-environment with noop.
+      ;;;
+      ;;; This probably belongs in aima; should we preserve the
+      ;;; step-limited-environment as a specialization of this?
+      (define (make-finalizing-environment finalizer final-step)
+        (let ((step 0))
+          (lambda ()
+            (set! step (+ step 1))
+            (let ((continue? (< step final-step)))
+              (if (not continue?) (finalizer))
+              continue?))))
+
+      (define (make-animation-finalizer directory)
+        (lambda ()
+          (system "rm -fv graph.gif")
+          (system* "convert $(find ~a -type f | sort -k 1.~a -n) -loop 0 graph.gif"
+                   directory
+                   (+ (string-length directory) 2))
+          (system* "identify ~a/0.gif" directory)
+          (system "mencoder graph.gif -ovc lavc -o graph.avi")))
+
+      (define (make-stateful-graph-agent start)
+        (make-reflex-agent
+         start
+         (let ((world (make-hash-table)))
+           (lambda (location clean?)
+             'right))))
+
+      (let* ((world (make-graph-world))
+             (start (random-start world))
+             (agent (make-stateful-graph-agent start)))
+        (let ((directory (create-temporary-directory))
+              (steps 20))
+          (write-world-as-pdf world agent "world.pdf")
+          (display-pdf "world.pdf")
+          #;
+          (simulate
+           (compose-environments
+            (make-step-limited-environment 10)
+            (make-graph-environment world agent)
+            (make-debug-environment agent)
+            (make-graph-performance-measure world agent)
+            ;; Can't this contain its finalizer? Maybe even give it the
+            ;; terminal frame?
+            ;; (make-graph-animating-environment world agent directory)
+            ;; (make-finalizing-environment
+            ;;  (make-animation-finalizer directory)
+            ;;  steps)
+            ))))
+
+    #+END_SRC
+
+    This is a cool graph with a large ring, incidentally; I don't know
+    what the random seed was, unfortunately:
+
+    #+BEGIN_SRC graphviz-dot
+      digraph G {
+        node [style=filled, fontname=monospace]
+        edge[fontname=monospace]
+        g17263 [fillcolor=white]
+        g17270 [fillcolor=white]
+        g17273 [fillcolor=white]
+        g17278 [fillcolor=white]
+        g17298 [fillcolor=white]
+        g17310 [fillcolor=gray]
+        g17316 [fillcolor=white]
+        g17329 [fillcolor=gray]
+        g17336 [fillcolor=gray]
+        g17357 [fillcolor=white]
+        g17226 [fillcolor=white]
+        g17227 [fillcolor=gray]
+        g17229 [fillcolor=white]
+        g17231 [fillcolor=gray]
+        g17232 [fillcolor=green]
+        g17234 [fillcolor=gray]
+        g17235 [fillcolor=gray]
+        g17237 [fillcolor=gray]
+        g17238 [fillcolor=white]
+        g17239 [fillcolor=gray]
+        g17245 [fillcolor=white]
+        g17258 [fillcolor=white]
+        g17259 [fillcolor=gray]
+        g17262 [fillcolor=gray]
+        g17263->g17258 [label=d]
+        g17270->g17262 [label=l]
+        g17273->g17245 [label=u]
+        g17278->g17245 [label=l]
+        g17298->g17262 [label=u]
+        g17310->g17258 [label=l]
+        g17310->g17262 [label=u]
+        g17316->g17259 [label=l]
+        g17329->g17258 [label=u]
+        g17336->g17259 [label=u]
+        g17357->g17259 [label=u]
+        g17226->g17229 [label=l]
+        g17226->g17227 [label=r]
+        g17227->g17226 [label=d]
+        g17229->g17226 [label=l]
+        g17229->g17234 [label=r]
+        g17229->g17232 [label=u]
+        g17229->g17231 [label=d]
+        g17231->g17229 [label=l]
+        g17232->g17229 [label=l]
+        g17232->g17238 [label=u]
+        g17234->g17235 [label=l]
+        g17234->g17229 [label=r]
+        g17234->g17239 [label=u]
+        g17234->g17237 [label=d]
+        g17235->g17234 [label=u]
+        g17237->g17245 [label=l]
+        g17237->g17234 [label=r]
+        g17237->g17239 [label=u]
+        g17238->g17259 [label=l]
+        g17238->g17258 [label=u]
+        g17238->g17232 [label=d]
+        g17239->g17234 [label=l]
+        g17239->g17237 [label=r]
+        g17245->g17278 [label=l]
+        g17245->g17273 [label=r]
+        g17245->g17262 [label=u]
+        g17245->g17237 [label=d]
+        g17258->g17310 [label=l]
+        g17258->g17263 [label=r]
+        g17258->g17329 [label=u]
+        g17258->g17238 [label=d]
+        g17259->g17357 [label=l]
+        g17259->g17336 [label=r]
+        g17259->g17316 [label=u]
+        g17259->g17238 [label=d]
+        g17262->g17245 [label=l]
+        g17262->g17310 [label=r]
+        g17262->g17298 [label=u]
+        g17262->g17270 [label=d]
+      }
+    #+END_SRC
+
+    Converting the =gif= output to an =avi= à la =mencoder=:
+
+    #+BEGIN_SRC sh
+      mencoder graph.gif -ovc lavc -o graph.avi
+    #+END_SRC
+*** DONE Depth-first graph constructor
+    CLOSED: [2012-07-16 Mon 12:44]
     Like Barabási-Albert, the probability of branching is relative to
     the degree of the current node (plus some probability for
     degreeless nodes); otherwise, follow a random branch; otherwise,
@@ -2288,8 +2926,10 @@
                             "composite-agent-harro"))))
       
     #+END_SRC
-*** TODO Allow specification of random-seeds
-*** TODO Stateful graph agent
+*** DONE Allow specification of random-seeds
+    CLOSED: [2012-07-16 Mon 12:44]
+*** DONE Stateful graph agent
+    CLOSED: [2012-07-16 Mon 12:44]
     The stateful graph agent has to divine indirectly that it
     encountered an obstacle based on whether or not the last action
     was movement and whether or not it's in the same position (this
@@ -2356,627 +2996,19 @@
       ,              - make-location clean? #(unknown unknown unknown unknown)
       
     #+END_SRC
-*** TODO =make-equilibrium-limited-environment=
+*** CANCELED =make-equilibrium-limited-environment=
+    CLOSED: [2012-07-16 Mon 12:44]
     Compare the delta on scores for some sort of equilibrium; or lack
     of movement?
-*** TODO Compare stateful and randomized reflex agents.
-*** DONE Figure out the correct aspect ratio for [[http://support.google.com/youtube/bin/static.pyhl%3Den&guide%3D1728585&topic%3D1728569&page%3Dguide.cs][youtube]].
+*** DONE Compare stateful and randomized reflex agents.
+    CLOSED: [2012-07-16 Mon 12:43]
+    - CLOSING NOTE [2012-07-16 Mon 12:43] \\
+      See [[http://youtu.be/B28ay_zSnoY]].
+*** DONE Figure out the correct aspect ratio for youtube.
     CLOSED: [2012-07-08 Sun 05:42]
     - CLOSING NOTE [2012-07-08 Sun 05:42] \\
       Involves the viewport, &c.
-    Ideally, this would start at graphviz.
-* Meetups
-** Mon Jun 11 2012
-   - Had to redefine the rational from "exercizing reason" to
-     "maximizing utility function" because they gave up an AI as
-     thinking machines in the 60s.
-   - Mitochondria were once autonomous agents; cells as composite
-     agents
-   - Thin vs. thick agents and skynet
-   - In games like poker, the mind of the adversarial agents are part
-     of the environment; requires a theory of mind to discern things
-     like: "is he bluffing?"
-** Mon Jun 18 2012
-   - David has the international version, which would have you write
-     an essay on evolution and autonomy; see e.g. Turing on child AI:
-     
-     #+BEGIN_QUOTE
-     We have thus divided our problem into two parts. The and
-     child-programme the education process. These two remain very
-     closely connected. We cannot expect to find a good child-machine
-     at the first attempt. One must experiment with teaching one such
-     machine and see how well it learns. One can then try another and
-     see if it is better or worse. There is an obvious connection
-     between this process and evolution, by the identifications
-
-     - Structure of the child machine :: Hereditary material
-     - Changes :: Mutations
-     - Natural selection :: Judgment of the experimenter
-
-     One may hope, however, that this process will be more expeditious
-     than evolution. The survival of the fittest is a slow method for
-     measuring advantages. The experimenter, by the exercise of
-     intelligence, should be able to speed it up. Equally important is
-     the fact that he is not restricted to random mutations. If he can
-     trace a cause for some weakness he can probably think of the kind
-     of mutation which will improve it.
-     #+END_QUOTE
-*** CANCELED Test a simple agent in each (Python, Java, Clojure) implementation.
-    CLOSED: [2012-06-20 Wed 03:19]
-    - CLOSING NOTE [2012-06-20 Wed 03:19] \\
-      Looks like we're going to standardize on Clojure.
-*** DONE Get some standard cables to connect to the projector.
-    CLOSED: [2012-06-20 Wed 03:19]
-*** DONE See if we can use =xrandr= to get twin-view with an external HDMI.
-    CLOSED: [2012-06-15 Fri 06:04]
-    #+BEGIN_SRC sh
-      xrandr --output eDP1 --off
-      xrandr --output HDMI1 --mode 1280x720
-    #+END_SRC
-** Mon Jun 25 2012
-*** Discussion
-**** 2.1
-     Change performance measure; utility-based agent aware of its own
-     performance measure: can react accordingly? Not a reflex agent,
-     though, that's pre-programmed.
-
-     Example: given a penalty for each move, a reflex agent's expected
-     performance would be just as good as any other's given T = 2; but
-     not when T = 1000 (it would require a state-based agent to
-     realize that the world is clean and stop moving).
-**** 2.2
-     - c :: Memory, motor, bump sensor (or penalty); learn geography,
-            probability of becoming dirty. Clustering algorithm:
-            centers of mass for dirt.
-**** 2.3
-     - a :: Best action given available information.
-     - c :: One-square, not dirty.
-     - d :: Page 51 (program) vs. page 36 (function).
-     - f :: See *c* above.
-     - g :: Stochastic vs. deterministic vacuum world: reflex agents
-            are still rational. Performance measure still the same.
-     - i :: Even an omniscient poker player is subject to luck.
-*** TODO Get a minimal Clojure example up [[https://github.com/klutometis/aima-clojure][here]].
-*** TODO Set up =csrg.org= with a mailing list.
-    This is an alternative to e.g. Google groups and whatever
-    mechanism Meetup has.
-
-    (Or is it =csrg.com=? It is indeed =csrg.org=.)
-** Mon Jul  2 2012
-   - Each parameter in the agent-program corresponds to a sensor.
-   - Should we pass a status-variable into the sensor instead of a
-     boolean? Might be more consistent with the singletons. Nah, fuck
-     it.
-* Notes
-** 1
-   - Two dimensions: thought vs. action, humanity vs. rationality.
-   - Physical simulation of a person is unnecessary for intelligence.
-     - Mind-body dualism of Descartes?
-   - Cognitive science brings together computer models from AI and
-     experimental techniques from psychology.
-   - Real cognitive science, however, is necessarily based on
-     experimental investigation of actual humans.
-   - The standard of rationality is mathematically well defined and
-     completely general.
-   - We will adopt the working hypothesis that perfect rationality is a
-     good starting point for analysis.
-   - Limited rationality: acting appropriately when there is not enough
-     time
-   - Materialism, which holds that the brain's operation according to
-     the laws of physicas constitutes the mind.
-   - Logical positivism
-   - Carnap, The Logical Structures of the World, was probably the
-     first theory of mind as a computational process.
-   - Intelligence requires action as well as reasoning.
-   - Actions are justified by a logical connection between goals and
-     knowledge of the action's outcome.
-   - Regression planning system
-   - The leap to a formal science required a level of mathematical
-     formalization: logic, computation, probability.
-   - The world is an extremely large problem instance.
-   - Models based on satisficing---making decisions that are "good
-     enough"---gave a better description of actual human behavior.
-   - Searle: brains cause minds.
-   - Behaviorism
-   - "A cognitive theory should be like a computer program."
-   - Intelligence and an artifact
-   - Parallelism---a curious convergence with the properties of the
-     brain.
-   - The state of a neuron was conceived of as "factually equivalent to
-     a proposition which proposed its adequate stimulus." McCulloch and
-     Pitts (1943)
-     - Neural events and the relations among them can be treated by
-       means of propositional logic.
-     - For any logical expression satisfying certain conditions, one
-       can find a net behaving in the fashion it describes.
-     - For every net behaving under one assumption, there exists
-       another net which behaves under the other and gives the same
-       results.
-   - Perhaps "computational rationality" would have been more precise
-     and less threatening, but "AI" stuck.
-   - AI from the start embraced the idea of duplicating human faculties
-     such as creativity.
-   - John McCarthy referred to this period as the "Look, Ma, no hands!"
-     era.
-   - "A physical symbol system has the necessary and sufficient means
-     for general intelligent action."
-   - 1958 . . . McCarthy define Lisp, which was to become the dominant
-     AI programming language for the next 30 years.
-   - It is useful to have a formal, explicit representation of the
-     world and its workings and to be able to maniplutae that
-     representation with deductive processes.
-   - McCarthy, Programs with Common Sense
-     - In this program the procedures will be described as much as
-       possible in the language itself and, in particular, the
-       heuristics are all so described.
-     - If one wants a machine to be able to discover an abstraction, it
-       seems most likely that the machine must be able to represent
-       this abstraction in some relatively simple way.
-     - The improving mechanism should be improvable.
-     - Must have or evolve concepts of partial success.
-       - Something about ~1995 that made for a cute blog.
-     - For example, to mest people, the number 3812 is not an object:
-       they have nothing to say about it except what can be deduced
-       from its structure. On the other hand, to most Americans the
-       number 1776 is an object because they have filed somewhere the
-       fact that it represents the year when the American Revolution
-       started.
-     - One might conjecture that division in man between conscious and
-       unconscious thought occurs at the boundary between
-       stimulus-response heuristics which do not have to be reasoned
-       about but only obeyed, and the others which have to serve as
-       premises in deductions.
-   - Machine evolution (genetic algorithms): Friedberg, 1958, 1959.
-     - Friedberg. 1958. A learning machine Part 1. IBM Journal of
-       Research and Development, 2, 2--13.
-       - From and intent, to be sure, are related quite discontinuously
-         in the compact, economical programs that programmers wrte.
-     - Friedberg, Dunham, North. 1959. A learning machine, Part 2. IBM
-       Journal of Research and Development, 3, 282--287.
-   - Failure to come to grips with the "combinatorial explosion"
-   - The new back-propagation learning algorithms for multilayer
-     netwrks that were to cause an enormous resurgence in neural-net
-     research in the late 1980s were actually discovered first in 1969.
-   - Bruce Buchanan: a philosopher turned computer scientist
-   - DENDRAL was the first successful knowledge-intensive system
-     (expert system).
-   - AI Winter
-   - Parallel Distributed Processing (Rumelhart, McClelland. 1986)
-   - Connectionist models: competitors to symbols models and logicist
-     approach
-   - Ones that act rationally according to the laws of decision theory
-     and do not try to imitate the thought steps of human experts
-   - Control theory deals with designing devices that act optimally on
-     the basis of feedback from the environment.
-
-** 2
-   - Rational agents
-   - Agents behaves as well as possible (utility function?)
-   - Agent perceives its environment through sensors and acts through
-     actuators.
-     - Hands are actuators and sensors.
-   - Percept :: agent's perceptual inputs at any given instant
-   - Agent's choice depends on percept sequence to date.
-   - Agent function :: maps percept sequence to action.
-   - External characterization of agent (agent function): table
-     mapping percept sequences to actions; internally: agent program.
-   - In a sense, all areas of engineering can be seen as designing
-     artifacts that intaract with the world.
-     - Trivializing agents to view e.g. calculators as such.
-   - Intelligent agents, on the other hand: non-trivial decision
-     making.
-   - Rational agents: does the right thing (utility).
-   - Performance measure
-     - (This all sounds reminiscent of [[http://www.cs.cmu.edu/~tom/mlbook.html][Mitchell]], by the way.)
-   - Sequence of actions causes the environment to go through states:
-     environmental states are distinct from agent states.
-     - Basing performance merely off of agent-states is a form of
-       coherentism.
-   - Design performance measures according to what one actually wants
-     in the environment.
-   - "We leave these question as an exercise for the diligent reader."
-     - Classic.
-   - Rationality: performance measure, agent's prior (i.e. /a priori/)
-     knowledge, agent's actions, agent's percept sequence.[fn:2]
-     - "Percept," it turns out, is the converse of "concept": "A
-       Percept or Intuition is a single representation . . . a Concept
-       is a collective (general or universal) representation of a
-       whole class of things." (F. C. Bowen Treat. Logic)
-   - For each percept sequence, a rational agent should select an
-     action that is expected to maximize its performance measure,
-     given its percept sequence and a priori knowledge.
-   - Omniscience vs. rationality
-   - Rationality maximizes /expected/ performance; perfection,
-     /actual/ performance.
-   - Our definition of rationality does not require omniscience.
-     - It's possible sometimes, by the way, to detect transitions in
-       authorship.
-   - Information gathering: actions in order to modify future
-     percepts.
-   - /a priori/ rather than percepts: lacks autonomy.
-   - Ration agent: autonomous; boostrap with /a priori/, though.
-   - Just as evolution provides animals with built-in reflexes to
-     survive long enough to learn for themselves
-   - Task environments
-   - PEAS :: Performance, Environment, Actuators, Sensors
-     - Mitchell has: task, performance measure, training experience,
-       target function, target function representation.
-   - Fully observable vs. partially observable environment.
-   - Task environment effectively fully observable if the sensors
-     detect all aspects that are /relevant/ to the choice of action,
-     performance measure.
-   - Single agent vs. multiagent
-   - Entity /may/ vs. /must/ be viewed as an agent.
-   - Competitive vs. cooperative multiagent environment
-   - Communication
-   - In some competitive environments, randomized behavior is rational
-     because it avoids predictability.
-   - Deterministic vs. stochastic environment
-   - "Uncertain" environment: not fully observable or not
-     deterministic
-   - Stochastic: uncertainty about outcomes quantified in terms of
-     probabilities; nondeterministic: actions characterized by
-     possible outcomes, no probabilities attached.
-   - Episodal vs. sequential: atomic episodes: receives percept and
-     performs single action; sequential: current decision affect all
-     future decisions.
-   - Static vs. dynamic: environment change while agent is
-     deliberating.
-   - Discrete vs. continuous: state of the environment, time,
-     percepts, actions.
-   - Known vs. unknown: "laws of physics" of the environment
-   - Hardest: partially observable, multiagent, stochastic,
-     sequential, dynamic, continuous, unknown.
-   - Code repository includes environment simulator that places one or
-     more agents in a simulated environment, observes their behavior
-     over time, evaluates them according to a given performance
-     measure.
-     - Shit: this is something we could implement in Scheme ([[http://code.google.com/p/aima-java/source/checkout][java]],
-       [[http://code.google.com/p/aima-python/source/checkout][python]], [[http://aima.cs.berkeley.edu/lisp/doc/overview.html][lisp]], [[http://code.google.com/p/aima-data/source/checkout][data]]); lot of work, though? Glory?
-       - A lot of the [[http://aima.cs.berkeley.edu/lisp/doc/overview-UTILITIES.html][utilities]] are in SRFI-1; e.g. =transpose= is
-         =zip=.
-       - Infinity is there.
-       - Might have to write =rms-error=; =ms-error=.
-       - =sample-with-replacement=; =sample-without-replacement=
-         - Combinatorics SRFI, anyone?
-       - =fuzz=
-       - =print-grid=, &c.
-       - =the-biggest=, =the-biggest-random-tie=, =the-biggest-that=,
-         &c.
-       - Binary tree stuff
-       - Queue
-       - Heap
-       - They did CLOS-like stuff
-     - Damn, they put some work in; could do it incrementally? Will be
-       ad-hoc, I guarantee it.
-     - Maybe we can program it, given the [[http://aima.cs.berkeley.edu/lisp/doc/overview-AGENTS.html][agents]] API.
-       - =run-environment= looks like something central.
-     - What would happen if we merely translated the code to Chicken?
-       Could do so, perhaps, without fully understanding it; write an
-       idiomatically Scheme-port later.
-     - In that case, find some alternative to CLOS; or use tinyCLOS?
-     - Also, beginning to think that we misnamed our repo: we're
-       calling it =aima=, but we'd like to write an =aima= egg; with
-       =aima-agents=, =aima-search=, =aima-logic=, =aima-planning=,
-       =aima-uncertainty=, =aima-learning=, =aima-language= modules.
-       - Call it =aima-egg=? =aima-chicken=?
-     - Translation seems like the way to go: relatively mechanical.
-     - [[http://aima.cs.berkeley.edu/lisp/doc/overview-LOGIC.html][Incidentally]], "We need a new language for logical expressions,
-       since we don't have all the nice characters (like upside-down
-       A) that we would like to use." We can use ∀ in Scheme, can't
-       we? Sure. Tough to type? Maybe. Also, think font-lock.
-     - May not be up-to-date for 3e; let's see; also, rife with
-       =defmethod= and other OOisms. Can ignore it, possibly, and its
-       type-checking; =defstructure= is similar, I think, to SRFI-9.
-     - Damn, they implemented unification.
-     - Not to mention: the learning stuff (e.g. decision trees).
-     - Man, should we implement this stuff ad-hoc; or otherwise depend
-       on the existing implementations?
-     - Path of least resistance: do it in Allegro? Ouch.
-   - The job of AI is to design an agent program that implements the
-     agent function, the mapping from percepts to actions.
-   - Agent = architecture + program
-   - The agent program takes the current percept as input; the agent
-     function, which takes the entire percept history.
-   - The agent function that the program embodies
-   - Write programs that produce rational behavior from a smallish
-     program rather than a vast table.
-   - Reflex agents; model-based reflex agents; goal-based agents;
-     utility-based agents.
-   - 
-     #+BEGIN_SRC org
-       ,- table-driven-agent percept
-       ,  - persistent
-       ,    - percepts ()
-       ,    - table
-       ,  - append percept to percepts
-       ,  - lookup percepts table
-       
-     #+END_SRC
-   - 
-     #+BEGIN_SRC org
-       ,- reflex-vacuum-agent location status
-       ,  - if dirty? status
-       ,    - suck
-       ,    - else if location = A
-       ,      - right
-       ,    - else
-       ,      - left
-     #+END_SRC
-   - Simple reflex agent: select actions on the basis of the current
-     precept
-     - Learned responses, innate reflexes
-     - 
-       #+BEGIN_SRC org
-         ,- simple-reflex-agent percept
-         ,  - persistent
-         ,    - rules
-         ,  - state = interpret-input(percept)
-         ,  - rule = rule-match(state rules)
-         ,  - rule.action
-       #+END_SRC
-     - Works only if the correct decision can be made on the current
-       percept: i.e. if the environment is fully observable.
-     - Escape from infinite loops is possible if the agent can randomize
-       its actions.
-     - In single-agent environments, randomization is usually not
-       rational.
-     - In most cases we can do better with more sophisticated
-       deterministic agents.
-   - Model-based reflex agents
-     - Partial observability: keep track of the part of the world it
-       can't see now.
-     - Internal state
-     - Knowledge of how world evolves independently from agent
-     - Knowledge of actions affect the world
-     - Model of the world
-     - 
-       #+BEGIN_SRC org
-         ,- model-based-reflex-agent percept
-         ,  - persistent
-         ,    - state
-         ,    - model
-         ,    - rules
-         ,    - action
-         ,  - state = update-state(state action percept model)
-         ,  - rule = rule-match(state)
-         ,  - (action rule)
-       #+END_SRC
-     - State of the world can contain goals.
-   - Goal-based agents
-     - In addition to current state, goal information that describes
-       situations that are desirable
-     - Search, planning
-     - Flexible, reason about world vis à vis goals
-   - Utility-based agents
-     - Whereas goals are happy/unhappy, more general performance
-       measure: utility
-     - Utility functional: internalization of performance measure
-     - This is not the only way to be rational: rational agent for
-       vacuum has no idea what its utility function is (see exercise
-       [[1.3]]).
-     - When there are conflicting goals, utility function opts for the
-       appropriate tradeoff.
-     - Partial observability, stochasticity: decision making under
-       uncertainty.
-     - Expected utility of the action outcomes: derive, given the
-       probabilities and utilities of each outcome.
-     - Any rational agent must behave as if it possesses a utility
-       function.
-     - An agent that possesses an explicit utility function can make
-       rational decisions with a general-purpose algorithm that does not
-       depend on the specific utility function being maximized.
-     - Global rationality: local constraint on rational-agent designs.
-     - Choosing utility-maximizing course of action
-   - Learning agents
-     - Now we're getting into some Mitchell-action: critic, learning
-       element, performance element, problem generator, &c.
-       - Need a book on big data?
-     - Operate in initially unknown environments and become more
-       competent.
-     - Learning element
-       - Making improvements
-     - Performance element
-       - Selecting external actions
-     - Critic
-       - How performance element should be modified vis à vis fixed
-         performance standard.
-       - Performance standard must be fixed (i.e. checkmate).
-       - Performance standard outside agent; conforms thereto.
-     - Problem generator
-       - Suggesting actions that will lead to new and informative
-         experiences.
-       - Suboptimal actions short run, better actions long run.
-     - Utility-based agents learning utility information
-     - Performance standard distinguishes percept as reward or
-       penalty.
-     - Process of modification of each component
-   - Atomic, factored, structured environments
-     - Atomic
-       - Each state of the world indivisible
-     - Factored
-       - Variables, attributes
-     - Structured
-       - Objects and relationships can be described explicitly
-     - Increasing expressiveness
-     - Intelligent systems: operate at all points along the
-       expressiveness-axis simultaneously.
-   - Agents perceives and acts; agent function maps percept seq ->
-     action.
-   - Performance measure evaluates behavior.
-   - Maximize expected performance measure.
-   - Task environment: performance measure, external environment,
-     actuators, sensors.
-   - Nicomachean Ethics
-   - McCarthy, Programs with Common Sense
-   - Newell and Simon, Human Problem Solving
-   - Horvitz suggests the use of rationality conceived as the
-     maximization of expected utility as the basis for AI.
-     Pearl, 1988.[fn:3]
-     - Horvitz, E., 1988. Reasoning Under Varying and Uncertain
-       Resource Constraints, Proc. of the 7th National Conference on
-       AI, Minneapolis, MN, Morgan Kauffman, pp:111-116.
-     - Horvitz, E. J., Breese, J.S., Henrion, M. 1988. Decision The-
-       ory in Expert Systems and Artificial Intelligence, Journal of
-       Approximate Reasoning, 2, pp247-302.
-
-** Lectures
-*** 1
-    - AI: mapping from sensors to actuators
-      - Voice, child-like engagement
-    - Fully vs. partially observable
-    - Deterministic vs. stochastic
-    - Discrete vs. continuous
-    - Benign vs. adversarial
-    - Uncertainty management
-*** 2
-    - Initial state
-    - $\texttt{actions}(state) \to {a_1, a_2, a_3, \dots}$
-    - $\texttt{result}(state, action) \to state^\prime$
-    - $\texttt{goal-test}(state) \to T|F$
-    - $\texttt{path-cost}(state \xrightarrow{action} state \xrightarrow{action} state) \to n$
-    - $\texttt{step-cost}(state, action, state^\prime) \to n$
-    - Navigate the state space by applying actions
-    - Separate state into three parts: ends of paths (frontier);
-      explored and unexplored regions.
-    - Step-cost
-    - Tree-search
-      - Family-resemlance; difference: which path to look at first.
-    - Depth-first search: shortest-first search
-** Turing, Computing Machinery and Intelligence
-   - Can machines think?
-   - It is A's object in the game to try and cause C to make the wrong
-     identification.
-     - Didn't realize there was an adversarial element to the Turing
-       test.
-   - What will happen when a machine takes the part of A in this game?
-   - . . . drawing a fairly sharp line between the physical and the
-     intellectual capacities of man.
-     - A reasonable dualism
-   - May not machines carry out something which ought to be described
-     as thinking but which is very different from what a man does?
-     - The humanity/rationality plane of AI?
-   - Imitation game
-     - Simulacrum sufficeth
-   - It is probably possible to rear a complete individual from a
-     single cell of the skin (say) of a man . . . but we would not be
-     inclined to regard it as a case of "constructing a thinking
-     machine".
-   - Digital computer:
-     1. Store
-     2. Executive unit
-     3. Control
-   - It is not normally possible to determine from observing a machine
-     whether it has a random element, for a similar effect can be
-     produced by such devices as making the choices depend on the
-     digits of the decimal for $\pi$.
-   - Discrete state machines: strictly speaking there are no such
-     machines. Everything really moves continuously.
-   - This is reminiscent of Laplace's view that from the complete
-     state of the universe at one moment of time, as described by the
-     positions and velocities of all particles, it should be possible
-     to predict all future states.
-   - This special property of digital computers, that they can mimic
-     any discrete state machine, is described by saying that they are
-     universal machines.
-   - "Are there imaginable digital computers which would do well in
-     the imitation game?" $\to$ "Are there discrete state machines
-     which would do well?"
-   - I believe that in about fifty years' time it will be possible to
-     programme computers, with a storage capacity of about $10^9$, to
-     make them play the imitation game so well that an average
-     interrogator will not have more than $70\%$ chance of making the
-     right identification after five minutes of questioning.
-     - Russell/Norvig, 12: storage units: $10^15$
-     - [[http://en.wikipedia.org/wiki/Loebner_Prize#2008][Loebner prize]]:
-       #+BEGIN_QUOTE
-       Elbot of Artificial Solutions won the 2008 Loebner Prize bronze
-       award, for most human-like artificial conversational entity,
-       through fooling three of the twelve judges who interrogated it
-       (in the human-parallel comparisons) into believing it was
-       human. This is coming very close to the $30\%$ traditionally
-       required to consider that a program has actually passed the
-       Turing test.
-       #+END_QUOTE
-       - From a [[http://technology.timesonline.co.uk/tol/news/tech_and_web/article4934858.ece][judge]]:
-         #+BEGIN_QUOTE
-         He predicted that by the end of the century, computers would
-         have a 30 per cent chance of being mistaken for a human being
-         in five minutes of text-based conversation.
-         #+END_QUOTE
-         I thought this was mistaken (should be $70$), but it is
-         indeed correct.
-     - In other words, a damn-good guess.
-   - Conjectures are of great importance since they suggest useful
-     lines of research.
-   - We might expect that He would only exercise this power in
-     conjunction with a mutation which provided the elephant with an
-     appropriately improved brain to minister to the needs of this
-     soul.
-   - We like to believe that Man is in some subtle way superior to the
-     rest of creation.
-   - "The consequences of machines thinking would be too dreadful." I
-     do not think that this argument sufficiently substantial to
-     require refutation. Consolation would would be more appropriate:
-     perhaps this should be sought the transmigration of souls.
-   - There are limitations to the powers of discrete-state
-     machines. The best known of these results is known as Gödel's
-     theorem, and shows that in any sufficiently powerful logical
-     system statements can be formulated which can neither be proved
-     nor disproved within the system, unless possibly the system
-     itself is inconsistent.
-   - "Will this machine every answer 'Yes' to any question?" It can be
-     shown that the answer is either wrong or not forthcoming.
-   - The only way to know that a man thinks is to be that particular
-     man. It is in fact the solipsist point of view.
-   - I do not wish to give the impression that I think there is no
-     mystery about consciousness. There is, for instance, something of
-     a paradox connected with any attempt to localise it.
-   - When a burnt child fears the fire and shows that he fears it by
-     avoiding it, I should say that he was applying scientific
-     induction.
-   - It would deliberately introduce mistakes in a manner calculated
-     to confuse the interrogator.
-   - By observing the results of its own behaviour it can modify its
-     own programmes so as to achieve some purpose more effectively.
-   - This is the assumption that as soon as a fact is presented to a
-     mind all consequences of that fact spring into the mind
-     simultaneously with it.
-   - The undistributed middle is glaring.
-   - I would defy anyone to learn from these replies sufficint about
-     the programme to be able to predict any replies to untried
-     values.
-   - A smallish proportion are super-critical. An idea presented to
-     such a mind may give rise to a whole "theory" consisting of
-     secondary, tertiary and more remote ideas.
-     - Sponteneity
-   - These last two paragraphs should be described as "recitations
-     tending to produce belief."
-   - The only satisfactory support that can be given will be that
-     provided by waiting for the end of the century and then doing the
-     experiment described.
-   - Estimates for the storage capacity of the brain vary from $10^10$
-     to $10^15$ binary digits.
-     - Russell/Norvig (12): $10^13$ synapses
-   - At my present rate of working I produce about a thousand digits
-     of programme a day, so that about sixty workers, working steadily
-     through the fifty years might accomplish the job, if nothing went
-     into the waste-paper basket.
-     - Mythical man-month?
-   - The child-programme and the education process
-   - One might have a complete system of logical inference "built
-     in". The store would be largely occupied with definitions and
-     propositions. Certain propositions may be described as
-     "imperatives". As soon as an imperative is classed as
-     "well-established" the appropriate action takes place.
-     - Compare McCarthy, Programs with Common Sense, regarding
-       imperatives.
-   - These choices make the difference between a brilliant and a
-     footling reasoner.
-   - We can only see a short distance ahead, but we can see plenty
-     there that needs to be done.
-
-* Tasks
+    See [[http://support.google.com/youtube/bin/static.pyhl%3Den&guide%3D1728585&topic%3D1728569&page%3Dguide.cs][this]]; ideally, this would start at graphviz.
 ** TODO Should we structure this somehow as a blog instead of an org-doc?
    Can we create a jekyll-based blog from this org-doc and push it to
    the github pages?
