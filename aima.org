@@ -915,13 +915,32 @@
     Even more fundamentally, however, the agent can't discern whether
     it's hit a wall; this changes in [[2.12]], however, when the agent
     gets a bump sensor.
-** TODO b
+** DONE b
+# <<2.11b>>
+   CLOSED: [2012-07-16 Mon 14:00]
+
+   The average score for a randomized agent in a 20-node world is
+   roughly $17300.0$; see the [[http://youtu.be/EvZvyxAoNdo][demonstration-video]].
+
    #+BEGIN_SRC scheme
-     (use aima-vacuum
-          debug
-          srfi-25)
+     (use aima aima-vacuum test)
      
-     
+     (parameterize ((current-test-epsilon 0.005))
+       (test
+        "Test the randomized graph agent on 100 different environments."
+        17300.0
+        (let* ((scores
+                (list-tabulate
+                 100
+                 (lambda (i)
+                   (let* ((world (make-graph-world))
+                          (start (random-start world))
+                          (agent (make-randomized-graph-agent start)))
+                     (parameterize ((random-seed i)
+                                    (debug? #f))
+                       (simulate-graph world agent))
+                     (agent-score agent))))))
+          (/ (apply + scores) (length scores)))))
    #+END_SRC
 
    #+BEGIN_EXAMPLE
