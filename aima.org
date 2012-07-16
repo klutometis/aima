@@ -942,12 +942,36 @@
                      (agent-score agent))))))
           (/ (apply + scores) (length scores)))))
    #+END_SRC
+** DONE c
+   CLOSED: [2012-07-16 Mon 14:49]
+   The randomized agent will perform poorly in a linear environment,
+   since many of its movement choices will be no-op; in fact, the
+   average score of a randomized agent on a linear world of 20 nodes
+   is roughly $15000.0$ ($\approx13\%$ less than the random 20-node
+   world in [[2.11b]]):
 
    #+BEGIN_SRC scheme
      (use aima aima-vacuum debug test)
      
+     (parameterize ((current-test-epsilon 0.1))
+       (test
+        "Test the randomized graph agent on a linear world 100 times."
+        15000.0
+        (let* ((world (make-linear-world))
+               (start (random-start world)))
+          (let ((scores (list-tabulate
+                         100
+                         (lambda (i)
+                           (let* ((world (copy-world world))
+                                  (agent (make-randomized-graph-agent start)))
+                             (parameterize ((debug? #f))
+                               (simulate-graph world agent))
+                             (agent-score agent))))))
+            (/ (apply + scores) (length scores))))))
      
    #+END_SRC
+
+   See [[http://youtu.be/wNLzEiIAG][the video]].
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
