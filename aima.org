@@ -2257,7 +2257,9 @@
              (start (random-start world)))
         (let ((stateful-agent (make-stateful-graph-agent start))
               (random-agent (make-randomized-reflex-graph-agent start)))
-          (parameterize ((default-steps 10))
+          (parameterize ((default-steps 10)
+                         (randomize! bsd-randomize)
+                         (random-seed 0))
             (compare-graphs world
                             stateful-agent
                             "Stateful agent"
