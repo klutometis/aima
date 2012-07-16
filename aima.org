@@ -1614,6 +1614,13 @@
               ((up? direction) down)
               ((down? direction) up)))
       
+      (define (make-dirty-location)
+        (make-location dirty
+                       (vector no-passage
+                               no-passage
+                               no-passage
+                               no-passage)))
+      
       (define (connect! world connectend connector direction)
           (hash-table-update!/default
            world
@@ -1650,13 +1657,6 @@
            (if clean?
                (list-ref '(left right up down) (random-direction))
                'suck))))
-      
-      (define (make-dirty-location)
-        (make-location dirty
-                       (vector no-passage
-                               no-passage
-                               no-passage
-                               no-passage)))
       
       (define (count-nodes world)
         (length (hash-table-keys world)))
