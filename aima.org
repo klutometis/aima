@@ -890,7 +890,8 @@
    update its state according to its omniscient percept and the simple
    one will simply act accordingly.
 * TODO 2.11
-** TODO a
+** DONE a
+   CLOSED: [2012-07-16 Mon 14:00]
     A simple reflex agent wouldn't be able to explore an environment of
     unknown extent without exhausting all possible paths of the
     corresponding $n \times n$ space; given sufficient time, such an
