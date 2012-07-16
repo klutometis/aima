@@ -1566,7 +1566,7 @@
            debug
            files
            posix
-           random-bsd
+           (prefix random-bsd bsd-)
            srfi-69
            stack
            vector-lib)
@@ -1606,7 +1606,7 @@
       
       (define make-node gensym)
       
-      (define (random-direction) (random 4))
+      (define (random-direction) (bsd-random 4))
       
       (define (reverse-direction direction)
         (cond ((left? direction) right)
@@ -1641,14 +1641,14 @@
       
       (define (random-start world)
         (let ((nodes (hash-table-keys world)))
-          (list-ref nodes (random-integer (length nodes)))))
+          (list-ref nodes (bsd-random-integer (length nodes)))))
       
       (define (make-randomized-reflex-graph-agent start)
         (make-reflex-agent
          start
          (lambda (location clean?)
            (if clean?
-               (list-ref '(left right up down) (random 4))
+               (list-ref '(left right up down) (random-direction))
                'suck))))
       
       (define (make-dirty-location)
@@ -1702,7 +1702,7 @@
                           (make-dirty-location))))
                     (let ((n-neighbors (n-neighbors location)))
                       (if (and (< n-neighbors 4)
-                               (< (random-real) (/ n-neighbors n-degrees)))
+                               (< (bsd-random-real) (/ n-neighbors n-degrees)))
                           (let* ((new-directions
                                   (vector-fold
                                    (lambda (direction directions neighbor)
@@ -1714,7 +1714,7 @@
                                  (new-direction
                                   (list-ref
                                    new-directions
-                                   (random (length new-directions)))))
+                                   (bsd-random (length new-directions)))))
                             ;; To make this Barabási-like, we could try to
                             ;; pick a preëxisting node; and, failing that,
                             ;; produce one.
@@ -1742,7 +1742,7 @@
                                    (location-neighbors location)))
                                  (neighbor
                                   (list-ref neighbors
-                                            (random (length neighbors)))))
+                                            (bsd-random (length neighbors)))))
                             (iter neighbor n-nodes n-degrees)))))))))))
       
       (define default-width (make-parameter 1600))
@@ -2103,7 +2103,7 @@
                                      ;; Go back the way we came.
                                      (reverse-move move)))) 
                              (let ((move (list-ref new-moves
-                                                   (random (length new-moves)))))
+                                                   (bsd-random (length new-moves)))))
                                (stack-push! moves move)
                                move))))))))))
       
