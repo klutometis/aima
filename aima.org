@@ -927,7 +927,7 @@
      
      (parameterize ((current-test-epsilon 0.005))
        (test
-        "Test the randomized graph agent on 100 different environments."
+        "Test the randomized graph agent on 100 different worlds."
         17300.0
         (let* ((scores
                 (list-tabulate
