@@ -1028,6 +1028,25 @@
 
   If the bump sensor stops working, unfortunately, the agent would
   have to fall back on random behavior (see [[2.11b]]).
+* DONE 2.13
+  CLOSED: [2012-07-16 Mon 17:20]
+** DONE a
+   CLOSED: [2012-07-16 Mon 17:20]
+   By expending an extra step at each square to make sure that it is,
+   in fact, clean (and repeatedly cleaning otherwise); one can still
+   clean the entire environment in linear time.
+
+   If the dirt sensor is wrong some percentage of the time, one would
+   repeatedly sense the status of the location until some significance
+   criterion is reached. For instance, it appears as though one would
+   have to sense the status $17$ times per location to achieve a
+   confidence level of $95\%$.
+** DONE b
+   CLOSED: [2012-07-16 Mon 17:20]
+   I don't see how you could avoid repeatedly exploring and cleaning
+   the world according to some acceptable interval; if the dirt is not
+   evenly distributed, store statistics about dirty hotspots (and hit
+   those locations more frequently).
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
