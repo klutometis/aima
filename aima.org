@@ -944,6 +944,7 @@
           (/ (apply + scores) (length scores)))))
    #+END_SRC
 ** DONE c
+# <<2.11c>>
    CLOSED: [2012-07-16 Mon 14:49]
    The randomized agent will perform poorly in a linear environment,
    since many of its movement choices will be no-op; in fact, the
@@ -976,7 +977,9 @@
    CLOSED: [2012-07-16 Mon 16:58]
    An agent with state can outperform a stateless agent and maximize
    its performance by systematically exploring the environment á la
-   e.g. depth-first search.
+   e.g. depth-first search; in a 20 node environment, the stateful
+   agent performs $\approx 20\%$ better than its randomized
+   counterpart (cf. [[2.11c]]).
 
    See [[http://youtu.be/B28ay_zSnoY][the video]].
 
