@@ -1640,6 +1640,7 @@
      there that needs to be done.
 
 * TODOs
+** TODO A listing environment
 ** TODO Blog about barabási-albert vs. depth-first graph-creation.
    The former produces nice hubs and cycles, but the problem of
    aligning complementary directions (like graph-coloring?) is
