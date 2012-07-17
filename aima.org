@@ -1014,6 +1014,20 @@
    4. If there are no unvisited (and uncleaned) locations, stop.
       
    Traversing the world in this fashion is [[http://en.wikipedia.org/wiki/Depth-first_search#Properties][linearly complex]].
+* DONE 2.12
+  CLOSED: [2012-07-16 Mon 17:09]
+  A simple reflex agent with a bump sensor will perform just as well
+  as a random agent since, upon detecting a bump, it can randomly
+  change directions. The same constraints on random agent apply: e.g.
+  poor performance in linear spaces.
+
+  The state agent is fundamentally unchanged: instead of deducing
+  implicit bumps, however, due to non-movement (requiring e.g. a
+  bump-sentinel in the movement stack); it can incorporate the
+  bump-data directly into its state.
+
+  If the bump sensor stops working, unfortunately, the agent would
+  have to fall back on random behavior (see [[2.11b]]).
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
