@@ -1971,6 +1971,8 @@
      there that needs to be done.
 
 * TODOs
+** TODO Modify 2.11 to list available actions?
+   No: that changes the problem.
 ** TODO A listing environment
 ** TODO Blog about barabási-albert vs. depth-first graph-creation.
    The former produces nice hubs and cycles, but the problem of
