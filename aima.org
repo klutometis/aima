@@ -1502,6 +1502,287 @@
        ory in Expert Systems and Artificial Intelligence, Journal of
        Approximate Reasoning, 2, pp247-302.
 
+** 3
+   - If environment is unknown, agent has no choice but to try
+     actionsat random (see exercise 2.11).
+   - Atomic representation: states of world, wholes: no
+     internalstructure visible. (What the fuck does this mean?)
+   - Informed search algorithms
+   - Goal vs. problem formulation
+   - Search, solution, execution
+   - Open-loop: executed while ignoring its precepts: breaks loop
+     between agent and environment.
+     - http://en.m.wikipedia.org/wiki/Open-loop_controller:
+       #+BEGIN_QUOTE
+       Computes its input using only its model and the current state.
+       #+END_QUOTE
+   - (Wow: formulates plan in one pass and executes.)
+   - Initial state :: =in(arad)=
+   - Actions applicable in state s :: =in(arad) -> { go(Sibiu), &c. }=
+   - Transition model :: =result(s, a) -> successor; result(in(arad),
+     go(zerind)) -> in(zerind)=
+   - State space :: initial state, actions, transitions; graph; path
+   - Goal test :: given state = goal state; enumerable or abstract
+   - Path cost :: step cost: =c(s, a, s')=
+   - Solution: leads from initial to goal state. Optimal solution
+     minimizes cost.
+   - Abstraction: removing detail from representation. (Strange that
+     it's formulated negatively.)
+   - Valid: expanded to more detailed environment; useful: easier than
+     original problem.
+   - Toy problems: sliding block, n-queens
+   - N-queens: no path cost; incremental vs. complete-state
+   - Knuth conjecture: factorial, square root and floor reach any
+     desired positive integer.
+   - Protein design
+   - Search tree: branches are actions, nodes: states
+   - Leaf nodes, frontier
+   - Expanding nodes on frontier, until solution (or not)
+   - State space: finite; search tree: infinite (loopy)
+   - Frontier separates the state-space graph into the explored region
+     and the unexplored region.
+   - Node: state, parent, action (whence), path-cost (cumulative)
+     - (They're getting implementationy.)
+     - (Seem to be talking about breadth-first search here: there's a
+       queue.)
+   - =solution= function: following parents up to root
+     #+BEGIN_SRC org
+       ,- child-node(problem, parent, action) -> node
+       ,  - let
+       ,    - state (problem-result (node-state parent) action)
+       ,    - parent parent
+       ,    - action action
+       ,    - path-cose (+ (path-cost parent) (step-cost problem (node-state
+       ,      parent) action)
+     #+END_SRC
+   - (Oh, never mind: queues are supersets of stacks, apparently;
+     LIFOs queues being the latter. Also, priority queues.)
+   - Canonical form: bit-vector, sorted list (keys for hash-tables)
+   - Completeness, optimality, time complexity, space complexity
+   - In AI, graph represented implicitly by initial state, actions,
+     transition model; frequently infinite.
+   - Complexity:
+     - b :: branching factor (maximum successors)
+     - d :: depth
+     - m :: maximum path in state space
+   - (State space: finally.)
+   - Search cost
+   - Total cost: search cost + path cost
+   - Uninformed search (blind search)
+   - Order in which nodes are expanded: informed search, heuristic search
+   - Breadth-first: root and successors expanded first
+     - FIFO queue
+     - Goal-test applied to each node when it is generated
+     - Breadth first expands the shallowest nodes
+   - Uniform-cost search: expands $n$ with lowest path-cost
+     - (Greedy algorithm? Apparently not, since the goal-test is
+       applied at expansion.)
+     - Frontier: priority queue ordered by $g$
+     - Goal-test applied when node selected for expansion; goal node
+       that is generated may be on a suboptimal path
+     - Second test added, in case a better path is found to a node
+       currently on the frontier. (Where is it in the algorithm?)
+     - Properties of priority queue and hash-table
+     - (There are these negative proofs.)
+     - Completeness is guaranteed, provided the cost of every step
+       exceeds some small positive constant $\epsilon$.
+       - ($\epsilon$ and floats)
+     - $C^*$: optimal value for $C$.
+     - Uniform-cost does more work than breadth-first, expanding nodes
+       even after finding a solution.
+   - Depth-first search
+     - Expands deepest node in current frontier.
+     - LIFO
+     - In infinite state spaces, fails if infinite non-goal path
+       encountered.
+     - Depth-first search not optimal.
+       - (Really? Interesting; depends, of course, on the order of
+         nodes selected.)
+     - $m$ itself can be much larger than $d$; infinite, if tree
+       unbounded.
+     - Space complexity: for a graph search, no advantage; for a tree
+       search: need store only a single path from root to leaf (plus
+       unexplored siblings).
+     - Depth first: constraint satisfaction, propositional
+       satisfiability, logic programming
+       - (Remember, though, that kanren had some breadth-first
+         facilities.)
+     - Backtracking search: modifying current state description
+   - Depth-limited search
+     - Time complexity $O(b^l)$; space complexity $O(bl)$
+     - Two kinds of failure: search failure, cutoff failure.
+     - Diameter of state space: any node can reach any other node in
+       at most $D$ steps
+   - Iterative deepening (depth-first) search
+     - Gradually increases the depth limit
+     - Like depth-first: $O(bd)$ space complexity
+     - Like breadth-first: complete when branching factor is finite
+       and optimal when the path cost is non-decreasing
+       #+BEGIN_SRC org
+         ,- iterative-deepening-search(problem) -> solution or failure
+         ,  - for depth = 0 to infinity do
+         ,    - result = depth-limited-search(problem, depth)
+         ,    - if result != cutoff
+         ,      - return result
+       #+END_SRC
+     - Iterative deepening, preferred uninformed search method when
+       search space is large and depth unknown
+     - Do breadth-first until almost all memory consumed; iterative
+       deepening on all nodes in the frontier.
+     - Iterative analog to uniform-cost search? (Overhead,
+       apparently.)
+   - Bidirectional search
+     - Forward from the initial state and backwards from the goal:
+       $b^{d/2} + b^{d/2} << b^d$
+     - Replace goal-test to see whether frontiers intersect
+     - Check when node selected for expansion; with hash-table:
+       constant time
+       - (Hash-tables for membership testing: I like it. Hence:
+         canonical form, &c.)
+     - Time, space complexity: $O(b^{d/2})$
+     - Reduce by half if one of the two searches done by iterative
+       deepening; at least one of the frontiers must be kept in memory
+     - Requires mechanism for computing predecessors; in reversible
+       case: reverse successor. Non-reversible: ingenuity
+     - Explicitly listed goal-states: construct dummy goal-states
+       whose predecessors are actual goal states.
+       - (Why?)
+     - Informed search
+       - Problem-specific knowledge
+       - Best-first search
+         - Evaluation function, $f(n)$; cost estimate
+         - Uniform-cost search, except that $f$ instead of $g$ orders
+           the priority queue
+         - A component of $f(n)$, the heuristic function $h(n)$:
+           estimated cost of cheapest path from the state at node $n$
+           to a goal state.
+         - $h(n)$, unlike $g(n)$, depends only on the $state$ at that
+           node.
+         - If $n$ is a goal node, $h(n)$ = 0.
+       - Greedy best-first search
+         - $f(n) = h(n)$
+         - E.g. straight-line distance heuristic
+         - The amount of reduction depends on the particualr problem
+           and on the quality of the heuristic.
+       - $A^*$ search (minimizing total estimated cost)
+         - $f(n) = h(n) + g(n) =$ estimated cost of the cheapest
+           solution through $n$.
+         - Provided that the heuristic function ($h(n)$) satisfies
+           certain conditions, $A^*$ is complete and optimal.
+         - Identical to uniform-cost search, except that $A^*$ uses
+           $g + h$ instead of $g$.
+         - Admissible heuristic :: Never overestimates the cost to
+              reach the goal.
+         - Consistent heuristic :: $h(n) \leq c(n, a, n^\prime) +
+              h(n^\prime)$; triangle inequality: if there were a route
+              from $n$ to $G_n$ via $n^\prime$ that was cheaper than
+              $h(n)$, that would violate the property that $h(n)$ is a
+              lower bound on the cost to reach $G_n$.
+         - Every consistent heuristic, admissible.
+         - $h_{SLD}$: consistent heuristic; straight line between $n$
+           and $n^\prime$ no greater than $c(n, a, n^\prime)$.
+         - The tree-search version of $A^*$ is optimal if $h(n)$ is
+           admissible, while the graph-search version is optimal if
+           $h(n)$ is consistent.
+         - If $h(n)$ is consistent, values of $f(n)$ along any path
+           are non-decreasing.
+         - $f(n^\prime) = g(n^\prime) + h(n^\prime) = g(n) + c(n, a,
+           n^\prime) + h(n^\prime) \geq g(n) + h(n) = f(n)$
+         - There would have to be another frontier node n^\prime on
+           the optimal path, by the graph selection property of 3.9.
+         - See page 77: The frontier separates the state-space graph
+           into the explored region and the unexplored region, so that
+           every path from the inital state to an unexplored state has
+           to pass through a state in the frontier. (This is the graph
+           separation property.)
+         - With an admissible but inconsistent heuristic, $A^*$
+           requires some extra book-keeping to ensure optimality.
+         - It follows that the sequence of nodes expanded by $A^*$ is
+           in non-decreasing order of $f(n)$. Hence, the first goal
+           node selected for expansion must be an optimal solutian
+           because $f$ is the true cost for goal nodes (which have
+           $h=0$) and all later goal nodes will be at least as
+           expensive.
+         - The fact that $f$-costs are non-decreasing means we can
+           draw contours in the state space.
+         - $A^*$ fans out from the start node, adding nodes in
+           concertric bands of increasing $f$-cost.
+         - With uniform-cost search ($A^*$ using $h(n) = 0$), the
+           bands will be circular; more accurate heuristics: bands
+           will stretch toward the goal state and become more
+           narrowlsy focused around the optimal path.
+         - $A^*$ expands all nodes with $f(n) < C^*$.
+         - $A^*$ might expand some nodes on the goal-contour before
+           selecting the goal node.
+         - Completeness requires that there be only finitely many
+           nodes with cost less than or equal to $C^*$, a condition
+           that is true if all step costs exceed some finite
+           $\epsilon$ and if $b$ is finite.
+           - (Actually (i.e. accidentally) finite, or finite in
+             principle? The latter doesn't matter; but we can put
+             upper bounds on $b$ in the case of e.g. tries.
+         - Subtree below Timisoara is pruned: because $h_{SLD}$ is
+           admissible.
+         - $A^*$ is optimally efficient for any given consistent
+           heuristic: no other optimal algorithm is guaranteed to
+           expand fewer nodes than $A^*$ (except possibly
+           tie-breaking). Any algorithm that does not expand all nodes
+           with $f(n) < C$ runs the risk of missing the optimal
+           solution.
+         - The catch is that the number of states within the goal
+           contour search space is still exponential.
+         - Absolute error, relative error
+         - Simplest model: state space, single goal, tree with
+           reversible actions
+         - $A^*$ usually runs out of space before it runs out of time
+       - Memory-bounded heuristic search
+         - Iterative-deepening $A^*$ (IDA*): cutoff is the $f$-cost
+           ($g + h$) rather than the depth. Practical for unit step
+           costs; avoid the overhead of sorted queue of nodes.
+         - Recursive best-first search: using linear space
+           - Modifies currnt f; unwinds along the recursion
+           - Somewhat more efficient than IDA*, suffers from excessive
+             node regeneration
+           - Space complexity: linear; time-complexity: depends on
+             heuristic and how often best path changes.
+         - Memory-bounded A*
+           - Drop oldest worst leaf when memory full
+           - SMA* is a fairly robust choice for finding optimal
+             solutions, particularly when the state space is a graph.
+       - Metalevel state-space
+         - Goal of learning is to minimize total cost of problem solving.
+   - 8-puzzle: exhaustive tree search: 3^22; graph search: 181,440
+     distinct states.
+   - Manhattan distance
+   - Quality of heuristic: effective branching factor $b^*$. (If the
+     total nuber of nodes generated by $A^*$ for a particualr problem
+     is $N$ and the solution depth is $d$, then $b^*$ is the branching
+     factor that a uniform tree of depth $d$ would have to have in
+     order to contain $N + 1$ nodes.)
+   - Experimental measurements of $b^*$ on a small set of problems can
+     provide a good uide to the heuristic's overall usefulness
+   - A well-designed heuristic would have a value of $b^*$ close to
+     $1$.
+   - "$h_2$ dominates $h_1$."
+   - Problem with fewer restrictions on the actions is called a
+     relaxed problem: whence heuristic. The state-space of the relaxed
+     problem is a supergraph of the original state space.
+   - The relaxed problem may have better solutions of the added edges
+     provide short cuts.
+   - The cost of an optimal solution to a relaxed problem is an
+     admissible heuristic for the original problem.
+   - It must obey the triangle inequality and is therefore consistent.
+   - Relaxed problems solved without search, otherwise: too expensive.
+   - =Absolver=: Prieditis
+   - $h(n) = max{h_1(n), ... , h_m(n)}$
+   - Composite heuristic: $h$ is admissible; consistent, dominates
+     component heuristics.
+   - Pattern databases
+   - Solutions share moves, cannot be additively combined
+   - Disjoint pattern databases
+   - Nonadditive heuristic
+   - Inductive methods supplied with features of a state that are
+     relevant to predicting the state's value.
 ** Lectures
 *** 1
     - AI: mapping from sensors to actuators
