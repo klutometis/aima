@@ -1047,6 +1047,9 @@
    the world according to some acceptable interval; if the dirt is not
    evenly distributed, store statistics about dirty hotspots (and hit
    those locations more frequently).
+*
+* TODO 3.7
+  See [[http://en.wikipedia.org/wiki/Convex_hull_algorithms][convex hulls]].
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
