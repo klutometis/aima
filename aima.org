@@ -1790,6 +1790,30 @@
    - Nonadditive heuristic
    - Inductive methods supplied with features of a state that are
      relevant to predicting the state's value.
+   - Goal identified, well-defined problem formulated.
+   - Initial state, actions, transition model, goal test, path cost.
+     This is the state space. Path through state space to goal state:
+     solution.
+   - States and actions: atomic; don't consider internal structure.
+     (What the fuck does this mean: features?)
+   - Tree-search: all paths; graph-search: avoids redundant paths.
+   - Completeness, optimality, time complexity, space complexity.
+   - Uninformed search
+     - Breadth-first
+     - Uniform-cost
+     - Depth-first
+     - Depth-limited
+     - Iterative deepening
+     - Bidirectional
+   - Informed search
+     - Heuristic function
+     - Best-first search
+     - Greedy best-first search
+     - $A^*$ search
+     - RBFS
+     - SMA*
+   - Dynamic programming can be seen as a form of depth-first search
+     on graphs.
 ** Lectures
 *** 1
     - AI: mapping from sensors to actuators
