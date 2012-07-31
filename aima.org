@@ -1971,6 +1971,8 @@
      there that needs to be done.
 
 * TODOs
+** TODO Focus on one or two problems for the coming week.
+   Assign people to be responsible for them.
 ** TODO Modify 2.11 to list available actions?
    No: that changes the problem.
 ** TODO A listing environment
