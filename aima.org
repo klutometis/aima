@@ -1136,6 +1136,20 @@
    - Michael mentioned that the triangle-inequality based consistency
      (monotonicity) condition states merely that the heuristic
      function monotonically decrease as you approach the goal.
+** Mon Aug  6 2012
+*** 3.1
+    Stock example:
+    - Initial state :: One P&G share
+    - Actions available :: Hold and sell
+    - Transition model :: Hold, retain the share; sell, lose the share
+    - Goal test :: P&G is up 10%.
+    - Path cost :: Cost of selling: dividends, &c.
+
+    Simple agent, given historical data, might determine that, in $n$
+    days time, P&G is up; then blindly executes $n - 1$ holds followed
+    by one buy.
+
+    How to apply to crossfit?
 * Notes
 ** 1
    - Two dimensions: thought vs. action, humanity vs. rationality.
