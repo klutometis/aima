@@ -1067,6 +1067,8 @@
         wall does not intervene; in the latter case, stays put.
    - Goal test :: The robot is out of the maze.
    - Path cost :: None
+
+   NB: There's fire possibilities for each square.
 ** TODO b
 * TODO 3.7
   See [[http://en.wikipedia.org/wiki/Convex_hull_algorithms][convex hulls]].
