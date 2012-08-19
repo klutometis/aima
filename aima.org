@@ -1057,6 +1057,17 @@
   process of deciding what actions and states to consider, given a
   goal;'' searching for solutions can't proceed without
   goal-formulation, either.
+* TODO 3.2
+** TODO a
+   - States :: A graph whose nodes point east, west, north, south; and
+               the square currently occupied by the robot.
+   - Initial state :: Graph of one node: the current location
+   - Actions :: East, west, north, south, forward
+   - Transition model :: Moves in the activating direction wherever a
+        wall does not intervene; in the latter case, stays put.
+   - Goal test :: The robot is out of the maze.
+   - Path cost :: None
+** TODO b
 * TODO 3.7
   See [[http://en.wikipedia.org/wiki/Convex_hull_algorithms][convex hulls]].
 * Meetups
