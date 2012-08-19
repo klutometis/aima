@@ -1048,6 +1048,15 @@
    evenly distributed, store statistics about dirty hotspots (and hit
    those locations more frequently).
 *
+* DONE 3.1
+  CLOSED: [2012-08-19 Sun 03:42]
+  Formally, a well-defined problem (see page 66) contains a goal-test;
+  such that we can't define a problem until we've formulated a goal.
+
+  Page 65 states, furthermore, that ``problem formulation is the
+  process of deciding what actions and states to consider, given a
+  goal;'' searching for solutions can't proceed without
+  goal-formulation, either.
 * TODO 3.7
   See [[http://en.wikipedia.org/wiki/Convex_hull_algorithms][convex hulls]].
 * Meetups
