@@ -1047,7 +1047,6 @@
    the world according to some acceptable interval; if the dirt is not
    evenly distributed, store statistics about dirty hotspots (and hit
    those locations more frequently).
-*
 * DONE 3.1
   CLOSED: [2012-08-19 Sun 03:42]
   Formally, a well-defined problem (see page 66) contains a goal-test;
