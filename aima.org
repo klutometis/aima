@@ -1173,7 +1173,7 @@
    connected graph with two-nodes has no solution (since the problem
    states that $i$ and $j$ are different cities).
 
-   #+BEGIN_SRC dot :file 3-3c.pdf
+   #+BEGIN_SRC dot :file img/3-3c.pdf
      digraph G {
        graph [size="0.5,0.5!", ratio=fill]
        edge [dir=none]
@@ -1183,7 +1183,7 @@
 ** DONE d
    CLOSED: [2012-08-20 Mon 04:40]
    With friends located at $a$ and $f$:
-   #+BEGIN_SRC dot :file 3-3d.pdf
+   #+BEGIN_SRC dot :file img/3-3d.pdf
      digraph G {
        graph [size="0.5,0.5!", ratio=fill]
        edge [dir=none]
