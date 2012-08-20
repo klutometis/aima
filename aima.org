@@ -1,5 +1,6 @@
 #+TITLE: Some notes and solutions to Russell and Norvig's Artificial Intelligence: A Modern Approach (AIMA, 3rd edition)
-#+AUTHOR: Peter Danenberg <pcd@roxygen.org>
+#+AUTHOR: Peter Danenberg
+#+EMAIL: pcd@roxygen.org
 * DONE 1.1
   CLOSED: [2011-10-10 Mon 03:03]
   - Intelligence :: A spontaneous faculty for associating impressions
