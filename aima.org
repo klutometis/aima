@@ -1137,23 +1137,60 @@
    2. the passages are straight;
    3. the passages are passable;
    4. the robot has unlimited energy.
-* TODO 3.3
-** TODO a
+* DONE 3.3
+  CLOSED: [2012-08-20 Mon 04:40]
+** DONE a
+   CLOSED: [2012-08-20 Mon 04:29]
    - State :: A state specifies the location of each friend on the map
               $n(\{i, j\})$, and the respective paths that led them
               there $P(\{i, j\})$.
    - Initial state :: A friend a each city $n(\{i, j\})_0$, $P(\{i,
                       j\})$ are empty.
-   - Actions :: Each friend moves to a neighboring city (or stays
-                put).
-   - Transition model :: Each friend moves to a neighboring city (or
-        stays put).
+   - Actions :: Each friend moves to a neighboring city [fn:8].
+   - Transition model :: Each friend moves to a neighboring city.
    - Goal test :: $n(i) = n(j)$, the two friends are in the same city.
-   - Path cost :: $max(T(i_n, i_{n+1}), T(j_n, j_{n+1})$, where $T$ is
-                  the time required to move from one city to the next.
+   - Path cost :: $max(T(i_n, i_{n+1}), T(j_n, j_{n+1}))$, where $T$
+                  is the time required to move from one city to the
+                  next.
 
    This is reminiscent of bidirectional search (\S 3.4.6) with a
    heuristic.
+** DONE b
+   CLOSED: [2012-08-20 Mon 04:29]
+   An admissible heuristic is one that never overestimates the cost to
+   reach a goal.
+   1. $D(i, j)$, the straight-line-distance heuristic, is admissible
+      (by the triangle inequality).
+   2. $2D(i, j)$, on the other hand, is not admissible; since it might
+      overestimate the cost of reaching the goal.
+   3. $D(i, j)/2$ is admissible, since $D(i, j)/2 < D(i, j)$ and $D(i,
+      j)$ is admissible.
+** DONE c
+   CLOSED: [2012-08-20 Mon 04:29]
+   If noöp is allowed, no completely connected map exists for which
+   there is no solution: one friend stays still, the other meets her;
+   if noöps are not allowed, on the other hand, even a completely
+   connected graph with two-nodes has no solution (since the problem
+   states that $i$ and $j$ are different cities).
+
+   #+BEGIN_SRC dot :file 3-3c.pdf
+     digraph G {
+       graph [size="0.5,0.5!", ratio=fill]
+       edge [dir=none]
+       a -> b
+     }
+   #+END_SRC
+** DONE d
+   CLOSED: [2012-08-20 Mon 04:40]
+   With friends located at $a$ and $f$:
+   #+BEGIN_SRC dot :file 3-3d.pdf
+     digraph G {
+       graph [size="0.5,0.5!", ratio=fill]
+       edge [dir=none]
+       a -> d -> e -> f
+       a -> b -> c -> a
+     }
+   #+END_SRC   
 * TODO 3.7
   See [[http://en.wikipedia.org/wiki/Convex_hull_algorithms][convex hulls]].
 * Meetups
@@ -3605,3 +3642,7 @@
 
 [fn:7] From page 67: "The state space . . . is the set of all states
   reachable from the initial state by any sequence of actions."
+
+[fn:8] Noöp, where one friend stays put; is apparently not an option.
+  If it were, there wouldn't be cases where vacillation is required to
+  convene.
