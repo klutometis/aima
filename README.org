@@ -1,0 +1,4 @@
+Some notes and solutions to Russell and Norvig's Artificial
+Intelligence: A Modern Approach (AIMA, 3rd edition)
+
+See the [[https://github.com/downloads/klutometis/aima/aima.pdf][PDF]] or [[http://klutometis.github.com/aima/][HTML]] versions.
