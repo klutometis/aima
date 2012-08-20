@@ -1057,19 +1057,87 @@
   process of deciding what actions and states to consider, given a
   goal;'' searching for solutions can't proceed without
   goal-formulation, either.
-* TODO 3.2
-** TODO a
-   - States :: A graph whose nodes point east, west, north, south; and
-               the square currently occupied by the robot.
-   - Initial state :: Graph of one node: the current location
-   - Actions :: East, west, north, south, forward
-   - Transition model :: Moves in the activating direction wherever a
-        wall does not intervene; in the latter case, stays put.
-   - Goal test :: The robot is out of the maze.
+* DONE 3.2
+  CLOSED: [2012-08-19 Sun 19:23]
+** DONE a
+   CLOSED: [2012-08-19 Sun 19:23]
+# <<3.2a>>
+   - States :: A graph whose nodes point east, west, north, south
+               (pointing to a special sentinel-node in the case of
+               adjoining walls); the orientation of the robot; the
+               square currently occupied by the robot.
+   - Initial state :: Graph of one central node; northward orientation
+   - Actions :: Turn east, west, north, south; move forward.
+   - Transition model :: Moves in the currently oriented direction
+        wherever a wall does not intervene; where a wall intervenes,
+        however, the robot stays put.
+   - Goal test :: Is the robot out of the maze?
    - Path cost :: None
 
-   NB: There's fire possibilities for each square.
-** TODO b
+   The state space is infinite: you can reach any square, for
+   instance, over an unlimited number of noöps (e.g. pressing forward
+   into a wall, turning redundantly, &c.).[fn:7]
+
+   Let's say that redundant noöps have been pruned, however; and that
+   the graph, furthermore, doesn't have any cycles: the state space is
+   at least $n$, corresponding to the number of nodes in the graph. It
+   is at least $4n$, though, since the robot can be in any of the four
+   orientations in each square. Let's say, furthermore, for every node
+   $n_i$ there are $m_i$ unique paths (i.e. sequences $n_{0, 1, \dots,
+   i}$) from the initial node $n_0$ to $n_i$: the state space for
+   $n_i$ alone becomes all the ways to fulfill each path in $m_i$
+   including unnecessary turns and false-forwards into walls. Let the
+   set of all fulfillments for a given $m_i$ be $M_i$.
+
+   The state space is the sum of $M_i$ over the number of nodes in the
+   graph; plus the robots current position; plus the robot's
+   orientation.
+** DONE b
+   CLOSED: [2012-08-19 Sun 19:23]
+# <<3.2b>>
+   - States :: A graph whose nodes point to one or more of east, west,
+               north, south if a neighbor exists in that direction;
+               the orientation of the robot; the square currently
+               occupied by the robot.
+   - Initial state :: Graph of one central node; northward orientation
+   - Actions :: Turn east, west, north, south if the robot is at an
+                intersection; or move forward.
+   - Transition model :: Moves in the currently oriented direction
+        wherever a wall does not intervene; where a wall intervenes,
+        however, the robot stays put.
+   - Goal test :: Is the robot out of the maze?
+   - Path cost :: None
+   
+   The state-space is still infinite, since the problem admits of
+   redundant forwards at intersections; the pruned state space is
+   smaller than [[3.2a]], however, since the fulfillment of $m_i$ doesn't
+   involve unnecessary turns in corridors.
+** DONE c
+   CLOSED: [2012-08-19 Sun 19:23]
+   - States :: A graph whose nodes point to one or more of east, west,
+               north, south if a neighbor exists in that direction;
+               the square currently occupied by the robot.
+   - Initial state :: Graph of one central node
+   - Actions :: Turn east, west, north, south
+   - Transition model :: Move east, west, north, south until the robot
+        is at a turning point.
+   - Goal test :: Is the robot out of the maze?
+   - Path cost :: None
+
+   If the maze has loops, the state space is infinite; otherwise, the
+   state-space is significantly smaller than even [[3.2b]], since $M_i$
+   doesn't require any superfluous movement to exhaust it.
+
+   The robot's orientation is irrelevant, since we'll travel along the
+   chosen direction to the next turning point.
+** DONE d
+   CLOSED: [2012-08-19 Sun 19:23]
+   At least three simplifications; that:
+
+   1. the maze is oriented along strict cardinal directions;
+   2. the passages are straight;
+   3. the passages are passable;
+   4. the robot has unlimited energy.
 * TODO 3.7
   See [[http://en.wikipedia.org/wiki/Convex_hull_algorithms][convex hulls]].
 * Meetups
@@ -3518,3 +3586,6 @@
 
 [fn:6] The agent's minds are unobservable: we have to operate in
   belief space.
+
+[fn:7] From page 67: "The state space . . . is the set of all states
+  reachable from the initial state by any sequence of actions."
