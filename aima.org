@@ -1138,6 +1138,23 @@
    2. the passages are straight;
    3. the passages are passable;
    4. the robot has unlimited energy.
+* TODO 3.3
+** TODO a
+   - State :: A state specifies the location of each friend on the map
+              $n(\{i, j\})$, and the respective paths that led them
+              there $P(\{i, j\})$.
+   - Initial state :: A friend a each city $n(\{i, j\})_0$, $P(\{i,
+                      j\})$ are empty.
+   - Actions :: Each friend moves to a neighboring city (or stays
+                put).
+   - Transition model :: Each friend moves to a neighboring city (or
+        stays put).
+   - Goal test :: $n(i) = n(j)$, the two friends are in the same city.
+   - Path cost :: $max(T(i_n, i_{n+1}), T(j_n, j_{n+1})$, where $T$ is
+                  the time required to move from one city to the next.
+
+   This is reminiscent of bidirectional search (\S 3.4.6) with a
+   heuristic.
 * TODO 3.7
   See [[http://en.wikipedia.org/wiki/Convex_hull_algorithms][convex hulls]].
 * Meetups
