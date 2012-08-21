@@ -1195,6 +1195,34 @@
        a -> b -> c -> a
      }
    #+END_SRC   
+* TODO 3.4
+  Found this note:[fn:9]
+
+  #+BEGIN_QUOTE
+  The history of the Fifteen Puzzle has been given too many times to
+  bear further repetition here. Exactly half of the $15!$ permutations
+  (the so called /even/ permutations) can be obtained. In technical
+  language, the available permutations form the *alternating grouph*,
+  $A_{15}$, whereas for the Lucky Seven Puzzle we have the full
+  *symmetric group*, $S_7$, of $7!$ permutations.
+
+  You can make a puzzle of this type by putting counters on all but
+  one of the nodes of any connected graph and then sliding them, point
+  to point, always along an edge into the currently empty node. We can
+  afford to ignore the /degenerate/ cases, when your garph is a
+  cycle, or is made by putting two smaller graphs together at a single
+  node, because then the puzzle is trivial, or degenerates into the
+  two smaller puzzles corresponding to the two smaller graphs.
+
+  Rick Wilson has proved the remarkable theorem that for every
+  non-degenerate case but one we get either the full symmetric group
+  (if some circuit is odd) or the alternating group (otherwise). The
+  single exception is the graph of the Tricky Six Puzzle for which the
+  group consists of all possible Möbius transformations \[x \to
+  \frac{ax + b}{cx + d}\mod 5\]
+  #+END_QUOTE
+
+  See [[http://en.wikipedia.org/wiki/Brooks'_theorem][Brook's theorem]]; also, [[http://www.sciencedirect.com/science/article/pii/0095895674900987][Richard Wilson's paper]].
 * TODO 3.7
   See [[http://en.wikipedia.org/wiki/Convex_hull_algorithms][convex hulls]].
 * Meetups
@@ -3650,3 +3678,6 @@
 [fn:8] Noöp, where one friend stays put; is apparently not an option.
   If it were, there wouldn't be cases where vacillation is required to
   convene.
+
+[fn:9] Berlekamp, Elwyn, et al. Winning Ways for Pour Mathematical
+  Plays. 2004. p. 867.
