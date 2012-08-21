@@ -1856,7 +1856,7 @@
            are non-decreasing.
          - $f(n^\prime) = g(n^\prime) + h(n^\prime) = g(n) + c(n, a,
            n^\prime) + h(n^\prime) \geq g(n) + h(n) = f(n)$
-         - There would have to be another frontier node n^\prime on
+         - There would have to be another frontier node $n^\prime$ on
            the optimal path, by the graph selection property of 3.9.
          - See page 77: The frontier separates the state-space graph
            into the explored region and the unexplored region, so that
