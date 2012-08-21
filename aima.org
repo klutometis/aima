@@ -1222,7 +1222,7 @@
   \frac{ax + b}{cx + d}\mod 5\]
   #+END_QUOTE
 
-  See [[http://en.wikipedia.org/wiki/Brooks'_theorem][Brook's theorem]]; also, [[http://www.sciencedirect.com/science/article/pii/0095895674900987][Richard Wilson's paper]].
+  See [[http://en.wikipedia.org/wiki/Brooks'_theorem][Brook's theorem]]; also, [[http://www.sciencedirect.com/science/article/pii/0095895674900987][Richard Wilson's paper]].[fn:10]
 * TODO 3.7
   See [[http://en.wikipedia.org/wiki/Convex_hull_algorithms][convex hulls]].
 * Meetups
@@ -3681,3 +3681,5 @@
 
 [fn:9] Berlekamp, Elwyn, et al. Winning Ways for Pour Mathematical
   Plays. 2004. p. 867.
+
+[fn:10] [[http://www2.research.att.com/~aarcher/Research/15puzzle_book_rev.pdf][Slocum's review]]
