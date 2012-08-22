@@ -1291,7 +1291,7 @@
   transpositions.
 
   The following rules follow directly from the corresponding rules about
-  addition of integers:[1]
+  addition of integers:
   - the composition of two even permutations is even
   - the composition of two odd permutations is even
   - the composition of an odd and an even permutation is odd
