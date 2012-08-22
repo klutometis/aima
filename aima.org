@@ -1377,14 +1377,14 @@
 
   Thus, given any two placements Pl_1 and Pl_2, belonging to
   configurations Cf_1 and Cf_2, respectively, Pl_2 is obtainable from
-  Pl_1 if and only if Cf2 is an even permutation Cf_1. Stated directly
-  terms of the placements, we see that if Pl_1 and Pl_2 have the blank
-  in the same cell then Pl_2 is obtainable from Pl_1 if and only if
-  Pl_2 is an even permutation the 15 numberedblocks in Pl_1. Let $n$
-  be the of number of moves the blank cell in Pl_1 is away from the
-  blank cell in Pl_2. Since each move of the blank block causes a
-  transposition two blocks, then for $n$ odd of (respectively even)
-  Pl_2 is obtainable from Pl_1 if and only if Pl_2 is an odd
+  Pl_1 if and only if Cf_2 is an even permutation Cf_1. Stated
+  directly terms of the placements, we see that if Pl_1 and Pl_2 have
+  the blank in the same cell then Pl_2 is obtainable from Pl_1 if and
+  only if Pl_2 is an even permutation the 15 numbered blocks in Pl_1.
+  Let $n$ be the of number of moves the blank cell in Pl_1 is away
+  from the blank cell in Pl_2. Since each move of the blank block
+  causes a transposition two blocks, then for $n$ odd of (respectively
+  even) Pl_2 is obtainable from Pl_1 if and only if Pl_2 is an odd
   (respectively even) permutation of the 16 blocksin Pl_1.
   #+END_QUOTE
 
