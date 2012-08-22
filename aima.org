@@ -1407,6 +1407,10 @@
   of the second class a given arrangemnent can or cannot be converted
   into the natural arrangement, according as its order is odd or even.
   #+END_QUOTE
+
+  Let's investigate writing the permutation as a product of disjoint
+  [[http://en.wikipedia.org/wiki/Cycle_(mathematics)][cycles]]: the permutation is odd if this factorization contains an odd
+  number of even-length cycles.
 * TODO 3.7
   See [[http://en.wikipedia.org/wiki/Convex_hull_algorithms][convex hulls]].
 * Meetups
