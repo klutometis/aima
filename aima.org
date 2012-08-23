@@ -1241,6 +1241,20 @@
     |   |   |
     +---+---+
   #+END_SRC
+  #+CAPTION: Odd 4-puzzle permutation
+  #+ATTR_LATEX: placement=[H]
+  #+BEGIN_SRC ditaa :file img/3-4-odd.png
+    +---+---+
+    |   |   |
+    | 2 | 1 |
+    |   |   |
+    +---+---+
+    |   |   |
+    | 3 | Ø |
+    |   |   |
+    +---+---+
+  #+END_SRC
+
 * TODO 3.7
   See [[http://en.wikipedia.org/wiki/Convex_hull_algorithms][convex hulls]].
 * Meetups
