@@ -1177,7 +1177,7 @@
 
    #+CAPTION: Pathological completely connected graph
    #+ATTR_LATEX: placement=[H]
-   #+BEGIN_SRC dot :file img/3-3c.pdf
+   #+BEGIN_SRC dot :file img/3-3c.png
      digraph G {
        // graph [size="0.5,0.5!", ratio=fill]
        edge [dir=none]
@@ -1192,7 +1192,7 @@
 
    #+CAPTION: Mandatory loop
    #+ATTR_LATEX: placement=[H]
-   #+BEGIN_SRC dot :file img/3-3d.pdf
+   #+BEGIN_SRC dot :file img/3-3d.png
      digraph G {
        // graph [size="0.5,0.5!", ratio=fill]
        edge [dir=none]
@@ -1215,7 +1215,7 @@
 
   #+CAPTION: 4-puzzle game-graph
   #+ATTR_LATEX: placement=[H]
-  #+BEGIN_SRC dot :file img/3-4.pdf :cmd neato
+  #+BEGIN_SRC dot :file img/3-4-graph.png :cmd neato
     digraph G {
       1
       2
