@@ -1250,7 +1250,8 @@
   #+END_SRC
 
   Odd permutations (e.g. $\{2, 1, 3\}$) are an odd number of even
-  cycles (e.g. $(1\ 2)$) away from the canonical version:
+  cycles (e.g. $(1\ 2)$) away from the canonical version (and cannot
+  be reached from the even canonical version):
 
   #+CAPTION: Odd 3-puzzle permutation
   #+ATTR_LATEX: placement=[H]
