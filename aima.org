@@ -1302,6 +1302,26 @@
   It suffices, therefore, to factor the puzzle into disjoint cycles;
   and count those cycles. If there are an odd number of them, the
   puzzle is odd; otherwise, even.
+* DONE 3.5
+  CLOSED: [2012-08-23 Thu 16:32]
+  Since a queen can attack at most three squares in a successive
+  column, the branching factor $b$ is 3; which produces a state space
+  of $3^d$ at column-depth d.
+
+  An naïve upper bound for the state-space of $n$-queens is $n!$ ($n$
+  choices for the first column, followed by $n-1$, &c.); which
+  contains, however, many illegal moves (queens threating queens).
+
+  If you reduce the total state space $n!$ by the attacking tree at
+  $3^d$, you get an lower bound of $\sqrt[3]{n!}$ states.
+
+  Using the so-called [[http://en.wikipedia.org/wiki/Brute-force_attack#Theoretical_limits][Landauer limit]] on computation-energy, it has
+  been argued that flipping through $2^{128}$ values is
+  computationally infeasible; checking $2^{128}$ boards would require
+  even more energy, but let's take it as an upper bound.
+
+  Since $\log_2(\sqrt[3]{79!}) \approx 127.4$, $n = 79$ is an upper
+  bound on exhaustive exploration (the actual $n$ would be much less).
 * TODO 3.7
   See [[http://en.wikipedia.org/wiki/Convex_hull_algorithms][convex hulls]].
 * Meetups
