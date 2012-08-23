@@ -1283,6 +1283,25 @@
     |   |   |
     +---+---+
   #+END_SRC
+
+  Similarly, this odd 8-puzzle is $(6\ 7)$ away from the canonical
+  even puzzle, and can't be reached:
+
+  #+CAPTION: Odd 8-puzzle permutation
+  #+ATTR_LATEX: placement=[H]
+  #+BEGIN_SRC ditaa :file img/3-4-odd-8.png
+    +-+-+-+  
+    |1|2|3|
+    +-+-+-+  
+    |4|5|6|  
+    +-+-+-+  
+    |8|7|Ø|  
+    +-+-+-+    
+  #+END_SRC
+
+  It suffices, therefore, to factor the puzzle into disjoint cycles;
+  and count those cycles. If there are an odd number of them, the
+  puzzle is odd; otherwise, even.
 * TODO 3.7
   See [[http://en.wikipedia.org/wiki/Convex_hull_algorithms][convex hulls]].
 * Meetups
