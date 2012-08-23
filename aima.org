@@ -1189,9 +1189,12 @@
    With friends located at $a$ and $f$, one friend must end up taking
    the $a \to b \to c \to a$ loop to offset the even displacement of
    friends.
+
+   #+CAPTION: Mandatory loop
+   #+ATTR_LATEX: placement=[H]
    #+BEGIN_SRC dot :file img/3-3d.pdf
      digraph G {
-       graph [size="0.5,0.5!", ratio=fill]
+       // graph [size="0.5,0.5!", ratio=fill]
        edge [dir=none]
        a -> d -> e -> f
        a -> b -> c -> a
