@@ -1175,9 +1175,11 @@
    connected graph with two-nodes has no solution (since the problem
    states that $i$ and $j$ are different cities).
 
+   #+CAPTION: Pathological completely connected graph
+   #+ATTR_LATEX: placement=[H]
    #+BEGIN_SRC dot :file img/3-3c.pdf
      digraph G {
-       graph [size="0.5,0.5!", ratio=fill]
+       // graph [size="0.5,0.5!", ratio=fill]
        edge [dir=none]
        a -> b
      }
