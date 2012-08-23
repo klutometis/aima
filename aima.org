@@ -1200,7 +1200,8 @@
        a -> b -> c -> a
      }
    #+END_SRC   
-* TODO 3.4
+* DONE 3.4
+  CLOSED: [2012-08-23 Thu 05:33]
   According to [[http://books.google.com/books/about/Winning_Ways_for_Your_Mathematical_Plays.htmlid%3DV3IrGIxRRWwC][Berlekamp]] (p. 867), [[http://www.sciencedirect.com/science/article/pii/0095895674900987][Richard Wilson]], [[http://www.jstor.org/stable/2589612][Aaron Archer]],
   [[http://www.jstor.org/stable/2369492][William Story]]; there are so-called odd and even permutations in the
   15s-puzzle. Richard Wilson showed that this is generalizable to 8s.
