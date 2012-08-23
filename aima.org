@@ -2356,6 +2356,8 @@
   Let's investigate writing the permutation as a product of disjoint
   [[http://en.wikipedia.org/wiki/Cycle_(mathematics)][cycles]]: the permutation is odd if this factorization contains an odd
   number of even-length cycles.
+
+  Wolfram has a [[http://mathworld.wolfram.com/PermutationCycle.html][better article on cycles]], incidentally.
 ** TODO Focus on one or two problems for the coming week.
    Assign people to be responsible for them.
 ** TODO Modify 2.11 to list available actions?
