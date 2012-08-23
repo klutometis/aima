@@ -1227,6 +1227,20 @@
     }
   #+END_SRC
 
+
+  #+CAPTION: Canonical 4-puzzle permutation (even)
+  #+ATTR_LATEX: placement=[H]
+  #+BEGIN_SRC ditaa :file img/3-4-canonical.png
+    +---+---+
+    |   |   |
+    | 1 | 2 |
+    |   |   |
+    +---+---+
+    |   |   |
+    | 3 | Ø |
+    |   |   |
+    +---+---+
+  #+END_SRC
 * TODO 3.7
   See [[http://en.wikipedia.org/wiki/Convex_hull_algorithms][convex hulls]].
 * Meetups
