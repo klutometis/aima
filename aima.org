@@ -1255,6 +1255,19 @@
     +---+---+
   #+END_SRC
 
+  #+CAPTION: Even 4-puzzle permutation
+  #+ATTR_LATEX: placement=[H]
+  #+BEGIN_SRC ditaa :file img/3-4-even.png
+    +---+---+
+    |   |   |
+    | 1 | Ø |    
+    |   |   |
+    +---+---+
+    |   |   |
+    | 3 | 2 |
+    |   |   |
+    +---+---+
+  #+END_SRC
 * TODO 3.7
   See [[http://en.wikipedia.org/wiki/Convex_hull_algorithms][convex hulls]].
 * Meetups
