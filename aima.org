@@ -1208,6 +1208,10 @@
   According to [[http://en.wikipedia.org/wiki/Parity_of_a_permutation][permutation-parity]], one can factor a permutation into
   [[http://en.wikipedia.org/wiki/Cycle_(mathematics)][cycles]]; the permutation is odd iff this factorization contains an
   odd number of even-length cycles.
+
+  Without loss of generality, we'll illustrate on a 4-puzzle; whose
+  game-graph is the following:
+
   #+CAPTION: 4-puzzle game-graph
   #+ATTR_LATEX: placement=[H]
   #+BEGIN_SRC dot :file img/3-4.pdf :cmd neato
@@ -1227,6 +1231,8 @@
     }
   #+END_SRC
 
+  Numbering clock-wise from $1$ and ignoring $\varnothing$, we have
+  $\{1, 2, 3\}$:
 
   #+CAPTION: Canonical 4-puzzle permutation (even)
   #+ATTR_LATEX: placement=[H]
@@ -1241,6 +1247,10 @@
     |   |   |
     +---+---+
   #+END_SRC
+
+  Odd permutations (e.g. $\{2, 1, 3\}$) are an odd number of even
+  cycles (e.g. $(1\ 2)$) away from the canonical version:
+
   #+CAPTION: Odd 4-puzzle permutation
   #+ATTR_LATEX: placement=[H]
   #+BEGIN_SRC ditaa :file img/3-4-odd.png
@@ -1254,6 +1264,9 @@
     |   |   |
     +---+---+
   #+END_SRC
+
+  Even permutations (e.g. $\{1, 2, 3\}$) are an even number of even
+  cycles (e.g. $\varnothing$) from the canonical version:
 
   #+CAPTION: Even 4-puzzle permutation
   #+ATTR_LATEX: placement=[H]
