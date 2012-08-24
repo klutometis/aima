@@ -1434,7 +1434,8 @@
   [[http://stackoverflow.com/questions/5608381/plotting-and-coloring-data-on-irregular-grid][Delaunay triangulation in R]], incidentally; using =spatstat= and
   =maptools=, also =latticeExtra=.
 
-  Voronoi diagrams are [[http://stackoverflow.com/a/3083145][one-liners in R]]; [[http://stackoverflow.com/a/9405831][another example]].
+  Voronoi diagrams are [[http://stackoverflow.com/a/3083145][one-liners in R]]; [[http://stackoverflow.com/a/9405831][another example]]. See also [[http://www.carsonfarmer.com/2009/09/voronoi-polygons-with-r/][sp
+  and deldir]]. [[http://www.cgal.org/Manual/latest/doc_html/cgal_manual/packages.html#part_IX][CGAL]] does it, too, of course.
 
   See [[http://en.wikipedia.org/wiki/Lloyd's_algorithm][Lloyd's algorithm]], [[http://en.wikipedia.org/wiki/Bowyer%E2%80%93Watson_algorithm][Bowyer-Watson]], and [[http://en.wikipedia.org/wiki/Fortune's_algorithm][Fortune]]; an alternative is
   [[http://en.wikipedia.org/wiki/Delaunay_triangulation][Delaunay triangulation]], too. Basically, we have random points; and
@@ -1444,6 +1445,11 @@
 
   What about just a [[http://en.wikipedia.org/wiki/Euclidean_minimum_spanning_tree][Euclidean minimum spanning tree]]? We can even find
   one in [[http://en.wikipedia.org/wiki/Euclidean_minimum_spanning_tree#Algorithms_for_computing_EMSTs_in_two_dimensions][O(n log n)]].
+** TODO Voronoi
+   - [[http://cs.nyu.edu/~ajsecord/npar2002/html/stipples-node2.html][Lloyd's]] and minimum energy
+   - See the description of [[http://en.wikipedia.org/wiki/K-means_clustering#Algorithms][k-means]]
+   - R [[http://en.wikibooks.org/wiki/Data_Mining_Algorithms_In_R/Clustering/K-Means#Implementation][implementations]] of k-means
+   - 
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
