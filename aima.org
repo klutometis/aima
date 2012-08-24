@@ -1059,7 +1059,10 @@
   goal;'' searching for solutions can't proceed without
   goal-formulation, either.
 * DONE 3.2
-  CLOSED: [2012-08-19 Sun 19:23]
+  CLOSED: [2012-08-23 Thu 17:21]
+  - CLOSING NOTE [2012-08-23 Thu 17:21] \\
+    I think we were confused here, incidentally, by the state space
+    (finite) and the decision space (infinite).
 ** DONE a
    CLOSED: [2012-08-19 Sun 19:23]
 # <<3.2a>>
