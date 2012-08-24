@@ -1434,7 +1434,7 @@
   [[http://stackoverflow.com/questions/5608381/plotting-and-coloring-data-on-irregular-grid][Delaunay triangulation in R]], incidentally; using =spatstat= and
   =maptools=, also =latticeExtra=.
 
-  Voronoi diagrams are [[http://stackoverflow.com/a/3083145][one-liners in R]].
+  Voronoi diagrams are [[http://stackoverflow.com/a/3083145][one-liners in R]]; [[http://stackoverflow.com/a/9405831][another example]].
 
   See [[http://en.wikipedia.org/wiki/Lloyd's_algorithm][Lloyd's algorithm]], [[http://en.wikipedia.org/wiki/Bowyer%E2%80%93Watson_algorithm][Bowyer-Watson]], and [[http://en.wikipedia.org/wiki/Fortune's_algorithm][Fortune]]; an alternative is
   [[http://en.wikipedia.org/wiki/Delaunay_triangulation][Delaunay triangulation]], too. Basically, we have random points; and
