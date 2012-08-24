@@ -1325,8 +1325,70 @@
 
   Since $\log_2(\sqrt[3]{79!}) \approx 127.4$, $n = 79$ is an upper
   bound on exhaustive exploration (the actual $n$ would be much less).
-* TODO 3.6
-** TODO a  
+* DONE 3.6
+  CLOSED: [2012-08-24 Fri 08:09]
+** DONE a  
+   CLOSED: [2012-08-24 Fri 08:09]
+   - States :: An upper bound on the number of 4-colorings is $4^n$,
+               where $n$ is the number of regions in the plane;
+               finding the exact number of colorings (the so-called
+               [[http://en.wikipedia.org/wiki/Chromatic_polynomial][chromatic polynomial]]) is [[http://epubs.siam.org/doi/abs/10.1137/S0097539704446797][#P-complete]].[fn:10]
+               
+               The map can be modeled as a graph where the nodes
+               correspond to regions and edges are drawn between nodes
+               whose corresponding regions are adjacent.
+   - Initial state :: A planar graph with the topology mentioned
+                      above, whose nodes are all uncolored.
+   - Actions :: Color node; add children to queue.
+   - Transition model :: After the node is colored, it is removed from
+        the queue; the next node in the queue becomes the current node.
+   - Goal test :: The graph is colored (there are no more nodes in the
+                  queue) and is a valid 4-coloring.
+
+   This assumes that we've [[http://en.wikipedia.org/wiki/Graph_coloring#Exact_algorithms][brute-forced]] all $4^n$ color-assignments,
+   and are checking them for validity; more efficient algorithms exist.[fn:11]
+** DONE b
+   CLOSED: [2012-08-24 Fri 08:09]
+   - States :: In a square room with $n \times n$ tiles, there are
+               $n^2$ possible arrangements of bananas.
+               
+               The room could be modeled as an $n \times n$ array,
+               with the location of the two crates, the monkey and
+               bananas.
+   - Initial state :: An $n \times n$ array with random bananas;
+                      monkey and two crates in position 0.
+   - Actions :: Move up, down, left, right; move crates up, down,
+                left, right.
+   - Transition model :: If the monkey moves up, down, left, right and
+        is not encumbered by a wall, update the position; the monkey,
+        incidentally, has a banana sensor which rings true if the
+        current square has bananas.
+        
+        If the monkey moves a box, update the position of the box.
+   - Goal test :: Has the graph been explored, and are there no more
+                  bananas?
+   Involves an e.g. breadth-first search of the banana-space with
+   backtracking so as to relocate the boxes from their last position.
+** DONE c
+   CLOSED: [2012-08-24 Fri 08:09]
+   - States :: An array of records with one or more of them illegal.
+               An list of indices with illegal records.
+   - Initial state :: Some array of records; an empty list of illegal
+                      records.
+   - Actions :: Parse record and next record.
+   - Transition model :: If parse-record returns false, the record is
+        illegal: add it to the list of illegal records; next-record
+        examines the next record.
+   - Goal test :: Have we examined all the records?
+** DONE d
+   CLOSED: [2012-08-24 Fri 08:09]
+   - States :: Three jugs in various states of fullness.
+   - Initial state :: All three jugs are empty.
+   - Actions :: Fill, empty into jug, empty onto ground.
+   - Transition model :: Filling or emptying updates the water level
+        of the corresponding jug(s).
+   - Goal test :: Does any jug contain one gallon?
+   Is this reminiscent of Knuth's conjecture?
 * TODO 3.7
   See [[http://en.wikipedia.org/wiki/Convex_hull_algorithms][convex hulls]].
 * Meetups
@@ -4003,3 +4065,8 @@
 
 [fn:9] Berlekamp, Elwyn, et al. Winning Ways for Pour Mathematical
   Plays. 2004. p. 867.
+
+[fn:10] Thanks, [[http://mathoverflow.net/questions/61225/how-many-different-colorings-excluding-exchanges-exist-for-a-given-map-graph/68737#68737][Emil Jeřábek]].
+
+[fn:11] One based on [[http://demonstrations.wolfram.com/FourColoringPlanarGraphs/][Kempe's method]], for instance; or [[http://www.sciencedirect.com/science/article/pii/S0167637704000409][Byskov's]] (which
+  is $O(1.7504^n))$.
