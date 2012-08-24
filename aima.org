@@ -1390,7 +1390,60 @@
    - Goal test :: Does any jug contain one gallon?
    Is this reminiscent of Knuth's conjecture?
 * TODO 3.7
-  See [[http://en.wikipedia.org/wiki/Convex_hull_algorithms][convex hulls]].
+  See [[http://en.wikipedia.org/wiki/Convex_hull_algorithms][convex hulls]]. It turns out that we don't have to model it as all
+  positions in the plane; let's model it as the corners of polygons.
+  We have to have a notion of "reachable" vertices, however. Can we
+  create the space as random polygons; and draw a graph of reachable
+  vertices? What's the best way to draw the vertices and path?
+
+  What's the trick for coming up with non-intersecting polygons? Is
+  this important? I think so, since we'll otherwise search unreachable
+  vertices; unless we can merge the polygons: but there's no guarantee
+  that the polygons will intersect at integer-valued x-ys.
+
+  See [[http://compgeom.cs.uiuc.edu/~jeffe/open/randompoly.html][random simple polygons]] (might be best to avoid [[http://en.wikipedia.org/wiki/Polygon#Self-intersecting_polygons][self-intersecting
+  ones]]); also, [[http://www.dcc.fc.up.pt/~apt/onlinepapers/caepia03.pdf][random orthogonal polygons]]. Nothing yet on
+  random-non-intersecting polygons; does it suffice to reject
+  points-in-preëxisting-polygons? You also have to take care not to
+  enclose prexisting points in new polygons. If we were drawing
+  parallel planes in e.g. three dimensions, this would be less of a
+  concern. Feasible? Sure. How do we draw it?
+
+  "Random non-overlapping polygons" might be more fruitful; seems like
+  it would be worthwhile to simply start drawing them at random,
+  rejecting overlapping ones until we reach $n$.
+
+  (See [[http://www.cgal.org/][CGAL]], incidentally: it even contains [[http://www.cgal.org/Manual/latest/doc_html/cgal_manual/packages.html#part_XVIII][visualization]] and
+  [[http://www.cgal.org/Manual/latest/doc_html/cgal_manual/packages.html#part_VI][polygon-operations]]; [[http://www.cgal.org/Manual/latest/doc_html/cgal_manual/Generator_ref/Function_random_polygon_2.html][random polygons]].)
+
+  Talking about [[http://cgal-discuss.949826.n4.nabble.com/Random-Polygon-Generator-tp951608p951609.html][convex hulls and voronoi diagrams]] to construct random
+  simple polygons; I wonder if CGAL wouldn't come in handy, after all.
+  Write the Scheme bindings? Ouch.
+
+  Can we just do a [[http://en.wikipedia.org/wiki/Voronoi_diagram][Voronoi tesselation]] and call it a day? It seems
+  like it has all the properties we're looking for: non-overlapping
+  simple polygons, unreachable points. Let's do it!
+
+  At this point, though, isn't it indistinguishable from drawing
+  random points in the plane and searching with a straight-line
+  heuristic? Yes. Voronoi diagrams are irrelevant. We could, of
+  course, generate them for the hell of it (using continuous, not
+  discrete, coördinates); and use their boundaries as our vertices.
+  Why? It's pretty. Still have to figure out how to draw them, though.
+
+  [[http://stackoverflow.com/questions/5608381/plotting-and-coloring-data-on-irregular-grid][Delaunay triangulation in R]], incidentally; using =spatstat= and
+  =maptools=, also =latticeExtra=.
+
+  Voronoi diagrams are [[http://stackoverflow.com/a/3083145][one-liners in R]].
+
+  See [[http://en.wikipedia.org/wiki/Lloyd's_algorithm][Lloyd's algorithm]], [[http://en.wikipedia.org/wiki/Bowyer%E2%80%93Watson_algorithm][Bowyer-Watson]], and [[http://en.wikipedia.org/wiki/Fortune's_algorithm][Fortune]]; an alternative is
+  [[http://en.wikipedia.org/wiki/Delaunay_triangulation][Delaunay triangulation]], too. Basically, we have random points; and
+  want to divvy them up into coincident, non-overlapping, convex
+  polygons. There's a number of [[http://en.wikipedia.org/wiki/Delaunay_triangulation#Algorithms][algorithms]] for Delaunay triangulation;
+  one of which is $O(n^2)$.
+
+  What about just a [[http://en.wikipedia.org/wiki/Euclidean_minimum_spanning_tree][Euclidean minimum spanning tree]]? We can even find
+  one in [[http://en.wikipedia.org/wiki/Euclidean_minimum_spanning_tree#Algorithms_for_computing_EMSTs_in_two_dimensions][O(n log n)]].
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
