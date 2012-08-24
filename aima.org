@@ -1322,6 +1322,8 @@
 
   Since $\log_2(\sqrt[3]{79!}) \approx 127.4$, $n = 79$ is an upper
   bound on exhaustive exploration (the actual $n$ would be much less).
+* TODO 3.6
+** TODO a  
 * TODO 3.7
   See [[http://en.wikipedia.org/wiki/Convex_hull_algorithms][convex hulls]].
 * Meetups
