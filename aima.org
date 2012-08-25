@@ -1481,6 +1481,8 @@
    [[http://www.cs.umd.edu/class/spring2012/cmsc754/Lects/lect14.pdf][Incremental Delaunay]]
    
    Oh, shit: [[http://people.csail.mit.edu/indyk/6.838-old/handouts/lec8.pdf][step-by-step Voronoi]]
+
+   [[http://www.springerlink.com/index/p8377h68j82l6860.pdf][Fantastic paper by Knuth, et al.]]
 ** TODO EMST
    There are even [[http://zachjorgensen.com/ictai06.pdf][EMST-based clustering algorithms]].
 * Meetups
