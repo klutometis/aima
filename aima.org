@@ -1477,6 +1477,10 @@
    [[http://mathworld.wolfram.com/VoronoiPolygon.html][Voronoi polygon]]
 
    [[http://en.wikipedia.org/wiki/Fundamental_polygon][Metric fundamental polygon]]
+
+   [[http://www.cs.umd.edu/class/spring2012/cmsc754/Lects/lect14.pdf][Incremental Delaunay]]
+   
+   Oh, shit: [[http://people.csail.mit.edu/indyk/6.838-old/handouts/lec8.pdf][step-by-step Voronoi]]
 ** TODO EMST
    There are even [[http://zachjorgensen.com/ictai06.pdf][EMST-based clustering algorithms]].
 * Meetups
