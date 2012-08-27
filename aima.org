@@ -1483,6 +1483,19 @@
    Oh, shit: [[http://people.csail.mit.edu/indyk/6.838-old/handouts/lec8.pdf][step-by-step Voronoi]]
 
    [[http://www.springerlink.com/index/p8377h68j82l6860.pdf][Fantastic paper by Knuth, et al.]]
+
+   This is good for an [[http://en.wikipedia.org/wiki/Delaunay_triangulation#Algorithms][intuition]], incidentally:
+
+   #+BEGIN_QUOTE
+   In mathematics and computational geometry, a Delaunay triangulation
+   for a set P of points in a plane is a triangulation DT(P) such that
+   no point in P is inside the circumcircle of any triangle in DT(P).
+   Delaunay triangulations maximize the minimum angle of all the
+   angles of the triangles in the triangulation; they tend to avoid
+   skinny triangles.
+   #+END_QUOTE
+
+   
 *** TODO Matrices
     Not a bad [[http://science.kennesaw.edu/~plaval/math3260/det1.pdf][recursive determinant]] (use only the first row).
 
