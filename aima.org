@@ -1483,6 +1483,92 @@
    Oh, shit: [[http://people.csail.mit.edu/indyk/6.838-old/handouts/lec8.pdf][step-by-step Voronoi]]
 
    [[http://www.springerlink.com/index/p8377h68j82l6860.pdf][Fantastic paper by Knuth, et al.]]
+*** TODO Matrices
+    Not a bad [[http://science.kennesaw.edu/~plaval/math3260/det1.pdf][recursive determinant]] (use only the first row).
+
+    #+BEGIN_SRC scheme
+      (use debug srfi-25)
+      
+      (include "arlib")
+      (include "play")
+      (let (;; (array (make-array (shape 0 3 0 3) 1))
+            (array (array (shape 0 4 0 4)
+                          7 4 2 0
+                          6 3 -1 2
+                          4 6 2 5
+                          8 2 -7 1)))
+        (play array)
+        (array-for-each-index array (lambda x (debug x))))      
+    #+END_SRC
+
+    No; let's hard-code the 4x4 determinant: atlas-laplace is failing;
+    and we can't do LU-decomp for every matrix.
+
+    #+BEGIN_SRC scheme
+      (use srfi-25 test)
+      
+      ;;; Slightly embarrasing; but atlas-laplace won't install, and I don't
+      ;;; feel like incurring the O(n!) penalty of recursive Leibniz. See
+      ;;; <http://www.euclideanspace.com/maths/algebra/matrix/functions/determinant/fourD/index.htm>.
+      ;;; 
+      ;;; m03 * m12 * m21 * m30 -
+      ;;; m02 * m13 * m21 * m30 -
+      ;;; m03 * m11 * m22 * m30 +
+      ;;; m01 * m13 * m22 * m30 +
+      ;;; m02 * m11 * m23 * m30 -
+      ;;; m01 * m12 * m23 * m30 -
+      ;;; m03 * m12 * m20 * m31 +
+      ;;; m02 * m13 * m20 * m31 +
+      ;;; m03 * m10 * m22 * m31 -
+      ;;; m00 * m13 * m22 * m31 -
+      ;;; m02 * m10 * m23 * m31 +
+      ;;; m00 * m12 * m23 * m31 +
+      ;;; m03 * m11 * m20 * m32 -
+      ;;; m01 * m13 * m20 * m32 -
+      ;;; m03 * m10 * m21 * m32 +
+      ;;; m00 * m13 * m21 * m32 +
+      ;;; m01 * m10 * m23 * m32 -
+      ;;; m00 * m11 * m23 * m32 -
+      ;;; m02 * m11 * m20 * m33 +
+      ;;; m01 * m12 * m20 * m33 +
+      ;;; m02 * m10 * m21 * m33 -
+      ;;; m00 * m12 * m21 * m33 -
+      ;;; m01 * m10 * m22 * m33 +
+      ;;; m00 * m11 * m22 * m33
+      (define (4d-determinant m)
+        (+ (* (array-ref m 0 3) (array-ref m 1 2) (array-ref m 2 1) (array-ref m 3 0))
+           (- (* (array-ref m 0 2) (array-ref m 1 3) (array-ref m 2 1) (array-ref m 3 0)))
+           (- (* (array-ref m 0 3) (array-ref m 1 1) (array-ref m 2 2) (array-ref m 3 0)))
+           (* (array-ref m 0 1) (array-ref m 1 3) (array-ref m 2 2) (array-ref m 3 0))
+           (* (array-ref m 0 2) (array-ref m 1 1) (array-ref m 2 3) (array-ref m 3 0))
+           (- (* (array-ref m 0 1) (array-ref m 1 2) (array-ref m 2 3) (array-ref m 3 0)))
+           (- (* (array-ref m 0 3) (array-ref m 1 2) (array-ref m 2 0) (array-ref m 3 1)))
+           (* (array-ref m 0 2) (array-ref m 1 3) (array-ref m 2 0) (array-ref m 3 1))
+           (* (array-ref m 0 3) (array-ref m 1 0) (array-ref m 2 2) (array-ref m 3 1))
+           (- (* (array-ref m 0 0) (array-ref m 1 3) (array-ref m 2 2) (array-ref m 3 1)))
+           (- (* (array-ref m 0 2) (array-ref m 1 0) (array-ref m 2 3) (array-ref m 3 1)))
+           (* (array-ref m 0 0) (array-ref m 1 2) (array-ref m 2 3) (array-ref m 3 1))
+           (* (array-ref m 0 3) (array-ref m 1 1) (array-ref m 2 0) (array-ref m 3 2))
+           (- (* (array-ref m 0 1) (array-ref m 1 3) (array-ref m 2 0) (array-ref m 3 2)))
+           (- (* (array-ref m 0 3) (array-ref m 1 0) (array-ref m 2 1) (array-ref m 3 2)))
+           (* (array-ref m 0 0) (array-ref m 1 3) (array-ref m 2 1) (array-ref m 3 2))
+           (* (array-ref m 0 1) (array-ref m 1 0) (array-ref m 2 3) (array-ref m 3 2))
+           (- (* (array-ref m 0 0) (array-ref m 1 1) (array-ref m 2 3) (array-ref m 3 2)))
+           (- (* (array-ref m 0 2) (array-ref m 1 1) (array-ref m 2 0) (array-ref m 3 3)))
+           (* (array-ref m 0 1) (array-ref m 1 2) (array-ref m 2 0) (array-ref m 3 3))
+           (* (array-ref m 0 2) (array-ref m 1 0) (array-ref m 2 1) (array-ref m 3 3))
+           (- (* (array-ref m 0 0) (array-ref m 1 2) (array-ref m 2 1) (array-ref m 3 3)))
+           (- (* (array-ref m 0 1) (array-ref m 1 0) (array-ref m 2 2) (array-ref m 3 3)))
+           (* (array-ref m 0 0) (array-ref m 1 1) (array-ref m 2 2) (array-ref m 3 3))))
+      
+      (let ((array (array (shape 0 4 0 4)
+                          7 4 2 0
+                          6 3 -1 2
+                          4 6 2 5
+                          8 2 -7 1)))
+        ;; <http://www.intmath.com/matrices-determinants/2-large-determinants.php>
+        (test -279 (4d-determinant array)))
+    #+END_SRC
 ** TODO EMST
    There are even [[http://zachjorgensen.com/ictai06.pdf][EMST-based clustering algorithms]].
 * Meetups
