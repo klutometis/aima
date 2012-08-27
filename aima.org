@@ -1445,6 +1445,12 @@
 
   What about just a [[http://en.wikipedia.org/wiki/Euclidean_minimum_spanning_tree][Euclidean minimum spanning tree]]? We can even find
   one in [[http://en.wikipedia.org/wiki/Euclidean_minimum_spanning_tree#Algorithms_for_computing_EMSTs_in_two_dimensions][O(n log n)]].
+
+  Look no further than [[http://www.cs.uu.nl/geobook/][Computational Geometry]]: implementable
+  algorithms, detailed explanations. Next candidate for LACSRG,
+  incidentally?
+
+  
 ** TODO Voronoi
    - [[http://cs.nyu.edu/~ajsecord/npar2002/html/stipples-node2.html][Lloyd's]] and minimum energy
    - See the description of [[http://en.wikipedia.org/wiki/K-means_clustering#Algorithms][k-means]]
@@ -1494,8 +1500,6 @@
    angles of the triangles in the triangulation; they tend to avoid
    skinny triangles.
    #+END_QUOTE
-
-   
 *** TODO Matrices
     Not a bad [[http://science.kennesaw.edu/~plaval/math3260/det1.pdf][recursive determinant]] (use only the first row).
 
