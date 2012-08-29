@@ -1450,7 +1450,10 @@
   algorithms, detailed explanations. Next candidate for LACSRG,
   incidentally?
 
-  
+  We might as well go [[http://dl.acm.org/citation.cfmid%3D10549][straight to Fortune]]; Berg is somewhat irritating
+  with internal references; [[https://kedras.mif.vu.lt/bastys/academic/ATE/delaunay/FortuneDemo.htm][Èuk Roman]] did a sub-adequate job.
+
+  [[http://ect.bell-labs.com/who/sjf/][Steven's own implementation]] in c
 ** TODO Voronoi
    - [[http://cs.nyu.edu/~ajsecord/npar2002/html/stipples-node2.html][Lloyd's]] and minimum energy
    - See the description of [[http://en.wikipedia.org/wiki/K-means_clustering#Algorithms][k-means]]
