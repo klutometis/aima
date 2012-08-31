@@ -1591,6 +1591,8 @@
     #+END_SRC
 ** TODO EMST
    There are even [[http://zachjorgensen.com/ictai06.pdf][EMST-based clustering algorithms]].
+** TODO Fortune's algorithm
+   Maybe we can lick this with a combination of
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
