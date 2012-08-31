@@ -1454,6 +1454,62 @@
   with internal references; [[https://kedras.mif.vu.lt/bastys/academic/ATE/delaunay/FortuneDemo.htm][Èuk Roman]] did a sub-adequate job.
 
   [[http://ect.bell-labs.com/who/sjf/][Steven's own implementation]] in c
+
+  Has some [[http://www.tcs.tifr.res.in/~workshop/bhu_igga/workshop.beamer.pdf][good non-optimal]] algorithms; [[http://www.ams.sunysb.edu/~jsbm/courses/345/11/lecture-Voronoi.ppt][n^2]].
+
+  [[http://www.ams.org/samplings/feature-column/fcarc-voronoi][Good prose from AMS]]:
+
+  #+BEGIN_QUOTE
+  If the next event that the sweep line encounters is a site event, we
+  simply insert the new site into our list of sites in the order in
+  which the corresponding parabolic arc appears on the beach line. We
+  then record the fact that we have encountered a new edge in the
+  diagram.
+
+  If the next event that the sweep line encounters is a circle event,
+  we record the fact that we have encountered a vertex in the diagram
+  and that this vertex is the endpoint of the edges corresponding to
+  the two breakpoints that have come together. We also record the new
+  edge corresponding to the new breakpoint that results from the
+  circle event.
+
+  Whether we encounter a site or circle event, we will always check to
+  see if we have added a new triple of parabolic arcs on the beach
+  line that may lead to a future circle event. It is also possible
+  that we will remove a future circle event from consideration if the
+  triple of parabolic arcs that led to it no longer exists after the
+  event.
+  #+END_QUOTE
+
+  Berg is pretty good, actually:
+
+  #+BEGIN_QUOTE
+  Now we know where and how the combinatorial structure of the beach
+  line changes: at a site event a new arc appears, and at a circle
+  event an existing arc drops out. We also know how this relates to
+  the Voronoi diagram under construction: at a site event a new edge
+  starts to grow, and at a circle event two growing edges meet to form
+  a vertex.
+  #+END_QUOTE
+
+  
+
+*** TODO $O(n^2)$ intersection of all the half-planes
+    Bisector between two points: perpendicular; points that are the
+    same distance from $p$ and $q$.
+
+    From [[http://www.cs.tufts.edu/g/163/notes05/voronoi_handout.pdf][Tufts]]:
+
+    #+BEGIN_QUOTE
+    A naive approach to construct of a Voronoi diagram is to determine
+    the region for each site, one at a time. Since each region is the
+    intersection of n − 1 half-planes, we can use an O(n log n)
+    half-plane intersection algorithm to determine this region.
+    Repeating for all n points, we have an O(n2 log n) algorithm.
+    #+END_QUOTE
+
+    Finally understand Berg's reference to chapter 4: they employ a
+    sweep-line for intersection.
 ** TODO Voronoi
    - [[http://cs.nyu.edu/~ajsecord/npar2002/html/stipples-node2.html][Lloyd's]] and minimum energy
    - See the description of [[http://en.wikipedia.org/wiki/K-means_clustering#Algorithms][k-means]]
@@ -1593,6 +1649,17 @@
    There are even [[http://zachjorgensen.com/ictai06.pdf][EMST-based clustering algorithms]].
 ** TODO Fortune's algorithm
    Maybe we can lick this with a combination of
+
+   #+BEGIN_QUOTE
+   In mathematics, a Voronoi diagram is a special kind of
+   decomposition of a metric space, determined by distances to a
+   specified family of objects (subsets) in the space. These objects
+   are usually called the sites or the generators (but other names are
+   used, such as "seeds") and to each such object one associates a
+   corresponding Voronoi cell, namely the set of all points in the
+   given space whose distance to the given object is not greater than
+   their distance to the other objects.
+   #+END_QUOTE
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
