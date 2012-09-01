@@ -1695,6 +1695,10 @@
   edges of the Voronoi diagram. We must add a bounding box to which
   these edges can be attached.
   #+END_QUOTE
+
+*** TODO Good overview
+    See [[http://nms.csail.mit.edu/~aklmiu/6.838/L7.pdf][here]]; actually breaks down the change in the tree and
+    double-linked list.
 *** TODO Calculate convergence of breakpoints
     [[http://cgm.cs.mcgill.ca/~mcleish/644/Projects/DerekJohns/Sweep.htm][Good animations]]; still doesn't elaborate on how to calculate
     whether the breakpoints converge.
