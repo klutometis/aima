@@ -1492,8 +1492,259 @@
   a vertex.
   #+END_QUOTE
 
-  
+  On the justification for $\mathcal{T}$, which changes:
 
+  #+BEGIN_QUOTE
+  The paradigm involves maintaining the intersection of the Voronoi
+  diagram with the sweep line. Unfortunately this is not so easy,
+  because the part of Vor(P) above depends not only on the sites that
+  lie above $\ell$ but also on sites below $\ell$. Stated differently,
+  when the sweep line reaches the topmost vertex of the Voronoi cell
+  $V(p_i)$ it has not yet encountered the corresponding site $p_i$.
+  Hence, we do not have all the information needed to compute the
+  vertex. We are forced to apply the plane sweep paradigm in a
+  slightly different fashion: instead of maintaining the intersection
+  of the Voronoi diagram with the sweep line, we maintain information
+  about the part of the Voronoi diagram of the sites above $\ell$ that
+  cannot be changed by sites below $\ell$.
+  #+END_QUOTE
+
+  Sweep line $\ell$; the beach line, however:
+
+  #+BEGIN_QUOTE
+  The locus of points that are closer to any site above $\ell$ than to
+  $\ell$ itself is bounded by parabolic arcs. We call this sequence of
+  parabolic arcs the beach line.
+
+  The beach line is x-monotone, that is, every vertical line
+  intersects it in exactly one point.
+  #+END_QUOTE
+
+  Breakpoints:
+
+  #+BEGIN_QUOTE
+  Notice that the breakpoints between the different parabolic arcs
+  forming the beach line lie on edges of the Voronoi diagram . . . the
+  breakpoints exactly trace out the Voronoi diagram while the sweep
+  line moves from top to bottom.
+
+  So, instead of maintaining the intersection of $Vor(P)$ with $\ell$,
+  we maintain the beach line as we move our sweep line $\ell$. We do
+  not maintain the beach line explicitly, since it changes
+  continuously as $\ell$ moves.
+
+  [The beach line's combinatorial structure changes] when a new
+  parabolic arc appears on it, and when a parabolic arc shrinks to a
+  point and disappears.
+  #+END_QUOTE
+
+  On site events:
+
+  #+BEGIN_QUOTE
+  [A new arc appears on the beach line] when the sweep line $\ell$
+  reaches a new site. The parabola defined by this site is at first a
+  degenerate parabola with zero width: a vertical line segment
+  connecting the new site to the beach line. As the sweep line
+  contiues to move downward the new parabola gets wider and wider.
+
+  We call the event where a new site is encountered a site event.
+
+  At a site event two new breakpoints appear, which start tracing out
+  edges. In fact, the new breakpoints coincide at first, and then move
+  in opposite directions to trace out the same edge. Initially, this
+  edge is not connected to the rest of the Voronoi diagram . . . Later
+  on, the growing edge will run into another edge, and it becomes
+  connected to the rest of the diagram.
+  #+END_QUOTE
+
+  Site events and beach lines:
+
+  #+BEGIN_QUOTE
+  The only way a new arc can appear on the beach line is through a
+  site event.
+  
+  The beach line consists of at most $2n - 1$ parabolic arcs: each
+  site encountered gives rise to one new arc and the splitting of at
+  most one existing arc into two.
+  #+END_QUOTE
+
+  Circle events:
+
+  #+BEGIN_QUOTE
+  The second type of event is where an existing arc of the beach line
+  shrinks to a point and disappears. Three arcs $\alpha$,
+  $\alpha^\prime$, $\alpha^{\prime\prime}$ are defined by three sites
+  $p_i$, $p_j$, and $p_k$. At the moment $a^\prime$ disappears, the
+  parabolas defined by these three sites pass through a common point
+  $q$. Point $q$ is equidistant from $\ell$ and each of the three sites.
+  Hence, there is a circle passing through $p_i$, $p_j$, and $p_k$
+  with $q$ as its center and whose lowest point lies on $\ell$. The
+  point $q$ is a vertex of the Voronoi diagram.
+
+  We call the event where the sweep line reaches the lowest point of a
+  circle through three sites defining consecutive arcs on the beach
+  line a cirle event.
+  #+END_QUOTE
+
+  Circle events and arcs:
+
+  #+BEGIN_QUOTE
+  The onl way in which an existing arc can disappear from the beach
+  line is through a circle event.
+
+  At a site event a new arc appears, and at a circle event an existing
+  arc drops out.
+
+  At a site event a new edge starts to grow, and at a circle event two
+  growing edges meet to form a vertex.
+  #+END_QUOTE
+
+  Data structures:
+
+  #+BEGIN_QUOTE
+  We need a data structure that stores the part of the Voronoi diagram
+  computed thus far. We also need the two `standard' data structures
+  for any sweep line algorithm: an even queue and a structure that
+  represents the status of the sweep line. Here the latter structure
+  is a representation of the beach line.
+
+  We store the Voronoi diagram as a doubly-connected edge list.
+
+  The beach line is represented by a balanced binary search tree
+  $\mathcal{T}$. Its leaves correspond to the arcs of the beach
+  line--which is $x$-monotone--in an ordered manner: the leftmost leaf
+  represents the leftmost arc, and so on. Each leaf $\mu$ stores the
+  site that defines the arc it represents. The internal nodes of
+  $\mathcal{T}$ represent the breakpoints on the beach line. A
+  breakpoint is stored at an internal node by an ordered tuple of site
+  $<p_i, p_j>$, where $p_i$ defines the parabola left of the
+  breakpoint and $p_j$ defines the parabola to the right. We can find
+  in $O(\log n)$ the arc of the beach line lying above a new site. At
+  an internal node, we simply compare the $x$-coördinate of the new
+  site with the $x$-coördinate of the breakpoint, which can be
+  computed from the tuple of sites and the position of the sweep line
+  in constant time.
+
+  In $\mathcal{T}$ we also store pointers to the other two data
+  structures used during the sweep. Each leaf of $\mathcal{T}$,
+  representing arc $\alpha$, stores a pointer to a circle event in the
+  event queue in which $\alpha$ will disappear. This pointer is =nil=
+  if no circle event exists where $\alpha$ will disappear, or this
+  circle event hasn't been detected yet. Every internal node $v$ has a
+  pointer to a half-edge in the doubly-connected edge list of the
+  Voronoi diagram. $v$ has a pointer to one of the half-edges of the
+  edge being traced out by the breakpoint represented by $v$.
+
+  The event queue $\mathcal{Q}$ is implemented as a priority queue,
+  where the priority of an event is its $y$-coördinate. It stores the
+  upcoming events that are already known. For a site event we simply
+  store the site itself. For a circle event the event point that we
+  store is the lowest point of the circle, with a pointer to the leaf
+  in $\mathcal{T}$ that represents the arc that will disappear in the
+  event.
+  #+END_QUOTE
+
+  Detection of circle events:
+
+  #+BEGIN_QUOTE
+  All the site events are known in advance, but the circle events are
+  not.
+
+  During the sweep the beach line changes its topological structure at
+  every event. This may cause new triples of consecutive arcs to
+  appear on the beach line and it may cause existing triples to
+  disappear. For every three consecutive arcs on the beach line that
+  define a potential circle event, the potential event is stored in
+  the event queue $\mathcal{Q}$.
+
+  There can be consecutive triples whose two breakpoints do not
+  converge. It can also happen that the triple disappears before the
+  event has taken place: $false alarm$.
+
+  At every event, it checks all the new triples of consecutive arcs
+  that appear. At a site event we can get three new triples: one where
+  the new arc is the left arc of the triple, on where it is the middle
+  arc, and one where it is the right arc. When such a new triple has
+  converging breakpoints, the event is inserted into the event queue
+  $\mathcal{Q}$. In the case of a site event, the triple with the new
+  arc being the middle one can never cause a circle event, because the
+  left and right arc of the triple come from the same parabola and
+  therefore the breakpoints must diverge.
+
+  For all disappearing triples it is checked whether they have a
+  corresponding event in $\mathcal{Q}$. If so, the event is a false
+  alarm, and it is deleted from $\mathcal{Q}$. This can be done using
+  the pointers we have from the leaves in $\mathcal{T}$ to the
+  corresponding circle events in $\mathcal{Q}$.
+  #+END_QUOTE
+
+  Voronoi vertices and circle events:
+
+  #+BEGIN_QUOTE
+  Every Voronoi vertex is detected by means of a circle event.
+
+  The corresponding circle event is in $\mathcal{Q}$ just before the
+  event takes place, and the Voronoi vertex is detected.
+  #+END_QUOTE
+
+  The algorithm:
+
+  #+BEGIN_QUOTE
+  After the event queue $\mathcal{Q}$ is empty, the beach line hasn't
+  disappeared yet. The breakpoints correspond to the half-infinite
+  edges of the Voronoi diagram. We must add a bounding box to which
+  these edges can be attached.
+  #+END_QUOTE
+*** TODO Calculate convergence of breakpoints
+    [[http://cgm.cs.mcgill.ca/~mcleish/644/Projects/DerekJohns/Sweep.htm][Good animations]]; still doesn't elaborate on how to calculate
+    whether the breakpoints converge.
+
+    #+BEGIN_QUOTE
+    First of all, there can be consecutive triples whose two
+    breakpoints do not converge, that is, the directions in which they
+    move are such that they will not meet in the future; this happens
+    when the breakpoints move along two bisectors away from the
+    intersection point. In this case the triple does not define a
+    potential circle event.
+    #+END_QUOTE
+
+    [[http://stackoverflow.com/questions/9612065/breakpoint-convergence-in-fortunes-algorithm][Someone answered their own question]]:
+
+    #+BEGIN_QUOTE
+    As long as three sites are not collinear, then the edges that
+    perpendicularly bisect the segments between the sites are also
+    tangent to the circle whose edge contains all three sites.
+    Therefore the breakpoints defined by a triple of Voronoi sites
+    converge if the center of the circle defined by the three sites is
+    in front of the middle site, where "in front" and "behind" depend
+    on the coordinate system and sweepline alignment you have chosen.
+    #+END_QUOTE
+*** TODO Doubly-connect edge list
+    See [[http://en.wikipedia.org/wiki/Doubly_connected_edge_list][here]]:
+
+    #+BEGIN_QUOTE
+    DCEL is more than just a doubly linked list of edges. In the
+    general case, a DCEL contains a record for each edge, vertex and
+    face of the subdivision. Each record may contain additional
+    information, for example, a face may contain the name of the area.
+    Each edge usually bounds two faces and it is therefore convenient
+    to regard each edge as half-edge. Each half-edge bounds a single
+    face and thus has a pointer to that face. A half-edge has a
+    pointer to the next half-edge and previous half-edge of the same
+    face. To reach the other face, we can go to the twin of the
+    half-edge and then traverse the other face. Each half-edge also
+    has a pointer to its origin vertex (the destination vertex can be
+    obtained by querying the origin of its twin).
+
+    Each vertex v contains the coordinates of the vertex and also
+    stores a pointer to an arbitrary edge that has v as its origin.
+    Each face stores a pointer to some half-edge of its outer boundary
+    (if the face is unbounded then pointer is null). It also has a
+    list of half-edges, one for each hole that may be incident within
+    the face. If the vertices or faces do not hold any interesting
+    information, there is no need to store them, thus saving space and
+    reducing the data structure complexity.
+    #+END_QUOTE
 *** TODO $O(n^2)$ intersection of all the half-planes
     Bisector between two points: perpendicular; points that are the
     same distance from $p$ and $q$.
