@@ -1696,7 +1696,239 @@
   these edges can be attached.
   #+END_QUOTE
 
-*** TODO Good overview
+  [[https://github.com/gorhill/Javascript-Voronoi/blob/master/rhill-voronoi-core.js][Javascript Voronoi]], by the way; 
+
+*** TODO Implementation
+    #+BEGIN_QUOTE
+    At a site event two new breakpoints appear, which start tracing
+    out edges. In fact, the new breakpoints coincide at first, and
+    then move in opposite directions to trace out the same edge.
+    #+END_QUOTE
+
+    #+BEGIN_QUOTE
+    A breakpoint is stored at an internal node by an ordered tuple of
+    sites pi , p j , where pi defines the parabola left of the
+    breakpoint and p j defines the parabola to the right.
+    #+END_QUOTE
+
+    Computing the breakpoint (from [[http://www.skynet.ie/~sos/mapviewer/docs/Voronoi_Diagram_Notes_1.pdf][here]]):
+
+# <<computing-breakpoint>>
+    #+BEGIN_QUOTE
+    Between each consecutive pair of sites pi and pj , there is a
+    breakpoint. Although the breakpoint moves as a function of the
+    sweep line, observe that it is possible to compute the exact
+    location of the breakpoint as a function of pi , pj , and the
+    current y-coordinate of the sweep line. In particular, the
+    breakpoint is the center of a circle that passes through pi , pj
+    and is tangent to the sweep line. Thus, as with beach lines, we do
+    not explicitly store breakpoints. Rather, we compute them only
+    when we need them.
+
+    Given a fixed location of the sweep line, determine the arc of the
+    beach line that intersects a given vertical line. This can be done
+    by a binary search on the breakpoints, which are computed “on the
+    fly”. (Think about this.)
+    #+END_QUOTE
+    
+    They're talking about consecutive triples on the beach-line, by
+    the way; is this a factor of $x$-monotonicity?
+
+    #+BEGIN_QUOTE
+    For each consecutive triple pi , pj , pk on the beach line, we
+    compute the circumcircle of these points. (We’ll leave the messy
+    algebraic details as an exercise, but this can be done in O(1)
+    time.) If the lower endpoint of the circle (the minimum
+    y-coordinate on the circle) lies below the sweep line, then we
+    create a vertex event whose y-coordinate is the y-coordinate of
+    the bottom endpoint of the circumcircle. We store this in the
+    priority queue. Each such event in the priority queue has a cross
+    link back to the triple of sites that generated it, and each
+    consecutive triple of sites has a cross link to the event that it
+    generated in the priority queue.
+    #+END_QUOTE
+
+    This is pretty cool:
+
+    #+BEGIN_QUOTE
+    Let pi be the current site. We shoot a vertical ray up to
+    determine the arc that lies immediately above this point in the
+    beach line. Let pj be the corresponding site. We split this arc,
+    replacing it with the triple of arcs pj , pi , pj which we insert
+    into the beach line. Also we create new (dangling) edge for the
+    Voronoi diagram which lies on the bisector between pi and pj .
+    Some old triples that involved pj may be deleted and some new
+    triples involving pi will be inserted. For example, suppose that
+    prior to insertion we had the beach-line sequence p1 , p2 , pj ,
+    p3 , p4 . The insertion of pi splits the arc pj into two arcs,
+    denoted pj and pj . Although these are separate arcs, they involve
+    the same site, pj . The new sequence is p1 , p2 , pj , pi , pj ,
+    p3 , p4 . Any event associated with the old triple p2 , pj , p3
+    will be deleted. We also consider the creation of new events for
+    the triples p2 , pj , pi and pi , pj , p3 . Note that the new
+    triple pj , pi , pj cannot generate an event because it only
+    involves two distinct sites.
+    #+END_QUOTE
+
+    Also for vertices:
+
+    #+BEGIN_QUOTE
+    Let pi , pj , and pk be the three sites that generate this event
+    (from left to right). We delete the arc for pj from the beach
+    line. We create a new vertex in the Voronoi diagram, and tie the
+    edges for the bisectors (pi , pj ), (pj , pk ) to it, and start a
+    new edge for the bisector (pi , pk ) that starts growing down
+    below. Finally, we delete any events that arose from triples
+    involving this arc of pj , and generate new events corresponding
+    to consecutive triples involving pi and pk (there are two of
+    them). For example, suppose that prior to insertion we had the
+    beach-line sequence p1 , pi , pj , pk , p2 . After the event we
+    have the sequence p1 , pi , pk , p2 . We remove any events
+    associated with the triples p1 , pi , pj and pj , pk , p2 . (The
+    event pi , pj , pk has already been removed since we are
+    processing it now.) We also consider the creation of new events
+    for the triples p1 , pi , pk and pi , pk , p2 .
+    #+END_QUOTE
+
+    About the appearance and disappearance of triples (how to find
+    triples?):
+
+    #+BEGIN_QUOTE
+    So what the algorithm does is this. At every event, it checks all
+    the new triples of consecutive arcs that appear. For instance, at
+    a site event we can get three new triples: one where the new arc
+    is the left arc of the triple, one where it is the middle arc, and
+    one where it is the right arc.
+    #+END_QUOTE
+
+**** TODO Binary search on breakpoints
+     See [[computing-breakpoint]].
+
+     [[http://math.stackexchange.com/questions/101986/how-to-determine-an-equation-of-a-circle-using-a-line-and-two-points-on-a-circle][Circle from two points and a line]]; there are two.
+*** TODO Test data
+    =tripack= has an interesting test-case:
+
+    #+BEGIN_EXAMPLE
+      > tritest
+      $x
+       [1] 0.00 1.00 0.50 0.15 0.85 0.50 0.00 1.00 0.35 0.65 0.65 0.35
+      
+      $y
+       [1] 0.00 0.00 0.15 0.50 0.50 0.85 1.00 1.00 0.35 0.35 0.65 0.65
+    #+END_EXAMPLE
+
+    #+BEGIN_EXAMPLE
+      > voronoi.mosaic(tritest)
+      voronoi mosaic:
+      nodes: (x,y): neighbours (<0: dummy node)
+      1: (0.5,-0.7583333): 7 2 -1
+      2: (0.2392857,0.1107143): 8 3 1
+      3: (0.1107143,0.2392857): 9 4 2
+      4: (-0.7583333,0.5): 10 -2 3
+      5: (1.758333,0.5): 11 6 -3
+      6: (0.8892857,0.2392857): 12 7 5
+      7: (0.7607143,0.1107143): 8 1 6
+      8: (0.5,0.30625): 17 2 7
+      9: (0.30625,0.5): 18 10 3
+      10: (0.1107143,0.7607143): 14 4 9
+      11: (0.8892857,0.7607143): 16 12 5
+      12: (0.69375,0.5): 17 6 11
+      13: (0.5,1.758333): -4 14 16
+      14: (0.2392857,0.8892857): 10 15 13
+      15: (0.5,0.69375): 18 16 14
+      16: (0.7607143,0.8892857): 11 13 15
+      17: (0.5,0.5): 12 18 8
+      18: (0.5,0.5): 15 9 17
+      dummy nodes: (x,y)
+      1: (0.5,-3.275)
+      2: (-3.275,0.5)
+      3: (4.275,0.5)
+      4: (0.5,4.275)      
+    #+END_EXAMPLE
+
+    Uh, oh; floating-point difficulties:
+
+    #+BEGIN_EXAMPLE
+      > voronoi.mosaic(c(0, sqrt(1/2), 1), c(1, sqrt(1/2), 0))
+      voronoi mosaic:
+      nodes: (x,y): neighbours (<0: dummy node)
+      1: (2.680315e-16,2.680315e-16): -1 -2 -3 
+      dummy nodes: (x,y)
+      1: (2.680315e-16,2.680315e-16)
+      2: (2.680315e-16,2.680315e-16)
+      3: (2.680315e-16,2.680315e-16)
+    #+END_EXAMPLE
+
+    From Steven's implementation:
+
+    #+BEGIN_EXAMPLE
+      λ ~/prg/c/fortune/ master cat | ./voronoi
+      0 1
+      0.70710678118 0.70710678118
+      1 0
+      s 1.000000 0.000000
+      s 0.707107 0.707107
+      l -0.414214 1.000000 -0.000000
+      s 0.000000 1.000000
+      l -1.000000 1.000000 0.000000
+      v -0.000000 -0.000000
+      l 1.000000 -0.414214 -0.000000
+      e 1 -1 0
+      e 2 0 -1
+      e 0 0 -1
+    #+END_EXAMPLE
+
+    It appears as though he generates the bisecting-lines upon finding
+    points; keeps track of partial edges on those lines.
+
+    #+BEGIN_QUOTE
+	s a b
+    indicates that an input point at coordinates 
+	l a b c
+    indicates a line with equation ax + by = c.
+	v a b
+    indicates a vertex at  a b.
+	e l v1 v2
+    indicates a Voronoi segment which is a subsegment of line number l;
+    with endpoints numbered v1 and v2.  If v1 or v2 is -1, the line
+    extends to infinity.
+    #+END_QUOTE
+*** Several implementations and "low-level" pseudo-code
+    [[http://blog.ivank.net/fortunes-algorithm-and-implementation.html]]
+*** Fortune's notes
+    [[http://www.skynet.ie/~sos/mapviewer/docs/Voronoi_Diagram_Notes_1.pdf][Here]] and [[http://www.skynet.ie/~sos/mapviewer/docs/Voronoi_Diagram_Notes_2.pdf][here]]; gotten from [[http://www.skynet.ie/~sos/mapviewer/voronoi.php][here]].
+
+    Site event:
+
+    #+BEGIN_QUOTE
+    Let pi be the current site. We shoot a vertical ray up to
+    determine the arc that lies immediately above this point in the
+    beach line. Let pj be the corresponding site. We split this arc,
+    replacing it with the triple of arcs pj , pi , pj which we insert
+    into the beach line. Also we create new (dangling) edge for the
+    Voronoi diagram which lies on the bisector between pi and pj .
+    Some old triples that involved pj may be deleted and some new
+    triples involving pi will be inserted.
+    #+END_QUOTE
+
+    Vertex event:
+
+    #+BEGIN_QUOTE
+    Let pi , pj , and pk be the three sites that generate this event
+    (from left to right). We delete the arc for pj from the beach
+    line. We create a new vertex in the Voronoi diagram, and tie the
+    edges for the bisectors (pi , pj ), (pj , pk ) to it, and start a
+    new edge for the bisector (pi , pk ) that starts growing down
+    below. Finally, we delete any events that arose from triples
+    involving this arc of pj , and generate new events corresponding
+    to consecutive triples involving pi and pk (there are two of
+    them).
+    #+END_QUOTE
+*** Voronoi toy
+    http://nodename.com/blog/2009/05/11/a-voronoi-toy/
+
+    Points to [[http://netlib.org/voronoi/sweep2][this implementation]] of Fortune's.
+*** Good overview
     See [[http://nms.csail.mit.edu/~aklmiu/6.838/L7.pdf][here]]; actually breaks down the change in the tree and
     double-linked list.
 *** TODO Calculate convergence of breakpoints
@@ -1765,6 +1997,16 @@
 
     Finally understand Berg's reference to chapter 4: they employ a
     sweep-line for intersection.
+*** Voronoi over Delaunay
+    See [[http://cran.r-project.org/web/packages/tripack/tripack.pdf][here]]:
+
+    #+BEGIN_QUOTE
+    This function creates a Voronoi mosaic.
+
+    It creates first a Delaunay triangulation, determines the
+    circumcircle centers of its triangles, and connects these points
+    according to the neighbourhood relations between the triangles.
+    #+END_QUOTE
 ** TODO Voronoi
    - [[http://cs.nyu.edu/~ajsecord/npar2002/html/stipples-node2.html][Lloyd's]] and minimum energy
    - See the description of [[http://en.wikipedia.org/wiki/K-means_clustering#Algorithms][k-means]]
