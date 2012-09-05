@@ -1805,6 +1805,24 @@
      See [[computing-breakpoint]].
 
      [[http://math.stackexchange.com/questions/101986/how-to-determine-an-equation-of-a-circle-using-a-line-and-two-points-on-a-circle][Circle from two points and a line]]; there are two.
+
+     [[http://mathforum.org/library/drmath/view/55239.html][Symbolic solution]] (given three points):
+
+     #+BEGIN_EXAMPLE
+       This can all be done symbolically, of course, but you'll get some 
+       pretty complicated expressions for h and k. The simplest forms of 
+       these involve determinants, if you know what they are:
+       
+                |x1^2+y1^2  y1  1|        |x1  x1^2+y1^2  1|
+                |x2^2+y2^2  y2  1|        |x2  x2^2+y2^2  1|
+                |x3^2+y3^2  y3  1|        |x3  x3^2+y3^2  1|
+            h = ------------------,   k = ------------------
+                    |x1  y1  1|               |x1  y1  1|
+                  2*|x2  y2  1|             2*|x2  y2  1|
+                    |x3  y3  1|               |x3  y3  1|
+     #+END_EXAMPLE
+*** Visualization
+    Some [[http://www.csee.umbc.edu/~chang/cs641.s01/voronoi/][screencaps]] from the Odgaard-Nielsen program.
 *** TODO Test data
     =tripack= has an interesting test-case:
 
@@ -1981,7 +1999,7 @@
     information, there is no need to store them, thus saving space and
     reducing the data structure complexity.
     #+END_QUOTE
-*** TODO $O(n^2)$ intersection of all the half-planes
+*** TODO $O(n^2 \log n)$ intersection of all the half-planes
     Bisector between two points: perpendicular; points that are the
     same distance from $p$ and $q$.
 
@@ -1997,6 +2015,18 @@
 
     Finally understand Berg's reference to chapter 4: they employ a
     sweep-line for intersection.
+
+    [[http://cgm.cs.mcgill.ca/~mcleish/644/Projects/DerekJohns/First%2520Attempt.htm][Another description]]:
+
+    #+BEGIN_QUOTE
+    For all pairs of sites, find their perpendicular bisector. This
+    calculation takes O(n log n) time and is done once. Next, we take
+    all the open half-planes that contain a site and calculate the
+    intersection of these half-planes to obtain the Voronoi cell for
+    this site. An optimal algorithm for computing the intersection of
+    half-planes is O(n log n) [1]. Repeat for every site. The overall
+    complexity then becomes O(n2 log n).
+    #+END_QUOTE
 *** Voronoi over Delaunay
     See [[http://cran.r-project.org/web/packages/tripack/tripack.pdf][here]]:
 
