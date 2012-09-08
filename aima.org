@@ -2193,6 +2193,71 @@
    given space whose distance to the given object is not greater than
    their distance to the other objects.
    #+END_QUOTE
+** TODO Plotting Voronoi
+   See [[http://had.co.nz/ggplot2/geom_path.html][path]] and [[http://had.co.nz/ggplot2/geom_segment.html][segment]]. We might actually build this Scheme-R bridge.
+   I'd like to do that; and Voronoi; and document [[https://github.com/klutometis/cock][cock]].
+
+   #+BEGIN_SRC R
+     library(deldir)
+     library(ggplot2)
+     
+     n.vertices <- 100
+     vertices <- subset(deldir(rnorm(n.vertices), rnorm(n.vertices))$dirsgs,
+                        !(bp1 | bp2))
+     
+     n.path <- 10
+     path <- vertices[sample(nrow(vertices), n.path), ]
+     
+     start <- vertices[sample(nrow(vertices), 1), ]
+     end <- vertices[sample(nrow(vertices), 1), ]
+     
+     qplot(vertices$x1,
+           vertices$y1,
+           xlab="",
+           ylab="") +
+       opts(legend.position='none') +
+       geom_point(aes(x=start$x1,
+                      y=start$y1,
+                      alpha=1.0),
+                  shape=1,
+                  size=5) +
+       geom_text(aes(x=start$x1,
+                     y=start$y1,
+                     label='Start',
+                     alpha=1.0),
+                 size=3) +
+       geom_point(aes(x=end$x1,
+                      y=end$y1,
+                      alpha=1.0),
+                  shape=1,
+                  size=5) +
+       geom_text(aes(x=end$x1,
+                     y=end$y1,
+                     label='End',
+                     alpha=1.0),
+                 size=3) +
+       geom_segment(aes(x=vertices$x1,
+                        xend=vertices$x2,
+                        yend=vertices$y2,
+                        yend=vertices$y2,
+                        alpha=1.0)) +
+       geom_text(aes(x=vertices$x1 + (vertices$x2 - vertices$x1) / 2,
+                     y=vertices$y1 + (vertices$y2 - vertices$y1) / 2,
+                     label=signif(sqrt((vertices$x2 - vertices$x1) ^ 2 +
+                       (vertices$y2 - vertices$y1) ^ 2),
+                       digits=2),
+                     alpha=1.0),
+                 size=3) +
+       geom_path(aes(x=path$x1,
+                     y=path$y1,
+                     alpha=1.0),
+                 size=2.0,
+                 color='red') +
+       geom_point(aes(x=vertices$x1,
+                      y=vertices$y1,
+                      alpha=1.0))
+     
+   #+END_SRC
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
