@@ -1801,6 +1801,12 @@
     one where it is the right arc.
     #+END_QUOTE
 
+    Let's table Voronoi for the time being, or at least out-source it
+    to R; even shit as trivial as finding the center of circles
+    between two points and a tangent seems difficult.
+
+    Can't we just hard-code the determinant and solve the equations;
+    how did Fortune do it?
 **** TODO Binary search on breakpoints
      See [[computing-breakpoint]].
 
