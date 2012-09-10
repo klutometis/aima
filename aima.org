@@ -2282,9 +2282,9 @@
      ## debug(readLines("/tmp/fifo", n=1))
      ## q()
      
-     sink("/tmp/harro-thar")
+     ## sink("/tmp/harro-thar")
      
-     sink()
+     ## sink()
      
      path <- tiles[sample(nrow(tiles), 10), ]
      
@@ -2327,13 +2327,11 @@
                  size=3) +
        ## We have to do this in segments, if we want to be able to model
        ## bi-directional search.
-       geom_segment(aes(x=path$x1,
-                        y=path$y1,
-                        xend=path$x2,
-                        yend=path$y2,
-                        alpha=1.0),
-                    color='red',
-                    size=2.0) +
+       geom_path(aes(x=path$x1,
+                     y=path$y1,
+                     alpha=1.0),
+                 color='red',
+                 size=2.0) +
        geom_point(aes(x=tiles$x1,
                       y=tiles$y1,
                       alpha=1.0))
