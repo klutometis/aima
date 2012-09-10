@@ -2216,9 +2216,6 @@
      n.path <- 10
      path <- vertices[sample(nrow(vertices), n.path), ]
      
-     start <- vertices[sample(nrow(vertices), 1), ]
-     end <- vertices[sample(nrow(vertices), 1), ]
-     
      points <- Reduce(function(points, row)
                       c(proto(x=row[[1]][[1]], y=row[[1]][[2]]),
                         proto(x=row[[1]][[3]], y=row[[1]][[4]]),
@@ -2226,7 +2223,10 @@
                       init=NULL,
                       apply(vertices, 1, list))
      
+     ## Leftest point as start
      leftest.point <- proto(x=Inf)
+     
+     ## Rightest point as end
      rightest.point <- proto(x=-Inf)
      
      for (point in points) {
