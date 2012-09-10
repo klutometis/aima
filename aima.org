@@ -2193,7 +2193,7 @@
    given space whose distance to the given object is not greater than
    their distance to the other objects.
    #+END_QUOTE
-** TODO Plotting Voronoi
+** COMMENT TODO Plotting Voronoi
    See [[http://had.co.nz/ggplot2/geom_path.html][path]] and [[http://had.co.nz/ggplot2/geom_segment.html][segment]]. We might actually build this Scheme-R bridge.
    I'd like to do that; and Voronoi; and document [[https://github.com/klutometis/cock][cock]].
 
@@ -2204,6 +2204,7 @@
    through the interesting center.
 
    #+BEGIN_SRC R :tangle voronoi.R :shebang #!/usr/bin/env Rscript
+     sink('/dev/null')
      library(deldir)
      library(ggplot2)
      library(proto)
@@ -2211,8 +2212,9 @@
      library(hash)
      
      n.vertices <- 100
-     tiles <- subset(deldir(rnorm(n.vertices),
-                            rnorm(n.vertices))$dirsgs, !(bp1 | bp2))
+     ## tiles <- subset(deldir(rnorm(n.vertices),
+     ##                        rnorm(n.vertices))$dirsgs, !(bp1 | bp2))
+     tiles <- deldir(rnorm(n.vertices), rnorm(n.vertices))$dirsgs
      
      coordinates.to.key <- function(x, y)
        sprintf('%s,%s', x, y)
@@ -2266,26 +2268,34 @@
      ## Node is abstract; vertex has a location.
      nodes <- keys(vertices)
      
-     ## for (node in nodes) {
-     ##   vertex <- vertices[[node]]
-     ##   cat(sprintf('(vertex %s %s %s)', node, vertex$x, vertex$y))
-     ## }
+     sink()
+     for (node in nodes) {
+       vertex <- vertices[[node]]
+       cat(sprintf('(vertex %s %s %s)', node, vertex$x, vertex$y))
+     }
      
-     ## for (node in nodes) {
-     ##   cat(sprintf('(neighbor %s %s)',
-     ##               node,
-     ##               do.call(paste, as.list(neighbors[[node]]))))
-     ## }
+     for (node in nodes) {
+       cat(sprintf('(neighbor %s %s)',
+                   node,
+                   do.call(paste, as.list(neighbors[[node]]))))
+     }
      
-     ## cat(sprintf('(start %s)', start))
-     ## cat(sprintf('(end %s)', end))
+     cat(sprintf('(start %s)', start))
+     cat(sprintf('(end %s)', end))
+     flush(stdout())
      
-     path.file <- file('/tmp/harro-thar', 'wt')
-     for (node in nodes[sample(length(nodes), 10)])
-       writeLines(node, path.file)
-     close(path.file)
+     ## path.file <- file('/tmp/harro-thar', 'wt')
+     ## for (node in nodes[sample(length(nodes), 10)])
+     ##   writeLines(node, path.file)
+     ## close(path.file)
      
-     path <- readLines('/tmp/harro-thar')
+     ## path <- readLines('/tmp/harro-thar')
+     
+     ## With fifos, we have to have a header line, for some reason.
+     ## close(stdout())
+     path <- readLines('/tmp/fifo')
+     
+     path <- nodes[1:2]
      
      vertex.path <-
        Map(function(node) vertices[[node]], path)
@@ -2294,6 +2304,7 @@
      vertex.path.y <- function(vertex.path)
        unlist(Map(function(vertex) vertex$y, vertex.path))
      
+     png('voronoi.png', width=1024, heigh=768)
      qplot(tiles$x1,
            tiles$y1,
            xlab="",
@@ -2341,6 +2352,42 @@
        geom_point(aes(x=tiles$x1,
                       y=tiles$y1,
                       alpha=1.0))
+     invisible(dev.off())
+     
+   #+END_SRC
+
+   #+BEGIN_SRC scheme :tangle voronoi.scm :shebang #!/usr/bin/env chicken-scheme
+     (use debug posix shell srfi-18)
+     
+     ;; (capture "./voronoi.R")
+     (receive (in out id err)
+       (process* "./voronoi.R" '())
+       (debug (read-all err))
+       ;; (close-input-port err)
+       (debug (read-all in))
+       ;; (close-input-port in)
+       ;; (with-output-to-port out
+       ;;   (lambda ()
+       ;;     (display "harro\n")))
+       ;; (flush-output)
+       (system "cat tempc74e.tmp > /tmp/fifo")
+       #;
+       (thread-start!
+        (lambda ()
+          (with-output-to-file "/tmp/fifo"
+            (lambda ()
+              (display "oeutnhoeutnh\n")))))
+       ;; (with-input-from-file "/tmp/fifo"
+       ;;   (read))
+       ;; (read-all in)
+       ;; (close-input-port err)
+       ;; (read-all err)
+       )
+     ;; (with-output-to-file "/tmp/fifo"
+     ;;   (lambda ()
+     ;;     (display "harro thar\n")
+     ;;     (display "harro thar\n")))
+     ;; (flush-output)
      
    #+END_SRC
 * Meetups
