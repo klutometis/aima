@@ -2203,7 +2203,7 @@
    line approximately hits it. That way, paths are forced to go
    through the interesting center.
 
-   #+BEGIN_SRC R
+   #+BEGIN_SRC R :tangle voronoi.R :shebang #!/usr/bin/env Rscript
      library(deldir)
      library(ggplot2)
      library(proto)
