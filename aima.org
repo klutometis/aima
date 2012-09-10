@@ -2263,30 +2263,36 @@
      end <- coordinates.to.key(rightest.vertex$x,
                                rightest.vertex$y)
      
-     ## for (key in keys(vertices)) {
-     ##   vertex <- vertices[[key]]
-     ##   cat(sprintf('(vertex %s %s %s)', key, vertex$x, vertex$y))
+     ## Node is abstract; vertex has a location.
+     nodes <- keys(vertices)
+     
+     ## for (node in nodes) {
+     ##   vertex <- vertices[[node]]
+     ##   cat(sprintf('(vertex %s %s %s)', node, vertex$x, vertex$y))
      ## }
      
-     ## for (key in keys(neighbors)) {
+     ## for (node in nodes) {
      ##   cat(sprintf('(neighbor %s %s)',
-     ##               key,
-     ##               do.call(paste, as.list(neighbors[[key]]))))
+     ##               node,
+     ##               do.call(paste, as.list(neighbors[[node]]))))
      ## }
      
      ## cat(sprintf('(start %s)', start))
      ## cat(sprintf('(end %s)', end))
      
-     ## On destructuring:
-     ## <http://stackoverflow.com/questions/7519790/assign-multiple-new-variables-in-a-single-line-in-r>
-     ## debug(readLines("/tmp/fifo", n=1))
-     ## q()
+     path.file <- file('/tmp/harro-thar', 'wt')
+     for (node in nodes[sample(length(nodes), 10)])
+       writeLines(node, path.file)
+     close(path.file)
      
-     ## sink("/tmp/harro-thar")
+     path <- readLines('/tmp/harro-thar')
      
-     ## sink()
-     
-     path <- tiles[sample(nrow(tiles), 10), ]
+     vertex.path <-
+       Map(function(node) vertices[[node]], path)
+     vertex.path.x <- function(vertex.path)
+       unlist(Map(function(vertex) vertex$x, vertex.path))
+     vertex.path.y <- function(vertex.path)
+       unlist(Map(function(vertex) vertex$y, vertex.path))
      
      qplot(tiles$x1,
            tiles$y1,
@@ -2327,8 +2333,8 @@
                  size=3) +
        ## We have to do this in segments, if we want to be able to model
        ## bi-directional search.
-       geom_path(aes(x=path$x1,
-                     y=path$y1,
+       geom_path(aes(x=vertex.path.x(vertex.path),
+                     y=vertex.path.y(vertex.path),
                      alpha=1.0),
                  color='red',
                  size=2.0) +
