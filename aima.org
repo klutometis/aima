@@ -2282,15 +2282,17 @@
      ## debug(readLines("/tmp/fifo", n=1))
      ## q()
      
-     path1 <- tiles[sample(nrow(tiles), 10), ]
-     path2 <- tiles[sample(nrow(tiles), 10), ]
-     path3 <- tiles[sample(nrow(tiles), 10), ]
+     sink("/tmp/harro-thar")
+     
+     sink()
+     
+     path <- tiles[sample(nrow(tiles), 10), ]
      
      qplot(tiles$x1,
            tiles$y1,
            xlab="",
            ylab="") +
-       ## opts(legend.position='none') +
+       opts(legend.position='none') +
        geom_point(aes(x=leftest.vertex$x,
                       y=leftest.vertex$y,
                       alpha=1.0),
@@ -2325,41 +2327,13 @@
                  size=3) +
        ## We have to do this in segments, if we want to be able to model
        ## bi-directional search.
-       geom_segment(aes(x=path1$x1,
-                        y=path1$y1,
-                        xend=path1$x2,
-                        yend=path1$y2,
-                        alpha=1.0,
-                        color="bidirectional"
-                        ),
+       geom_segment(aes(x=path$x1,
+                        y=path$y1,
+                        xend=path$x2,
+                        yend=path$y2,
+                        alpha=1.0),
+                    color='red',
                     size=2.0) +
-       geom_segment(aes(x=path2$x1,
-                        y=path2$y1,
-                        xend=path2$x2,
-                        yend=path2$y2,
-                        alpha=1.0,
-                        color="depth-first"
-                        ),
-                    size=2.0) +
-       geom_segment(aes(x=path3$x1,
-                        y=path3$y1,
-                        xend=path3$x2,
-                        yend=path3$y2,
-                        alpha=1.0,
-                        color="breadth-first"
-                        ),
-                    size=2.0) +
-       ## Legends:
-       ## <http://stackoverflow.com/questions/10349206/add-legend-to-ggplot2-line-plot>;
-       ## also,
-       ## <https://groups.google.com/forum/?fromgroups=#!topic/ggplot2/09CBpXV0YyU>
-       ## scale_fill_manual(values=c("depth-first", "breadth-first", "bidirectional")) +
-       scale_color_manual("harro",
-                          values=c(1, 2, 3),
-                          breaks=c('breadth-first',
-                            'depth-first',
-                            'bidirectional'),
-                          labels=c('eins', 'zwei', 'drei')) +
        geom_point(aes(x=tiles$x1,
                       y=tiles$y1,
                       alpha=1.0))
