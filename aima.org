@@ -2226,71 +2226,62 @@
                       init=NULL,
                       apply(vertices, 1, list))
      
-     furthest.points <- list(p1=NULL, p2=NULL, distance=-Inf)
+     leftest.point <- proto(x=Inf)
+     rightest.point <- proto(x=-Inf)
      
-     distance <- function(p1, p2)
-         sqrt((p1$x - p2$x)^2 + (p1$y - p2$y)^2)
+     for (point in points) {
+       if (point$x < leftest.point$x)
+         leftest.point <<- point
      
-     ## This thing is necessarily O(n^2), unless we can find a clever way
-     ## to wrap the thing in a containing circle:
-     ## <http://stackoverflow.com/a/6524446>.
-     for (p1 in points) {
-       for (p2 in points) {
-         if (distance(p1, p2) > furthest.points$distance) {
-           furthest.points$p1 <- p1
-           furthest.points$p2 <- p2
-           furthest.points$distance <- distance(p1, p2)
-         }
-       }
+       if (point$x > rightest.point$x)
+         rightest.point <<- point
      }
      
-     debug(furthest.points)
-     
-     ## qplot(vertices$x1,
-     ##       vertices$y1,
-     ##       xlab="",
-     ##       ylab="") +
-     ##   opts(legend.position='none') +
-     ##   geom_point(aes(x=start$x1,
-     ##                  y=start$y1,
-     ##                  alpha=1.0),
-     ##              shape=1,
-     ##              size=5) +
-     ##   geom_text(aes(x=start$x1,
-     ##                 y=start$y1,
-     ##                 label='Start',
-     ##                 alpha=1.0),
-     ##             size=3) +
-     ##   geom_point(aes(x=end$x1,
-     ##                  y=end$y1,
-     ##                  alpha=1.0),
-     ##              shape=1,
-     ##              size=5) +
-     ##   geom_text(aes(x=end$x1,
-     ##                 y=end$y1,
-     ##                 label='End',
-     ##                 alpha=1.0),
-     ##             size=3) +
-     ##   geom_segment(aes(x=vertices$x1,
-     ##                    xend=vertices$x2,
-     ##                    yend=vertices$y2,
-     ##                    yend=vertices$y2,
-     ##                    alpha=1.0)) +
-     ##   geom_text(aes(x=vertices$x1 + (vertices$x2 - vertices$x1) / 2,
-     ##                 y=vertices$y1 + (vertices$y2 - vertices$y1) / 2,
-     ##                 label=signif(sqrt((vertices$x2 - vertices$x1) ^ 2 +
-     ##                   (vertices$y2 - vertices$y1) ^ 2),
-     ##                   digits=2),
-     ##                 alpha=1.0),
-     ##             size=3) +
-     ##   geom_path(aes(x=path$x1,
-     ##                 y=path$y1,
-     ##                 alpha=1.0),
-     ##             size=2.0,
-     ##             color='red') +
-     ##   geom_point(aes(x=vertices$x1,
-     ##                  y=vertices$y1,
-     ##                  alpha=1.0))
+     qplot(vertices$x1,
+           vertices$y1,
+           xlab="",
+           ylab="") +
+       opts(legend.position='none') +
+       geom_point(aes(x=leftest.point$x,
+                      y=leftest.point$y,
+                      alpha=1.0),
+                  shape=1,
+                  size=5) +
+       geom_text(aes(x=leftest.point$x,
+                     y=leftest.point$y,
+                     label='Start',
+                     alpha=1.0),
+                 size=3) +
+       geom_point(aes(x=rightest.point$x,
+                      y=rightest.point$y,
+                      alpha=1.0),
+                  shape=1,
+                  size=5) +
+       geom_text(aes(x=rightest.point$x,
+                     y=rightest.point$y,
+                     label='End',
+                     alpha=1.0),
+                 size=3) +
+       geom_segment(aes(x=vertices$x1,
+                        xend=vertices$x2,
+                        yend=vertices$y2,
+                        yend=vertices$y2,
+                        alpha=1.0)) +
+       geom_text(aes(x=vertices$x1 + (vertices$x2 - vertices$x1) / 2,
+                     y=vertices$y1 + (vertices$y2 - vertices$y1) / 2,
+                     label=signif(sqrt((vertices$x2 - vertices$x1) ^ 2 +
+                       (vertices$y2 - vertices$y1) ^ 2),
+                       digits=2),
+                     alpha=1.0),
+                 size=3) +
+       geom_path(aes(x=path$x1,
+                     y=path$y1,
+                     alpha=1.0),
+                 size=2.0,
+                 color='red') +
+       geom_point(aes(x=vertices$x1,
+                      y=vertices$y1,
+                      alpha=1.0))
      
    #+END_SRC
 * Meetups
