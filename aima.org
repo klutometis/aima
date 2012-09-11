@@ -2193,7 +2193,7 @@
    given space whose distance to the given object is not greater than
    their distance to the other objects.
    #+END_QUOTE
-** COMMENT TODO Plotting Voronoi
+** TODO Plotting Voronoi
    See [[http://had.co.nz/ggplot2/geom_path.html][path]] and [[http://had.co.nz/ggplot2/geom_segment.html][segment]]. We might actually build this Scheme-R bridge.
    I'd like to do that; and Voronoi; and document [[https://github.com/klutometis/cock][cock]].
 
@@ -2422,9 +2422,208 @@
    #+BEGIN_SRC sh :tangle voronoi.sh :shebang #!/usr/bin/env sh
      ./voronoi.scm &
      ./voronoi.R
-     # ls -altrc   
-     
+     # ls -altrc
    #+END_SRC
+
+   What about using Scheme to write R? [[http://cran.r-project.org/doc/manuals/R-exts.html#Linking-GUIs-and-other-front_002dends-to-R][Embedded R]], of course; from C
+   first and then from Chicken? See [[file:/usr/local/src/R/src/unix/system.txt][system.txt]], [[file:/usr/local/src/R/src/unix/Rembedded.c][Rembedded.c]], &c.
+   [[file:/usr/local/src/R/tests/Embedding/embeddedRCall.c][embeddedRCall.c]] is cool, too. [[file:/usr/local/src/R/src/gnuwin32/front-ends/rtest.c][Minimal Windows example]].
+
+   We're probably just talking about the [[http://cran.r-project.org/doc/manuals/R-exts.html#The-R-API][C-api]] in R, aren't we?
+
+   [[http://rpy.sourceforge.net/][An example in Python]]; someone embedded it in [[http://www.joeconway.com/plr/][PostgreSQL]].
+
+   Christ, [[http://biostat.mc.vanderbilt.edu/wiki/pub/Main/RApacheProject/paper.pdf][they]] even did a [[http://biostat.mc.vanderbilt.edu/rapache/][mod_R]] (a.k.a. rApache). Take a look at [[http://common-lisp.net/project/rcl/][RCL]],
+   the CL-interface?
+
+   [[file:/usr/local/src/R/tests/Embedding/Rpackage.c][Rpackage.c]] and [[file:/usr/local/src/R/tests/Embedding/tryEval.c][tryEval.c]] have some possibly interesting
+   initialization code.
+
+   See [[http://www.omegahat.org/RSPython/][RSPython]], [[http://rpy.sourceforge.net/rpy.html][rpy]], [[http://rpy.sourceforge.net/rpy2.html][rpy2]].
+*** TODO Embedded R
+    [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/introduction.html][rpy2]] has =robjects=, which does lookup on =.globalEnv=. Has a
+    callable R-vector type; allows calling of arbitrary R code. The
+    ``R singleton.'' There's =r_repr=: R-representation? Deals with
+    the specific vector-types.
+
+    Have to call on vectors:
+
+    #+BEGIN_EXAMPLE
+      >>> rsum = robjects.r['sum']
+      >>> rsum(robjects.IntVector([1,2,3]))[0]
+      6L    
+    #+END_EXAMPLE
+
+    Passes keyword arguments:
+
+    #+BEGIN_EXAMPLE
+      >>> rsort = robjects.r['sort']
+      >>> res = rsort(robjects.IntVector([1,2,3]), decreasing=True)
+      >>> print(res.r_repr())
+      c(3L, 2L, 1L)
+    #+END_EXAMPLE
+
+    Has a specific =r.X11()= call; there's a whole spiel about
+    processing interactive events; they talk about that a little [[http://cran.r-project.org/doc/manuals/R-exts.html#Meshing-event-loops][here]].
+
+    It looks like the example code deals a lot with special
+    vector-types.
+
+    There's mechanisms for accessing fields:
+
+    #+BEGIN_EXAMPLE
+      >>> print(lm_D9.names)
+       [1] "coefficients"  "residuals"     "effects"       "rank"
+       [5] "fitted.values" "assign"        "qr"            "df.residual"
+       [9] "contrasts"     "xlevels"       "call"          "terms"
+      [13] "model"
+    #+END_EXAMPLE
+
+    A lot of invocation of the R-singleton:
+
+    #+BEGIN_EXAMPLE
+      import rpy2.robjects as robjects
+      
+      r = robjects.r
+      
+      m = r.matrix(r.rnorm(100), ncol=5)
+      pca = r.princomp(m)
+      r.plot(pca, main="Eigen values")
+      r.biplot(pca, main="biplot")
+    #+END_EXAMPLE
+
+    Importing packages:
+
+    #+BEGIN_EXAMPLE
+      from rpy2.robjects.packages import importr
+      
+      base     = importr('base')
+      stats    = importr('stats')
+      graphics = importr('graphics')
+      
+      m = base.matrix(stats.rnorm(100), ncol = 5)
+      pca = stats.princomp(m)
+      graphics.plot(pca, main = "Eigen values")
+      stats.biplot(pca, main = "biplot")
+    #+END_EXAMPLE
+
+    It assigns variables to the imported packages so that you can
+    reference shit.
+
+    [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/robjects_rinstance.html][The instance of R]]; on which: call arbitrary code, too:
+
+    #+BEGIN_EXAMPLE
+      >>> print(robjects.r('1+2'))
+      [1] 3
+      >>> sqr = robjects.r('function(x) x^2')
+      >>> print(sqr)
+      function (x)
+      x^2
+      >>> print(sqr(2))
+      [1] 4
+    #+END_EXAMPLE
+
+    Something about an R-representation:
+
+    #+BEGIN_QUOTE
+    The astute reader will quickly realize that R objects named by
+    python variables can be plugged into code through their R
+    representation:
+
+    #+BEGIN_EXAMPLE
+      >>> x = robjects.r.rnorm(100)
+      >>> robjects.r('hist(%s, xlab="x", main="hist(x)")' %x.r_repr())
+    #+END_EXAMPLE
+    #+END_QUOTE
+
+    [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/robjects_environments.html][Assigning to environment]]:
+
+    #+BEGIN_EXAMPLE
+      >>> robjects.r.ls(globalenv)
+      >>> robjects.globalenv["a"] = 123
+      >>> print(robjects.r.ls(globalenv))
+    #+END_EXAMPLE
+
+    Oh, shit: [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/robjects_formulae.html][formulae]]; [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/robjects_oop.html][fucking OO]]; [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/vector.html][specialized vectors]], along with
+    subsetting. Specialized =NA=, too. Special-casing operators, too.
+    =DataFrame=.
+
+    [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/robjects_convert.html][Type-conversion]] between R <-> Python: =ri2py=, =py2ri=, =py2ro=,
+    &c. [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/graphics.html][Graphics]] require special handling. [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/interactive.html][Interactive]].
+
+    [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/rinterface.html][Low-level interface]]: =initr=, =endr=, &c. =globalenv=, =baseenv=,
+    &c.
+
+    Oh, shit:
+
+    #+BEGIN_QUOTE
+    Rpy2 is using its own reference counting system in order to bridge
+    R with Python and keep the pass-by-reference approach familiar to
+    Python users.
+    #+END_QUOTE
+
+    Calling Python from R:
+
+    #+BEGIN_QUOTE
+    As could be expected from R’s functional roots, functions are
+    first-class objects. This means that the use of callback functions
+    as passed as parameters is not seldom, and this also means that
+    the Python programmer has to either be able write R code for
+    functions as arguments, or have a way to pass Python functions to
+    R as genuine R functions. That last option is becoming possible,
+    in other words one can write a Python function and expose it to R
+    in such a way that the embedded R engine can use as a regular R
+    function.
+    #+END_QUOTE
+
+    They have support for closures; [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/rinterface.html#index-19][enumeration of R-types]]. Don't
+    forget about [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/server.html#][Rserve]].
+
+    [[http://rpy.sourceforge.net/rpy/doc/rpy_html/Invocation.html#Invocation][rpy]] looks less magical; [[http://rpy.sourceforge.net/rpy/doc/rpy_html/R-objects-look-up.html#R-objects-look-up][name-munging]]; [[http://rpy.sourceforge.net/rpy/doc/rpy_html/Methods-of-Robj-type.html#Methods-of-Robj-type][awkward calling]]; [[http://rpy.sourceforge.net/rpy/doc/rpy_html/Sequence-protocol.html#Sequence-protocol][slices are
+    not supported]]; [[http://rpy.sourceforge.net/rpy/doc/rpy_html/R-to-Python.html#R-to-Python][conversions]]; [[http://rpy.sourceforge.net/rpy/doc/rpy_html/No-conversion.html#No-conversion][Robj object]]; 
+
+    [[http://www.omegahat.org/RSPython/overview.pdf][RSPython]] looks lower-level and possibly simpler; is it a good
+    candidate for emulation? Heh: they did the [[http://www.omegahat.org/RSPython/PythonFromR.pdf][reverse]] with a
+    =.Python= form in R.
+
+    Ah: the [[http://www.omegahat.org/RSPython/Conversion.pdf][customizable convertes]] you see in =rpy=, too.
+
+    They also [[file:/usr/local/src/RSPython/src/RCall.c][count references]], apparently; [[file:/usr/local/src/RSPython/inst/Python/RS.py][RS.py]] is refreshingly (or
+    deceptively) simple. (The whole thing is packaged as an R-package,
+    by the way.)
+    
+    Here's [[file:/usr/local/src/RSPython/src/PythonCall.c][some meat]]; see:
+
+    #+BEGIN_QUOTE
+    This handles calling R from Python.
+
+    This code is quickly thrown together for the purposes of a)
+    learning about the Python internals and C API, and b) to
+    illustrate to others how one might embed R in Python or other
+    applications and programming environments.
+
+    There is a lot more to come, specifically the ability to be able
+    to pass Python objects to R by "reference" and have R operate on
+    these by calling methods in those objects that result in calls to
+    Python functions/methods.
+    #+END_QUOTE
+
+    Interesting:
+
+    #+BEGIN_QUOTE
+    This is the routine that implements Python calling an S function
+    with a simple, ordered list of arguments (i.e. no named S
+    arguments, etc.). This converts the Python arguments into S
+    objects.
+
+    This gets 4 arguments:
+      1) the name of the function to call
+      2) the un-named arguments as a Tuple
+      3) the named arguments (that do not use ``reserved'' words)
+      4) a convert argument.    
+    #+END_QUOTE
+
+    [[http://cran.r-project.org/doc/manuals/R-exts.html#Attributes][Install]] pops things in the symbol-table, incidentally.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
