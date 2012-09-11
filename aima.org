@@ -2624,6 +2624,26 @@
     #+END_QUOTE
 
     [[http://cran.r-project.org/doc/manuals/R-exts.html#Attributes][Install]] pops things in the symbol-table, incidentally.
+
+    #+BEGIN_SRC scheme :tangle R-test.scm
+      (use foreign)
+      
+      (foreign-declare "#include <Rembedded.h>")
+      
+      (foreign-code
+       #<<END
+       Rf_initEmbeddedR(1, "R-test");
+       SEXP e;
+       PROTECT (e = lang2 (install ("cat")))
+      END
+      )
+      
+    #+END_SRC
+
+    #+BEGIN_SRC makefile :tangle R-test.mk :shebang #!/usr/bin/unexpand -t 4
+      R-test: R-test.scm
+          csc `R CMD config --cppflags` `R CMD config --ldflags` R-test.scm
+    #+END_SRC
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
