@@ -2204,7 +2204,6 @@
    through the interesting center.
 
    #+BEGIN_SRC R :tangle voronoi.R :shebang #!/usr/bin/env Rscript
-     sink('/dev/null')
      library(deldir)
      library(ggplot2)
      library(proto)
@@ -2268,7 +2267,7 @@
      ## Node is abstract; vertex has a location.
      nodes <- keys(vertices)
      
-     sink()
+     sink('/tmp/fifo')
      for (node in nodes) {
        vertex <- vertices[[node]]
        cat(sprintf('(vertex %s %s %s)', node, vertex$x, vertex$y))
@@ -2282,7 +2281,7 @@
      
      cat(sprintf('(start %s)', start))
      cat(sprintf('(end %s)', end))
-     flush(stdout())
+     sink()
      
      ## path.file <- file('/tmp/harro-thar', 'wt')
      ## for (node in nodes[sample(length(nodes), 10)])
@@ -2293,7 +2292,11 @@
      
      ## With fifos, we have to have a header line, for some reason.
      ## close(stdout())
-     path <- readLines('/tmp/fifo')
+     ## fifo <- file('/tmp/fifo', 'r', blocking=FALSE)
+     ## path <- readChar(fifo, nchars=1)
+     path <- readChar('/tmp/fifo', nchars=10)
+     ## path <- readLines('/tmp/fifo', n=1)
+     debug(path)
      
      path <- nodes[1:2]
      
@@ -2352,14 +2355,33 @@
        geom_point(aes(x=tiles$x1,
                       y=tiles$y1,
                       alpha=1.0))
-     invisible(dev.off())
+     dev.off()
      
    #+END_SRC
 
    #+BEGIN_SRC scheme :tangle voronoi.scm :shebang #!/usr/bin/env chicken-scheme
-     (use debug posix shell srfi-18)
+     (use debug extras posix shell srfi-18)
+     
+     (with-input-from-file "/tmp/fifo"
+       (lambda () (debug (read-lines))))
+     
+     ;; (system "cat /tmp/tempc74e.tmp > /tmp/fifo")
+     (system "echo harro > /tmp/fifo")
+     
+     ;; (thread-start!
+     ;;  (lambda ()
+     ;;    (with-output-to-file "/tmp/fifo"
+     ;;      (lambda ()
+     ;;        (display "oeutnhoeutnh\n")
+     ;;        (flush-output)))))
+     
+     ;; (with-output-to-file "/tmp/fifo"
+     ;;   (lambda ()
+     ;;     (display "harro, welt\n")
+     ;;     (flush-output)))
      
      ;; (capture "./voronoi.R")
+     #;
      (receive (in out id err)
        (process* "./voronoi.R" '())
        (debug (read-all err))
@@ -2370,13 +2392,13 @@
        ;;   (lambda ()
        ;;     (display "harro\n")))
        ;; (flush-output)
-       (system "cat tempc74e.tmp > /tmp/fifo")
+       ;; (system "cat tempc74e.tmp > /tmp/fifo &")
        #;
        (thread-start!
-        (lambda ()
-          (with-output-to-file "/tmp/fifo"
-            (lambda ()
-              (display "oeutnhoeutnh\n")))))
+       (lambda ()
+       (with-output-to-file "/tmp/fifo"
+       (lambda ()
+       (display "oeutnhoeutnh\n")))))
        ;; (with-input-from-file "/tmp/fifo"
        ;;   (read))
        ;; (read-all in)
@@ -2388,6 +2410,13 @@
      ;;     (display "harro thar\n")
      ;;     (display "harro thar\n")))
      ;; (flush-output)
+     
+   #+END_SRC
+
+   #+BEGIN_SRC sh :tangle voronoi.sh :shebang #!/usr/bin/env sh
+     ./voronoi.scm &
+     ./voronoi.R
+     # ls -altrc   
      
    #+END_SRC
 * Meetups
