@@ -2366,14 +2366,20 @@
        (lambda () (debug (read-lines))))
      
      ;; (system "cat /tmp/tempc74e.tmp > /tmp/fifo")
-     (system "echo harro > /tmp/fifo")
+     ;; (system "echo harro > /tmp/fifo")
      
-     ;; (thread-start!
-     ;;  (lambda ()
-     ;;    (with-output-to-file "/tmp/fifo"
-     ;;      (lambda ()
-     ;;        (display "oeutnhoeutnh\n")
-     ;;        (flush-output)))))
+     (with-output-to-file "/tmp/fifo"
+       (lambda ()
+         (display "oeutnho\004\n\n")
+         (flush-output)))
+     
+     #;
+     (thread-start!
+      (lambda ()
+        (with-output-to-file "/tmp/fifo"
+          (lambda ()
+            (display "oeutnhoeutnh\n")
+            (flush-output)))))
      
      ;; (with-output-to-file "/tmp/fifo"
      ;;   (lambda ()
