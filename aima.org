@@ -3395,224 +3395,224 @@
      there that needs to be done.
 
 * TODOs
-* TODO 3.4
-  Found this note:[fn:9]
+** TODO 3.4
+   Found this note:[fn:9]
 
-  #+BEGIN_QUOTE
-  The history of the Fifteen Puzzle has been given too many times to
-  bear further repetition here. Exactly half of the $15!$ permutations
-  (the so called /even/ permutations) can be obtained. In technical
-  language, the available permutations form the *alternating grouph*,
-  $A_{15}$, whereas for the Lucky Seven Puzzle we have the full
-  *symmetric group*, $S_7$, of $7!$ permutations.
+   #+BEGIN_QUOTE
+   The history of the Fifteen Puzzle has been given too many times to
+   bear further repetition here. Exactly half of the $15!$ permutations
+   (the so called /even/ permutations) can be obtained. In technical
+   language, the available permutations form the *alternating grouph*,
+   $A_{15}$, whereas for the Lucky Seven Puzzle we have the full
+   *symmetric group*, $S_7$, of $7!$ permutations.
 
-  You can make a puzzle of this type by putting counters on all but
-  one of the nodes of any connected graph and then sliding them, point
-  to point, always along an edge into the currently empty node. We can
-  afford to ignore the /degenerate/ cases, when your garph is a
-  cycle, or is made by putting two smaller graphs together at a single
-  node, because then the puzzle is trivial, or degenerates into the
-  two smaller puzzles corresponding to the two smaller graphs.
+   You can make a puzzle of this type by putting counters on all but
+   one of the nodes of any connected graph and then sliding them, point
+   to point, always along an edge into the currently empty node. We can
+   afford to ignore the /degenerate/ cases, when your garph is a
+   cycle, or is made by putting two smaller graphs together at a single
+   node, because then the puzzle is trivial, or degenerates into the
+   two smaller puzzles corresponding to the two smaller graphs.
 
-  Rick Wilson has proved the remarkable theorem that for every
-  non-degenerate case but one we get either the full symmetric group
-  (if some circuit is odd) or the alternating group (otherwise). The
-  single exception is the graph of the Tricky Six Puzzle for which the
-  group consists of all possible Möbius transformations \[x \to
-  \frac{ax + b}{cx + d}\mod 5\]
-  #+END_QUOTE
+   Rick Wilson has proved the remarkable theorem that for every
+   non-degenerate case but one we get either the full symmetric group
+   (if some circuit is odd) or the alternating group (otherwise). The
+   single exception is the graph of the Tricky Six Puzzle for which the
+   group consists of all possible Möbius transformations \[x \to
+   \frac{ax + b}{cx + d}\mod 5\]
+   #+END_QUOTE
 
-  See [[http://en.wikipedia.org/wiki/Brooks'_theorem][Brook's theorem]]; also, [[http://www.sciencedirect.com/science/article/pii/0095895674900987][Richard Wilson's paper]].
+   See [[http://en.wikipedia.org/wiki/Brooks'_theorem][Brook's theorem]]; also, [[http://www.sciencedirect.com/science/article/pii/0095895674900987][Richard Wilson's paper]].
 
-  See [[http://www2.research.att.com/~aarcher/Research/15puzzle_book_rev.pdf][Slocum's review]]:
+   See [[http://www2.research.att.com/~aarcher/Research/15puzzle_book_rev.pdf][Slocum's review]]:
 
-  #+BEGIN_QUOTE
-  The set of solvable configurations can be easily described using the
-  theory of even and odd permutations. First, it should be clear that
-  the set of all solvable configurations are precisely those that can
-  be reached starting from the canonical state, since each move is
-  reversible. Second, let us imagine the blank space to contain a
-  block that we will call the “blank block.” Then each move consists
-  of swapping the blank with one of the blocks that is adjacent to it
-  horizontally or vertically. Third, let us focus on the set of
-  attainable configurations where the blank lies in the lower right
-  corner. Then the question is which of the 15! permutations of 16
-  blocks that fix the blank can be attained, starting from the
-  canonical configuration.
-    
-  Let us consider an arbitrary sequence of moves that returns the
-  blank to its initial position. Since each move swaps the blank with
-  another block, we may write the resulting permutation as a product
-  of transpositions, one per move. Now color the spaces of the board
-  white and black in a checkerboard pattern, with the lower right
-  corner colored black. Since the color of the square occupied by the
-  blank switches with each move and it starts and ends on black, it
-  must make an even number of moves, so the resulting permutation may
-  be written as a product of an even number of transpositions. Now
-  recall the well-known fact that every permutation can be written as
-  a product of either an even or odd number of transpositions, but not
-  both. Then the argument we just made shows that no odd permutation
-  that fixes the blank is attainable. It is also the case that every
-  even permutation that fixes the blank is attainable, although that
-  result is far less obvious. To complete the picture, a configuration
-  of the puzzle with the blank in an arbitrary position is obtainable
-  from the canonical configuration if and only if either the blank is
-  on a black square and the permutation is even, or the blank is on a
-  white square and the permutation is odd. It is against this
-  mathematical backdrop that the remarkable history of the 15 puzzle
-  plays itself out.
+   #+BEGIN_QUOTE
+   The set of solvable configurations can be easily described using the
+   theory of even and odd permutations. First, it should be clear that
+   the set of all solvable configurations are precisely those that can
+   be reached starting from the canonical state, since each move is
+   reversible. Second, let us imagine the blank space to contain a
+   block that we will call the “blank block.” Then each move consists
+   of swapping the blank with one of the blocks that is adjacent to it
+   horizontally or vertically. Third, let us focus on the set of
+   attainable configurations where the blank lies in the lower right
+   corner. Then the question is which of the 15! permutations of 16
+   blocks that fix the blank can be attained, starting from the
+   canonical configuration.
 
-  Unfortunately, Hess also makes several small mathematical missteps.
-  In his exposition of Johnson’s proof, he defines a permutation of n
-  objects as being even or odd according to the parity of the number
-  of cycles in its cycle representation. Luckily, this turns out to
-  coincide with the usual definition when n is even, as it is for the
-  case under consideration, namely the 16 spaces in the 15 puzzle. But
-  when n is odd, this definition conflicts with the usual one. In
-  explaining Wilson’s result, he omits an important hypothesis of the
-  theorem, namely that the graph under consideration contain no cut
-  vertex. He also dismisses papers by Edward Spitznagel and myself as
-  “essentially following Johnson’s approach,” even though both of
-  these papers actually give alternate proofs of Story’s result that
-  all even permutations are attainable. Much of the mathematical
-  literature on the 15 puzzle obscures the distinction between proving
-  that no odd permutation is attainable and proving that all even
-  permutations are attainable, so I was sad to see that this book did
-  not do more to clarify that point.
-  #+END_QUOTE
+   Let us consider an arbitrary sequence of moves that returns the
+   blank to its initial position. Since each move swaps the blank with
+   another block, we may write the resulting permutation as a product
+   of transpositions, one per move. Now color the spaces of the board
+   white and black in a checkerboard pattern, with the lower right
+   corner colored black. Since the color of the square occupied by the
+   blank switches with each move and it starts and ends on black, it
+   must make an even number of moves, so the resulting permutation may
+   be written as a product of an even number of transpositions. Now
+   recall the well-known fact that every permutation can be written as
+   a product of either an even or odd number of transpositions, but not
+   both. Then the argument we just made shows that no odd permutation
+   that fixes the blank is attainable. It is also the case that every
+   even permutation that fixes the blank is attainable, although that
+   result is far less obvious. To complete the picture, a configuration
+   of the puzzle with the blank in an arbitrary position is obtainable
+   from the canonical configuration if and only if either the blank is
+   on a black square and the permutation is even, or the blank is on a
+   white square and the permutation is odd. It is against this
+   mathematical backdrop that the remarkable history of the 15 puzzle
+   plays itself out.
 
-  See [[http://en.wikipedia.org/wiki/Parity_of_a_permutation][parity of a permutation]]:
+   Unfortunately, Hess also makes several small mathematical missteps.
+   In his exposition of Johnson’s proof, he defines a permutation of n
+   objects as being even or odd according to the parity of the number
+   of cycles in its cycle representation. Luckily, this turns out to
+   coincide with the usual definition when n is even, as it is for the
+   case under consideration, namely the 16 spaces in the 15 puzzle. But
+   when n is odd, this definition conflicts with the usual one. In
+   explaining Wilson’s result, he omits an important hypothesis of the
+   theorem, namely that the graph under consideration contain no cut
+   vertex. He also dismisses papers by Edward Spitznagel and myself as
+   “essentially following Johnson’s approach,” even though both of
+   these papers actually give alternate proofs of Story’s result that
+   all even permutations are attainable. Much of the mathematical
+   literature on the 15 puzzle obscures the distinction between proving
+   that no odd permutation is attainable and proving that all even
+   permutations are attainable, so I was sad to see that this book did
+   not do more to clarify that point.
+   #+END_QUOTE
 
-  #+BEGIN_QUOTE
-  The identity permutation is an even permutation. An even
-  permutation can be obtained from the identity permutation by an even
-  number of exchanges (called transpositions) of two elements, while
-  an odd permutation can be obtained by an odd number of
-  transpositions.
+   See [[http://en.wikipedia.org/wiki/Parity_of_a_permutation][parity of a permutation]]:
 
-  The following rules follow directly from the corresponding rules about
-  addition of integers:
-  - the composition of two even permutations is even
-  - the composition of two odd permutations is even
-  - the composition of an odd and an even permutation is odd
+   #+BEGIN_QUOTE
+   The identity permutation is an even permutation. An even
+   permutation can be obtained from the identity permutation by an even
+   number of exchanges (called transpositions) of two elements, while
+   an odd permutation can be obtained by an odd number of
+   transpositions.
 
-  From these it follows that
-  - the inverse of every even permutation is even
-  - the inverse of every odd permutation is odd
+   The following rules follow directly from the corresponding rules about
+   addition of integers:
+   - the composition of two even permutations is even
+   - the composition of two odd permutations is even
+   - the composition of an odd and an even permutation is odd
 
-  Considering the symmetric group Sn of all permutations of the set
-  {1, ..., n}, we can conclude that the map sgn: Sn → {−1, 1}  that
-  assigns to every permutation its signature is a group homomorphism.
+   From these it follows that
+   - the inverse of every even permutation is even
+   - the inverse of every odd permutation is odd
 
-  Furthermore, we see that the even permutations form a subgroup of
-  Sn. This is the alternating group on n letters, denoted by An.
-  It is the kernel of the homomorphism sgn. The odd permutations
-  cannot form a subgroup, since the composite of two odd permutations
-  is even, but they form a coset of An (in Sn).
+   Considering the symmetric group Sn of all permutations of the set
+   {1, ..., n}, we can conclude that the map sgn: Sn → {−1, 1}  that
+   assigns to every permutation its signature is a group homomorphism.
 
-  If n > 1 , then there are just as many even permutations in Sn as
-  there are odd ones; consequently, An contains n!/2 permutations.
-  [The reason: if σ is even, then (1 2) σ is odd; if σ is odd, then
-  (1 2) σ is even; the two maps are inverse to each other.]
+   Furthermore, we see that the even permutations form a subgroup of
+   Sn. This is the alternating group on n letters, denoted by An.
+   It is the kernel of the homomorphism sgn. The odd permutations
+   cannot form a subgroup, since the composite of two odd permutations
+   is even, but they form a coset of An (in Sn).
 
-  A cycle is even if and only if its length is odd. This follows from
-  formulas like (a b c d e) = (d e) (c e) (b e) (a e)
+   If n > 1 , then there are just as many even permutations in Sn as
+   there are odd ones; consequently, An contains n!/2 permutations.
+   [The reason: if σ is even, then (1 2) σ is odd; if σ is odd, then
+   (1 2) σ is even; the two maps are inverse to each other.]
 
-  In practice, in order to determine whether a given permutation is
-  even or odd, one writes the permutation as a product of disjoint
-  cycles. The permutation is odd if and only if this factorization
-  contains an odd number of even-length cycles.
+   A cycle is even if and only if its length is odd. This follows from
+   formulas like (a b c d e) = (d e) (c e) (b e) (a e)
 
-  Another method for determining whether a given permutation is even
-  or odd is to construct the corresponding Permutation matrix and
-  compute its determinant. The value of the determinant is same as the
-  parity of the permutation.
+   In practice, in order to determine whether a given permutation is
+   even or odd, one writes the permutation as a product of disjoint
+   cycles. The permutation is odd if and only if this factorization
+   contains an odd number of even-length cycles.
 
-  Every permutation of odd order must be even; the converse is not
-  true in general.
-  #+END_QUOTE
+   Another method for determining whether a given permutation is even
+   or odd is to construct the corresponding Permutation matrix and
+   compute its determinant. The value of the determinant is same as the
+   parity of the permutation.
 
-  On the [[http://en.wikipedia.org/wiki/Fifteen_puzzle#Solvability][solvability of 15]]:
+   Every permutation of odd order must be even; the converse is not
+   true in general.
+   #+END_QUOTE
 
-  #+BEGIN_QUOTE
-  Johnson & Story (1879) used a parity argument to show that half of
-  the starting positions for the n-puzzle are impossible to resolve,
-  no matter how many moves are made. This is done by considering a
-  function of the tile configuration that is invariant under any valid
-  move, and then using this to partition the space of all possible
-  labeled states into two equivalence classes of reachable and
-  unreachable states.
+   On the [[http://en.wikipedia.org/wiki/Fifteen_puzzle#Solvability][solvability of 15]]:
 
-  The invariant is the parity of the permutation of all 16 squares
-  plus the parity of the taxicab distance (number of rows plus number
-  of columns) of the empty square from the lower right corner. This is
-  an invariant because each move changes both the parity of the
-  permutation and the parity of the taxicab distance. In particular if
-  the empty square is in the lower right corner then the puzzle is
-  solvable if and only if the permutation of the remaining pieces is
-  even.
+   #+BEGIN_QUOTE
+   Johnson & Story (1879) used a parity argument to show that half of
+   the starting positions for the n-puzzle are impossible to resolve,
+   no matter how many moves are made. This is done by considering a
+   function of the tile configuration that is invariant under any valid
+   move, and then using this to partition the space of all possible
+   labeled states into two equivalence classes of reachable and
+   unreachable states.
 
-  Johnson & Story (1879) also showed that the converse holds on boards
-  of size m×n provided m and n are both at least 2: all even
-  permutations are solvable. This is straightforward but a little
-  messy to prove by induction on m and n starting with m=n=2. Archer
-  (1999) gave another proof, based on defining equivalence classes via
-  a hamiltonian path.
-  #+END_QUOTE
+   The invariant is the parity of the permutation of all 16 squares
+   plus the parity of the taxicab distance (number of rows plus number
+   of columns) of the empty square from the lower right corner. This is
+   an invariant because each move changes both the parity of the
+   permutation and the parity of the taxicab distance. In particular if
+   the empty square is in the lower right corner then the puzzle is
+   solvable if and only if the permutation of the remaining pieces is
+   even.
 
-  From [[http://www.jstor.org/stable/2589612][Archer]]:
+   Johnson & Story (1879) also showed that the converse holds on boards
+   of size m×n provided m and n are both at least 2: all even
+   permutations are solvable. This is straightforward but a little
+   messy to prove by induction on m and n starting with m=n=2. Archer
+   (1999) gave another proof, based on defining equivalence classes via
+   a hamiltonian path.
+   #+END_QUOTE
 
-  #+BEGIN_QUOTE
-  The reason for this hysteria, of course,is that Loyd's puzzle has no
-  solution. Each move causes a transposition the 16 blocks (where the
-  empty square is considered to contain a blank block), and for the
-  blank to end up in the lower right corner requires an even number of
-  moves, so the resulting permutation is even.
+   From [[http://www.jstor.org/stable/2589612][Archer]]:
 
-  Figure 2. The dashed line and the numbers in the corner of each cell
-  indicate a special ordering the cells that we use to define
-  equivalence classes of placements.
+   #+BEGIN_QUOTE
+   The reason for this hysteria, of course,is that Loyd's puzzle has no
+   solution. Each move causes a transposition the 16 blocks (where the
+   empty square is considered to contain a blank block), and for the
+   blank to end up in the lower right corner requires an even number of
+   moves, so the resulting permutation is even.
 
-  [NB: We're looking for equivalence classes.]
+   Figure 2. The dashed line and the numbers in the corner of each cell
+   indicate a special ordering the cells that we use to define
+   equivalence classes of placements.
 
-  Thus, given any two placements Pl_1 and Pl_2, belonging to
-  configurations Cf_1 and Cf_2, respectively, Pl_2 is obtainable from
-  Pl_1 if and only if Cf_2 is an even permutation Cf_1. Stated
-  directly terms of the placements, we see that if Pl_1 and Pl_2 have
-  the blank in the same cell then Pl_2 is obtainable from Pl_1 if and
-  only if Pl_2 is an even permutation the 15 numbered blocks in Pl_1.
-  Let $n$ be the of number of moves the blank cell in Pl_1 is away
-  from the blank cell in Pl_2. Since each move of the blank block
-  causes a transposition two blocks, then for $n$ odd of (respectively
-  even) Pl_2 is obtainable from Pl_1 if and only if Pl_2 is an odd
-  (respectively even) permutation of the 16 blocksin Pl_1.
-  #+END_QUOTE
+   [NB: We're looking for equivalence classes.]
 
-  From [[http://www.jstor.org/stable/2369492][Story]]:
+   Thus, given any two placements Pl_1 and Pl_2, belonging to
+   configurations Cf_1 and Cf_2, respectively, Pl_2 is obtainable from
+   Pl_1 if and only if Cf_2 is an even permutation Cf_1. Stated
+   directly terms of the placements, we see that if Pl_1 and Pl_2 have
+   the blank in the same cell then Pl_2 is obtainable from Pl_1 if and
+   only if Pl_2 is an even permutation the 15 numbered blocks in Pl_1.
+   Let $n$ be the of number of moves the blank cell in Pl_1 is away
+   from the blank cell in Pl_2. Since each move of the blank block
+   causes a transposition two blocks, then for $n$ odd of (respectively
+   even) Pl_2 is obtainable from Pl_1 if and only if Pl_2 is an odd
+   (respectively even) permutation of the 16 blocksin Pl_1.
+   #+END_QUOTE
 
-  #+BEGIN_QUOTE
-  From which it follows (since no arrangement whose order is positive
-  can be changed into one whose order is negative, or vice versa) that
-  every arrangenment whose order is positive, and only such, can be
-  converted into the standard arrangement. This is the desired
-  criterion for the possibility of a standard solution.
+   From [[http://www.jstor.org/stable/2369492][Story]]:
 
-  We may divide all possible boards into two classes, regarding as of
-  the first class a board for which the number just found is even, and
-  as of the second class one for which this number is odd.
+   #+BEGIN_QUOTE
+   From which it follows (since no arrangement whose order is positive
+   can be changed into one whose order is negative, or vice versa) that
+   every arrangenment whose order is positive, and only such, can be
+   converted into the standard arrangement. This is the desired
+   criterion for the possibility of a standard solution.
 
-  We have then this rule: On a board of the first class a given
-  arrangemnent can or cannot be converted into the natural
-  arrangement, according as its order is even or odd; but on a board
-  of the second class a given arrangemnent can or cannot be converted
-  into the natural arrangement, according as its order is odd or even.
-  #+END_QUOTE
+   We may divide all possible boards into two classes, regarding as of
+   the first class a board for which the number just found is even, and
+   as of the second class one for which this number is odd.
 
-  Let's investigate writing the permutation as a product of disjoint
-  [[http://en.wikipedia.org/wiki/Cycle_(mathematics)][cycles]]: the permutation is odd if this factorization contains an odd
-  number of even-length cycles.
+   We have then this rule: On a board of the first class a given
+   arrangemnent can or cannot be converted into the natural
+   arrangement, according as its order is even or odd; but on a board
+   of the second class a given arrangemnent can or cannot be converted
+   into the natural arrangement, according as its order is odd or even.
+   #+END_QUOTE
 
-  Wolfram has a [[http://mathworld.wolfram.com/PermutationCycle.html][better article on cycles]], incidentally.
+   Let's investigate writing the permutation as a product of disjoint
+   [[http://en.wikipedia.org/wiki/Cycle_(mathematics)][cycles]]: the permutation is odd if this factorization contains an odd
+   number of even-length cycles.
+
+   Wolfram has a [[http://mathworld.wolfram.com/PermutationCycle.html][better article on cycles]], incidentally.
 ** TODO Focus on one or two problems for the coming week.
    Assign people to be responsible for them.
 ** TODO Modify 2.11 to list available actions?
