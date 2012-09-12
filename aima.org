@@ -2655,6 +2655,15 @@
     Keep [[file:/usr/local/lib64/R/include/Rinternals.h][Rinternals.h]] handy: there's good stuff in there about types,
     &c. Not to mention the [[http://cran.r-project.org/doc/manuals/R-ints.html][R internals]] doc. [[file:/usr/local/lib64/R/include/Rdefines.h][Rdefines.h]] has stuff like
     =NEW_NUMERIC=, by the way.
+
+    There's a missing argument marker:
+
+    #+BEGIN_SRC c
+      LibExtern SEXP  R_MissingArg;       /* Missing argument marker */
+    #+END_SRC
+
+    Do we need to have a special symbol, e.g. =*missing*=? Named
+    variables have to be handled, too. See e.g. keywords and kvlists.
 **** On [[http://cran.r-project.org/doc/manuals/R-exts.html#Handling-lists][lists]]
      #+BEGIN_QUOTE
      List elements can be retrieved or set by direct access to the
