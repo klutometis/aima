@@ -2626,15 +2626,22 @@
     [[http://cran.r-project.org/doc/manuals/R-exts.html#Attributes][Install]] pops things in the symbol-table, incidentally.
 
     #+BEGIN_SRC scheme :tangle R-test.scm
-      (use foreign)
-      
+      (foreign-declare "#include <Rinternals.h>")
+      (foreign-declare "#include <Rdefines.h>")
       (foreign-declare "#include <Rembedded.h>")
       
       (foreign-code
        #<<END
-       Rf_initEmbeddedR(1, "R-test");
-       SEXP e;
-       PROTECT (e = lang2 (install ("cat")))
+       // Thanks, Adam Rosenfield: <http://stackoverflow.com/a/1140795>.
+       Rf_initEmbeddedR(1, (char*[]) {"R-test"});
+       SEXP e, s;
+       PROTECT(s = allocVector(STRSXP, 1));
+       SET_STRING_ELT(s, 0, mkChar("harro"));
+       PROTECT(e = lang2(install("cat"), s));
+       // This is eval(e, R_GlobalEnv); on global vs. base environment:
+       // <http://cran.r-project.org/doc/manuals/R-lang.html#Global-environment>.
+       EVAL(e);
+       UNPROTECT(2);
       END
       )
       
