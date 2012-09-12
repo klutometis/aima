@@ -2626,24 +2626,70 @@
     [[http://cran.r-project.org/doc/manuals/R-exts.html#Attributes][Install]] pops things in the symbol-table, incidentally.
 
     #+BEGIN_SRC scheme :tangle R-test.scm
-      (foreign-declare "#include <Rinternals.h>")
-      (foreign-declare "#include <Rdefines.h>")
-      (foreign-declare "#include <Rembedded.h>")
+      (use dollar lolevel)
+      
+      #>
+      #include <assert.h>
+      #include <string.h>
+      
+      #include <Rinternals.h>
+      #include <Rdefines.h>
+      #include <Rembedded.h>
+      <#
       
       (foreign-code
        #<<END
-       // Thanks, Adam Rosenfield: <http://stackoverflow.com/a/1140795>.
-       Rf_initEmbeddedR(1, (char*[]) {"R-test"});
-       SEXP e, s;
-       PROTECT(s = allocVector(STRSXP, 1));
-       SET_STRING_ELT(s, 0, mkChar("harro"));
-       PROTECT(e = lang2(install("cat"), s));
-       // This is eval(e, R_GlobalEnv); on global vs. base environment:
-       // <http://cran.r-project.org/doc/manuals/R-lang.html#Global-environment>.
-       EVAL(e);
-       UNPROTECT(2);
+       Rf_initEmbeddedR(4, (char*[]) {"R-test",
+                                      "--slave",
+                                      "--vanilla",
+                                      "--args"});
       END
       )
+      
+      (define (Reval function . args)
+        ((foreign-lambda*
+          scheme-object
+          ((c-string function)
+           (scheme-object args)
+           (int nargs))
+          #<<END
+          assert(strcmp(function, "cat") == 0);
+      
+          C_word car = C_u_i_car(args);
+          C_word cadr = C_u_i_cadr(args);
+      
+          assert(C_fixnump(car));
+          assert(C_fixnump(cadr));
+      
+          int augend = C_num_to_int(car);
+          int addend = C_num_to_int(cadr);
+      
+          assert(augend == 3);
+          assert(addend == 4);
+      
+          SEXP fun = Rf_findFun (Rf_install (function), R_GlobalEnv);
+          PROTECT (fun);
+      
+          SEXP e = allocVector (LANGSXP, nargs + 1);
+          PROTECT (e);
+          SEXP arg1 = NEW_INTEGER (1);
+          INTEGER_DATA (arg1) [0] = augend;
+          SEXP arg2 = NEW_INTEGER (1);
+          INTEGER_DATA (arg2) [0] = addend;
+          SETCAR (e, fun);
+          SETCADR (e, arg1);
+          SETCADDR (e, arg2);
+          int error = 0;
+          SEXP val = R_tryEval (e, R_GlobalEnv, &error);
+      
+          C_return(C_SCHEME_UNDEFINED);
+      END
+      )
+         function
+         args
+         (length args)))
+      
+      (Reval "cat" 3 4)
       
     #+END_SRC
 
