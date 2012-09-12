@@ -2664,6 +2664,43 @@
 
     Do we need to have a special symbol, e.g. =*missing*=? Named
     variables have to be handled, too. See e.g. keywords and kvlists.
+
+    Can we create a SEXP in Scheme before we pass it to R, and
+    UNPROTECT it in the destructor? I wonder if we'll have impedence
+    mismatch between R and Scheme GC. God, I hope not. Or can we pass
+    primitive types to see and do the primitive -> SEXP calculus in C?
+
+    Look at the [[http://wiki.call-cc.org/eggref/4/lua][lua egg]], by the way, for a good, basic, thoughtful
+    API; cf. [[http://wiki.call-cc.org/eggref/4/bind][bind]] and [[http://wiki.call-cc.org/eggref/4/dollar][dollar]]. Lua doesn't drop into C at all, it's
+    all-dollar. Ah, it's all in the associated =.c= and =.h= files;
+    wait: that's the entirety of Lua? Wow. =lua-main.scm= is
+    beautiful, but maybe that's because Lua was built from the ground
+    up as an embeddable. R, maybe not so much. Can be coerced, though.
+
+    Can we confine the complexities of e.g. =SEXP= to embedded C; or
+    do we have to go through the whole =define-foreign-record-type=
+    rigmarole?
+
+    See [[file:/usr/local/src/RSPython/src/RPythonConverters.c][RPythonConverters.c]], incidentally, for some conversion
+    goodness. [[file:/usr/local/src/RSPython/inst/include/RSCommon.h][Mother-fuckers]]:
+
+    #+BEGIN_SRC c
+      typedef SEXP USER_OBJECT_;
+    #+END_SRC
+
+    Uses =getListElementType= to simplify to vectors when there are
+    homogenous datatypes; we can just use native vectors, right?
+    Native vectors are of course heterogenous in Scheme.
+
+    Can we write write a C-function that takes a =C_word=
+    (representing a list somehow), and returns a =C_word= representing
+    the R-object? RSPython has an optional translate thing. Should we
+    force the user to package things as R-objects; or should we
+    translate transparently? I'm loathe to do the latter; initial
+    hypothesis, however?
+
+    See [[file:/usr/local/src/chicken-4.7.0.6/chicken.h][chicken.h]] for things like =C_inline C_word C_a_i_list1(C_word
+    **a, int n, C_word x1)=, which create lists;
 **** On [[http://cran.r-project.org/doc/manuals/R-exts.html#Handling-lists][lists]]
      #+BEGIN_QUOTE
      List elements can be retrieved or set by direct access to the
