@@ -2650,13 +2650,12 @@
         SETCAR(expression, function);
         SEXP temp = CDR(expression);
       
-        while (nargs > 0) {
+        while (Rf_length(temp) > 0) {
           SEXP arg = NEW_INTEGER(1);
           INTEGER_DATA(arg)[0] = C_num_to_int(C_i_car(args));
           SETCAR(temp, arg);
           args = C_i_cdr(args);
           temp = CDR(temp);
-          nargs--;
         }
       
         int error = 0;
