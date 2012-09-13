@@ -2625,24 +2625,78 @@
 
     [[http://cran.r-project.org/doc/manuals/R-exts.html#Attributes][Install]] pops things in the symbol-table, incidentally.
 
-    #+BEGIN_SRC scheme :tangle R-test.scm
-      (use dollar lolevel)
+    #+BEGIN_SRC c :tangle R-test.h
+      #include <chicken.h>
       
-      #>
+      C_word Reval(char* function, C_word args, int nargs);
+      
+    #+END_SRC
+
+    #+BEGIN_SRC c :tangle R-test.c
       #include <assert.h>
       #include <string.h>
       
       #include <Rinternals.h>
       #include <Rdefines.h>
       #include <Rembedded.h>
+      
+      #include <chicken.h>
+      
+      C_word Reval(char* function, C_word args, int nargs) {
+        assert(strcmp(function, "cat") == 0);
+      
+        C_word car = C_u_i_car(args);
+        C_word cadr = C_u_i_cadr(args);
+      
+        assert(C_fixnump(car));
+        assert(C_fixnump(cadr));
+      
+        int augend = C_num_to_int(car);
+        int addend = C_num_to_int(cadr);
+      
+        assert(augend == 3);
+        assert(addend == 4);
+      
+        SEXP fun = Rf_findFun(Rf_install(function), R_GlobalEnv);
+        PROTECT (fun);
+      
+        SEXP e = allocVector(LANGSXP, nargs + 1);
+      
+        PROTECT(e);
+      
+        SEXP arg1 = NEW_INTEGER(1);
+        INTEGER_DATA(arg1)[0] = augend;
+      
+        SEXP arg2 = NEW_INTEGER(1);
+        INTEGER_DATA(arg2)[0] = addend;
+      
+        SETCAR(e, fun);
+        SETCADR(e, arg1);
+        SETCADDR(e, arg2);
+      
+        int error = 0;
+        SEXP val = R_tryEval(e, R_GlobalEnv, &error);
+        UNPROTECT(2);
+      
+        C_return(C_SCHEME_UNDEFINED);
+      }
+      
+    #+END_SRC
+
+    #+BEGIN_SRC scheme :tangle R-test.scm
+      (use dollar lolevel)
+      
       <#
+      #include "R-test.h"
+      #include <Rembedded.h>
+      #>
       
       (foreign-code
        #<<END
-       Rf_initEmbeddedR(4, (char*[]) {"R-test",
+       Rf_initEmbeddedR(4, (*char[]) {"R-test",
                                       "--slave",
                                       "--vanilla",
-                                      "--args"});
+                                      "--args"}) ;
       END
       )
       
@@ -2653,36 +2707,7 @@
            (scheme-object args)
            (int nargs))
           #<<END
-          assert(strcmp(function, "cat") == 0);
-      
-          C_word car = C_u_i_car(args);
-          C_word cadr = C_u_i_cadr(args);
-      
-          assert(C_fixnump(car));
-          assert(C_fixnump(cadr));
-      
-          int augend = C_num_to_int(car);
-          int addend = C_num_to_int(cadr);
-      
-          assert(augend == 3);
-          assert(addend == 4);
-      
-          SEXP fun = Rf_findFun (Rf_install (function), R_GlobalEnv);
-          PROTECT (fun);
-      
-          SEXP e = allocVector (LANGSXP, nargs + 1);
-          PROTECT (e);
-          SEXP arg1 = NEW_INTEGER (1);
-          INTEGER_DATA (arg1) [0] = augend;
-          SEXP arg2 = NEW_INTEGER (1);
-          INTEGER_DATA (arg2) [0] = addend;
-          SETCAR (e, fun);
-          SETCADR (e, arg1);
-          SETCADDR (e, arg2);
-          int error = 0;
-          SEXP val = R_tryEval (e, R_GlobalEnv, &error);
-      
-          C_return(C_SCHEME_UNDEFINED);
+          C_return(Reval(function, args, nargs));
       END
       )
          function
@@ -2694,8 +2719,18 @@
     #+END_SRC
 
     #+BEGIN_SRC makefile :tangle R-test.mk :shebang #!/usr/bin/unexpand -t 4
-      R-test: R-test.scm
-          csc `R CMD config --cppflags` `R CMD config --ldflags` R-test.scm
+      R-test.o: R-test.c
+          gcc \
+          `R CMD config --cppflags` \
+          `R CMD config --ldflags` \
+          -c R-test.c
+      
+      R-test: R-test.o R-test.scm
+          csc \
+          `R CMD config --cppflags` \
+          `R CMD config --ldflags` \
+          R-test.o R-test.scm
+      
     #+END_SRC
     
     Keep [[file:/usr/local/lib64/R/include/Rinternals.h][Rinternals.h]] handy: there's good stuff in there about types,
