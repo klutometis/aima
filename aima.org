@@ -2774,6 +2774,9 @@
 
     On [[http://cran.r-project.org/doc/manuals/R-exts.html#Garbage-Collection][PROTECT]]: they unprotect return before =return=. How much of the
     conversion can we do in Scheme? Seems more flexible that way.
+
+    Is =C_c_pointer= useful for returning opaque R-objects, by the
+    way? =C_pointer_to_object=?
 **** On [[http://cran.r-project.org/doc/manuals/R-exts.html#Handling-lists][lists]]
      #+BEGIN_QUOTE
      List elements can be retrieved or set by direct access to the
