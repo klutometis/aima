@@ -2690,6 +2690,9 @@
         printf("%s", IS_VECTOR(GET_CLASS(value)) ? "vectorclass" : "");
         printf("%d", GET_LENGTH(GET_CLASS(value)));
         printf("%d", GET_LENGTH(value));
+        int evaluatum = INTEGER_DATA(value)[0];
+        if (C_fitsinfixnump(evaluatum))
+          C_return(C_fix(evaluatum));
         C_return(C_SCHEME_UNDEFINED);
       }
       
