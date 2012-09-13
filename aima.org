@@ -2682,7 +2682,7 @@
     #+END_SRC
 
     #+BEGIN_SRC scheme :tangle R-test.scm
-      (use debug dollar lolevel)
+      (use debug dollar lolevel test)
       
       <#
       #include "R-test.h"
