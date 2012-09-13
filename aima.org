@@ -2660,21 +2660,11 @@
       
         int error = 0;
         SEXP value = R_tryEval(expression, R_GlobalEnv, &error);
-        printf("%d", error);
-        printf("%s", IS_LIST(value) ? "list" : "");
-        printf("%s", IS_LOGICAL(value) ? "logical" : "");
-        printf("%s", IS_INTEGER(value) ? "integer" : "");
-        printf("%s", IS_NUMERIC(value) ? "numeric" : "");
-        printf("%s", IS_CHARACTER(value) ? "character" : "");
-        printf("%s", IS_VECTOR(value) ? "vector" : "");
-        printf("%s", IS_RAW(value) ? "raw" : "");
-        printf("%s", IS_COMPLEX(value) ? "complex" : "");
-        printf("%s", IS_VECTOR(GET_CLASS(value)) ? "vectorclass" : "");
-        printf("%d", GET_LENGTH(GET_CLASS(value)));
-        printf("%d", GET_LENGTH(value));
-        int evaluatum = INTEGER_DATA(value)[0];
-        if (C_fitsinfixnump(evaluatum))
-          C_return(C_fix(evaluatum));
+        if (!error) {
+          int evaluatum = INTEGER_DATA(value)[0];
+          if (C_fitsinfixnump(evaluatum))
+            C_return(C_fix(evaluatum));
+        }
         C_return(C_SCHEME_UNDEFINED);
       }
       
