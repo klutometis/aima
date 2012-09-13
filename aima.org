@@ -2699,17 +2699,7 @@
       )
       
       (define (Reval function . args)
-        ((foreign-lambda*
-          scheme-object
-          ((c-string function)
-           (scheme-object args)
-           (int nargs))
-          #<<END
-          C_return(Reval(function, args, nargs));
-      END
-      )
-         function
-         args
+        ($ scheme-object Reval (c-string function) (scheme-object args)))
       
       (Reval "cat" 3 4)
       
