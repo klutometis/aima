@@ -2706,6 +2706,8 @@
     #+END_SRC
 
     #+BEGIN_SRC makefile :tangle R-test.mk :shebang #!/usr/bin/unexpand -t 4
+      all: R-test
+      
       Reval.o: Reval.c
           gcc \
           `R CMD config --cppflags` \
