@@ -2701,7 +2701,7 @@
       (define (Reval function . args)
         ($ scheme-object Reval (c-string function) (scheme-object args)))
       
-      (Reval "cat" 3 4)
+      (test 8 (Reval "+" 3 5))
       
     #+END_SRC
 
