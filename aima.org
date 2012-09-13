@@ -2678,6 +2678,18 @@
         SEXP val = R_tryEval(e, R_GlobalEnv, &error);
         UNPROTECT(2);
       
+        printf("%d", error);
+        printf("%s", IS_LIST(value) ? "list" : "");
+        printf("%s", IS_LOGICAL(value) ? "logical" : "");
+        printf("%s", IS_INTEGER(value) ? "integer" : "");
+        printf("%s", IS_NUMERIC(value) ? "numeric" : "");
+        printf("%s", IS_CHARACTER(value) ? "character" : "");
+        printf("%s", IS_VECTOR(value) ? "vector" : "");
+        printf("%s", IS_RAW(value) ? "raw" : "");
+        printf("%s", IS_COMPLEX(value) ? "complex" : "");
+        printf("%s", IS_VECTOR(GET_CLASS(value)) ? "vectorclass" : "");
+        printf("%d", GET_LENGTH(GET_CLASS(value)));
+        printf("%d", GET_LENGTH(value));
         C_return(C_SCHEME_UNDEFINED);
       }
       
