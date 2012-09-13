@@ -2628,7 +2628,7 @@
     #+BEGIN_SRC c :tangle Reval.h
       #include <chicken.h>
       
-      C_word Reval(char* function, C_word args, int nargs);
+      C_word Reval(char* function, C_word args);
       
     #+END_SRC
 
@@ -2642,8 +2642,8 @@
       
       #include <chicken.h>
       
-      C_word Reval(char* function, C_word args, int nargs) {
         assert(strcmp(function, "cat") == 0);
+      C_word Reval(char* name, C_word args) {
       
         C_word car = C_u_i_car(args);
         C_word cadr = C_u_i_cadr(args);
@@ -2712,7 +2712,6 @@
       )
          function
          args
-         (length args)))
       
       (Reval "cat" 3 4)
       
