@@ -2747,6 +2747,9 @@
 
     See [[file:/usr/local/src/chicken-4.7.0.6/chicken.h][chicken.h]] for things like =C_inline C_word C_a_i_list1(C_word
     **a, int n, C_word x1)=, which create lists;
+
+    On [[http://cran.r-project.org/doc/manuals/R-exts.html#Garbage-Collection][PROTECT]]: they unprotect return before =return=. How much of the
+    conversion can we do in Scheme? Seems more flexible that way.
 **** On [[http://cran.r-project.org/doc/manuals/R-exts.html#Handling-lists][lists]]
      #+BEGIN_QUOTE
      List elements can be retrieved or set by direct access to the
