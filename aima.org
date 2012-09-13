@@ -2691,7 +2691,7 @@
       
       (foreign-code
        #<<END
-       Rf_initEmbeddedR(4, (*char[]) {"R-test",
+       Rf_initEmbeddedR(4, (char*[]) {"R-test",
                                       "--slave",
                                       "--vanilla",
                                       "--args"}) ;
