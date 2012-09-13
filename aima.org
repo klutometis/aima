@@ -2625,14 +2625,14 @@
 
     [[http://cran.r-project.org/doc/manuals/R-exts.html#Attributes][Install]] pops things in the symbol-table, incidentally.
 
-    #+BEGIN_SRC c :tangle R-test.h
+    #+BEGIN_SRC c :tangle Reval.h
       #include <chicken.h>
       
       C_word Reval(char* function, C_word args, int nargs);
       
     #+END_SRC
 
-    #+BEGIN_SRC c :tangle R-test.c
+    #+BEGIN_SRC c :tangle Reval.c
       #include <assert.h>
       #include <string.h>
       
@@ -2719,17 +2719,17 @@
     #+END_SRC
 
     #+BEGIN_SRC makefile :tangle R-test.mk :shebang #!/usr/bin/unexpand -t 4
-      R-test.o: R-test.c
+      Reval.o: Reval.c
           gcc \
           `R CMD config --cppflags` \
           `R CMD config --ldflags` \
-          -c R-test.c
+          -c Reval.c
       
-      R-test: R-test.o R-test.scm
+      R-test: Reval.o R-test.scm
           csc \
           `R CMD config --cppflags` \
           `R CMD config --ldflags` \
-          R-test.o R-test.scm
+          Reval.o R-test.scm
       
     #+END_SRC
     
