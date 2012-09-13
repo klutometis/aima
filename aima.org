@@ -2642,42 +2642,25 @@
       
       #include <chicken.h>
       
-        assert(strcmp(function, "cat") == 0);
       C_word Reval(char* name, C_word args) {
+        int nargs = C_num_to_int(C_i_length(args));
+        SEXP expression = allocVector(LANGSXP, nargs + 1);
+        SEXP function = Rf_findFun(Rf_install(name), R_GlobalEnv);
       
-        C_word car = C_u_i_car(args);
-        C_word cadr = C_u_i_cadr(args);
+        SETCAR(expression, function);
+        SEXP temp = CDR(expression);
       
-        assert(C_fixnump(car));
-        assert(C_fixnump(cadr));
-      
-        int augend = C_num_to_int(car);
-        int addend = C_num_to_int(cadr);
-      
-        assert(augend == 3);
-        assert(addend == 4);
-      
-        SEXP fun = Rf_findFun(Rf_install(function), R_GlobalEnv);
-        PROTECT (fun);
-      
-        SEXP e = allocVector(LANGSXP, nargs + 1);
-      
-        PROTECT(e);
-      
-        SEXP arg1 = NEW_INTEGER(1);
-        INTEGER_DATA(arg1)[0] = augend;
-      
-        SEXP arg2 = NEW_INTEGER(1);
-        INTEGER_DATA(arg2)[0] = addend;
-      
-        SETCAR(e, fun);
-        SETCADR(e, arg1);
-        SETCADDR(e, arg2);
+        while (nargs > 0) {
+          SEXP arg = NEW_INTEGER(1);
+          INTEGER_DATA(arg)[0] = C_num_to_int(C_i_car(args));
+          SETCAR(temp, arg);
+          args = C_i_cdr(args);
+          temp = CDR(temp);
+          nargs--;
+        }
       
         int error = 0;
-        SEXP val = R_tryEval(e, R_GlobalEnv, &error);
-        UNPROTECT(2);
-      
+        SEXP value = R_tryEval(expression, R_GlobalEnv, &error);
         printf("%d", error);
         printf("%s", IS_LIST(value) ? "list" : "");
         printf("%s", IS_LOGICAL(value) ? "logical" : "");
@@ -2699,7 +2682,7 @@
     #+END_SRC
 
     #+BEGIN_SRC scheme :tangle R-test.scm
-      (use dollar lolevel)
+      (use debug dollar lolevel)
       
       <#
       #include "R-test.h"
