@@ -2645,25 +2645,58 @@
       C_word Reval(char* name, C_word args) {
         int nargs = C_num_to_int(C_i_length(args));
         SEXP expression = allocVector(LANGSXP, nargs + 1);
+        /* Have to check this for R_NilValue; see e.g. RNamedCall.c. */
         SEXP function = Rf_findFun(Rf_install(name), R_GlobalEnv);
       
         SETCAR(expression, function);
-        SEXP temp = CDR(expression);
+        SEXP iterexp = CDR(expression);
       
-        while (Rf_length(temp) > 0) {
-          SEXP arg = NEW_INTEGER(1);
-          INTEGER_DATA(arg)[0] = C_num_to_int(C_i_car(args));
-          SETCAR(temp, arg);
+        while (!C_truep(C_i_nullp(args))) {
+          SEXP Rarg = R_NilValue;
+          C_word arg = C_i_car(args);
+          if (C_truep(C_i_flonump(arg))) {
+            /* Setting a tag on the SEXP via SET_TAG simulates a named
+               argument, incidentally; makes me wonder whether we can't do
+               a little work in Scheme before calling Reval.
+      
+               We're going to have to formalize missing arguments for a
+               first pass. */
+            Rarg = ScalarReal(C_flonum_magnitude(arg));
+          } else if (C_truep(C_fixnump(arg))) {
+            Rarg = ScalarInteger(C_num_to_int(arg));
+          }
+          SETCAR(iterexp, Rarg);
           args = C_i_cdr(args);
-          temp = CDR(temp);
+          iterexp = CDR(iterexp);
+          puts("");
         }
       
         int error = 0;
-        SEXP value = R_tryEval(expression, R_GlobalEnv, &error);
+        SEXP Rvalue = R_tryEval(expression, R_GlobalEnv, &error);
+        printf("%d", error);
+        printf("%d", TYPEOF(Rvalue));
+        printf("%s", isList(Rvalue) ? "list" : "");
+        printf("%s", isNewList(Rvalue) ? "newlist" : "");
+        printf("%s", isPairList(Rvalue) ? "pairlist" : "");
+        printf("%s", isVector(Rvalue) ? "vector" : "");
+        printf("%s", isVectorList(Rvalue) ? "vectorlist" : "");
+        C_word *value;
         if (!error) {
-          int evaluatum = INTEGER_DATA(value)[0];
-          if (C_fitsinfixnump(evaluatum))
-            C_return(C_fix(evaluatum));
+          /* Let's do something like
+             <http://rcrowley.org/2008/03/03/functional-programming-in-c.html>
+             in an array-pointing-to-functions, instead of this switch. */
+          switch (TYPEOF(Rvalue)) {
+          case REALSXP:
+            printf("data: %f; ", REAL(Rvalue)[0]);
+            value = C_alloc(C_SIZEOF_FLONUM);
+            C_flonum(&value, REAL(Rvalue)[0]);
+            break;
+          case INTSXP:
+            value = C_alloc(sizeof(C_word));
+            *value = C_fix(INTEGER(Rvalue)[0]);
+            break;
+          }
+          C_return(*value);
         }
         C_return(C_SCHEME_UNDEFINED);
       }
