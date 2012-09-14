@@ -2786,6 +2786,339 @@
 
     Is =C_c_pointer= useful for returning opaque R-objects, by the
     way? =C_pointer_to_object=?
+
+    There's a [[file:/usr/local/lib64/R/include/Rinternals.h][reason]], incidentally, why things come up as both vectors
+    and lists:
+
+    #+BEGIN_SRC c
+      #define IS_LIST(x)      IS_VECTOR(x)
+    #+END_SRC
+
+    How do we distinguish true lists from vectors? Maybe try the
+    =Rf_isList=, =Rf_isPairList=, &c. from =Rinternals.h=.
+
+    Here's the list:
+
+    #+BEGIN_SRC c
+      Rboolean Rf_isArray(SEXP);
+      Rboolean Rf_isFactor(SEXP);
+      Rboolean Rf_isFrame(SEXP);
+      Rboolean Rf_isFunction(SEXP);
+      Rboolean Rf_isInteger(SEXP);
+      Rboolean Rf_isLanguage(SEXP);
+      Rboolean Rf_isList(SEXP);
+      Rboolean Rf_isMatrix(SEXP);
+      Rboolean Rf_isNewList(SEXP);
+      Rboolean Rf_isNumber(SEXP);
+      Rboolean Rf_isNumeric(SEXP);
+      Rboolean Rf_isPairList(SEXP);
+      Rboolean Rf_isPrimitive(SEXP);
+      Rboolean Rf_isTs(SEXP);
+      Rboolean Rf_isUserBinop(SEXP);
+      Rboolean Rf_isValidString(SEXP);
+      Rboolean Rf_isValidStringF(SEXP);
+      Rboolean Rf_isVector(SEXP);
+      Rboolean Rf_isVectorAtomic(SEXP);
+      Rboolean Rf_isVectorList(SEXP);
+      Rboolean Rf_isVectorizable(SEXP);
+    #+END_SRC
+
+    Oh, yeah: there was that whole [[http://cran.r-project.org/doc/manuals/R-exts.html#Handling-lists][newList]] thing. Can we cherry-pick
+    the things that have obvious Scheme counterparts
+
+    From [[http://cran.r-project.org/doc/manuals/R-lang.html#Attributes][R-lang]]:
+
+    #+BEGIN_QUOTE
+    Matrices and arrays are simply vectors with the attribute dim and
+    optionally dimnames attached to the vector.
+    #+END_QUOTE
+
+    [[http://cran.r-project.org/doc/manuals/R-lang.html#Factors][Factors]] sounds like enums:
+
+    #+BEGIN_QUOTE
+    Factors are currently implemented using an integer array to
+    specify the actual levels and a second array of names that are
+    mapped to the integers.
+    #+END_QUOTE
+
+    I wonder if =Rf_isFrame= applies to dataframes.
+
+    This is cool, by the way; these guys dispatch on [[http://cran.r-project.org/doc/manuals/R-exts.html#Calling-_002eExternal][TYPEOF(el)]]:
+
+    #+BEGIN_SRC c
+      #include <R_ext/PrtUtil.h>
+           
+      SEXP showArgs(SEXP args)
+      {
+        args = CDR(args); /* skip 'name' */
+        for(int i = 0; args != R_NilValue; i++, args = CDR(args)) {
+          const char *name =
+            isNull(TAG(args)) ? "" : CHAR(PRINTNAME(TAG(args)));
+          SEXP el = CAR(args);
+          if (length(el) == 0) {
+            Rprintf("[%d] '%s' R type, length 0\n", i+1, name);
+            continue;
+          }
+          switch(TYPEOF(el)) {
+          case REALSXP:
+            Rprintf("[%d] '%s' %f\n", i+1, name, REAL(el)[0]);
+            break;
+          case LGLSXP:
+          case INTSXP:
+            Rprintf("[%d] '%s' %d\n", i+1, name, INTEGER(el)[0]);
+            break;
+          case CPLXSXP:
+            {
+              Rcomplex cpl = COMPLEX(el)[0];
+              Rprintf("[%d] '%s' %f + %fi\n", i+1, name, cpl.r, cpl.i);
+            }
+            break;
+          case STRSXP:
+            Rprintf("[%d] '%s' %s\n", i+1, name,
+                    CHAR(STRING_ELT(el, 0)));
+            break;
+          default:
+            Rprintf("[%d] '%s' R type\n", i+1, name);
+          }
+        }
+        return(R_NilValue);
+      }
+    #+END_SRC
+
+    Here's another list:
+
+    #+BEGIN_SRC c
+      #undef isNull
+      #define isNull(s)   (TYPEOF(s) == NILSXP)
+      #undef isSymbol
+      #define isSymbol(s) (TYPEOF(s) == SYMSXP)
+      #undef isLogical
+      #define isLogical(s)    (TYPEOF(s) == LGLSXP)
+      #undef isReal
+      #define isReal(s)   (TYPEOF(s) == REALSXP)
+      #undef isComplex
+      #define isComplex(s)    (TYPEOF(s) == CPLXSXP)
+      #undef isExpression
+      #define isExpression(s) (TYPEOF(s) == EXPRSXP)
+      #undef isEnvironment
+      #define isEnvironment(s) (TYPEOF(s) == ENVSXP)
+      #undef isString
+      #define isString(s) (TYPEOF(s) == STRSXP)
+      #undef isObject
+      #define isObject(s) (OBJECT(s) != 0)
+    #+END_SRC
+
+    And yet another unadorned list:
+
+    #+BEGIN_SRC c
+      #define isArray         Rf_isArray
+      #define isBasicClass            Rf_isBasicClass
+      #define isComplex       Rf_isComplex
+      #define isEnvironment       Rf_isEnvironment
+      #define isExpression        Rf_isExpression
+      #define isFactor        Rf_isFactor
+      #define isFrame         Rf_isFrame
+      #define isFree          Rf_isFree
+      #define isFunction      Rf_isFunction
+      #define isInteger       Rf_isInteger
+      #define isLanguage      Rf_isLanguage
+      #define isList          Rf_isList
+      #define isLogical       Rf_isLogical
+      #define isSymbol        Rf_isSymbol
+      #define isMatrix        Rf_isMatrix
+      #define isNewList       Rf_isNewList
+      #define isNull          Rf_isNull
+      #define isNumeric       Rf_isNumeric
+      #define isNumber        Rf_isNumber
+      #define isObject        Rf_isObject
+      #define isOrdered       Rf_isOrdered
+      #define isPairList      Rf_isPairList
+      #define isPrimitive     Rf_isPrimitive
+      #define isReal          Rf_isReal
+      #define isS4            Rf_isS4
+      #define isString        Rf_isString
+      #define isTs            Rf_isTs
+      #define isUnordered     Rf_isUnordered
+      #define isUnsorted      Rf_isUnsorted
+      #define isUserBinop     Rf_isUserBinop
+      #define isValidString       Rf_isValidString
+      #define isValidStringF      Rf_isValidStringF
+      #define isVector        Rf_isVector
+      #define isVectorAtomic      Rf_isVectorAtomic
+      #define isVectorizable      Rf_isVectorizable
+      #define isVectorList        Rf_isVectorList
+    #+END_SRC
+
+    Here's a list of SEXP-types that we could dispatch on via e.g.
+    =switch= or some data-driven mechanism:
+
+    #+BEGIN_SRC c
+      #define NILSXP       0    /* nil = NULL */
+      #define SYMSXP       1    /* symbols */
+      #define LISTSXP      2    /* lists of dotted pairs */
+      #define CLOSXP       3    /* closures */
+      #define ENVSXP       4    /* environments */
+      #define PROMSXP      5    /* promises: [un]evaluated closure arguments */
+      #define LANGSXP      6    /* language constructs (special lists) */
+      #define SPECIALSXP   7    /* special forms */
+      #define BUILTINSXP   8    /* builtin non-special forms */
+      #define CHARSXP      9    /* "scalar" string type (internal only)*/
+      #define LGLSXP      10    /* logical vectors */
+      #define INTSXP      13    /* integer vectors */
+      #define REALSXP     14    /* real variables */
+      #define CPLXSXP     15    /* complex variables */
+      #define STRSXP      16    /* string vectors */
+      #define DOTSXP      17    /* dot-dot-dot object */
+      #define ANYSXP      18    /* make "any" args work.
+                       Used in specifying types for symbol
+                       registration to mean anything is okay  */
+      #define VECSXP      19    /* generic vectors */
+      #define EXPRSXP     20    /* expressions vectors */
+      #define BCODESXP    21    /* byte code */
+      #define EXTPTRSXP   22    /* external pointer */
+      #define WEAKREFSXP  23    /* weak reference */
+      #define RAWSXP      24    /* raw bytes */
+      #define S4SXP       25    /* S4, non-vector */
+      
+      /* used for detecting PROTECT issues in memory.c */
+      #define NEWSXP      30    /* fresh node creaed in new page */
+      #define FREESXP     31    /* node released by GC */
+      
+      #define FUNSXP      99    /* Closure or Builtin or Special */
+    #+END_SRC
+
+    No, the whole fucking calculus in [[file:/usr/local/src/R/src/include/Rinlinedfuns.h][Rinlinedfuns.h]] regarding e.g.
+    =isPairList= is relatively complex. Yeah; frame is dataframe, by
+    the way:
+
+    #+BEGIN_SRC c
+      INLINE_FUN Rboolean isFrame(SEXP s)
+      {   
+        SEXP klass;
+        int i;
+        if (OBJECT(s)) {
+          klass = getAttrib(s, R_ClassSymbol);
+          for (i = 0; i < length(klass); i++)
+            if (!strcmp(CHAR(STRING_ELT(klass, i)), "data.frame")) return TRUE;
+        }
+        return FALSE;
+      }      
+    #+END_SRC
+
+    Levels can be symbols, can't they?
+
+    Here's the difference between numeric and number:
+
+    #+BEGIN_SRC c
+      INLINE_FUN Rboolean isNumeric(SEXP s)
+      {   
+        switch(TYPEOF(s)) {
+        case INTSXP:
+          if (inherits(s,"factor")) return FALSE;
+        case LGLSXP:
+        case REALSXP:
+          return TRUE;
+        default:
+          return FALSE;
+        }
+      }
+      
+      /** Is an object "Numeric" or  complex */
+      INLINE_FUN Rboolean isNumber(SEXP s)
+      {   
+        switch(TYPEOF(s)) {
+        case INTSXP:
+          if (inherits(s,"factor")) return FALSE;
+        case LGLSXP:
+        case REALSXP:
+        case CPLXSXP:
+          return TRUE;
+        default:
+          return FALSE;
+        }
+      }
+    #+END_SRC
+    
+    That's cool; they have scalar constructors:
+
+    #+BEGIN_SRC c
+      INLINE_FUN SEXP ScalarLogical(int x)
+      {   
+        SEXP ans = allocVector(LGLSXP, 1);
+        if (x == NA_LOGICAL) LOGICAL(ans)[0] = NA_LOGICAL;
+        else LOGICAL(ans)[0] = (x != 0);
+        return ans;
+      }
+    #+END_SRC
+
+    Making a named vector:
+
+    #+BEGIN_SRC c
+      /**
+       * Create a named vector of type TYP
+       *
+       * @example const char *nms[] = {"xi", "yi", "zi", ""};
+       *          mkNamed(VECSXP, nms);  =~= R  list(xi=, yi=, zi=)
+       *
+       * @param TYP a vector SEXP type (e.g. REALSXP)
+       * @param names names of list elements with null string appended
+       *
+       * @return (pointer to a) named vector of type TYP
+       */
+      INLINE_FUN SEXP mkNamed(SEXPTYPE TYP, const char **names)
+      {   
+        SEXP ans, nms;
+        int i, n;
+      
+        for (n = 0; strlen(names[n]) > 0; n++) {}
+        ans = PROTECT(allocVector(TYP, n));
+        nms = PROTECT(allocVector(STRSXP, n));
+        for (i = 0; i < n; i++)
+          SET_STRING_ELT(nms, i, mkChar(names[i]));
+        setAttrib(ans, R_NamesSymbol, nms);
+        UNPROTECT(2);
+        return ans;
+      }      
+    #+END_SRC
+
+    Making strings:
+
+    #+BEGIN_SRC c
+      /* short cut for  ScalarString(mkChar(s)) : */
+      INLINE_FUN SEXP mkString(const char *s)
+      {   
+        SEXP t;
+      
+        PROTECT(t = allocVector(STRSXP, 1));
+        SET_STRING_ELT(t, 0, mkChar(s));
+        UNPROTECT(1);
+        return t;
+      }      
+    #+END_SRC
+
+    More basic tests:
+
+    #+BEGIN_SRC c
+      Rboolean (Rf_isNull)(SEXP s);
+      Rboolean (Rf_isSymbol)(SEXP s);
+      Rboolean (Rf_isLogical)(SEXP s);
+      Rboolean (Rf_isReal)(SEXP s);
+      Rboolean (Rf_isComplex)(SEXP s);
+      Rboolean (Rf_isExpression)(SEXP s);
+      Rboolean (Rf_isEnvironment)(SEXP s);
+      Rboolean (Rf_isString)(SEXP s);
+      Rboolean (Rf_isObject)(SEXP s);
+    #+END_SRC
+
+    [[http://www.jetcafe.org/jim/c-style.html#Naming][Funny]]:
+
+    #+BEGIN_QUOTE
+    In short, follow "Mike's Rule" to make variable name size
+    proportional to scope:
+    #+BEGIN_EXAMPLE
+    length(name(variable)) ~ log(countlines(scope(variable)))
+    #+END_EXAMPLE
+    #+END_QUOTE
 **** On [[http://cran.r-project.org/doc/manuals/R-exts.html#Handling-lists][lists]]
      #+BEGIN_QUOTE
      List elements can be retrieved or set by direct access to the
