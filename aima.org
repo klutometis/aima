@@ -2688,9 +2688,29 @@
       )
       
       (define (Reval function . args)
-        ($ scheme-object Reval (c-string function) (scheme-object args)))
+        #;($ scheme-object Reval (c-string function) (scheme-object args))
+        ((foreign-safe-lambda scheme-object "Reval" c-string scheme-object)
+         function
+         args))
       
-      (test 8 (Reval "+" 3 5))
+      ;; (test 8 (Reval "+" 3 5))
+      ;;; VECSXP
+      ;; (Reval "list")
+      ;;; LGLSXP
+      ;; (Reval "vector")
+      ;;; INTSXP
+      (debug (Reval "c" 2.023989823989823))
+      (debug (Reval "c" 1))
+      (debug (Reval "c" 2))
+      (debug (Reval "c" 3))
+      ;;; STRSXP
+      ;; (Reval "paste" 1.0 2.0)
+      ;;; NILSXP
+      ;; (Reval "c")
+      ;;; REALSXP
+      ;;; CPLXSXL
+      ;; (Reval "NULL")
+      ;;; Otherwise, package it up as an exotic; also: string evaluation.
       
     #+END_SRC
 
