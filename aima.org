@@ -3152,6 +3152,15 @@
     length(name(variable)) ~ log(countlines(scope(variable)))
     #+END_EXAMPLE
     #+END_QUOTE
+
+    Need an =Rvalue=, =Rfind=, or =Rget= to look up variables in a
+    given environment (default to e.g. =R_GlobalEnv=).
+
+    [[http://api.call-cc.org/doc/cairo][Cairo]] is replete with instances of allocating f64-vectors for e.g.
+    pointers in Scheme before descending into C. We could probably do
+    that before-hand, since we know the arguments; not necessarily the
+    size, though? Sure: if we do the translation from within Scheme.
+    Nursery takes care of garbage collection, I believe.
 **** On [[http://cran.r-project.org/doc/manuals/R-exts.html#Handling-lists][lists]]
      #+BEGIN_QUOTE
      List elements can be retrieved or set by direct access to the
