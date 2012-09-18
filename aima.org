@@ -3363,6 +3363,116 @@
 
      I vaguely remember doing this for rJava.
 **** The [[http://cran.r-project.org/doc/manuals/R-exts.html#Organization-of-header-files][headers]]
+* TODO 3.9
+  #+BEGIN_SRC scheme
+    (use data-structures
+         debug
+         defstruct
+         miscmacros
+         srfi-69
+         srfi-95)
+    
+    (defstruct bank
+      missionaries
+      cannibals
+      boat?)
+    
+    (defstruct transition
+      missionaries
+      cannibals)
+    
+    (define transitions
+      (list (make-transition missionaries: 1
+                             cannibals: 1)
+            (make-transition missionaries: 0
+                             cannibals: 2)
+            (make-transition missionaries: 0
+                             cannibals: 1)
+            (make-transition missionaries: 2
+                             cannibals: 0)
+            (make-transition missionaries: 1
+                             cannibals: 0)))
+    
+    (define (valid-substate? bank)
+      (let ((missionaries (bank-missionaries bank))
+            (cannibals (bank-cannibals bank)))
+        (not (or (negative? missionaries)
+                 (negative? cannibals)
+                 (> cannibals missionaries)
+                 (> cannibals 3)
+                 (> missionaries 3)))))
+    
+    (define (substates bank)
+      (let ((substates
+             (map (lambda (transition)
+                    (let ((transition
+                           (if (bank-boat? bank)
+                               (update-transition
+                                transition
+                                missionaries: (- (transition-missionaries transition))
+                                cannibals: (- (transition-cannibals transition)))
+                               transition)))
+                      (update-bank
+                       bank
+                       missionaries: (+ (bank-missionaries bank)
+                                        (transition-missionaries transition))
+                       cannibals: (+ (bank-cannibals bank)
+                                     (transition-cannibals transition))
+                       boat?: (not (bank-boat? bank)))))
+                  transitions)))
+        (filter valid-substate? substates)))
+    
+    (define (bank=? b1 b2)
+      (and (= (bank-missionaries b1) (bank-missionaries b2))
+           (= (bank-cannibals b1) (bank-cannibals b2))
+           (eq? (bank-boat? b1) (bank-boat? b2))))
+    
+    (define (visit-state! visited-states state parent)
+      (hash-table-set! visited-states state parent))
+    
+    (define root (defstruct root))
+    (define root (make-root))
+    
+    (define (unvisited-states visited-states states)
+      (filter (lambda (state) (not (hash-table-ref/default
+                               visited-states
+                               state
+                               #f)))
+           states))
+    
+    (define (search start end)
+      (let ((visited-states (make-hash-table))
+            (frontier (make-queue)))
+        (queue-add! frontier start)    
+        (visit-state! visited-states start root)
+        (let iter ()
+          (if (queue-empty? frontier)
+              (display "No solution found.")
+              (let ((state (queue-remove! frontier)))
+                (if (bank=? state end)
+                    (begin
+                      (display "Found solution!")
+                      (let iter ((child end))
+                        (debug (bank->alist child))
+                        (let ((parent (hash-table-ref/default visited-states child #f)))
+                          (if (not (root? parent)) (iter parent)))))
+                    (let ((substates
+                           (unvisited-states visited-states (substates state))))
+                      (for-each (lambda (substate)
+                                  (queue-add! frontier substate)
+                                  (visit-state! visited-states substate state))
+                        substates) 
+                      (iter))))))))
+    
+    (let ((start (make-bank missionaries: 3
+                            cannibals: 3
+                            boat?: #t))
+          (end (make-bank missionaries: 0
+                          cannibals: 0
+                          boat?: #f)))
+      (search start end))
+    
+  #+END_SRC
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
