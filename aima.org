@@ -2740,10 +2740,13 @@
       ;;; LGLSXP
       ;; (Reval "vector")
       ;;; INTSXP
-      (debug (Reval "c" 2.023989823989823))
-      ;; (debug (Reval "c" 1))
-      ;; (debug (Reval "c" 2))
-      ;; (debug (Reval "c" 3))
+      (debug (R-eval "c" 2.023989823989823))
+      (debug (R-eval "c" 1))
+      (debug (R-eval "c" 2))
+      (debug (R-eval "c" 3))
+      (debug (R-eval "c" #t))
+      (debug (R-eval "c" #f))
+      (debug (R-eval "c" "harro"))
       ;;; STRSXP
       ;; (Reval "paste" 1.0 2.0)
       ;;; NILSXP
