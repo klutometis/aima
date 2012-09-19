@@ -2646,7 +2646,7 @@
         int nargs = C_num_to_int(C_i_length(args));
         SEXP expression = allocVector(LANGSXP, nargs + 1);
         /* Have to check this for R_NilValue; see e.g. RNamedCall.c. */
-        SEXP function = Rf_findFun(Rf_install(name), R_GlobalEnv);
+        SEXP function = Rf_findFun(Rf_install(C_c_string(name)), R_GlobalEnv);
       
         SETCAR(expression, function);
         SEXP iterexp = CDR(expression);
@@ -2664,6 +2664,15 @@
             Rarg = ScalarReal(C_flonum_magnitude(arg));
           } else if (C_truep(C_fixnump(arg))) {
             Rarg = ScalarInteger(C_num_to_int(arg));
+          } else if (C_truep(C_booleanp(arg))) {
+            Rarg = ScalarLogical(C_truep(arg) ? 1 : 0);
+          /* } else if (C_truep(C_numberp(arg))) { */
+            /* Holding off on complex for the time being, since it's not
+               supported in basic Chicken; have to load the numbers
+               library. */
+            /* Rcomplex complex = { */
+          } else if (C_truep(C_stringp(arg))) {
+            Rarg = ScalarString(Rf_mkChar(C_string_or_null(arg)));
           }
           SETCAR(iterexp, Rarg);
           args = C_i_cdr(args);
@@ -2680,25 +2689,33 @@
         printf("%s", isPairList(Rvalue) ? "pairlist" : "");
         printf("%s", isVector(Rvalue) ? "vector" : "");
         printf("%s", isVectorList(Rvalue) ? "vectorlist" : "");
-        C_word *value;
         if (!error) {
           /* Let's do something like
              <http://rcrowley.org/2008/03/03/functional-programming-in-c.html>
              in an array-pointing-to-functions, instead of this switch. */
           switch (TYPEOF(Rvalue)) {
           case REALSXP:
-            printf("data: %f; ", REAL(Rvalue)[0]);
-            value = C_alloc(C_SIZEOF_FLONUM);
-            C_flonum(&value, REAL(Rvalue)[0]);
-            break;
+            {
+              C_word *value;
+              value = C_alloc(C_SIZEOF_FLONUM);
+              C_kontinue(k, C_flonum(&value, REAL(Rvalue)[0]));
+            }
           case INTSXP:
-            value = C_alloc(sizeof(C_word));
-            *value = C_fix(INTEGER(Rvalue)[0]);
-            break;
+            C_kontinue(k, C_fix(INTEGER(Rvalue)[0]));
+          case LGLSXP:
+            C_kontinue(k, LOGICAL(Rvalue)[0] ? C_SCHEME_TRUE : C_SCHEME_FALSE);
+          case STRSXP:
+            {
+              char *string = CHAR(STRING_ELT(Rvalue, 0));
+              C_word *value;
+              value = C_alloc(C_SIZEOF_STRING(strlen(string)));
+              C_kontinue(k, C_string(&value, strlen(string), string));
+            }
           }
-          C_return(*value);
+          /* return(value); */
         }
-        C_return(C_SCHEME_UNDEFINED);
+        /* C_return(C_SCHEME_UNDEFINED); */
+        C_kontinue(k, C_SCHEME_UNDEFINED);
       }
       
     #+END_SRC
