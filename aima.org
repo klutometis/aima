@@ -2720,9 +2720,13 @@
       END
       )
       
+      #;
       (define (Reval function . args)
         #;($ scheme-object Reval (c-string function) (scheme-object args))
-        ((foreign-safe-lambda scheme-object "Reval" c-string scheme-object)
+        ((foreign-primitive scheme-object
+                            ((c-string function)
+                             (scheme-object args))
+                            "return(Reval(function, args));")
          function
          args))
       
