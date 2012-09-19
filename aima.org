@@ -2668,6 +2668,12 @@
             Rarg = ScalarLogical(C_truep(arg) ? 1 : 0);
           } else if (C_truep(C_stringp(arg))) {
             Rarg = ScalarString(Rf_mkChar(C_string_or_null(arg)));
+          } else if (C_truep(C_pointerp(arg))) {
+            puts("pointer!");
+            /* Rarg = C_scheme_or_c_pointer(arg); */
+            /* Rarg = C_data_pointer(arg); */
+            /* Rarg = C_pointer_to_object(arg); */
+            Rarg = C_a_i_data_mpointer(arg, 1, 1);
           }
           SETCAR(iterexp, Rarg);
           args = C_i_cdr(args);
@@ -2677,11 +2683,11 @@
         int error = 0;
         SEXP Rvalue = R_tryEval(expression, R_GlobalEnv, &error);
         if (!error) {
+          printf("typeof: %d; ", TYPEOF(Rvalue));
           switch (TYPEOF(Rvalue)) {
           case REALSXP:
             {
-              C_word *value;
-              value = C_alloc(C_SIZEOF_FLONUM);
+              C_word *value = C_alloc(C_SIZEOF_FLONUM);
               C_kontinue(k, C_flonum(&value, REAL(Rvalue)[0]));
             }
           case INTSXP:
@@ -2690,10 +2696,18 @@
             C_kontinue(k, LOGICAL(Rvalue)[0] ? C_SCHEME_TRUE : C_SCHEME_FALSE);
           case STRSXP:
             {
-              char *string = CHAR(STRING_ELT(Rvalue, 0));
-              C_word *value;
-              value = C_alloc(C_SIZEOF_STRING(strlen(string)));
-              C_kontinue(k, C_string(&value, strlen(string), string));
+              const char *string = CHAR(STRING_ELT(Rvalue, 0));
+              C_word *value = C_alloc(C_SIZEOF_STRING(strlen(string)));
+              C_kontinue(k, C_string(&value, strlen(string), (char *) string));
+            }
+          default:
+            {
+              /* const char *TAG = "R"; */
+              /* C_word *tag = C_alloc(C_SIZEOF_STRING(strlen(TAG))); */
+              /* C_string(&tag, strlen(TAG), (char *) TAG); */
+      
+              C_word *pointer = C_alloc(C_SIZEOF_POINTER);
+              C_kontinue(k, C_mpointer(&pointer, &Rvalue));
             }
           }
         }
@@ -2746,6 +2760,9 @@
       (debug (R-eval "c" #t))
       (debug (R-eval "c" #f))
       (debug (R-eval "c" "harro"))
+      ;; (debug (R-eval "file" "/tmp/yes"))
+      (let ((env (R-eval "new.env")))
+        (R-eval "print" env))
       ;;; STRSXP
       ;; (Reval "paste" 1.0 2.0)
       ;;; NILSXP
@@ -3204,6 +3221,10 @@
       
     How many of them can we support without trickery? Yet to do: char,
     pair, symbol, vector.
+
+    To return opaque pointers, do we need =C_pointer_to_object=? How
+    do we tag it? =C_taggedmpointer=, =C_taggedmpointer_or_false=.
+    =C_make_pointer=, =C_make_tagged_pointer=. Shit: they're CPS.
 **** On [[http://cran.r-project.org/doc/manuals/R-exts.html#Handling-lists][lists]]
      #+BEGIN_QUOTE
      List elements can be retrieved or set by direct access to the
