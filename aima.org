@@ -2651,10 +2651,36 @@
           return ScalarLogical(C_truep(arg) ? 1 : 0);
         } else if (C_truep(C_stringp(arg))) {
           return ScalarString(Rf_mkChar(C_string_or_null(arg)));
+        } else if (C_truep(C_vectorp(arg))) {
+          /* Is this where we need to type the vector; or can we just
+             VECSXP? We probably need to type the vector. Can we stick e.g.
+             STRSXP in an INTSXP, though?
+      
+             See e.g. getListElementType in RPythonConverters.c; see also
+             do_c_dflt in bind.c. What about calling the actual R function?
+             It's too bad do_c or do_c_dflt aren't exposed in
+             Rinternals.h.
+      
+             The call to R is slower, but guaranteed to be semantically
+             correct. */
+          int length = C_unfix(C_i_vector_length(arg));
+          SEXP c = allocVector(LANGSXP, length + 1);
+          SETCAR(c, Rf_findFun(Rf_install("c"), R_GlobalEnv));
+          int i;
+          for (i = 0; i < length; i++) {
+            SET_VECTOR_ELT(c, i + 1, toR(C_i_vector_ref(arg, i)));
+          }
+          puts("vector");
+          printf("length: %d; ", length);
+          fflush(stdout);
+          int error = 0;
+          return R_tryEval(c, R_GlobalEnv, &error);
         } else if (C_truep(C_pointerp(arg))) {
           return *((SEXP *) C_c_pointer_or_null(arg));
         }
-        /* What the fuck is this, if not above? */
+        /* What the fuck is this, if not above? There should be some
+           symmetry: if I don't know what the hell it is, it's a pointer
+           (and vice versa). */
         return R_NilValue;
       }
       
