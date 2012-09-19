@@ -2713,7 +2713,7 @@
     #+END_SRC
 
     #+BEGIN_SRC scheme :tangle R-test.scm
-      (use debug dollar lolevel test)
+      (use debug dollar lolevel miscmacros test)
       
       #>
       #include "Reval.h"
@@ -2729,26 +2729,10 @@
       END
       )
       
-      #;
-      (define (Reval function . args)
-        #;($ scheme-object Reval (c-string function) (scheme-object args))
-        ((foreign-primitive scheme-object
-                            ((c-string function)
-                             (scheme-object args))
-                            "return(Reval(function, args));")
-         function
-         args))
-      
       (define Reval (##core#primitive "Reval"))
       (define (R-eval f . args)
         (Reval f args))
       
-      ;; (test 8 (Reval "+" 3 5))
-      ;;; VECSXP
-      ;; (Reval "list")
-      ;;; LGLSXP
-      ;; (Reval "vector")
-      ;;; INTSXP
       (debug (R-eval "c" 2.023989823989823))
       (debug (R-eval "c" 1))
       (debug (R-eval "c" 2))
@@ -2756,17 +2740,9 @@
       (debug (R-eval "c" #t))
       (debug (R-eval "c" #f))
       (debug (R-eval "c" "harro"))
-      ;; (debug (R-eval "file" "/tmp/yes"))
+      (debug (R-eval "list" "harro"))
       (let ((env (R-eval "new.env")))
         (R-eval "print" env))
-      ;;; STRSXP
-      ;; (Reval "paste" 1.0 2.0)
-      ;;; NILSXP
-      ;; (Reval "c")
-      ;;; REALSXP
-      ;;; CPLXSXL
-      ;; (Reval "NULL")
-      ;;; Otherwise, package it up as an exotic; also: string evaluation.
       
     #+END_SRC
 
