@@ -2642,7 +2642,7 @@
       
       #include <chicken.h>
       
-      C_word Reval(char* name, C_word args) {
+      void Reval(C_word c, C_word self, C_word k, C_word name, C_word args) {
         int nargs = C_num_to_int(C_i_length(args));
         SEXP expression = allocVector(LANGSXP, nargs + 1);
         /* Have to check this for R_NilValue; see e.g. RNamedCall.c. */
@@ -2726,6 +2726,7 @@
          function
          args))
       
+      (define Reval (##core#primitive "Reval"))
       ;; (test 8 (Reval "+" 3 5))
       ;;; VECSXP
       ;; (Reval "list")
