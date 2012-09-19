@@ -3201,6 +3201,111 @@
     [[https://groups.google.com/d/msg/julia-dev/p5R7_xo7sRE/VnC6ZoCv-OUJ][Length vs. truelength]]; [[http://r.789695.n4.nabble.com/R-PreserveObject-R-ReleaseObject-reference-counting-needed-td997167.html][R_PreserveObject and R_ReleaseObject]]. We
     might have to use them.
 
+    [[file:/usr/local/src/R/src/main/bind.c][Vector-type calculus]]:
+
+    #+BEGIN_SRC c
+      SEXP attribute_hidden do_c_dflt(SEXP call, SEXP op, SEXP args, SEXP env)
+      {
+        SEXP ans, t;
+        int mode, recurse, usenames;
+        struct BindData data;
+        struct NameData nameData;
+      
+        /*    data.deparse_level = 1;  Initialize this early. */
+      
+        /* Method dispatch has failed; run the default code. */
+        /* By default we do not recurse, but this can be over-ridden */
+        /* by an optional "recursive" argument. */
+      
+        usenames = 1;
+        recurse = 0;
+        /* this was only done for length(args) > 1 prior to 1.5.0,
+           _but_ `recursive' might be the only argument */
+        PROTECT(args = ExtractOptionals(args, &recurse, &usenames, call));
+      
+        /* Determine the type of the returned value. */
+        /* The strategy here is appropriate because the */
+        /* object being operated on is a pair based list. */
+      
+        data.ans_flags  = 0;
+        data.ans_length = 0;
+        data.ans_nnames = 0;
+      
+        for (t = args; t != R_NilValue; t = CDR(t)) {
+          if (usenames && !data.ans_nnames) {
+            if (!isNull(TAG(t))) data.ans_nnames = 1;
+            else data.ans_nnames = HasNames(CAR(t));
+          }
+          AnswerType(CAR(t), recurse, usenames, &data);
+        }
+      
+        /* If a non-vector argument was encountered (perhaps a list if */
+        /* recursive is FALSE) then we must return a list.    Otherwise, */
+        /* we use the natural coercion for vector types. */
+      
+        mode = NILSXP;
+        if (data.ans_flags & 512)    mode = EXPRSXP;
+        else if (data.ans_flags & 256) mode = VECSXP;
+        else if (data.ans_flags & 128) mode = STRSXP;
+        else if (data.ans_flags &  64) mode = CPLXSXP;
+        else if (data.ans_flags &  32) mode = REALSXP;
+        else if (data.ans_flags &  16) mode = INTSXP;
+        else if (data.ans_flags & 2) mode = LGLSXP;
+        else if (data.ans_flags & 1) mode = RAWSXP;
+      
+        /* Allocate the return value and set up to pass through */
+        /* the arguments filling in values of the returned object. */
+      
+        PROTECT(ans = allocVector(mode, data.ans_length));
+        data.ans_ptr = ans;
+        data.ans_length = 0;
+        t = args;
+      
+        if (mode == VECSXP || mode == EXPRSXP) {
+          if (!recurse) {
+            while (args != R_NilValue) {
+              ListAnswer(CAR(args), 0, &data, call);
+              args = CDR(args);
+            }
+          }
+          else ListAnswer(args, recurse, &data, call);
+          data.ans_length = length(ans);
+        }
+        else if (mode == STRSXP)
+          StringAnswer(args, &data, call);
+        else if (mode == CPLXSXP)
+          ComplexAnswer(args, &data, call);
+        else if (mode == REALSXP)
+          RealAnswer(args, &data, call);
+        else if (mode == RAWSXP)
+          RawAnswer(args, &data, call);
+        else if (mode == LGLSXP)
+          LogicalAnswer(args, &data, call);
+        else /* integer */
+          IntegerAnswer(args, &data, call);
+        args = t;
+      
+        /* Build and attach the names attribute for the returned object. */
+      
+        if (data.ans_nnames && data.ans_length > 0) {
+          PROTECT(data.ans_names = allocVector(STRSXP, data.ans_length));
+          data.ans_nnames = 0;
+          while (args != R_NilValue) {
+            nameData.seqno = 0;
+            nameData.firstpos = 0;
+            nameData.count = 0;
+            NewExtractNames(CAR(args), R_NilValue, TAG(args), recurse, &data, &nameData);
+            args = CDR(args);
+          }
+          setAttrib(ans, R_NamesSymbol, data.ans_names);
+          UNPROTECT(1);
+        }
+        UNPROTECT(2);
+        R_FreeStringBufferL(&cbuff);
+        return ans;
+      } /* do_c */
+      
+    #+END_SRC
 **** On [[http://cran.r-project.org/doc/manuals/R-exts.html#Handling-lists][lists]]
      #+BEGIN_QUOTE
      List elements can be retrieved or set by direct access to the
