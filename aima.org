@@ -3189,6 +3189,22 @@
     that before-hand, since we know the arguments; not necessarily the
     size, though? Sure: if we do the translation from within Scheme.
     Nursery takes care of garbage collection, I believe.
+
+    #+BEGIN_SRC scheme :tangle minimal-segv.scm
+      (use debug
+           miscmacros)
+      
+      (define (give-me-some-shit)
+        ((foreign-primitive
+          scheme-object
+          ()
+          "C_word *value = C_alloc(C_SIZEOF_FLONUM);"
+          "return(C_flonum(&value, 1.234));")))
+      
+      (dotimes (i 100000)
+        (debug (give-me-some-shit)))      
+    #+END_SRC
+
 **** On [[http://cran.r-project.org/doc/manuals/R-exts.html#Handling-lists][lists]]
      #+BEGIN_QUOTE
      List elements can be retrieved or set by direct access to the
