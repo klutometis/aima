@@ -2676,7 +2676,6 @@
         int error = 0;
         SEXP Rvalue = R_tryEval(expression, R_GlobalEnv, &error);
         if (!error) {
-          printf("typeof: %d; ", TYPEOF(Rvalue));
           switch (TYPEOF(Rvalue)) {
           case REALSXP:
             {
@@ -2695,10 +2694,6 @@
             }
           default:
             {
-              /* const char *TAG = "R"; */
-              /* C_word *tag = C_alloc(C_SIZEOF_STRING(strlen(TAG))); */
-              /* C_string(&tag, strlen(TAG), (char *) TAG); */
-      
               C_word *pointer = C_alloc(C_SIZEOF_POINTER);
               C_kontinue(k, C_mpointer(&pointer, &Rvalue));
             }
