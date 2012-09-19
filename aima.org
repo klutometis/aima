@@ -2668,30 +2668,7 @@
         SEXP iterexp = CDR(expression);
       
         while (!C_truep(C_i_nullp(args))) {
-          SEXP Rarg = R_NilValue;
-          C_word arg = C_i_car(args);
-          if (C_truep(C_i_flonump(arg))) {
-            /* Setting a tag on the SEXP via SET_TAG simulates a named
-               argument, incidentally; makes me wonder whether we can't do
-               a little work in Scheme before calling Reval.
-      
-               We're going to have to formalize missing arguments for a
-               first pass. */
-            Rarg = ScalarReal(C_flonum_magnitude(arg));
-          } else if (C_truep(C_fixnump(arg))) {
-            Rarg = ScalarInteger(C_num_to_int(arg));
-          } else if (C_truep(C_booleanp(arg))) {
-            Rarg = ScalarLogical(C_truep(arg) ? 1 : 0);
-          } else if (C_truep(C_stringp(arg))) {
-            Rarg = ScalarString(Rf_mkChar(C_string_or_null(arg)));
-          } else if (C_truep(C_pointerp(arg))) {
-            puts("pointer!");
-            /* Rarg = C_scheme_or_c_pointer(arg); */
-            /* Rarg = C_data_pointer(arg); */
-            /* Rarg = C_pointer_to_object(arg); */
-            Rarg = C_a_i_data_mpointer(arg, 1, 1);
-          }
-          SETCAR(iterexp, Rarg);
+          SETCAR(iterexp, toR(C_i_car(args)));
           args = C_i_cdr(args);
           iterexp = CDR(iterexp);
         }
