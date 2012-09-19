@@ -2642,6 +2642,22 @@
       
       #include <chicken.h>
       
+      SEXP toR(C_word arg) {
+        if (C_truep(C_i_flonump(arg))) {
+          return ScalarReal(C_flonum_magnitude(arg));
+        } else if (C_truep(C_fixnump(arg))) {
+          return ScalarInteger(C_num_to_int(arg));
+        } else if (C_truep(C_booleanp(arg))) {
+          return ScalarLogical(C_truep(arg) ? 1 : 0);
+        } else if (C_truep(C_stringp(arg))) {
+          return ScalarString(Rf_mkChar(C_string_or_null(arg)));
+        } else if (C_truep(C_pointerp(arg))) {
+          return *((SEXP *) C_c_pointer_or_null(arg));
+        }
+        /* What the fuck is this, if not above? */
+        return R_NilValue;
+      }
+      
       void Reval(C_word c, C_word self, C_word k, C_word name, C_word args) {
         int nargs = C_num_to_int(C_i_length(args));
         SEXP expression = allocVector(LANGSXP, nargs + 1);
