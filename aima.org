@@ -2702,7 +2702,12 @@
               C_word *pointer = C_alloc(C_SIZEOF_POINTER);
               /* We probably need to allocate a new structure, copy Rvalue
                  thither, and free at some point; don't we? Or at least
-                 protect the value? */
+                 protect the value?
+      
+                 PROTECT and UNPROTECT preserve within calls, while
+                 R_PreserveObject and R_ReleaseObject preserve past calls;
+                 see:
+                 <http://r.789695.n4.nabble.com/R-PreserveObject-R-ReleaseObject-reference-counting-needed-td997167.html>*/
               C_kontinue(k, C_mpointer(&pointer, &Rvalue));
             }
           }
