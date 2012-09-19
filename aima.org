@@ -3197,6 +3197,10 @@
     To return opaque pointers, do we need =C_pointer_to_object=? How
     do we tag it? =C_taggedmpointer=, =C_taggedmpointer_or_false=.
     =C_make_pointer=, =C_make_tagged_pointer=. Shit: they're CPS.
+
+    [[https://groups.google.com/d/msg/julia-dev/p5R7_xo7sRE/VnC6ZoCv-OUJ][Length vs. truelength]]; [[http://r.789695.n4.nabble.com/R-PreserveObject-R-ReleaseObject-reference-counting-needed-td997167.html][R_PreserveObject and R_ReleaseObject]]. We
+    might have to use them.
+
 **** On [[http://cran.r-project.org/doc/manuals/R-exts.html#Handling-lists][lists]]
      #+BEGIN_QUOTE
      List elements can be retrieved or set by direct access to the
