@@ -2740,6 +2740,7 @@
       (debug (R-eval "c" #t))
       (debug (R-eval "c" #f))
       (debug (R-eval "c" "harro"))
+      (debug (R-eval "c" '#(1 2)))
       (debug (R-eval "list" "harro"))
       (let ((env (R-eval "new.env")))
         (R-eval "print" env))
