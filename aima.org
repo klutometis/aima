@@ -3205,6 +3205,23 @@
         (debug (give-me-some-shit)))      
     #+END_SRC
 
+    Is [[http://paste.call-cc.org/pasteid%3Dd91e9ef5c6f671e7d20b408ea9144cacc1fbae47][this]] interesting? I like [[file:/usr/local/src/chicken-eggs/s11n/trunk/s11n-c.c][s11n-c.c]]. What's the equivalent of
+    symbols in R, by the way?
+
+    Disjoint predicates in Scheme:
+
+    - boolean?
+    - symbol?
+    - char?
+    - vector?
+    - procedure?
+    - pair?
+    - number?
+    - string?
+    - port?
+      
+    How many of them can we support without trickery? Yet to do: char,
+    pair, symbol, vector.
 **** On [[http://cran.r-project.org/doc/manuals/R-exts.html#Handling-lists][lists]]
      #+BEGIN_QUOTE
      List elements can be retrieved or set by direct access to the
