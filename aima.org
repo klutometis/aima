@@ -2692,6 +2692,11 @@
               C_word *value = C_alloc(C_SIZEOF_STRING(strlen(string)));
               C_kontinue(k, C_string(&value, strlen(string), (char *) string));
             }
+          case VECSXP:
+            {
+              C_word *list = C_alloc(C_SIZEOF_LIST(1)); 
+              C_kontinue(k, C_a_i_list1(&list, 1, C_fix(1)));
+            }
           default:
             {
               C_word *pointer = C_alloc(C_SIZEOF_POINTER);
