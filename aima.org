@@ -2666,33 +2666,17 @@
             Rarg = ScalarInteger(C_num_to_int(arg));
           } else if (C_truep(C_booleanp(arg))) {
             Rarg = ScalarLogical(C_truep(arg) ? 1 : 0);
-          /* } else if (C_truep(C_numberp(arg))) { */
-            /* Holding off on complex for the time being, since it's not
-               supported in basic Chicken; have to load the numbers
-               library. */
-            /* Rcomplex complex = { */
           } else if (C_truep(C_stringp(arg))) {
             Rarg = ScalarString(Rf_mkChar(C_string_or_null(arg)));
           }
           SETCAR(iterexp, Rarg);
           args = C_i_cdr(args);
           iterexp = CDR(iterexp);
-          puts("");
         }
       
         int error = 0;
         SEXP Rvalue = R_tryEval(expression, R_GlobalEnv, &error);
-        printf("%d", error);
-        printf("%d", TYPEOF(Rvalue));
-        printf("%s", isList(Rvalue) ? "list" : "");
-        printf("%s", isNewList(Rvalue) ? "newlist" : "");
-        printf("%s", isPairList(Rvalue) ? "pairlist" : "");
-        printf("%s", isVector(Rvalue) ? "vector" : "");
-        printf("%s", isVectorList(Rvalue) ? "vectorlist" : "");
         if (!error) {
-          /* Let's do something like
-             <http://rcrowley.org/2008/03/03/functional-programming-in-c.html>
-             in an array-pointing-to-functions, instead of this switch. */
           switch (TYPEOF(Rvalue)) {
           case REALSXP:
             {
@@ -2712,9 +2696,7 @@
               C_kontinue(k, C_string(&value, strlen(string), string));
             }
           }
-          /* return(value); */
         }
-        /* C_return(C_SCHEME_UNDEFINED); */
         C_kontinue(k, C_SCHEME_UNDEFINED);
       }
       
