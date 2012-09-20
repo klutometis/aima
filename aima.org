@@ -2773,9 +2773,12 @@
       )
       
       (define Reval (##core#primitive "Reval"))
+      
+      ;;; We should avoid this trick and just use varargs.
       (define (R-eval f . args)
         (Reval f args))
       
+      (debug (R-eval "rep" 2 10))
       (debug (R-eval "c" 2.023989823989823))
       (debug (R-eval "c" 1))
       (debug (R-eval "c" 2))
