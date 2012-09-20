@@ -2665,14 +2665,13 @@
              correct. */
           int length = C_unfix(C_i_vector_length(arg));
           SEXP c = allocVector(LANGSXP, length + 1);
+          SEXP citer = c;
           SETCAR(c, Rf_findFun(Rf_install("c"), R_GlobalEnv));
           int i;
           for (i = 0; i < length; i++) {
-            SET_VECTOR_ELT(c, i + 1, toR(C_i_vector_ref(arg, i)));
+            citer = CDR(citer);
+            SETCAR(citer, toR(C_i_vector_ref(arg, C_fix(i))));
           }
-          puts("vector");
-          printf("length: %d; ", length);
-          fflush(stdout);
           int error = 0;
           return R_tryEval(c, R_GlobalEnv, &error);
         } else if (C_truep(C_pointerp(arg))) {
@@ -2771,7 +2770,7 @@
       (debug (R-eval "c" #t))
       (debug (R-eval "c" #f))
       (debug (R-eval "c" "harro"))
-      (debug (R-eval "c" '#(1 2)))
+      (debug (R-eval "c" '#(10 11)))
       (debug (R-eval "list" "harro"))
       (let ((env (R-eval "new.env")))
         (R-eval "print" env))
@@ -2785,6 +2784,10 @@
           gcc \
           `R CMD config --cppflags` \
           `R CMD config --ldflags` \
+          `csc -cflags` \
+          `csc -ldflags` \
+          `csc -libs` \
+          -I/usr/local/include/chicken \
           -c Reval.c
       
       R-test: Reval.o R-test.scm
