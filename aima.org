@@ -2778,23 +2778,18 @@
     #+END_SRC
 
     #+BEGIN_SRC makefile :tangle R-test.mk :shebang #!/usr/bin/unexpand -t 4
+      R_FLAGS := $(shell R CMD config --cppflags) \
+          $(shell R CMD config --ldflags)
+      
+      CHICKEN_FLAGS := $(shell csc -cflags -ldflags -libs)
+      
       all: R-test
       
       Reval.o: Reval.c
-          gcc \
-          `R CMD config --cppflags` \
-          `R CMD config --ldflags` \
-          `csc -cflags` \
-          `csc -ldflags` \
-          `csc -libs` \
-          -I/usr/local/include/chicken \
-          -c Reval.c
+          gcc $(R_FLAGS) $(CHICKEN_FLAGS) -c -o $@ $^
       
       R-test: Reval.o R-test.scm
-          csc \
-          `R CMD config --cppflags` \
-          `R CMD config --ldflags` \
-          Reval.o R-test.scm
+          csc $(R_FLAGS) -o $@ $^
       
     #+END_SRC
     
