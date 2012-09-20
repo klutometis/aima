@@ -2665,12 +2665,12 @@
              correct. */
           int length = C_unfix(C_i_vector_length(arg));
           SEXP c = allocVector(LANGSXP, length + 1);
-          SEXP citer = c;
+          SEXP ci = c;
           SETCAR(c, Rf_findFun(Rf_install("c"), R_GlobalEnv));
           int i;
           for (i = 0; i < length; i++) {
-            citer = CDR(citer);
-            SETCAR(citer, toR(C_i_vector_ref(arg, C_fix(i))));
+            ci = CDR(ci);
+            SETCAR(ci, toR(C_i_vector_ref(arg, C_fix(i))));
           }
           int error = 0;
           return R_tryEval(c, R_GlobalEnv, &error);
