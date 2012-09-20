@@ -2708,7 +2708,20 @@
               C_kontinue(k, C_flonum(&value, REAL(Rvalue)[0]));
             }
           case INTSXP:
-            C_kontinue(k, C_fix(INTEGER(Rvalue)[0]));
+            {
+              int length = Rf_length(Rvalue);
+              if (length == 1) {
+                C_kontinue(k, C_fix(INTEGER(Rvalue)[0]));
+              } else {
+                C_word *v = C_alloc(C_SIZEOF_VECTOR(length)),
+                  *v0 = v;
+                *(v++) = C_VECTOR_TYPE | length;
+                int i;
+                for (i = 0; i < length; i++)
+                  *(v++) = C_fix(INTEGER(Rvalue)[i]);
+                C_kontinue(k, (C_word) v0);
+              }
+            }
           case LGLSXP:
             C_kontinue(k, LOGICAL(Rvalue)[0] ? C_SCHEME_TRUE : C_SCHEME_FALSE);
           case STRSXP:
