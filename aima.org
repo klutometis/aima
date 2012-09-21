@@ -2704,8 +2704,21 @@
           switch (TYPEOF(Rvalue)) {
           case REALSXP:
             {
-              C_word *value = C_alloc(C_SIZEOF_FLONUM);
-              C_kontinue(k, C_flonum(&value, REAL(Rvalue)[0]));
+              int length = Rf_length(Rvalue);
+              if (length == 1) {
+                C_word *value = C_alloc(C_SIZEOF_FLONUM);
+                C_kontinue(k, C_flonum(&value, REAL(Rvalue)[0]));
+              } else {
+                C_word *v = C_alloc(C_SIZEOF_VECTOR(length)),
+                  *v0 = v;
+                *(v++) = C_VECTOR_TYPE | length;
+                int i;
+                for (i = 0; i < length; i++) {
+                  C_word *value = C_alloc(C_SIZEOF_FLONUM);
+                  *(v++) = C_flonum(&value, REAL(Rvalue)[i]);
+                }
+                C_kontinue(k, (C_word) v0);
+              }
             }
           case INTSXP:
             {
@@ -2779,6 +2792,7 @@
         (Reval f args))
       
       (debug (R-eval "rep" 2 10))
+      (debug (R-eval "rep" 2.1 10))
       (debug (R-eval "c" 2.023989823989823))
       (debug (R-eval "c" 1))
       (debug (R-eval "c" 2))
