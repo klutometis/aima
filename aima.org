@@ -2736,12 +2736,40 @@
               }
             }
           case LGLSXP:
-            C_kontinue(k, LOGICAL(Rvalue)[0] ? C_SCHEME_TRUE : C_SCHEME_FALSE);
+            {
+              int length = Rf_length(Rvalue);
+              if (length == 1) {
+                C_kontinue(k, LOGICAL(Rvalue)[0] ? C_SCHEME_TRUE : C_SCHEME_FALSE);
+              } else {
+                C_word *v = C_alloc(C_SIZEOF_VECTOR(length)),
+                  *v0 = v;
+                *(v++) = C_VECTOR_TYPE | length;
+                int i;
+                for (i = 0; i < length; i++)
+                  *(v++) = LOGICAL(Rvalue)[i] ?
+                    C_SCHEME_TRUE : C_SCHEME_FALSE;
+                C_kontinue(k, (C_word) v0);
+              }
+            }
           case STRSXP:
             {
-              const char *string = CHAR(STRING_ELT(Rvalue, 0));
-              C_word *value = C_alloc(C_SIZEOF_STRING(strlen(string)));
-              C_kontinue(k, C_string(&value, strlen(string), (char *) string));
+              int length = Rf_length(Rvalue);
+              if (length == 1) {
+                const char *string = CHAR(STRING_ELT(Rvalue, 0));
+                C_word *value = C_alloc(C_SIZEOF_STRING(strlen(string)));
+                C_kontinue(k, C_string(&value, strlen(string), (char *) string));
+              } else {
+                C_word *v = C_alloc(C_SIZEOF_VECTOR(length)),
+                  *v0 = v;
+                *(v++) = C_VECTOR_TYPE | length;
+                int i;
+                for (i = 0; i < length; i++) {
+                  const char *string = CHAR(STRING_ELT(Rvalue, i));
+                  C_word *value = C_alloc(C_SIZEOF_STRING(strlen(string)));
+                  *(v++) = C_string(&value, strlen(string), (char *) string);
+                }
+                C_kontinue(k, (C_word) v0);
+              }
             }
           case VECSXP:
             {
@@ -2793,12 +2821,13 @@
       
       (debug (R-eval "rep" 2 10))
       (debug (R-eval "rep" 2.1 10))
+      (debug (R-eval "rep" #t 10))
+      (debug (R-eval "rep" #f 10))
+      (debug (R-eval "rep" "harro" 10))
       (debug (R-eval "c" 2.023989823989823))
       (debug (R-eval "c" 1))
       (debug (R-eval "c" 2))
       (debug (R-eval "c" 3))
-      (debug (R-eval "c" #t))
-      (debug (R-eval "c" #f))
       (debug (R-eval "c" "harro"))
       (debug (R-eval "c" '#(10 11)))
       (debug (R-eval "list" "harro"))
