@@ -2848,8 +2848,7 @@
           gcc $(R_FLAGS) $(CHICKEN_FLAGS) -c -o $@ $^
       
       R-test: Reval.o R-test.scm
-          csc $(R_FLAGS) -o $@ $^
-      
+          csc $(R_FLAGS) -o $@ $^      
     #+END_SRC
     
     Keep [[file:/usr/local/lib64/R/include/Rinternals.h][Rinternals.h]] handy: there's good stuff in there about types,
