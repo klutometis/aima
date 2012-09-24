@@ -1393,78 +1393,6 @@
   #+BEGIN_SRC scheme :tangle 3.7.scm :shebang #!/usr/bin/env chicken-scheme
     (use aima-tessellation data-structures debug stack)
     
-    (define (depth-first start end neighbors)
-      (let ((visited (make-hash-table)))
-        (let search ((frontier
-                      (list (make-node start #f #f 0)))
-                     (path '()))
-          ;; (debug frontier)
-          (if (null? frontier)
-              (debug 'search-failed)
-              (let* ((parent (car frontier))
-                     (children (hash-table-ref neighbors (node-state parent))))
-                ;; (debug parent)
-                (hash-table-set! visited (node-state parent) #f)
-                (if (eq? (node-state parent) end)
-                    parent
-                    (let ((unvisited-children
-                           (filter (lambda (child)
-                                     (hash-table-ref/default
-                                      visited
-                                      child
-                                      #t))
-                                   children)))
-                      ;; (debug parent children unvisited-children)
-                      (let ((nodes
-                             (map (lambda (child)
-                                    (make-node child
-                                               parent
-                                               #f
-                                               (+ (node-path-cost parent)
-                                                  (point-distance
-                                                   (node-state parent)
-                                                   child))))
-                                  unvisited-children)))
-                        (search (append nodes (cdr frontier))
-                                (cons parent path))))))))))
-    
-    (define (breadth-first start end neighbors)
-      (let ((visited (make-hash-table))
-            (frontier (make-queue)))
-        (queue-add! frontier (make-node start #f #f 0))
-        (let search ()
-          (debug ;; (queue->list frontier)
-                 (length (queue->list frontier)))
-          (if (queue-empty? frontier)
-              (debug 'search-failed)
-              (let* ((parent (queue-remove! frontier))
-                     (children (hash-table-ref neighbors (node-state parent))))
-                ;; (debug parent)
-                (hash-table-set! visited (node-state parent) #f)
-                (if (eq? (node-state parent) end)
-                    parent
-                    (let ((unvisited-children
-                           (filter (lambda (child)
-                                     (hash-table-ref/default
-                                      visited
-                                      child
-                                      #t))
-                                   children)))
-                      ;; (debug parent children unvisited-children)
-                      (for-each
-                          (lambda (child)
-                            (let ((node
-                                   (make-node child
-                                              parent
-                                              #f
-                                              (+ (node-path-cost parent)
-                                                 (point-distance
-                                                  child
-                                                  (node-state parent))))))
-                              (queue-add! frontier node)))
-                        unvisited-children)
-                      (search))))))))
-    
     (define (search start
                     end
                     neighbors
@@ -1506,29 +1434,30 @@
                         unvisited-children)
                       (search))))))))
     
-    (define (depth-first-general start end neighbors)
-      (search start end neighbors make-stack stack-push! stack-pop! stack-empty?))
+    (define (depth-first start end neighbors)
+      (search start
+              end
+              neighbors
+              make-stack
+              stack-push!
+              stack-pop!
+              stack-empty?))
     
-    (define (breadth-first-general start end neighbors)
-      (search start end neighbors make-queue queue-add! queue-remove! queue-empty?))
+    (define (breadth-first start end neighbors)
+      (search start
+              end
+              neighbors
+              make-queue
+              queue-add!
+              queue-remove!
+              queue-empty?))
     
-    ;;; Generalized too quickly; each node should have: state, parent,
-    ;;; action, path-cost.
     (let ((tessellation (tessellate)))
       (let ((start (tessellation-start tessellation))
             (end (tessellation-end tessellation))
             (neighbors (tessellation-neighbors tessellation)))
         (let ((breadth-first (breadth-first start end neighbors))
-              (breadth-first-general (breadth-first-general start end neighbors))
-              (depth-first (depth-first start end neighbors))
-              (depth-first-general (depth-first-general start end neighbors))
-              )
-          #;
-          (debug (length depth-first)
-                 ;; (length depth-first-general)
-                 ;; (length breadth-first)
-                 ;; (length breadth-first-general)
-                 )
+              (depth-first (depth-first start end neighbors)))
           (plot-tessellation
            tessellation
            depth-first
@@ -1536,25 +1465,9 @@
            "depth-first.png")
           (plot-tessellation
            tessellation
-           breadth-first-general
-           "Breadth-First-General"
-           "breadth-first-general.png")
-          (plot-tessellation
-           tessellation
-           depth-first-general
-           "Depth-First-General"
-           "depth-first-general.png")
-          (plot-tessellation
-           tessellation
            breadth-first
            "Breadth-First"
-           "breadth-first.png")
-          ;; (plot-tessellation
-          ;;  tessellation
-          ;;  (list breadth-first depth-first)
-          ;;  "Comparative"
-          ;;  "comparative.png")
-          )))
+           "breadth-first.png"))))
     
   #+END_SRC
 * TODO 3.9
