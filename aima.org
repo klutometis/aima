@@ -1391,7 +1391,7 @@
    Is this reminiscent of Knuth's conjecture?
 * TODO 3.7
   #+BEGIN_SRC scheme :tangle 3.7.scm :shebang #!/usr/bin/env chicken-scheme
-    (use aima-tessellation debug stack)
+    (use aima-tessellation data-structures debug stack)
     
     (define (depth-first start end neighbors)
       (let ((visited (make-hash-table)))
@@ -1417,11 +1417,55 @@
                       (search (append unvisited-children (cdr frontier))
                               (cons parent path)))))))))
     
+    (define (predecessor-path predecessor end)
+      (let iter ((path (list end)))
+        (let ((predecessor
+               (hash-table-ref/default predecessor (car path) #f)))
+          (if predecessor
+              (iter (cons predecessor path))
+              (reverse path)))))
+    
+    (define (breadth-first start end neighbors)
+      (let ((visited (make-hash-table))
+            (predecessor (make-hash-table))
+            (frontier (make-queue)))
+        (queue-add! frontier start)
+        (let search ()
+          ;; (debug frontier)
+          (if (queue-empty? frontier)
+              (debug 'search-failed)
+              (let* ((parent (queue-remove! frontier))
+                     (children (hash-table-ref neighbors parent)))
+                ;; (debug parent)
+                (hash-table-set! visited parent #f)
+                (if (eq? parent end)
+                    (predecessor-path predecessor parent)
+                    (let ((unvisited-children
+                           (filter (lambda (child)
+                                     (hash-table-ref/default
+                                      visited
+                                      child
+                                      #t))
+                                   children)))
+                      ;; (debug parent children unvisited-children)
+                      (for-each
+                          (lambda (child)
+                            (queue-add! frontier child)
+                            (hash-table-set! predecessor child parent))
+                        unvisited-children)
+                      (search))))))))
+    
     (let ((tessellation (tessellate)))
       (let ((start (tessellation-start tessellation))
             (end (tessellation-end tessellation))
             (neighbors (tessellation-neighbors tessellation)))
-        (let ((depth-first (depth-first start end neighbors)))
+        (let ((breadth-first (breadth-first start end neighbors))
+              (depth-first (depth-first start end neighbors)))
+          (plot-tessellation/animation
+           tessellation
+           breadth-first
+           "Breadth-First"
+           "breadth-first")
           (plot-tessellation/animation
            tessellation
            depth-first
