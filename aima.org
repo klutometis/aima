@@ -1395,17 +1395,18 @@
     
     (define (depth-first start end neighbors)
       (let ((visited (make-hash-table)))
-        (let search ((frontier (list start))
+        (let search ((frontier
+                      (list (make-node start #f #f 0)))
                      (path '()))
           ;; (debug frontier)
           (if (null? frontier)
               (debug 'search-failed)
               (let* ((parent (car frontier))
-                     (children (hash-table-ref neighbors parent)))
+                     (children (hash-table-ref neighbors (node-state parent))))
                 ;; (debug parent)
-                (hash-table-set! visited parent #f)
-                (if (eq? parent end)
-                    (cons parent path)
+                (hash-table-set! visited (node-state parent) #f)
+                (if (eq? (node-state parent) end)
+                    parent
                     (let ((unvisited-children
                            (filter (lambda (child)
                                      (hash-table-ref/default
@@ -1414,32 +1415,34 @@
                                       #t))
                                    children)))
                       ;; (debug parent children unvisited-children)
-                      (search (append unvisited-children (cdr frontier))
-                              (cons parent path)))))))))
-    
-    (define (predecessor-path predecessor end)
-      (let iter ((path (list end)))
-        (let ((predecessor
-               (hash-table-ref/default predecessor (car path) #f)))
-          (if predecessor
-              (iter (cons predecessor path))
-              (reverse path)))))
+                      (let ((nodes
+                             (map (lambda (child)
+                                    (make-node child
+                                               parent
+                                               #f
+                                               (+ (node-path-cost parent)
+                                                  (point-distance
+                                                   (node-state parent)
+                                                   child))))
+                                  unvisited-children)))
+                        (search (append nodes (cdr frontier))
+                                (cons parent path))))))))))
     
     (define (breadth-first start end neighbors)
       (let ((visited (make-hash-table))
-            (predecessor (make-hash-table))
             (frontier (make-queue)))
-        (queue-add! frontier start)
+        (queue-add! frontier (make-node start #f #f 0))
         (let search ()
-          ;; (debug frontier)
+          (debug ;; (queue->list frontier)
+                 (length (queue->list frontier)))
           (if (queue-empty? frontier)
               (debug 'search-failed)
               (let* ((parent (queue-remove! frontier))
-                     (children (hash-table-ref neighbors parent)))
+                     (children (hash-table-ref neighbors (node-state parent))))
                 ;; (debug parent)
-                (hash-table-set! visited parent #f)
-                (if (eq? parent end)
-                    (predecessor-path predecessor parent)
+                (hash-table-set! visited (node-state parent) #f)
+                (if (eq? (node-state parent) end)
+                    parent
                     (let ((unvisited-children
                            (filter (lambda (child)
                                      (hash-table-ref/default
@@ -1450,27 +1453,108 @@
                       ;; (debug parent children unvisited-children)
                       (for-each
                           (lambda (child)
-                            (queue-add! frontier child)
-                            (hash-table-set! predecessor child parent))
+                            (let ((node
+                                   (make-node child
+                                              parent
+                                              #f
+                                              (+ (node-path-cost parent)
+                                                 (point-distance
+                                                  child
+                                                  (node-state parent))))))
+                              (queue-add! frontier node)))
                         unvisited-children)
                       (search))))))))
     
+    (define (search start
+                    end
+                    neighbors
+                    make-frontier
+                    frontier-add!
+                    frontier-delete!
+                    frontier-empty?)
+      (let ((visited (make-hash-table))
+            (frontier (make-frontier)))
+        (frontier-add! frontier (make-node start #f #f 0))
+        (let search ()
+          ;; (debug frontier)
+          (if (frontier-empty? frontier)
+              (error "SEARCH -- Search failed")
+              (let* ((parent (frontier-delete! frontier))
+                     (children (hash-table-ref neighbors (node-state parent))))
+                ;; (debug parent)
+                (hash-table-set! visited (node-state parent) #f)
+                (if (eq? (node-state parent) end)
+                    parent
+                    (let ((unvisited-children
+                           (filter (lambda (child)
+                                     (hash-table-ref/default
+                                      visited
+                                      child
+                                      #t))
+                                   children)))
+                      ;; (debug parent children unvisited-children)
+                      (for-each
+                          (lambda (child)
+                            (let ((node (make-node child
+                                                   parent
+                                                   #f
+                                                   (+ (node-path-cost parent)
+                                                      (point-distance
+                                                       child
+                                                       (node-state parent))))))
+                              (frontier-add! frontier node)))
+                        unvisited-children)
+                      (search))))))))
+    
+    (define (depth-first-general start end neighbors)
+      (search start end neighbors make-stack stack-push! stack-pop! stack-empty?))
+    
+    (define (breadth-first-general start end neighbors)
+      (search start end neighbors make-queue queue-add! queue-remove! queue-empty?))
+    
+    ;;; Generalized too quickly; each node should have: state, parent,
+    ;;; action, path-cost.
     (let ((tessellation (tessellate)))
       (let ((start (tessellation-start tessellation))
             (end (tessellation-end tessellation))
             (neighbors (tessellation-neighbors tessellation)))
         (let ((breadth-first (breadth-first start end neighbors))
-              (depth-first (depth-first start end neighbors)))
-          (plot-tessellation/animation
-           tessellation
-           breadth-first
-           "Breadth-First"
-           "breadth-first")
-          (plot-tessellation/animation
+              (breadth-first-general (breadth-first-general start end neighbors))
+              (depth-first (depth-first start end neighbors))
+              (depth-first-general (depth-first-general start end neighbors))
+              )
+          #;
+          (debug (length depth-first)
+                 ;; (length depth-first-general)
+                 ;; (length breadth-first)
+                 ;; (length breadth-first-general)
+                 )
+          (plot-tessellation
            tessellation
            depth-first
            "Depth-First"
-           "depth-first"))))
+           "depth-first.png")
+          (plot-tessellation
+           tessellation
+           breadth-first-general
+           "Breadth-First-General"
+           "breadth-first-general.png")
+          (plot-tessellation
+           tessellation
+           depth-first-general
+           "Depth-First-General"
+           "depth-first-general.png")
+          (plot-tessellation
+           tessellation
+           breadth-first
+           "Breadth-First"
+           "breadth-first.png")
+          ;; (plot-tessellation
+          ;;  tessellation
+          ;;  (list breadth-first depth-first)
+          ;;  "Comparative"
+          ;;  "comparative.png")
+          )))
     
   #+END_SRC
 * TODO 3.9
@@ -3373,104 +3457,112 @@
       library(proto)
       library(debug)
       library(hash)
-
+      
       n.vertices <- 100
       ## tiles <- subset(deldir(rnorm(n.vertices),
       ##                        rnorm(n.vertices))$dirsgs, !(bp1 | bp2))
       tiles <- deldir(rnorm(n.vertices), rnorm(n.vertices))$dirsgs
-
+      
       coordinates.to.key <- function(x, y)
         sprintf('%s,%s', x, y)
-
+      
       coordinates.to.vertex <- function(x, y)
         proto(x=x, y=y)
-
+      
       vertices <- hash()
       neighbors <- hash()
-
+      
       for (tile in apply(tiles, 1, list)) {
         x1 <- tile[[1]][[1]]
         y1 <- tile[[1]][[2]]
         x2 <- tile[[1]][[3]]
         y2 <- tile[[1]][[4]]
-
+      
         k1 <- coordinates.to.key(x1, y1)
         k2 <- coordinates.to.key(x2, y2)
-
+      
         vertices[k1] <-
           coordinates.to.vertex(x1, y1)
         vertices[k2] <-
           coordinates.to.vertex(x2, y2)
-
+      
         n1 <- if (has.key(k1, neighbors)) neighbors[[k1]] else NULL
         n2 <- if (has.key(k2, neighbors)) neighbors[[k2]] else NULL
-
+      
         neighbors[k1] <- union(k2, n1)
         neighbors[k2] <- union(k1, n2)
       }
-
+      
       ## Leftest vertex as start
       leftest.vertex <- proto(x=Inf)
-
+      
       ## Rightest vertex as end
       rightest.vertex <- proto(x=-Inf)
-
+      
       for (vertex in as.list(vertices)) {
         if (vertex$x < leftest.vertex$x)
           leftest.vertex <<- vertex
-
+      
         if (vertex$x > rightest.vertex$x)
           rightest.vertex <<- vertex
       }
-
+      
       start <- coordinates.to.key(leftest.vertex$x,
                                   leftest.vertex$y)
       end <- coordinates.to.key(rightest.vertex$x,
                                 rightest.vertex$y)
-
+      
       ## Node is abstract; vertex has a location.
       nodes <- keys(vertices)
-
-      sink('/tmp/fifo')
-      for (node in nodes) {
-        vertex <- vertices[[node]]
-        cat(sprintf('(vertex %s %s %s)', node, vertex$x, vertex$y))
-      }
-
-      for (node in nodes) {
-        cat(sprintf('(neighbor %s %s)',
-                    node,
-                    do.call(paste, as.list(neighbors[[node]]))))
-      }
-
-      cat(sprintf('(start %s)', start))
-      cat(sprintf('(end %s)', end))
-      sink()
-
+      
+      ## sink('/tmp/fifo')
+      ## for (node in nodes) {
+      ##   vertex <- vertices[[node]]
+      ##   cat(sprintf('(vertex %s %s %s)', node, vertex$x, vertex$y))
+      ## }
+      
+      ## for (node in nodes) {
+      ##   cat(sprintf('(neighbor %s %s)',
+      ##               node,
+      ##               do.call(paste, as.list(neighbors[[node]]))))
+      ## }
+      
+      ## cat(sprintf('(start %s)', start))
+      ## cat(sprintf('(end %s)', end))
+      ## sink()
+      
       ## path.file <- file('/tmp/harro-thar', 'wt')
       ## for (node in nodes[sample(length(nodes), 10)])
       ##   writeLines(node, path.file)
       ## close(path.file)
-
+      
       ## path <- readLines('/tmp/harro-thar')
-
+      
       ## With fifos, we have to have a header line, for some reason.
       ## close(stdout())
       ## fifo <- file('/tmp/fifo', 'r', blocking=FALSE)
       ## path <- readChar(fifo, nchars=1)
-      path <- readChar('/tmp/fifo', nchars=10)
+      ## path <- readChar('/tmp/fifo', nchars=10)
       ## path <- readLines('/tmp/fifo', n=1)
-      debug(path)
-
-      path <- nodes[1:2]
-
-      vertex.path <-
-        Map(function(node) vertices[[node]], path)
-      vertex.path.x <- function(vertex.path)
-        unlist(Map(function(vertex) vertex$x, vertex.path))
-      vertex.path.y <- function(vertex.path)
-        unlist(Map(function(vertex) vertex$y, vertex.path))
-
+      ## debug(path)
+      
+      path1 <- nodes[1:2]
+      path2 <- nodes[3:4]
+      
+      vertex.path1 <-
+        Map(function(node) vertices[[node]], path1)
+      vertex.path1.x <- function(vertex.path1)
+        unlist(Map(function(vertex) vertex$x, vertex.path1))
+      vertex.path1.y <- function(vertex.path1)
+        unlist(Map(function(vertex) vertex$y, vertex.path1))
+      
+      vertex.path2 <-
+        Map(function(node) vertices[[node]], path2)
+      vertex.path2.x <- function(vertex.path2)
+        unlist(Map(function(vertex) vertex$x, vertex.path2))
+      vertex.path2.y <- function(vertex.path2)
+        unlist(Map(function(vertex) vertex$y, vertex.path2))
+      
       png('voronoi.png', width=1024, heigh=768)
       qplot(tiles$x1,
             tiles$y1,
@@ -3511,16 +3603,21 @@
                   size=3) +
         ## We have to do this in segments, if we want to be able to model
         ## bi-directional search.
-        geom_path(aes(x=vertex.path.x(vertex.path),
-                      y=vertex.path.y(vertex.path),
+        geom_path(aes(x=vertex.path1.x(vertex.path1),
+                      y=vertex.path1.y(vertex.path1),
                       alpha=1.0),
-                  color='red',
+                  color=3,
+                  size=2.0) +
+        geom_path(aes(x=vertex.path2.x(vertex.path2),
+                      y=vertex.path2.y(vertex.path2),
+                      alpha=1.0),
+                  color=4,
                   size=2.0) +
         geom_point(aes(x=tiles$x1,
                        y=tiles$y1,
                        alpha=1.0))
       dev.off()
-
+      
     #+END_SRC
 
     #+BEGIN_SRC scheme :tangle voronoi.scm :shebang #!/usr/bin/env chicken-scheme
