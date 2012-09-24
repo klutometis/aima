@@ -1390,7 +1390,43 @@
    - Goal test :: Does any jug contain one gallon?
    Is this reminiscent of Knuth's conjecture?
 * TODO 3.7
+  #+BEGIN_SRC scheme :tangle 3.7.scm :shebang #!/usr/bin/env chicken-scheme
+    (use aima-tessellation debug stack)
     
+    (let ((tessellation (tessellate)))
+      (let ((start (tessellation-start tessellation))
+            (end (tessellation-end tessellation))
+            (neighbors (tessellation-neighbors tessellation)))
+        (let ((visited (make-hash-table)))
+          (let ((path
+                 (let search ((frontier (list start))
+                              (path '()))
+                   ;; (debug frontier)
+                   (if (null? frontier)
+                       (debug 'search-failed)
+                       (let* ((parent (car frontier))
+                              (children (hash-table-ref neighbors parent)))
+                         ;; (debug parent)
+                         (hash-table-set! visited parent #f)
+                         (if (eq? parent end)
+                             (cons parent path)
+                             (let ((unvisited-children
+                                    (filter (lambda (child)
+                                              (hash-table-ref/default
+                                               visited
+                                               child
+                                               #t))
+                                            children)))
+                               ;; (debug parent children unvisited-children)
+                               (search (append unvisited-children (cdr frontier))
+                                       (cons parent path)))))))))
+            (plot-tessellation
+             tessellation
+             (list->vector path)
+             "test.png"
+             "Depth-First Search")))))
+    
+  #+END_SRC
 * TODO 3.9
   #+BEGIN_SRC scheme
     (use data-structures
