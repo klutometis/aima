@@ -1422,7 +1422,7 @@
                                        (cons parent path)))))))))
             (plot-tessellation
              tessellation
-             (list->vector path)
+             path
              "test.png"
              "Depth-First Search")))))
     
