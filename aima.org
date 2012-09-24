@@ -1420,11 +1420,11 @@
                                ;; (debug parent children unvisited-children)
                                (search (append unvisited-children (cdr frontier))
                                        (cons parent path)))))))))
-            (plot-tessellation
+            (plot-tessellation/animation
              tessellation
              path
-             "test.png"
-             "Depth-First Search")))))
+             "Depth-First Search"
+             "depth-first")))))
     
   #+END_SRC
 * TODO 3.9
