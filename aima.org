@@ -1390,2221 +1390,7 @@
    - Goal test :: Does any jug contain one gallon?
    Is this reminiscent of Knuth's conjecture?
 * TODO 3.7
-  See [[http://en.wikipedia.org/wiki/Convex_hull_algorithms][convex hulls]]. It turns out that we don't have to model it as all
-  positions in the plane; let's model it as the corners of polygons.
-  We have to have a notion of "reachable" vertices, however. Can we
-  create the space as random polygons; and draw a graph of reachable
-  vertices? What's the best way to draw the vertices and path?
-
-  What's the trick for coming up with non-intersecting polygons? Is
-  this important? I think so, since we'll otherwise search unreachable
-  vertices; unless we can merge the polygons: but there's no guarantee
-  that the polygons will intersect at integer-valued x-ys.
-
-  See [[http://compgeom.cs.uiuc.edu/~jeffe/open/randompoly.html][random simple polygons]] (might be best to avoid [[http://en.wikipedia.org/wiki/Polygon#Self-intersecting_polygons][self-intersecting
-  ones]]); also, [[http://www.dcc.fc.up.pt/~apt/onlinepapers/caepia03.pdf][random orthogonal polygons]]. Nothing yet on
-  random-non-intersecting polygons; does it suffice to reject
-  points-in-preëxisting-polygons? You also have to take care not to
-  enclose prexisting points in new polygons. If we were drawing
-  parallel planes in e.g. three dimensions, this would be less of a
-  concern. Feasible? Sure. How do we draw it?
-
-  "Random non-overlapping polygons" might be more fruitful; seems like
-  it would be worthwhile to simply start drawing them at random,
-  rejecting overlapping ones until we reach $n$.
-
-  (See [[http://www.cgal.org/][CGAL]], incidentally: it even contains [[http://www.cgal.org/Manual/latest/doc_html/cgal_manual/packages.html#part_XVIII][visualization]] and
-  [[http://www.cgal.org/Manual/latest/doc_html/cgal_manual/packages.html#part_VI][polygon-operations]]; [[http://www.cgal.org/Manual/latest/doc_html/cgal_manual/Generator_ref/Function_random_polygon_2.html][random polygons]].)
-
-  Talking about [[http://cgal-discuss.949826.n4.nabble.com/Random-Polygon-Generator-tp951608p951609.html][convex hulls and voronoi diagrams]] to construct random
-  simple polygons; I wonder if CGAL wouldn't come in handy, after all.
-  Write the Scheme bindings? Ouch.
-
-  Can we just do a [[http://en.wikipedia.org/wiki/Voronoi_diagram][Voronoi tesselation]] and call it a day? It seems
-  like it has all the properties we're looking for: non-overlapping
-  simple polygons, unreachable points. Let's do it!
-
-  At this point, though, isn't it indistinguishable from drawing
-  random points in the plane and searching with a straight-line
-  heuristic? Yes. Voronoi diagrams are irrelevant. We could, of
-  course, generate them for the hell of it (using continuous, not
-  discrete, coördinates); and use their boundaries as our vertices.
-  Why? It's pretty. Still have to figure out how to draw them, though.
-
-  [[http://stackoverflow.com/questions/5608381/plotting-and-coloring-data-on-irregular-grid][Delaunay triangulation in R]], incidentally; using =spatstat= and
-  =maptools=, also =latticeExtra=.
-
-  Voronoi diagrams are [[http://stackoverflow.com/a/3083145][one-liners in R]]; [[http://stackoverflow.com/a/9405831][another example]]. See also [[http://www.carsonfarmer.com/2009/09/voronoi-polygons-with-r/][sp
-  and deldir]]. [[http://www.cgal.org/Manual/latest/doc_html/cgal_manual/packages.html#part_IX][CGAL]] does it, too, of course.
-
-  See [[http://en.wikipedia.org/wiki/Lloyd's_algorithm][Lloyd's algorithm]], [[http://en.wikipedia.org/wiki/Bowyer%E2%80%93Watson_algorithm][Bowyer-Watson]], and [[http://en.wikipedia.org/wiki/Fortune's_algorithm][Fortune]]; an alternative is
-  [[http://en.wikipedia.org/wiki/Delaunay_triangulation][Delaunay triangulation]], too. Basically, we have random points; and
-  want to divvy them up into coincident, non-overlapping, convex
-  polygons. There's a number of [[http://en.wikipedia.org/wiki/Delaunay_triangulation#Algorithms][algorithms]] for Delaunay triangulation;
-  one of which is $O(n^2)$.
-
-  What about just a [[http://en.wikipedia.org/wiki/Euclidean_minimum_spanning_tree][Euclidean minimum spanning tree]]? We can even find
-  one in [[http://en.wikipedia.org/wiki/Euclidean_minimum_spanning_tree#Algorithms_for_computing_EMSTs_in_two_dimensions][O(n log n)]].
-
-  Look no further than [[http://www.cs.uu.nl/geobook/][Computational Geometry]]: implementable
-  algorithms, detailed explanations. Next candidate for LACSRG,
-  incidentally?
-
-  We might as well go [[http://dl.acm.org/citation.cfmid%3D10549][straight to Fortune]]; Berg is somewhat irritating
-  with internal references; [[https://kedras.mif.vu.lt/bastys/academic/ATE/delaunay/FortuneDemo.htm][Èuk Roman]] did a sub-adequate job.
-
-  [[http://ect.bell-labs.com/who/sjf/][Steven's own implementation]] in c
-
-  Has some [[http://www.tcs.tifr.res.in/~workshop/bhu_igga/workshop.beamer.pdf][good non-optimal]] algorithms; [[http://www.ams.sunysb.edu/~jsbm/courses/345/11/lecture-Voronoi.ppt][n^2]].
-
-  [[http://www.ams.org/samplings/feature-column/fcarc-voronoi][Good prose from AMS]]:
-
-  #+BEGIN_QUOTE
-  If the next event that the sweep line encounters is a site event, we
-  simply insert the new site into our list of sites in the order in
-  which the corresponding parabolic arc appears on the beach line. We
-  then record the fact that we have encountered a new edge in the
-  diagram.
-
-  If the next event that the sweep line encounters is a circle event,
-  we record the fact that we have encountered a vertex in the diagram
-  and that this vertex is the endpoint of the edges corresponding to
-  the two breakpoints that have come together. We also record the new
-  edge corresponding to the new breakpoint that results from the
-  circle event.
-
-  Whether we encounter a site or circle event, we will always check to
-  see if we have added a new triple of parabolic arcs on the beach
-  line that may lead to a future circle event. It is also possible
-  that we will remove a future circle event from consideration if the
-  triple of parabolic arcs that led to it no longer exists after the
-  event.
-  #+END_QUOTE
-
-  Berg is pretty good, actually:
-
-  #+BEGIN_QUOTE
-  Now we know where and how the combinatorial structure of the beach
-  line changes: at a site event a new arc appears, and at a circle
-  event an existing arc drops out. We also know how this relates to
-  the Voronoi diagram under construction: at a site event a new edge
-  starts to grow, and at a circle event two growing edges meet to form
-  a vertex.
-  #+END_QUOTE
-
-  On the justification for $\mathcal{T}$, which changes:
-
-  #+BEGIN_QUOTE
-  The paradigm involves maintaining the intersection of the Voronoi
-  diagram with the sweep line. Unfortunately this is not so easy,
-  because the part of Vor(P) above depends not only on the sites that
-  lie above $\ell$ but also on sites below $\ell$. Stated differently,
-  when the sweep line reaches the topmost vertex of the Voronoi cell
-  $V(p_i)$ it has not yet encountered the corresponding site $p_i$.
-  Hence, we do not have all the information needed to compute the
-  vertex. We are forced to apply the plane sweep paradigm in a
-  slightly different fashion: instead of maintaining the intersection
-  of the Voronoi diagram with the sweep line, we maintain information
-  about the part of the Voronoi diagram of the sites above $\ell$ that
-  cannot be changed by sites below $\ell$.
-  #+END_QUOTE
-
-  Sweep line $\ell$; the beach line, however:
-
-  #+BEGIN_QUOTE
-  The locus of points that are closer to any site above $\ell$ than to
-  $\ell$ itself is bounded by parabolic arcs. We call this sequence of
-  parabolic arcs the beach line.
-
-  The beach line is x-monotone, that is, every vertical line
-  intersects it in exactly one point.
-  #+END_QUOTE
-
-  Breakpoints:
-
-  #+BEGIN_QUOTE
-  Notice that the breakpoints between the different parabolic arcs
-  forming the beach line lie on edges of the Voronoi diagram . . . the
-  breakpoints exactly trace out the Voronoi diagram while the sweep
-  line moves from top to bottom.
-
-  So, instead of maintaining the intersection of $Vor(P)$ with $\ell$,
-  we maintain the beach line as we move our sweep line $\ell$. We do
-  not maintain the beach line explicitly, since it changes
-  continuously as $\ell$ moves.
-
-  [The beach line's combinatorial structure changes] when a new
-  parabolic arc appears on it, and when a parabolic arc shrinks to a
-  point and disappears.
-  #+END_QUOTE
-
-  On site events:
-
-  #+BEGIN_QUOTE
-  [A new arc appears on the beach line] when the sweep line $\ell$
-  reaches a new site. The parabola defined by this site is at first a
-  degenerate parabola with zero width: a vertical line segment
-  connecting the new site to the beach line. As the sweep line
-  contiues to move downward the new parabola gets wider and wider.
-
-  We call the event where a new site is encountered a site event.
-
-  At a site event two new breakpoints appear, which start tracing out
-  edges. In fact, the new breakpoints coincide at first, and then move
-  in opposite directions to trace out the same edge. Initially, this
-  edge is not connected to the rest of the Voronoi diagram . . . Later
-  on, the growing edge will run into another edge, and it becomes
-  connected to the rest of the diagram.
-  #+END_QUOTE
-
-  Site events and beach lines:
-
-  #+BEGIN_QUOTE
-  The only way a new arc can appear on the beach line is through a
-  site event.
-  
-  The beach line consists of at most $2n - 1$ parabolic arcs: each
-  site encountered gives rise to one new arc and the splitting of at
-  most one existing arc into two.
-  #+END_QUOTE
-
-  Circle events:
-
-  #+BEGIN_QUOTE
-  The second type of event is where an existing arc of the beach line
-  shrinks to a point and disappears. Three arcs $\alpha$,
-  $\alpha^\prime$, $\alpha^{\prime\prime}$ are defined by three sites
-  $p_i$, $p_j$, and $p_k$. At the moment $a^\prime$ disappears, the
-  parabolas defined by these three sites pass through a common point
-  $q$. Point $q$ is equidistant from $\ell$ and each of the three sites.
-  Hence, there is a circle passing through $p_i$, $p_j$, and $p_k$
-  with $q$ as its center and whose lowest point lies on $\ell$. The
-  point $q$ is a vertex of the Voronoi diagram.
-
-  We call the event where the sweep line reaches the lowest point of a
-  circle through three sites defining consecutive arcs on the beach
-  line a cirle event.
-  #+END_QUOTE
-
-  Circle events and arcs:
-
-  #+BEGIN_QUOTE
-  The onl way in which an existing arc can disappear from the beach
-  line is through a circle event.
-
-  At a site event a new arc appears, and at a circle event an existing
-  arc drops out.
-
-  At a site event a new edge starts to grow, and at a circle event two
-  growing edges meet to form a vertex.
-  #+END_QUOTE
-
-  Data structures:
-
-  #+BEGIN_QUOTE
-  We need a data structure that stores the part of the Voronoi diagram
-  computed thus far. We also need the two `standard' data structures
-  for any sweep line algorithm: an even queue and a structure that
-  represents the status of the sweep line. Here the latter structure
-  is a representation of the beach line.
-
-  We store the Voronoi diagram as a doubly-connected edge list.
-
-  The beach line is represented by a balanced binary search tree
-  $\mathcal{T}$. Its leaves correspond to the arcs of the beach
-  line--which is $x$-monotone--in an ordered manner: the leftmost leaf
-  represents the leftmost arc, and so on. Each leaf $\mu$ stores the
-  site that defines the arc it represents. The internal nodes of
-  $\mathcal{T}$ represent the breakpoints on the beach line. A
-  breakpoint is stored at an internal node by an ordered tuple of site
-  $<p_i, p_j>$, where $p_i$ defines the parabola left of the
-  breakpoint and $p_j$ defines the parabola to the right. We can find
-  in $O(\log n)$ the arc of the beach line lying above a new site. At
-  an internal node, we simply compare the $x$-coördinate of the new
-  site with the $x$-coördinate of the breakpoint, which can be
-  computed from the tuple of sites and the position of the sweep line
-  in constant time.
-
-  In $\mathcal{T}$ we also store pointers to the other two data
-  structures used during the sweep. Each leaf of $\mathcal{T}$,
-  representing arc $\alpha$, stores a pointer to a circle event in the
-  event queue in which $\alpha$ will disappear. This pointer is =nil=
-  if no circle event exists where $\alpha$ will disappear, or this
-  circle event hasn't been detected yet. Every internal node $v$ has a
-  pointer to a half-edge in the doubly-connected edge list of the
-  Voronoi diagram. $v$ has a pointer to one of the half-edges of the
-  edge being traced out by the breakpoint represented by $v$.
-
-  The event queue $\mathcal{Q}$ is implemented as a priority queue,
-  where the priority of an event is its $y$-coördinate. It stores the
-  upcoming events that are already known. For a site event we simply
-  store the site itself. For a circle event the event point that we
-  store is the lowest point of the circle, with a pointer to the leaf
-  in $\mathcal{T}$ that represents the arc that will disappear in the
-  event.
-  #+END_QUOTE
-
-  Detection of circle events:
-
-  #+BEGIN_QUOTE
-  All the site events are known in advance, but the circle events are
-  not.
-
-  During the sweep the beach line changes its topological structure at
-  every event. This may cause new triples of consecutive arcs to
-  appear on the beach line and it may cause existing triples to
-  disappear. For every three consecutive arcs on the beach line that
-  define a potential circle event, the potential event is stored in
-  the event queue $\mathcal{Q}$.
-
-  There can be consecutive triples whose two breakpoints do not
-  converge. It can also happen that the triple disappears before the
-  event has taken place: $false alarm$.
-
-  At every event, it checks all the new triples of consecutive arcs
-  that appear. At a site event we can get three new triples: one where
-  the new arc is the left arc of the triple, on where it is the middle
-  arc, and one where it is the right arc. When such a new triple has
-  converging breakpoints, the event is inserted into the event queue
-  $\mathcal{Q}$. In the case of a site event, the triple with the new
-  arc being the middle one can never cause a circle event, because the
-  left and right arc of the triple come from the same parabola and
-  therefore the breakpoints must diverge.
-
-  For all disappearing triples it is checked whether they have a
-  corresponding event in $\mathcal{Q}$. If so, the event is a false
-  alarm, and it is deleted from $\mathcal{Q}$. This can be done using
-  the pointers we have from the leaves in $\mathcal{T}$ to the
-  corresponding circle events in $\mathcal{Q}$.
-  #+END_QUOTE
-
-  Voronoi vertices and circle events:
-
-  #+BEGIN_QUOTE
-  Every Voronoi vertex is detected by means of a circle event.
-
-  The corresponding circle event is in $\mathcal{Q}$ just before the
-  event takes place, and the Voronoi vertex is detected.
-  #+END_QUOTE
-
-  The algorithm:
-
-  #+BEGIN_QUOTE
-  After the event queue $\mathcal{Q}$ is empty, the beach line hasn't
-  disappeared yet. The breakpoints correspond to the half-infinite
-  edges of the Voronoi diagram. We must add a bounding box to which
-  these edges can be attached.
-  #+END_QUOTE
-
-  [[https://github.com/gorhill/Javascript-Voronoi/blob/master/rhill-voronoi-core.js][Javascript Voronoi]], by the way; 
-
-*** TODO Implementation
-    #+BEGIN_QUOTE
-    At a site event two new breakpoints appear, which start tracing
-    out edges. In fact, the new breakpoints coincide at first, and
-    then move in opposite directions to trace out the same edge.
-    #+END_QUOTE
-
-    #+BEGIN_QUOTE
-    A breakpoint is stored at an internal node by an ordered tuple of
-    sites pi , p j , where pi defines the parabola left of the
-    breakpoint and p j defines the parabola to the right.
-    #+END_QUOTE
-
-    Computing the breakpoint (from [[http://www.skynet.ie/~sos/mapviewer/docs/Voronoi_Diagram_Notes_1.pdf][here]]):
-
-# <<computing-breakpoint>>
-    #+BEGIN_QUOTE
-    Between each consecutive pair of sites pi and pj , there is a
-    breakpoint. Although the breakpoint moves as a function of the
-    sweep line, observe that it is possible to compute the exact
-    location of the breakpoint as a function of pi , pj , and the
-    current y-coordinate of the sweep line. In particular, the
-    breakpoint is the center of a circle that passes through pi , pj
-    and is tangent to the sweep line. Thus, as with beach lines, we do
-    not explicitly store breakpoints. Rather, we compute them only
-    when we need them.
-
-    Given a fixed location of the sweep line, determine the arc of the
-    beach line that intersects a given vertical line. This can be done
-    by a binary search on the breakpoints, which are computed “on the
-    fly”. (Think about this.)
-    #+END_QUOTE
     
-    They're talking about consecutive triples on the beach-line, by
-    the way; is this a factor of $x$-monotonicity?
-
-    #+BEGIN_QUOTE
-    For each consecutive triple pi , pj , pk on the beach line, we
-    compute the circumcircle of these points. (We’ll leave the messy
-    algebraic details as an exercise, but this can be done in O(1)
-    time.) If the lower endpoint of the circle (the minimum
-    y-coordinate on the circle) lies below the sweep line, then we
-    create a vertex event whose y-coordinate is the y-coordinate of
-    the bottom endpoint of the circumcircle. We store this in the
-    priority queue. Each such event in the priority queue has a cross
-    link back to the triple of sites that generated it, and each
-    consecutive triple of sites has a cross link to the event that it
-    generated in the priority queue.
-    #+END_QUOTE
-
-    This is pretty cool:
-
-    #+BEGIN_QUOTE
-    Let pi be the current site. We shoot a vertical ray up to
-    determine the arc that lies immediately above this point in the
-    beach line. Let pj be the corresponding site. We split this arc,
-    replacing it with the triple of arcs pj , pi , pj which we insert
-    into the beach line. Also we create new (dangling) edge for the
-    Voronoi diagram which lies on the bisector between pi and pj .
-    Some old triples that involved pj may be deleted and some new
-    triples involving pi will be inserted. For example, suppose that
-    prior to insertion we had the beach-line sequence p1 , p2 , pj ,
-    p3 , p4 . The insertion of pi splits the arc pj into two arcs,
-    denoted pj and pj . Although these are separate arcs, they involve
-    the same site, pj . The new sequence is p1 , p2 , pj , pi , pj ,
-    p3 , p4 . Any event associated with the old triple p2 , pj , p3
-    will be deleted. We also consider the creation of new events for
-    the triples p2 , pj , pi and pi , pj , p3 . Note that the new
-    triple pj , pi , pj cannot generate an event because it only
-    involves two distinct sites.
-    #+END_QUOTE
-
-    Also for vertices:
-
-    #+BEGIN_QUOTE
-    Let pi , pj , and pk be the three sites that generate this event
-    (from left to right). We delete the arc for pj from the beach
-    line. We create a new vertex in the Voronoi diagram, and tie the
-    edges for the bisectors (pi , pj ), (pj , pk ) to it, and start a
-    new edge for the bisector (pi , pk ) that starts growing down
-    below. Finally, we delete any events that arose from triples
-    involving this arc of pj , and generate new events corresponding
-    to consecutive triples involving pi and pk (there are two of
-    them). For example, suppose that prior to insertion we had the
-    beach-line sequence p1 , pi , pj , pk , p2 . After the event we
-    have the sequence p1 , pi , pk , p2 . We remove any events
-    associated with the triples p1 , pi , pj and pj , pk , p2 . (The
-    event pi , pj , pk has already been removed since we are
-    processing it now.) We also consider the creation of new events
-    for the triples p1 , pi , pk and pi , pk , p2 .
-    #+END_QUOTE
-
-    About the appearance and disappearance of triples (how to find
-    triples?):
-
-    #+BEGIN_QUOTE
-    So what the algorithm does is this. At every event, it checks all
-    the new triples of consecutive arcs that appear. For instance, at
-    a site event we can get three new triples: one where the new arc
-    is the left arc of the triple, one where it is the middle arc, and
-    one where it is the right arc.
-    #+END_QUOTE
-
-    Let's table Voronoi for the time being, or at least out-source it
-    to R; even shit as trivial as finding the center of circles
-    between two points and a tangent seems difficult.
-
-    Can't we just hard-code the determinant and solve the equations;
-    how did Fortune do it?
-**** TODO Binary search on breakpoints
-     See [[computing-breakpoint]].
-
-     [[http://math.stackexchange.com/questions/101986/how-to-determine-an-equation-of-a-circle-using-a-line-and-two-points-on-a-circle][Circle from two points and a line]]; there are two.
-
-     [[http://mathforum.org/library/drmath/view/55239.html][Symbolic solution]] (given three points):
-
-     #+BEGIN_EXAMPLE
-       This can all be done symbolically, of course, but you'll get some 
-       pretty complicated expressions for h and k. The simplest forms of 
-       these involve determinants, if you know what they are:
-       
-                |x1^2+y1^2  y1  1|        |x1  x1^2+y1^2  1|
-                |x2^2+y2^2  y2  1|        |x2  x2^2+y2^2  1|
-                |x3^2+y3^2  y3  1|        |x3  x3^2+y3^2  1|
-            h = ------------------,   k = ------------------
-                    |x1  y1  1|               |x1  y1  1|
-                  2*|x2  y2  1|             2*|x2  y2  1|
-                    |x3  y3  1|               |x3  y3  1|
-     #+END_EXAMPLE
-*** Visualization
-    Some [[http://www.csee.umbc.edu/~chang/cs641.s01/voronoi/][screencaps]] from the Odgaard-Nielsen program.
-*** TODO Test data
-    =tripack= has an interesting test-case:
-
-    #+BEGIN_EXAMPLE
-      > tritest
-      $x
-       [1] 0.00 1.00 0.50 0.15 0.85 0.50 0.00 1.00 0.35 0.65 0.65 0.35
-      
-      $y
-       [1] 0.00 0.00 0.15 0.50 0.50 0.85 1.00 1.00 0.35 0.35 0.65 0.65
-    #+END_EXAMPLE
-
-    #+BEGIN_EXAMPLE
-      > voronoi.mosaic(tritest)
-      voronoi mosaic:
-      nodes: (x,y): neighbours (<0: dummy node)
-      1: (0.5,-0.7583333): 7 2 -1
-      2: (0.2392857,0.1107143): 8 3 1
-      3: (0.1107143,0.2392857): 9 4 2
-      4: (-0.7583333,0.5): 10 -2 3
-      5: (1.758333,0.5): 11 6 -3
-      6: (0.8892857,0.2392857): 12 7 5
-      7: (0.7607143,0.1107143): 8 1 6
-      8: (0.5,0.30625): 17 2 7
-      9: (0.30625,0.5): 18 10 3
-      10: (0.1107143,0.7607143): 14 4 9
-      11: (0.8892857,0.7607143): 16 12 5
-      12: (0.69375,0.5): 17 6 11
-      13: (0.5,1.758333): -4 14 16
-      14: (0.2392857,0.8892857): 10 15 13
-      15: (0.5,0.69375): 18 16 14
-      16: (0.7607143,0.8892857): 11 13 15
-      17: (0.5,0.5): 12 18 8
-      18: (0.5,0.5): 15 9 17
-      dummy nodes: (x,y)
-      1: (0.5,-3.275)
-      2: (-3.275,0.5)
-      3: (4.275,0.5)
-      4: (0.5,4.275)      
-    #+END_EXAMPLE
-
-    Uh, oh; floating-point difficulties:
-
-    #+BEGIN_EXAMPLE
-      > voronoi.mosaic(c(0, sqrt(1/2), 1), c(1, sqrt(1/2), 0))
-      voronoi mosaic:
-      nodes: (x,y): neighbours (<0: dummy node)
-      1: (2.680315e-16,2.680315e-16): -1 -2 -3 
-      dummy nodes: (x,y)
-      1: (2.680315e-16,2.680315e-16)
-      2: (2.680315e-16,2.680315e-16)
-      3: (2.680315e-16,2.680315e-16)
-    #+END_EXAMPLE
-
-    From Steven's implementation:
-
-    #+BEGIN_EXAMPLE
-      λ ~/prg/c/fortune/ master cat | ./voronoi
-      0 1
-      0.70710678118 0.70710678118
-      1 0
-      s 1.000000 0.000000
-      s 0.707107 0.707107
-      l -0.414214 1.000000 -0.000000
-      s 0.000000 1.000000
-      l -1.000000 1.000000 0.000000
-      v -0.000000 -0.000000
-      l 1.000000 -0.414214 -0.000000
-      e 1 -1 0
-      e 2 0 -1
-      e 0 0 -1
-    #+END_EXAMPLE
-
-    It appears as though he generates the bisecting-lines upon finding
-    points; keeps track of partial edges on those lines.
-
-    #+BEGIN_QUOTE
-	s a b
-    indicates that an input point at coordinates 
-	l a b c
-    indicates a line with equation ax + by = c.
-	v a b
-    indicates a vertex at  a b.
-	e l v1 v2
-    indicates a Voronoi segment which is a subsegment of line number l;
-    with endpoints numbered v1 and v2.  If v1 or v2 is -1, the line
-    extends to infinity.
-    #+END_QUOTE
-*** Several implementations and "low-level" pseudo-code
-    [[http://blog.ivank.net/fortunes-algorithm-and-implementation.html]]
-*** Fortune's notes
-    [[http://www.skynet.ie/~sos/mapviewer/docs/Voronoi_Diagram_Notes_1.pdf][Here]] and [[http://www.skynet.ie/~sos/mapviewer/docs/Voronoi_Diagram_Notes_2.pdf][here]]; gotten from [[http://www.skynet.ie/~sos/mapviewer/voronoi.php][here]].
-
-    Site event:
-
-    #+BEGIN_QUOTE
-    Let pi be the current site. We shoot a vertical ray up to
-    determine the arc that lies immediately above this point in the
-    beach line. Let pj be the corresponding site. We split this arc,
-    replacing it with the triple of arcs pj , pi , pj which we insert
-    into the beach line. Also we create new (dangling) edge for the
-    Voronoi diagram which lies on the bisector between pi and pj .
-    Some old triples that involved pj may be deleted and some new
-    triples involving pi will be inserted.
-    #+END_QUOTE
-
-    Vertex event:
-
-    #+BEGIN_QUOTE
-    Let pi , pj , and pk be the three sites that generate this event
-    (from left to right). We delete the arc for pj from the beach
-    line. We create a new vertex in the Voronoi diagram, and tie the
-    edges for the bisectors (pi , pj ), (pj , pk ) to it, and start a
-    new edge for the bisector (pi , pk ) that starts growing down
-    below. Finally, we delete any events that arose from triples
-    involving this arc of pj , and generate new events corresponding
-    to consecutive triples involving pi and pk (there are two of
-    them).
-    #+END_QUOTE
-*** Voronoi toy
-    http://nodename.com/blog/2009/05/11/a-voronoi-toy/
-
-    Points to [[http://netlib.org/voronoi/sweep2][this implementation]] of Fortune's.
-*** Good overview
-    See [[http://nms.csail.mit.edu/~aklmiu/6.838/L7.pdf][here]]; actually breaks down the change in the tree and
-    double-linked list.
-*** TODO Calculate convergence of breakpoints
-    [[http://cgm.cs.mcgill.ca/~mcleish/644/Projects/DerekJohns/Sweep.htm][Good animations]]; still doesn't elaborate on how to calculate
-    whether the breakpoints converge.
-
-    #+BEGIN_QUOTE
-    First of all, there can be consecutive triples whose two
-    breakpoints do not converge, that is, the directions in which they
-    move are such that they will not meet in the future; this happens
-    when the breakpoints move along two bisectors away from the
-    intersection point. In this case the triple does not define a
-    potential circle event.
-    #+END_QUOTE
-
-    [[http://stackoverflow.com/questions/9612065/breakpoint-convergence-in-fortunes-algorithm][Someone answered their own question]]:
-
-    #+BEGIN_QUOTE
-    As long as three sites are not collinear, then the edges that
-    perpendicularly bisect the segments between the sites are also
-    tangent to the circle whose edge contains all three sites.
-    Therefore the breakpoints defined by a triple of Voronoi sites
-    converge if the center of the circle defined by the three sites is
-    in front of the middle site, where "in front" and "behind" depend
-    on the coordinate system and sweepline alignment you have chosen.
-    #+END_QUOTE
-*** TODO Doubly-connect edge list
-    See [[http://en.wikipedia.org/wiki/Doubly_connected_edge_list][here]]:
-
-    #+BEGIN_QUOTE
-    DCEL is more than just a doubly linked list of edges. In the
-    general case, a DCEL contains a record for each edge, vertex and
-    face of the subdivision. Each record may contain additional
-    information, for example, a face may contain the name of the area.
-    Each edge usually bounds two faces and it is therefore convenient
-    to regard each edge as half-edge. Each half-edge bounds a single
-    face and thus has a pointer to that face. A half-edge has a
-    pointer to the next half-edge and previous half-edge of the same
-    face. To reach the other face, we can go to the twin of the
-    half-edge and then traverse the other face. Each half-edge also
-    has a pointer to its origin vertex (the destination vertex can be
-    obtained by querying the origin of its twin).
-
-    Each vertex v contains the coordinates of the vertex and also
-    stores a pointer to an arbitrary edge that has v as its origin.
-    Each face stores a pointer to some half-edge of its outer boundary
-    (if the face is unbounded then pointer is null). It also has a
-    list of half-edges, one for each hole that may be incident within
-    the face. If the vertices or faces do not hold any interesting
-    information, there is no need to store them, thus saving space and
-    reducing the data structure complexity.
-    #+END_QUOTE
-*** TODO $O(n^2 \log n)$ intersection of all the half-planes
-    Bisector between two points: perpendicular; points that are the
-    same distance from $p$ and $q$.
-
-    From [[http://www.cs.tufts.edu/g/163/notes05/voronoi_handout.pdf][Tufts]]:
-
-    #+BEGIN_QUOTE
-    A naive approach to construct of a Voronoi diagram is to determine
-    the region for each site, one at a time. Since each region is the
-    intersection of n − 1 half-planes, we can use an O(n log n)
-    half-plane intersection algorithm to determine this region.
-    Repeating for all n points, we have an O(n2 log n) algorithm.
-    #+END_QUOTE
-
-    Finally understand Berg's reference to chapter 4: they employ a
-    sweep-line for intersection.
-
-    [[http://cgm.cs.mcgill.ca/~mcleish/644/Projects/DerekJohns/First%2520Attempt.htm][Another description]]:
-
-    #+BEGIN_QUOTE
-    For all pairs of sites, find their perpendicular bisector. This
-    calculation takes O(n log n) time and is done once. Next, we take
-    all the open half-planes that contain a site and calculate the
-    intersection of these half-planes to obtain the Voronoi cell for
-    this site. An optimal algorithm for computing the intersection of
-    half-planes is O(n log n) [1]. Repeat for every site. The overall
-    complexity then becomes O(n2 log n).
-    #+END_QUOTE
-*** Voronoi over Delaunay
-    See [[http://cran.r-project.org/web/packages/tripack/tripack.pdf][here]]:
-
-    #+BEGIN_QUOTE
-    This function creates a Voronoi mosaic.
-
-    It creates first a Delaunay triangulation, determines the
-    circumcircle centers of its triangles, and connects these points
-    according to the neighbourhood relations between the triangles.
-    #+END_QUOTE
-** TODO Voronoi
-   - [[http://cs.nyu.edu/~ajsecord/npar2002/html/stipples-node2.html][Lloyd's]] and minimum energy
-   - See the description of [[http://en.wikipedia.org/wiki/K-means_clustering#Algorithms][k-means]]
-   - R [[http://en.wikibooks.org/wiki/Data_Mining_Algorithms_In_R/Clustering/K-Means#Implementation][implementations]] of k-means
-** TODO Triangulation
-   Can't we do some sort of Delaunay triangulation and remove edges to
-   produce more complex polygons?
-
-   From [[http://www.comp.lancs.ac.uk/~kristof/research/notes/voronoi/][here]]:
-
-   #+BEGIN_QUOTE
-   The Voronoi cells/polygons are sometimes also called Thiessen
-   Polytopes or Dirichlet Regions.
-   #+END_QUOTE
-   
-   Ah, interesting! And on the dual-graph relationship:
-
-   #+BEGIN_QUOTE
-   The Delaunay triangulation is the dual structure of the Voronoi
-   diagram in $R^2$. By dual, we mean to draw a line segment between
-   two Voronoi vertices if their Voronoi polygons have a common edge,
-   or in more mathematical terminology: there is a natural bijection
-   between the two which reverses the face inclusions.
-   #+END_QUOTE
-
-   A [[http://www.comp.lancs.ac.uk/~kristof/research/notes/voronoi/voronoi.pdf][pretty good chapter]] on Voronoi
-
-   [[http://www.ae.metu.edu.tr/tuncer/ae546/prj/delaunay/][Triangulation algorithms]]
-
-   [[http://mathworld.wolfram.com/VoronoiPolygon.html][Voronoi polygon]]
-
-   [[http://en.wikipedia.org/wiki/Fundamental_polygon][Metric fundamental polygon]]
-
-   [[http://www.cs.umd.edu/class/spring2012/cmsc754/Lects/lect14.pdf][Incremental Delaunay]]
-   
-   Oh, shit: [[http://people.csail.mit.edu/indyk/6.838-old/handouts/lec8.pdf][step-by-step Voronoi]]
-
-   [[http://www.springerlink.com/index/p8377h68j82l6860.pdf][Fantastic paper by Knuth, et al.]]
-
-   This is good for an [[http://en.wikipedia.org/wiki/Delaunay_triangulation#Algorithms][intuition]], incidentally:
-
-   #+BEGIN_QUOTE
-   In mathematics and computational geometry, a Delaunay triangulation
-   for a set P of points in a plane is a triangulation DT(P) such that
-   no point in P is inside the circumcircle of any triangle in DT(P).
-   Delaunay triangulations maximize the minimum angle of all the
-   angles of the triangles in the triangulation; they tend to avoid
-   skinny triangles.
-   #+END_QUOTE
-*** TODO Matrices
-    Not a bad [[http://science.kennesaw.edu/~plaval/math3260/det1.pdf][recursive determinant]] (use only the first row).
-
-    #+BEGIN_SRC scheme
-      (use debug srfi-25)
-      
-      (include "arlib")
-      (include "play")
-      (let (;; (array (make-array (shape 0 3 0 3) 1))
-            (array (array (shape 0 4 0 4)
-                          7 4 2 0
-                          6 3 -1 2
-                          4 6 2 5
-                          8 2 -7 1)))
-        (play array)
-        (array-for-each-index array (lambda x (debug x))))      
-    #+END_SRC
-
-    No; let's hard-code the 4x4 determinant: atlas-laplace is failing;
-    and we can't do LU-decomp for every matrix.
-
-    #+BEGIN_SRC scheme
-      (use srfi-25 test)
-      
-      ;;; Slightly embarrasing; but atlas-laplace won't install, and I don't
-      ;;; feel like incurring the O(n!) penalty of recursive Leibniz. See
-      ;;; <http://www.euclideanspace.com/maths/algebra/matrix/functions/determinant/fourD/index.htm>.
-      ;;; 
-      ;;; m03 * m12 * m21 * m30 -
-      ;;; m02 * m13 * m21 * m30 -
-      ;;; m03 * m11 * m22 * m30 +
-      ;;; m01 * m13 * m22 * m30 +
-      ;;; m02 * m11 * m23 * m30 -
-      ;;; m01 * m12 * m23 * m30 -
-      ;;; m03 * m12 * m20 * m31 +
-      ;;; m02 * m13 * m20 * m31 +
-      ;;; m03 * m10 * m22 * m31 -
-      ;;; m00 * m13 * m22 * m31 -
-      ;;; m02 * m10 * m23 * m31 +
-      ;;; m00 * m12 * m23 * m31 +
-      ;;; m03 * m11 * m20 * m32 -
-      ;;; m01 * m13 * m20 * m32 -
-      ;;; m03 * m10 * m21 * m32 +
-      ;;; m00 * m13 * m21 * m32 +
-      ;;; m01 * m10 * m23 * m32 -
-      ;;; m00 * m11 * m23 * m32 -
-      ;;; m02 * m11 * m20 * m33 +
-      ;;; m01 * m12 * m20 * m33 +
-      ;;; m02 * m10 * m21 * m33 -
-      ;;; m00 * m12 * m21 * m33 -
-      ;;; m01 * m10 * m22 * m33 +
-      ;;; m00 * m11 * m22 * m33
-      (define (4d-determinant m)
-        (+ (* (array-ref m 0 3) (array-ref m 1 2) (array-ref m 2 1) (array-ref m 3 0))
-           (- (* (array-ref m 0 2) (array-ref m 1 3) (array-ref m 2 1) (array-ref m 3 0)))
-           (- (* (array-ref m 0 3) (array-ref m 1 1) (array-ref m 2 2) (array-ref m 3 0)))
-           (* (array-ref m 0 1) (array-ref m 1 3) (array-ref m 2 2) (array-ref m 3 0))
-           (* (array-ref m 0 2) (array-ref m 1 1) (array-ref m 2 3) (array-ref m 3 0))
-           (- (* (array-ref m 0 1) (array-ref m 1 2) (array-ref m 2 3) (array-ref m 3 0)))
-           (- (* (array-ref m 0 3) (array-ref m 1 2) (array-ref m 2 0) (array-ref m 3 1)))
-           (* (array-ref m 0 2) (array-ref m 1 3) (array-ref m 2 0) (array-ref m 3 1))
-           (* (array-ref m 0 3) (array-ref m 1 0) (array-ref m 2 2) (array-ref m 3 1))
-           (- (* (array-ref m 0 0) (array-ref m 1 3) (array-ref m 2 2) (array-ref m 3 1)))
-           (- (* (array-ref m 0 2) (array-ref m 1 0) (array-ref m 2 3) (array-ref m 3 1)))
-           (* (array-ref m 0 0) (array-ref m 1 2) (array-ref m 2 3) (array-ref m 3 1))
-           (* (array-ref m 0 3) (array-ref m 1 1) (array-ref m 2 0) (array-ref m 3 2))
-           (- (* (array-ref m 0 1) (array-ref m 1 3) (array-ref m 2 0) (array-ref m 3 2)))
-           (- (* (array-ref m 0 3) (array-ref m 1 0) (array-ref m 2 1) (array-ref m 3 2)))
-           (* (array-ref m 0 0) (array-ref m 1 3) (array-ref m 2 1) (array-ref m 3 2))
-           (* (array-ref m 0 1) (array-ref m 1 0) (array-ref m 2 3) (array-ref m 3 2))
-           (- (* (array-ref m 0 0) (array-ref m 1 1) (array-ref m 2 3) (array-ref m 3 2)))
-           (- (* (array-ref m 0 2) (array-ref m 1 1) (array-ref m 2 0) (array-ref m 3 3)))
-           (* (array-ref m 0 1) (array-ref m 1 2) (array-ref m 2 0) (array-ref m 3 3))
-           (* (array-ref m 0 2) (array-ref m 1 0) (array-ref m 2 1) (array-ref m 3 3))
-           (- (* (array-ref m 0 0) (array-ref m 1 2) (array-ref m 2 1) (array-ref m 3 3)))
-           (- (* (array-ref m 0 1) (array-ref m 1 0) (array-ref m 2 2) (array-ref m 3 3)))
-           (* (array-ref m 0 0) (array-ref m 1 1) (array-ref m 2 2) (array-ref m 3 3))))
-      
-      (let ((array (array (shape 0 4 0 4)
-                          7 4 2 0
-                          6 3 -1 2
-                          4 6 2 5
-                          8 2 -7 1)))
-        ;; <http://www.intmath.com/matrices-determinants/2-large-determinants.php>
-        (test -279 (4d-determinant array)))
-    #+END_SRC
-** TODO EMST
-   There are even [[http://zachjorgensen.com/ictai06.pdf][EMST-based clustering algorithms]].
-** TODO Fortune's algorithm
-   Maybe we can lick this with a combination of
-
-   #+BEGIN_QUOTE
-   In mathematics, a Voronoi diagram is a special kind of
-   decomposition of a metric space, determined by distances to a
-   specified family of objects (subsets) in the space. These objects
-   are usually called the sites or the generators (but other names are
-   used, such as "seeds") and to each such object one associates a
-   corresponding Voronoi cell, namely the set of all points in the
-   given space whose distance to the given object is not greater than
-   their distance to the other objects.
-   #+END_QUOTE
-** TODO Plotting Voronoi
-   See [[http://had.co.nz/ggplot2/geom_path.html][path]] and [[http://had.co.nz/ggplot2/geom_segment.html][segment]]. We might actually build this Scheme-R bridge.
-   I'd like to do that; and Voronoi; and document [[https://github.com/klutometis/cock][cock]].
-
-   Start and end points: furthest points from one another? Better
-   would be if we could come up with a convex hull, calculate its
-   centroid, and find two vertices of maximum length whose adjoining
-   line approximately hits it. That way, paths are forced to go
-   through the interesting center.
-
-   #+BEGIN_SRC R :tangle voronoi.R :shebang #!/usr/bin/env Rscript
-     library(deldir)
-     library(ggplot2)
-     library(proto)
-     library(debug)
-     library(hash)
-     
-     n.vertices <- 100
-     ## tiles <- subset(deldir(rnorm(n.vertices),
-     ##                        rnorm(n.vertices))$dirsgs, !(bp1 | bp2))
-     tiles <- deldir(rnorm(n.vertices), rnorm(n.vertices))$dirsgs
-     
-     coordinates.to.key <- function(x, y)
-       sprintf('%s,%s', x, y)
-     
-     coordinates.to.vertex <- function(x, y)
-       proto(x=x, y=y)
-     
-     vertices <- hash()
-     neighbors <- hash()
-     
-     for (tile in apply(tiles, 1, list)) {
-       x1 <- tile[[1]][[1]]
-       y1 <- tile[[1]][[2]]
-       x2 <- tile[[1]][[3]]
-       y2 <- tile[[1]][[4]]
-     
-       k1 <- coordinates.to.key(x1, y1)
-       k2 <- coordinates.to.key(x2, y2)
-     
-       vertices[k1] <-
-         coordinates.to.vertex(x1, y1)
-       vertices[k2] <-
-         coordinates.to.vertex(x2, y2)
-     
-       n1 <- if (has.key(k1, neighbors)) neighbors[[k1]] else NULL
-       n2 <- if (has.key(k2, neighbors)) neighbors[[k2]] else NULL
-     
-       neighbors[k1] <- union(k2, n1)
-       neighbors[k2] <- union(k1, n2)
-     }
-     
-     ## Leftest vertex as start
-     leftest.vertex <- proto(x=Inf)
-     
-     ## Rightest vertex as end
-     rightest.vertex <- proto(x=-Inf)
-     
-     for (vertex in as.list(vertices)) {
-       if (vertex$x < leftest.vertex$x)
-         leftest.vertex <<- vertex
-     
-       if (vertex$x > rightest.vertex$x)
-         rightest.vertex <<- vertex
-     }
-     
-     start <- coordinates.to.key(leftest.vertex$x,
-                                 leftest.vertex$y)
-     end <- coordinates.to.key(rightest.vertex$x,
-                               rightest.vertex$y)
-     
-     ## Node is abstract; vertex has a location.
-     nodes <- keys(vertices)
-     
-     sink('/tmp/fifo')
-     for (node in nodes) {
-       vertex <- vertices[[node]]
-       cat(sprintf('(vertex %s %s %s)', node, vertex$x, vertex$y))
-     }
-     
-     for (node in nodes) {
-       cat(sprintf('(neighbor %s %s)',
-                   node,
-                   do.call(paste, as.list(neighbors[[node]]))))
-     }
-     
-     cat(sprintf('(start %s)', start))
-     cat(sprintf('(end %s)', end))
-     sink()
-     
-     ## path.file <- file('/tmp/harro-thar', 'wt')
-     ## for (node in nodes[sample(length(nodes), 10)])
-     ##   writeLines(node, path.file)
-     ## close(path.file)
-     
-     ## path <- readLines('/tmp/harro-thar')
-     
-     ## With fifos, we have to have a header line, for some reason.
-     ## close(stdout())
-     ## fifo <- file('/tmp/fifo', 'r', blocking=FALSE)
-     ## path <- readChar(fifo, nchars=1)
-     path <- readChar('/tmp/fifo', nchars=10)
-     ## path <- readLines('/tmp/fifo', n=1)
-     debug(path)
-     
-     path <- nodes[1:2]
-     
-     vertex.path <-
-       Map(function(node) vertices[[node]], path)
-     vertex.path.x <- function(vertex.path)
-       unlist(Map(function(vertex) vertex$x, vertex.path))
-     vertex.path.y <- function(vertex.path)
-       unlist(Map(function(vertex) vertex$y, vertex.path))
-     
-     png('voronoi.png', width=1024, heigh=768)
-     qplot(tiles$x1,
-           tiles$y1,
-           xlab="",
-           ylab="") +
-       opts(legend.position='none') +
-       geom_point(aes(x=leftest.vertex$x,
-                      y=leftest.vertex$y,
-                      alpha=1.0),
-                  shape=1,
-                  size=5) +
-       geom_text(aes(x=leftest.vertex$x,
-                     y=leftest.vertex$y,
-                     label='Start',
-                     alpha=1.0),
-                 size=3) +
-       geom_point(aes(x=rightest.vertex$x,
-                      y=rightest.vertex$y,
-                      alpha=1.0),
-                  shape=1,
-                  size=5) +
-       geom_text(aes(x=rightest.vertex$x,
-                     y=rightest.vertex$y,
-                     label='End',
-                     alpha=1.0),
-                 size=3) +
-       geom_segment(aes(x=tiles$x1,
-                        xend=tiles$x2,
-                        yend=tiles$y2,
-                        yend=tiles$y2,
-                        alpha=1.0)) +
-       geom_text(aes(x=tiles$x1 + (tiles$x2 - tiles$x1) / 2,
-                     y=tiles$y1 + (tiles$y2 - tiles$y1) / 2,
-                     label=signif(sqrt((tiles$x2 - tiles$x1) ^ 2 +
-                       (tiles$y2 - tiles$y1) ^ 2),
-                       digits=2),
-                     alpha=1.0),
-                 size=3) +
-       ## We have to do this in segments, if we want to be able to model
-       ## bi-directional search.
-       geom_path(aes(x=vertex.path.x(vertex.path),
-                     y=vertex.path.y(vertex.path),
-                     alpha=1.0),
-                 color='red',
-                 size=2.0) +
-       geom_point(aes(x=tiles$x1,
-                      y=tiles$y1,
-                      alpha=1.0))
-     dev.off()
-     
-   #+END_SRC
-
-   #+BEGIN_SRC scheme :tangle voronoi.scm :shebang #!/usr/bin/env chicken-scheme
-     (use debug extras posix shell srfi-18)
-     
-     (with-input-from-file "/tmp/fifo"
-       (lambda () (debug (read-lines))))
-     
-     ;; (system "cat /tmp/tempc74e.tmp > /tmp/fifo")
-     ;; (system "echo harro > /tmp/fifo")
-     
-     (with-output-to-file "/tmp/fifo"
-       (lambda ()
-         (display "oeutnho\004\n\n")
-         (flush-output)))
-     
-     #;
-     (thread-start!
-      (lambda ()
-        (with-output-to-file "/tmp/fifo"
-          (lambda ()
-            (display "oeutnhoeutnh\n")
-            (flush-output)))))
-     
-     ;; (with-output-to-file "/tmp/fifo"
-     ;;   (lambda ()
-     ;;     (display "harro, welt\n")
-     ;;     (flush-output)))
-     
-     ;; (capture "./voronoi.R")
-     #;
-     (receive (in out id err)
-       (process* "./voronoi.R" '())
-       (debug (read-all err))
-       ;; (close-input-port err)
-       (debug (read-all in))
-       ;; (close-input-port in)
-       ;; (with-output-to-port out
-       ;;   (lambda ()
-       ;;     (display "harro\n")))
-       ;; (flush-output)
-       ;; (system "cat tempc74e.tmp > /tmp/fifo &")
-       #;
-       (thread-start!
-       (lambda ()
-       (with-output-to-file "/tmp/fifo"
-       (lambda ()
-       (display "oeutnhoeutnh\n")))))
-       ;; (with-input-from-file "/tmp/fifo"
-       ;;   (read))
-       ;; (read-all in)
-       ;; (close-input-port err)
-       ;; (read-all err)
-       )
-     ;; (with-output-to-file "/tmp/fifo"
-     ;;   (lambda ()
-     ;;     (display "harro thar\n")
-     ;;     (display "harro thar\n")))
-     ;; (flush-output)
-     
-   #+END_SRC
-
-   #+BEGIN_SRC sh :tangle voronoi.sh :shebang #!/usr/bin/env sh
-     ./voronoi.scm &
-     ./voronoi.R
-     # ls -altrc
-   #+END_SRC
-
-   What about using Scheme to write R? [[http://cran.r-project.org/doc/manuals/R-exts.html#Linking-GUIs-and-other-front_002dends-to-R][Embedded R]], of course; from C
-   first and then from Chicken? See [[file:/usr/local/src/R/src/unix/system.txt][system.txt]], [[file:/usr/local/src/R/src/unix/Rembedded.c][Rembedded.c]], &c.
-   [[file:/usr/local/src/R/tests/Embedding/embeddedRCall.c][embeddedRCall.c]] is cool, too. [[file:/usr/local/src/R/src/gnuwin32/front-ends/rtest.c][Minimal Windows example]].
-
-   We're probably just talking about the [[http://cran.r-project.org/doc/manuals/R-exts.html#The-R-API][C-api]] in R, aren't we?
-
-   [[http://rpy.sourceforge.net/][An example in Python]]; someone embedded it in [[http://www.joeconway.com/plr/][PostgreSQL]].
-
-   Christ, [[http://biostat.mc.vanderbilt.edu/wiki/pub/Main/RApacheProject/paper.pdf][they]] even did a [[http://biostat.mc.vanderbilt.edu/rapache/][mod_R]] (a.k.a. rApache). Take a look at [[http://common-lisp.net/project/rcl/][RCL]],
-   the CL-interface?
-
-   [[file:/usr/local/src/R/tests/Embedding/Rpackage.c][Rpackage.c]] and [[file:/usr/local/src/R/tests/Embedding/tryEval.c][tryEval.c]] have some possibly interesting
-   initialization code.
-
-   See [[http://www.omegahat.org/RSPython/][RSPython]], [[http://rpy.sourceforge.net/rpy.html][rpy]], [[http://rpy.sourceforge.net/rpy2.html][rpy2]].
-*** TODO Embedded R
-    [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/introduction.html][rpy2]] has =robjects=, which does lookup on =.globalEnv=. Has a
-    callable R-vector type; allows calling of arbitrary R code. The
-    ``R singleton.'' There's =r_repr=: R-representation? Deals with
-    the specific vector-types.
-
-    Have to call on vectors:
-
-    #+BEGIN_EXAMPLE
-      >>> rsum = robjects.r['sum']
-      >>> rsum(robjects.IntVector([1,2,3]))[0]
-      6L    
-    #+END_EXAMPLE
-
-    Passes keyword arguments:
-
-    #+BEGIN_EXAMPLE
-      >>> rsort = robjects.r['sort']
-      >>> res = rsort(robjects.IntVector([1,2,3]), decreasing=True)
-      >>> print(res.r_repr())
-      c(3L, 2L, 1L)
-    #+END_EXAMPLE
-
-    Has a specific =r.X11()= call; there's a whole spiel about
-    processing interactive events; they talk about that a little [[http://cran.r-project.org/doc/manuals/R-exts.html#Meshing-event-loops][here]].
-
-    It looks like the example code deals a lot with special
-    vector-types.
-
-    There's mechanisms for accessing fields:
-
-    #+BEGIN_EXAMPLE
-      >>> print(lm_D9.names)
-       [1] "coefficients"  "residuals"     "effects"       "rank"
-       [5] "fitted.values" "assign"        "qr"            "df.residual"
-       [9] "contrasts"     "xlevels"       "call"          "terms"
-      [13] "model"
-    #+END_EXAMPLE
-
-    A lot of invocation of the R-singleton:
-
-    #+BEGIN_EXAMPLE
-      import rpy2.robjects as robjects
-      
-      r = robjects.r
-      
-      m = r.matrix(r.rnorm(100), ncol=5)
-      pca = r.princomp(m)
-      r.plot(pca, main="Eigen values")
-      r.biplot(pca, main="biplot")
-    #+END_EXAMPLE
-
-    Importing packages:
-
-    #+BEGIN_EXAMPLE
-      from rpy2.robjects.packages import importr
-      
-      base     = importr('base')
-      stats    = importr('stats')
-      graphics = importr('graphics')
-      
-      m = base.matrix(stats.rnorm(100), ncol = 5)
-      pca = stats.princomp(m)
-      graphics.plot(pca, main = "Eigen values")
-      stats.biplot(pca, main = "biplot")
-    #+END_EXAMPLE
-
-    It assigns variables to the imported packages so that you can
-    reference shit.
-
-    [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/robjects_rinstance.html][The instance of R]]; on which: call arbitrary code, too:
-
-    #+BEGIN_EXAMPLE
-      >>> print(robjects.r('1+2'))
-      [1] 3
-      >>> sqr = robjects.r('function(x) x^2')
-      >>> print(sqr)
-      function (x)
-      x^2
-      >>> print(sqr(2))
-      [1] 4
-    #+END_EXAMPLE
-
-    Something about an R-representation:
-
-    #+BEGIN_QUOTE
-    The astute reader will quickly realize that R objects named by
-    python variables can be plugged into code through their R
-    representation:
-
-    #+BEGIN_EXAMPLE
-      >>> x = robjects.r.rnorm(100)
-      >>> robjects.r('hist(%s, xlab="x", main="hist(x)")' %x.r_repr())
-    #+END_EXAMPLE
-    #+END_QUOTE
-
-    [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/robjects_environments.html][Assigning to environment]]:
-
-    #+BEGIN_EXAMPLE
-      >>> robjects.r.ls(globalenv)
-      >>> robjects.globalenv["a"] = 123
-      >>> print(robjects.r.ls(globalenv))
-    #+END_EXAMPLE
-
-    Oh, shit: [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/robjects_formulae.html][formulae]]; [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/robjects_oop.html][fucking OO]]; [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/vector.html][specialized vectors]], along with
-    subsetting. Specialized =NA=, too. Special-casing operators, too.
-    =DataFrame=.
-
-    [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/robjects_convert.html][Type-conversion]] between R <-> Python: =ri2py=, =py2ri=, =py2ro=,
-    &c. [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/graphics.html][Graphics]] require special handling. [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/interactive.html][Interactive]].
-
-    [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/rinterface.html][Low-level interface]]: =initr=, =endr=, &c. =globalenv=, =baseenv=,
-    &c.
-
-    Oh, shit:
-
-    #+BEGIN_QUOTE
-    Rpy2 is using its own reference counting system in order to bridge
-    R with Python and keep the pass-by-reference approach familiar to
-    Python users.
-    #+END_QUOTE
-
-    Calling Python from R:
-
-    #+BEGIN_QUOTE
-    As could be expected from R’s functional roots, functions are
-    first-class objects. This means that the use of callback functions
-    as passed as parameters is not seldom, and this also means that
-    the Python programmer has to either be able write R code for
-    functions as arguments, or have a way to pass Python functions to
-    R as genuine R functions. That last option is becoming possible,
-    in other words one can write a Python function and expose it to R
-    in such a way that the embedded R engine can use as a regular R
-    function.
-    #+END_QUOTE
-
-    They have support for closures; [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/rinterface.html#index-19][enumeration of R-types]]. Don't
-    forget about [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/server.html#][Rserve]].
-
-    [[http://rpy.sourceforge.net/rpy/doc/rpy_html/Invocation.html#Invocation][rpy]] looks less magical; [[http://rpy.sourceforge.net/rpy/doc/rpy_html/R-objects-look-up.html#R-objects-look-up][name-munging]]; [[http://rpy.sourceforge.net/rpy/doc/rpy_html/Methods-of-Robj-type.html#Methods-of-Robj-type][awkward calling]]; [[http://rpy.sourceforge.net/rpy/doc/rpy_html/Sequence-protocol.html#Sequence-protocol][slices are
-    not supported]]; [[http://rpy.sourceforge.net/rpy/doc/rpy_html/R-to-Python.html#R-to-Python][conversions]]; [[http://rpy.sourceforge.net/rpy/doc/rpy_html/No-conversion.html#No-conversion][Robj object]]; 
-
-    [[http://www.omegahat.org/RSPython/overview.pdf][RSPython]] looks lower-level and possibly simpler; is it a good
-    candidate for emulation? Heh: they did the [[http://www.omegahat.org/RSPython/PythonFromR.pdf][reverse]] with a
-    =.Python= form in R.
-
-    Ah: the [[http://www.omegahat.org/RSPython/Conversion.pdf][customizable convertes]] you see in =rpy=, too.
-
-    They also [[file:/usr/local/src/RSPython/src/RCall.c][count references]], apparently; [[file:/usr/local/src/RSPython/inst/Python/RS.py][RS.py]] is refreshingly (or
-    deceptively) simple. (The whole thing is packaged as an R-package,
-    by the way.)
-    
-    Here's [[file:/usr/local/src/RSPython/src/PythonCall.c][some meat]]; see:
-
-    #+BEGIN_QUOTE
-    This handles calling R from Python.
-
-    This code is quickly thrown together for the purposes of a)
-    learning about the Python internals and C API, and b) to
-    illustrate to others how one might embed R in Python or other
-    applications and programming environments.
-
-    There is a lot more to come, specifically the ability to be able
-    to pass Python objects to R by "reference" and have R operate on
-    these by calling methods in those objects that result in calls to
-    Python functions/methods.
-    #+END_QUOTE
-
-    Interesting:
-
-    #+BEGIN_QUOTE
-    This is the routine that implements Python calling an S function
-    with a simple, ordered list of arguments (i.e. no named S
-    arguments, etc.). This converts the Python arguments into S
-    objects.
-
-    This gets 4 arguments:
-      1) the name of the function to call
-      2) the un-named arguments as a Tuple
-      3) the named arguments (that do not use ``reserved'' words)
-      4) a convert argument.    
-    #+END_QUOTE
-
-    [[http://cran.r-project.org/doc/manuals/R-exts.html#Attributes][Install]] pops things in the symbol-table, incidentally.
-
-    #+BEGIN_SRC c :tangle Reval.h
-      #include <chicken.h>
-      
-      C_word Reval(char* function, C_word args);
-      
-    #+END_SRC
-
-    #+BEGIN_SRC c :tangle Reval.c
-      #include <assert.h>
-      #include <string.h>
-      
-      #include <Rinternals.h>
-      #include <Rdefines.h>
-      #include <Rembedded.h>
-      
-      #include <chicken.h>
-      
-      SEXP toR(C_word arg) {
-        if (C_truep(C_i_flonump(arg))) {
-          return ScalarReal(C_flonum_magnitude(arg));
-        } else if (C_truep(C_fixnump(arg))) {
-          return ScalarInteger(C_num_to_int(arg));
-        } else if (C_truep(C_booleanp(arg))) {
-          return ScalarLogical(C_truep(arg) ? 1 : 0);
-        } else if (C_truep(C_stringp(arg))) {
-          return ScalarString(Rf_mkChar(C_string_or_null(arg)));
-        } else if (C_truep(C_vectorp(arg))) {
-          /* Is this where we need to type the vector; or can we just
-             VECSXP? We probably need to type the vector. Can we stick e.g.
-             STRSXP in an INTSXP, though?
-      
-             See e.g. getListElementType in RPythonConverters.c; see also
-             do_c_dflt in bind.c. What about calling the actual R function?
-             It's too bad do_c or do_c_dflt aren't exposed in
-             Rinternals.h.
-      
-             The call to R is slower, but guaranteed to be semantically
-             correct. */
-          int length = C_unfix(C_i_vector_length(arg));
-          SEXP c = allocVector(LANGSXP, length + 1);
-          SEXP ci = c;
-          SETCAR(c, Rf_findFun(Rf_install("c"), R_GlobalEnv));
-          int i;
-          for (i = 0; i < length; i++) {
-            ci = CDR(ci);
-            SETCAR(ci, toR(C_i_vector_ref(arg, C_fix(i))));
-          }
-          int error = 0;
-          return R_tryEval(c, R_GlobalEnv, &error);
-        } else if (C_truep(C_pointerp(arg))) {
-          return *((SEXP *) C_c_pointer_or_null(arg));
-        }
-        /* What the fuck is this, if not above? There should be some
-           symmetry: if I don't know what the hell it is, it's a pointer
-           (and vice versa). */
-        return R_NilValue;
-      }
-      
-      void Reval(C_word c, C_word self, C_word k, C_word name, C_word args) {
-        int nargs = C_num_to_int(C_i_length(args));
-        SEXP expression = allocVector(LANGSXP, nargs + 1);
-        /* Have to check this for R_NilValue; see e.g. RNamedCall.c. */
-        SEXP function = Rf_findFun(Rf_install(C_c_string(name)), R_GlobalEnv);
-      
-        SETCAR(expression, function);
-        SEXP iterexp = CDR(expression);
-      
-        while (!C_truep(C_i_nullp(args))) {
-          SETCAR(iterexp, toR(C_i_car(args)));
-          args = C_i_cdr(args);
-          iterexp = CDR(iterexp);
-        }
-      
-        int error = 0;
-        SEXP Rvalue = R_tryEval(expression, R_GlobalEnv, &error);
-        if (!error) {
-          switch (TYPEOF(Rvalue)) {
-          case REALSXP:
-            {
-              int length = Rf_length(Rvalue);
-              if (length == 1) {
-                C_word *value = C_alloc(C_SIZEOF_FLONUM);
-                C_kontinue(k, C_flonum(&value, REAL(Rvalue)[0]));
-              } else {
-                C_word *v = C_alloc(C_SIZEOF_VECTOR(length)),
-                  *v0 = v;
-                *(v++) = C_VECTOR_TYPE | length;
-                int i;
-                for (i = 0; i < length; i++) {
-                  C_word *value = C_alloc(C_SIZEOF_FLONUM);
-                  *(v++) = C_flonum(&value, REAL(Rvalue)[i]);
-                }
-                C_kontinue(k, (C_word) v0);
-              }
-            }
-          case INTSXP:
-            {
-              int length = Rf_length(Rvalue);
-              if (length == 1) {
-                C_kontinue(k, C_fix(INTEGER(Rvalue)[0]));
-              } else {
-                C_word *v = C_alloc(C_SIZEOF_VECTOR(length)),
-                  *v0 = v;
-                *(v++) = C_VECTOR_TYPE | length;
-                int i;
-                for (i = 0; i < length; i++)
-                  *(v++) = C_fix(INTEGER(Rvalue)[i]);
-                C_kontinue(k, (C_word) v0);
-              }
-            }
-          case LGLSXP:
-            {
-              int length = Rf_length(Rvalue);
-              if (length == 1) {
-                C_kontinue(k, LOGICAL(Rvalue)[0] ? C_SCHEME_TRUE : C_SCHEME_FALSE);
-              } else {
-                C_word *v = C_alloc(C_SIZEOF_VECTOR(length)),
-                  *v0 = v;
-                *(v++) = C_VECTOR_TYPE | length;
-                int i;
-                for (i = 0; i < length; i++)
-                  *(v++) = LOGICAL(Rvalue)[i] ?
-                    C_SCHEME_TRUE : C_SCHEME_FALSE;
-                C_kontinue(k, (C_word) v0);
-              }
-            }
-          case STRSXP:
-            {
-              int length = Rf_length(Rvalue);
-              if (length == 1) {
-                const char *string = CHAR(STRING_ELT(Rvalue, 0));
-                C_word *value = C_alloc(C_SIZEOF_STRING(strlen(string)));
-                C_kontinue(k, C_string(&value, strlen(string), (char *) string));
-              } else {
-                C_word *v = C_alloc(C_SIZEOF_VECTOR(length)),
-                  *v0 = v;
-                *(v++) = C_VECTOR_TYPE | length;
-                int i;
-                for (i = 0; i < length; i++) {
-                  const char *string = CHAR(STRING_ELT(Rvalue, i));
-                  C_word *value = C_alloc(C_SIZEOF_STRING(strlen(string)));
-                  *(v++) = C_string(&value, strlen(string), (char *) string);
-                }
-                C_kontinue(k, (C_word) v0);
-              }
-            }
-          case VECSXP:
-            {
-              C_word *list = C_alloc(C_SIZEOF_LIST(1)); 
-              C_kontinue(k, C_a_i_list1(&list, 1, C_fix(1)));
-            }
-          default:
-            {
-              C_word *pointer = C_alloc(C_SIZEOF_POINTER);
-              /* We probably need to allocate a new structure, copy Rvalue
-                 thither, and free at some point; don't we? Or at least
-                 protect the value?
-      
-                 PROTECT and UNPROTECT preserve within calls, while
-                 R_PreserveObject and R_ReleaseObject preserve past calls;
-                 see:
-                 <http://r.789695.n4.nabble.com/R-PreserveObject-R-ReleaseObject-reference-counting-needed-td997167.html>*/
-              C_kontinue(k, C_mpointer(&pointer, &Rvalue));
-            }
-          }
-        }
-        C_kontinue(k, C_SCHEME_UNDEFINED);
-      }
-      
-    #+END_SRC
-
-    #+BEGIN_SRC scheme :tangle R-test.scm
-      (use debug dollar lolevel miscmacros test)
-      
-      #>
-      #include "Reval.h"
-      #include <Rembedded.h>
-      <#
-      
-      (foreign-code
-       #<<END
-       Rf_initEmbeddedR(4, (char*[]) {"R-test",
-                                      "--slave",
-                                      "--vanilla",
-                                      "--args"}) ;
-      END
-      )
-      
-      (define Reval (##core#primitive "Reval"))
-      
-      ;;; We should avoid this trick and just use varargs.
-      (define (R-eval f . args)
-        (Reval f args))
-      
-      (debug (R-eval "rep" 2 10))
-      (debug (R-eval "rep" 2.1 10))
-      (debug (R-eval "rep" #t 10))
-      (debug (R-eval "rep" #f 10))
-      (debug (R-eval "rep" "harro" 10))
-      (debug (R-eval "c" 2.023989823989823))
-      (debug (R-eval "c" 1))
-      (debug (R-eval "c" 2))
-      (debug (R-eval "c" 3))
-      (debug (R-eval "c" "harro"))
-      (debug (R-eval "c" '#(10 11)))
-      (debug (R-eval "list" "harro"))
-      (let ((env (R-eval "new.env")))
-        (R-eval "print" env))
-      
-    #+END_SRC
-
-    #+BEGIN_SRC makefile :tangle R-test.mk :shebang #!/usr/bin/unexpand -t 4
-      R_FLAGS := $(shell R CMD config --cppflags) \
-          $(shell R CMD config --ldflags)
-      
-      CHICKEN_FLAGS := $(shell csc -cflags -ldflags -libs)
-      
-      all: R-test
-      
-      Reval.o: Reval.c
-          gcc $(R_FLAGS) $(CHICKEN_FLAGS) -c -o $@ $^
-      
-      R-test: Reval.o R-test.scm
-          csc $(R_FLAGS) -o $@ $^      
-    #+END_SRC
-    
-    Keep [[file:/usr/local/lib64/R/include/Rinternals.h][Rinternals.h]] handy: there's good stuff in there about types,
-    &c. Not to mention the [[http://cran.r-project.org/doc/manuals/R-ints.html][R internals]] doc. [[file:/usr/local/lib64/R/include/Rdefines.h][Rdefines.h]] has stuff like
-    =NEW_NUMERIC=, by the way.
-
-    There's a missing argument marker:
-
-    #+BEGIN_SRC c
-      LibExtern SEXP  R_MissingArg;       /* Missing argument marker */
-    #+END_SRC
-
-    Do we need to have a special symbol, e.g. =*missing*=? Named
-    variables have to be handled, too. See e.g. keywords and kvlists.
-
-    Can we create a SEXP in Scheme before we pass it to R, and
-    UNPROTECT it in the destructor? I wonder if we'll have impedence
-    mismatch between R and Scheme GC. God, I hope not. Or can we pass
-    primitive types to see and do the primitive -> SEXP calculus in C?
-
-    Look at the [[http://wiki.call-cc.org/eggref/4/lua][lua egg]], by the way, for a good, basic, thoughtful
-    API; cf. [[http://wiki.call-cc.org/eggref/4/bind][bind]] and [[http://wiki.call-cc.org/eggref/4/dollar][dollar]]. Lua doesn't drop into C at all, it's
-    all-dollar. Ah, it's all in the associated =.c= and =.h= files;
-    wait: that's the entirety of Lua? Wow. =lua-main.scm= is
-    beautiful, but maybe that's because Lua was built from the ground
-    up as an embeddable. R, maybe not so much. Can be coerced, though.
-
-    Can we confine the complexities of e.g. =SEXP= to embedded C; or
-    do we have to go through the whole =define-foreign-record-type=
-    rigmarole?
-
-    See [[file:/usr/local/src/RSPython/src/RPythonConverters.c][RPythonConverters.c]], incidentally, for some conversion
-    goodness. [[file:/usr/local/src/RSPython/inst/include/RSCommon.h][Mother-fuckers]]:
-
-    #+BEGIN_SRC c
-      typedef SEXP USER_OBJECT_;
-    #+END_SRC
-
-    Uses =getListElementType= to simplify to vectors when there are
-    homogenous datatypes; we can just use native vectors, right?
-    Native vectors are of course heterogenous in Scheme.
-
-    Can we write write a C-function that takes a =C_word=
-    (representing a list somehow), and returns a =C_word= representing
-    the R-object? RSPython has an optional translate thing. Should we
-    force the user to package things as R-objects; or should we
-    translate transparently? I'm loathe to do the latter; initial
-    hypothesis, however?
-
-    See [[file:/usr/local/src/chicken-4.7.0.6/chicken.h][chicken.h]] for things like =C_inline C_word C_a_i_list1(C_word
-    **a, int n, C_word x1)=, which create lists;
-
-    On [[http://cran.r-project.org/doc/manuals/R-exts.html#Garbage-Collection][PROTECT]]: they unprotect return before =return=. How much of the
-    conversion can we do in Scheme? Seems more flexible that way.
-
-    Is =C_c_pointer= useful for returning opaque R-objects, by the
-    way? =C_pointer_to_object=?
-
-    There's a [[file:/usr/local/lib64/R/include/Rinternals.h][reason]], incidentally, why things come up as both vectors
-    and lists:
-
-    #+BEGIN_SRC c
-      #define IS_LIST(x)      IS_VECTOR(x)
-    #+END_SRC
-
-    How do we distinguish true lists from vectors? Maybe try the
-    =Rf_isList=, =Rf_isPairList=, &c. from =Rinternals.h=.
-
-    Here's the list:
-
-    #+BEGIN_SRC c
-      Rboolean Rf_isArray(SEXP);
-      Rboolean Rf_isFactor(SEXP);
-      Rboolean Rf_isFrame(SEXP);
-      Rboolean Rf_isFunction(SEXP);
-      Rboolean Rf_isInteger(SEXP);
-      Rboolean Rf_isLanguage(SEXP);
-      Rboolean Rf_isList(SEXP);
-      Rboolean Rf_isMatrix(SEXP);
-      Rboolean Rf_isNewList(SEXP);
-      Rboolean Rf_isNumber(SEXP);
-      Rboolean Rf_isNumeric(SEXP);
-      Rboolean Rf_isPairList(SEXP);
-      Rboolean Rf_isPrimitive(SEXP);
-      Rboolean Rf_isTs(SEXP);
-      Rboolean Rf_isUserBinop(SEXP);
-      Rboolean Rf_isValidString(SEXP);
-      Rboolean Rf_isValidStringF(SEXP);
-      Rboolean Rf_isVector(SEXP);
-      Rboolean Rf_isVectorAtomic(SEXP);
-      Rboolean Rf_isVectorList(SEXP);
-      Rboolean Rf_isVectorizable(SEXP);
-    #+END_SRC
-
-    Oh, yeah: there was that whole [[http://cran.r-project.org/doc/manuals/R-exts.html#Handling-lists][newList]] thing. Can we cherry-pick
-    the things that have obvious Scheme counterparts
-
-    From [[http://cran.r-project.org/doc/manuals/R-lang.html#Attributes][R-lang]]:
-
-    #+BEGIN_QUOTE
-    Matrices and arrays are simply vectors with the attribute dim and
-    optionally dimnames attached to the vector.
-    #+END_QUOTE
-
-    [[http://cran.r-project.org/doc/manuals/R-lang.html#Factors][Factors]] sounds like enums:
-
-    #+BEGIN_QUOTE
-    Factors are currently implemented using an integer array to
-    specify the actual levels and a second array of names that are
-    mapped to the integers.
-    #+END_QUOTE
-
-    I wonder if =Rf_isFrame= applies to dataframes.
-
-    This is cool, by the way; these guys dispatch on [[http://cran.r-project.org/doc/manuals/R-exts.html#Calling-_002eExternal][TYPEOF(el)]]:
-
-    #+BEGIN_SRC c
-      #include <R_ext/PrtUtil.h>
-           
-      SEXP showArgs(SEXP args)
-      {
-        args = CDR(args); /* skip 'name' */
-        for(int i = 0; args != R_NilValue; i++, args = CDR(args)) {
-          const char *name =
-            isNull(TAG(args)) ? "" : CHAR(PRINTNAME(TAG(args)));
-          SEXP el = CAR(args);
-          if (length(el) == 0) {
-            Rprintf("[%d] '%s' R type, length 0\n", i+1, name);
-            continue;
-          }
-          switch(TYPEOF(el)) {
-          case REALSXP:
-            Rprintf("[%d] '%s' %f\n", i+1, name, REAL(el)[0]);
-            break;
-          case LGLSXP:
-          case INTSXP:
-            Rprintf("[%d] '%s' %d\n", i+1, name, INTEGER(el)[0]);
-            break;
-          case CPLXSXP:
-            {
-              Rcomplex cpl = COMPLEX(el)[0];
-              Rprintf("[%d] '%s' %f + %fi\n", i+1, name, cpl.r, cpl.i);
-            }
-            break;
-          case STRSXP:
-            Rprintf("[%d] '%s' %s\n", i+1, name,
-                    CHAR(STRING_ELT(el, 0)));
-            break;
-          default:
-            Rprintf("[%d] '%s' R type\n", i+1, name);
-          }
-        }
-        return(R_NilValue);
-      }
-    #+END_SRC
-
-    Here's another list:
-
-    #+BEGIN_SRC c
-      #undef isNull
-      #define isNull(s)   (TYPEOF(s) == NILSXP)
-      #undef isSymbol
-      #define isSymbol(s) (TYPEOF(s) == SYMSXP)
-      #undef isLogical
-      #define isLogical(s)    (TYPEOF(s) == LGLSXP)
-      #undef isReal
-      #define isReal(s)   (TYPEOF(s) == REALSXP)
-      #undef isComplex
-      #define isComplex(s)    (TYPEOF(s) == CPLXSXP)
-      #undef isExpression
-      #define isExpression(s) (TYPEOF(s) == EXPRSXP)
-      #undef isEnvironment
-      #define isEnvironment(s) (TYPEOF(s) == ENVSXP)
-      #undef isString
-      #define isString(s) (TYPEOF(s) == STRSXP)
-      #undef isObject
-      #define isObject(s) (OBJECT(s) != 0)
-    #+END_SRC
-
-    And yet another unadorned list:
-
-    #+BEGIN_SRC c
-      #define isArray         Rf_isArray
-      #define isBasicClass            Rf_isBasicClass
-      #define isComplex       Rf_isComplex
-      #define isEnvironment       Rf_isEnvironment
-      #define isExpression        Rf_isExpression
-      #define isFactor        Rf_isFactor
-      #define isFrame         Rf_isFrame
-      #define isFree          Rf_isFree
-      #define isFunction      Rf_isFunction
-      #define isInteger       Rf_isInteger
-      #define isLanguage      Rf_isLanguage
-      #define isList          Rf_isList
-      #define isLogical       Rf_isLogical
-      #define isSymbol        Rf_isSymbol
-      #define isMatrix        Rf_isMatrix
-      #define isNewList       Rf_isNewList
-      #define isNull          Rf_isNull
-      #define isNumeric       Rf_isNumeric
-      #define isNumber        Rf_isNumber
-      #define isObject        Rf_isObject
-      #define isOrdered       Rf_isOrdered
-      #define isPairList      Rf_isPairList
-      #define isPrimitive     Rf_isPrimitive
-      #define isReal          Rf_isReal
-      #define isS4            Rf_isS4
-      #define isString        Rf_isString
-      #define isTs            Rf_isTs
-      #define isUnordered     Rf_isUnordered
-      #define isUnsorted      Rf_isUnsorted
-      #define isUserBinop     Rf_isUserBinop
-      #define isValidString       Rf_isValidString
-      #define isValidStringF      Rf_isValidStringF
-      #define isVector        Rf_isVector
-      #define isVectorAtomic      Rf_isVectorAtomic
-      #define isVectorizable      Rf_isVectorizable
-      #define isVectorList        Rf_isVectorList
-    #+END_SRC
-
-    Here's a list of SEXP-types that we could dispatch on via e.g.
-    =switch= or some data-driven mechanism:
-
-    #+BEGIN_SRC c
-      #define NILSXP       0    /* nil = NULL */
-      #define SYMSXP       1    /* symbols */
-      #define LISTSXP      2    /* lists of dotted pairs */
-      #define CLOSXP       3    /* closures */
-      #define ENVSXP       4    /* environments */
-      #define PROMSXP      5    /* promises: [un]evaluated closure arguments */
-      #define LANGSXP      6    /* language constructs (special lists) */
-      #define SPECIALSXP   7    /* special forms */
-      #define BUILTINSXP   8    /* builtin non-special forms */
-      #define CHARSXP      9    /* "scalar" string type (internal only)*/
-      #define LGLSXP      10    /* logical vectors */
-      #define INTSXP      13    /* integer vectors */
-      #define REALSXP     14    /* real variables */
-      #define CPLXSXP     15    /* complex variables */
-      #define STRSXP      16    /* string vectors */
-      #define DOTSXP      17    /* dot-dot-dot object */
-      #define ANYSXP      18    /* make "any" args work.
-                       Used in specifying types for symbol
-                       registration to mean anything is okay  */
-      #define VECSXP      19    /* generic vectors */
-      #define EXPRSXP     20    /* expressions vectors */
-      #define BCODESXP    21    /* byte code */
-      #define EXTPTRSXP   22    /* external pointer */
-      #define WEAKREFSXP  23    /* weak reference */
-      #define RAWSXP      24    /* raw bytes */
-      #define S4SXP       25    /* S4, non-vector */
-      
-      /* used for detecting PROTECT issues in memory.c */
-      #define NEWSXP      30    /* fresh node creaed in new page */
-      #define FREESXP     31    /* node released by GC */
-      
-      #define FUNSXP      99    /* Closure or Builtin or Special */
-    #+END_SRC
-
-    No, the whole fucking calculus in [[file:/usr/local/src/R/src/include/Rinlinedfuns.h][Rinlinedfuns.h]] regarding e.g.
-    =isPairList= is relatively complex. Yeah; frame is dataframe, by
-    the way:
-
-    #+BEGIN_SRC c
-      INLINE_FUN Rboolean isFrame(SEXP s)
-      {   
-        SEXP klass;
-        int i;
-        if (OBJECT(s)) {
-          klass = getAttrib(s, R_ClassSymbol);
-          for (i = 0; i < length(klass); i++)
-            if (!strcmp(CHAR(STRING_ELT(klass, i)), "data.frame")) return TRUE;
-        }
-        return FALSE;
-      }      
-    #+END_SRC
-
-    Levels can be symbols, can't they?
-
-    Here's the difference between numeric and number:
-
-    #+BEGIN_SRC c
-      INLINE_FUN Rboolean isNumeric(SEXP s)
-      {   
-        switch(TYPEOF(s)) {
-        case INTSXP:
-          if (inherits(s,"factor")) return FALSE;
-        case LGLSXP:
-        case REALSXP:
-          return TRUE;
-        default:
-          return FALSE;
-        }
-      }
-      
-      /** Is an object "Numeric" or  complex */
-      INLINE_FUN Rboolean isNumber(SEXP s)
-      {   
-        switch(TYPEOF(s)) {
-        case INTSXP:
-          if (inherits(s,"factor")) return FALSE;
-        case LGLSXP:
-        case REALSXP:
-        case CPLXSXP:
-          return TRUE;
-        default:
-          return FALSE;
-        }
-      }
-    #+END_SRC
-    
-    That's cool; they have scalar constructors:
-
-    #+BEGIN_SRC c
-      INLINE_FUN SEXP ScalarLogical(int x)
-      {   
-        SEXP ans = allocVector(LGLSXP, 1);
-        if (x == NA_LOGICAL) LOGICAL(ans)[0] = NA_LOGICAL;
-        else LOGICAL(ans)[0] = (x != 0);
-        return ans;
-      }
-    #+END_SRC
-
-    Making a named vector:
-
-    #+BEGIN_SRC c
-      /**
-       * Create a named vector of type TYP
-       *
-       * @example const char *nms[] = {"xi", "yi", "zi", ""};
-       *          mkNamed(VECSXP, nms);  =~= R  list(xi=, yi=, zi=)
-       *
-       * @param TYP a vector SEXP type (e.g. REALSXP)
-       * @param names names of list elements with null string appended
-       *
-       * @return (pointer to a) named vector of type TYP
-       */
-      INLINE_FUN SEXP mkNamed(SEXPTYPE TYP, const char **names)
-      {   
-        SEXP ans, nms;
-        int i, n;
-      
-        for (n = 0; strlen(names[n]) > 0; n++) {}
-        ans = PROTECT(allocVector(TYP, n));
-        nms = PROTECT(allocVector(STRSXP, n));
-        for (i = 0; i < n; i++)
-          SET_STRING_ELT(nms, i, mkChar(names[i]));
-        setAttrib(ans, R_NamesSymbol, nms);
-        UNPROTECT(2);
-        return ans;
-      }      
-    #+END_SRC
-
-    Making strings:
-
-    #+BEGIN_SRC c
-      /* short cut for  ScalarString(mkChar(s)) : */
-      INLINE_FUN SEXP mkString(const char *s)
-      {   
-        SEXP t;
-      
-        PROTECT(t = allocVector(STRSXP, 1));
-        SET_STRING_ELT(t, 0, mkChar(s));
-        UNPROTECT(1);
-        return t;
-      }      
-    #+END_SRC
-
-    More basic tests:
-
-    #+BEGIN_SRC c
-      Rboolean (Rf_isNull)(SEXP s);
-      Rboolean (Rf_isSymbol)(SEXP s);
-      Rboolean (Rf_isLogical)(SEXP s);
-      Rboolean (Rf_isReal)(SEXP s);
-      Rboolean (Rf_isComplex)(SEXP s);
-      Rboolean (Rf_isExpression)(SEXP s);
-      Rboolean (Rf_isEnvironment)(SEXP s);
-      Rboolean (Rf_isString)(SEXP s);
-      Rboolean (Rf_isObject)(SEXP s);
-    #+END_SRC
-
-    [[http://www.jetcafe.org/jim/c-style.html#Naming][Funny]]:
-
-    #+BEGIN_QUOTE
-    In short, follow "Mike's Rule" to make variable name size
-    proportional to scope:
-    #+BEGIN_EXAMPLE
-    length(name(variable)) ~ log(countlines(scope(variable)))
-    #+END_EXAMPLE
-    #+END_QUOTE
-
-    Need an =Rvalue=, =Rfind=, or =Rget= to look up variables in a
-    given environment (default to e.g. =R_GlobalEnv=).
-
-    [[http://api.call-cc.org/doc/cairo][Cairo]] is replete with instances of allocating f64-vectors for e.g.
-    pointers in Scheme before descending into C. We could probably do
-    that before-hand, since we know the arguments; not necessarily the
-    size, though? Sure: if we do the translation from within Scheme.
-    Nursery takes care of garbage collection, I believe.
-
-    #+BEGIN_SRC scheme :tangle minimal-segv.scm
-      (use debug
-           miscmacros)
-      
-      (define (give-me-some-shit)
-        ((foreign-primitive
-          scheme-object
-          ()
-          "C_word *value = C_alloc(C_SIZEOF_FLONUM);"
-          "return(C_flonum(&value, 1.234));")))
-      
-      (dotimes (i 100000)
-        (debug (give-me-some-shit)))      
-    #+END_SRC
-
-    Is [[http://paste.call-cc.org/pasteid%3Dd91e9ef5c6f671e7d20b408ea9144cacc1fbae47][this]] interesting? I like [[file:/usr/local/src/chicken-eggs/s11n/trunk/s11n-c.c][s11n-c.c]]. What's the equivalent of
-    symbols in R, by the way?
-
-    Disjoint predicates in Scheme:
-
-    - boolean?
-    - symbol?
-    - char?
-    - vector?
-    - procedure?
-    - pair?
-    - number?
-    - string?
-    - port?
-      
-    How many of them can we support without trickery? Yet to do: char,
-    pair, symbol, vector.
-
-    To return opaque pointers, do we need =C_pointer_to_object=? How
-    do we tag it? =C_taggedmpointer=, =C_taggedmpointer_or_false=.
-    =C_make_pointer=, =C_make_tagged_pointer=. Shit: they're CPS.
-
-    [[https://groups.google.com/d/msg/julia-dev/p5R7_xo7sRE/VnC6ZoCv-OUJ][Length vs. truelength]]; [[http://r.789695.n4.nabble.com/R-PreserveObject-R-ReleaseObject-reference-counting-needed-td997167.html][R_PreserveObject and R_ReleaseObject]]. We
-    might have to use them.
-
-    [[file:/usr/local/src/R/src/main/bind.c][Vector-type calculus]]:
-
-    #+BEGIN_SRC c
-      SEXP attribute_hidden do_c_dflt(SEXP call, SEXP op, SEXP args, SEXP env)
-      {
-        SEXP ans, t;
-        int mode, recurse, usenames;
-        struct BindData data;
-        struct NameData nameData;
-      
-        /*    data.deparse_level = 1;  Initialize this early. */
-      
-        /* Method dispatch has failed; run the default code. */
-        /* By default we do not recurse, but this can be over-ridden */
-        /* by an optional "recursive" argument. */
-      
-        usenames = 1;
-        recurse = 0;
-        /* this was only done for length(args) > 1 prior to 1.5.0,
-           _but_ `recursive' might be the only argument */
-        PROTECT(args = ExtractOptionals(args, &recurse, &usenames, call));
-      
-        /* Determine the type of the returned value. */
-        /* The strategy here is appropriate because the */
-        /* object being operated on is a pair based list. */
-      
-        data.ans_flags  = 0;
-        data.ans_length = 0;
-        data.ans_nnames = 0;
-      
-        for (t = args; t != R_NilValue; t = CDR(t)) {
-          if (usenames && !data.ans_nnames) {
-            if (!isNull(TAG(t))) data.ans_nnames = 1;
-            else data.ans_nnames = HasNames(CAR(t));
-          }
-          AnswerType(CAR(t), recurse, usenames, &data);
-        }
-      
-        /* If a non-vector argument was encountered (perhaps a list if */
-        /* recursive is FALSE) then we must return a list.    Otherwise, */
-        /* we use the natural coercion for vector types. */
-      
-        mode = NILSXP;
-        if (data.ans_flags & 512)    mode = EXPRSXP;
-        else if (data.ans_flags & 256) mode = VECSXP;
-        else if (data.ans_flags & 128) mode = STRSXP;
-        else if (data.ans_flags &  64) mode = CPLXSXP;
-        else if (data.ans_flags &  32) mode = REALSXP;
-        else if (data.ans_flags &  16) mode = INTSXP;
-        else if (data.ans_flags & 2) mode = LGLSXP;
-        else if (data.ans_flags & 1) mode = RAWSXP;
-      
-        /* Allocate the return value and set up to pass through */
-        /* the arguments filling in values of the returned object. */
-      
-        PROTECT(ans = allocVector(mode, data.ans_length));
-        data.ans_ptr = ans;
-        data.ans_length = 0;
-        t = args;
-      
-        if (mode == VECSXP || mode == EXPRSXP) {
-          if (!recurse) {
-            while (args != R_NilValue) {
-              ListAnswer(CAR(args), 0, &data, call);
-              args = CDR(args);
-            }
-          }
-          else ListAnswer(args, recurse, &data, call);
-          data.ans_length = length(ans);
-        }
-        else if (mode == STRSXP)
-          StringAnswer(args, &data, call);
-        else if (mode == CPLXSXP)
-          ComplexAnswer(args, &data, call);
-        else if (mode == REALSXP)
-          RealAnswer(args, &data, call);
-        else if (mode == RAWSXP)
-          RawAnswer(args, &data, call);
-        else if (mode == LGLSXP)
-          LogicalAnswer(args, &data, call);
-        else /* integer */
-          IntegerAnswer(args, &data, call);
-        args = t;
-      
-        /* Build and attach the names attribute for the returned object. */
-      
-        if (data.ans_nnames && data.ans_length > 0) {
-          PROTECT(data.ans_names = allocVector(STRSXP, data.ans_length));
-          data.ans_nnames = 0;
-          while (args != R_NilValue) {
-            nameData.seqno = 0;
-            nameData.firstpos = 0;
-            nameData.count = 0;
-            NewExtractNames(CAR(args), R_NilValue, TAG(args), recurse, &data, &nameData);
-            args = CDR(args);
-          }
-          setAttrib(ans, R_NamesSymbol, data.ans_names);
-          UNPROTECT(1);
-        }
-        UNPROTECT(2);
-        R_FreeStringBufferL(&cbuff);
-        return ans;
-      } /* do_c */
-      
-    #+END_SRC
-**** On [[http://cran.r-project.org/doc/manuals/R-exts.html#Handling-lists][lists]]
-     #+BEGIN_QUOTE
-     List elements can be retrieved or set by direct access to the
-     elements of the generic vector. Suppose we have a list object a
-     <- list(f = 1, g = 2, h = 3)
-
-     Then we can access a$g as =a[[2]]= by 
-     #+BEGIN_SRC c
-       double g;
-       ....
-       g = REAL(VECTOR_ELT(a, 1))[0];
-     #+END_SRC
-
-     This can rapidly become tedious, and the following function
-     (based on one in package stats) is very useful:
-
-     #+BEGIN_SRC c
-       /* get the list element named str, or return NULL */
-            
-       SEXP getListElement(SEXP list, const char *str)
-       {
-         SEXP elmt = R_NilValue, names = getAttrib(list,
-                                                   R_NamesSymbol);
-            
-         for (R_len_t i = 0; i < length(list); i++)
-           if(strcmp(CHAR(STRING_ELT(names, i)), str) == 0) {
-             elmt = VECTOR_ELT(list, i);
-             break;
-           }
-         return elmt;
-       }
-     #+END_SRC
-
-     and enables us to say 
-
-     #+BEGIN_SRC c
-       double g;
-       g = REAL(getListElement(a, "g"))[0];
-     #+END_SRC
-     #+END_QUOTE
-**** Finding [[http://cran.r-project.org/doc/manuals/R-exts.html#Finding-and-setting-variables][variables]]
-     #+BEGIN_SRC c
-       SEXP getvar(SEXP name, SEXP rho)
-       {
-         SEXP ans;
-            
-         if(!isString(name) || length(name) != 1)
-           error("name is not a single string");
-         if(!isEnvironment(rho))
-           error("rho should be an environment");
-         ans = findVar(install(CHAR(STRING_ELT(name, 0))), rho);
-         Rprintf("first value is %f\n", REAL(ans)[0]);
-         return(R_NilValue);
-       }
-     #+END_SRC
-
-     #+BEGIN_SRC c
-       void defineVar(SEXP symbol, SEXP value, SEXP rho);
-       void setVar(SEXP symbol, SEXP value, SEXP rho);
-     #+END_SRC
-**** [[http://cran.r-project.org/doc/manuals/R-exts.html#Named-objects-and-copying][Copying]] objects
-     #+BEGIN_QUOTE
-     It is safe to modify the value of any SEXP for which NAMED(foo)
-     is zero, and if NAMED(foo) is two, the value should be duplicated
-     (via a call to duplicate) before any modification. Note that it
-     is the responsibility of the author of the code making the
-     modification to do the duplication, even if it is x whose value
-     is being modified after y <- x.
-     #+END_QUOTE
-**** [[http://cran.r-project.org/doc/manuals/R-exts.html#Evaluating-R-expressions-from-C][Evaluating]] R expressions
-     #+BEGIN_SRC c
-       SEXP lapply(SEXP list, SEXP expr, SEXP rho)
-       {
-         R_len_t i, n = length(list);
-         SEXP ans;
-            
-         if(!isNewList(list)) error("'list' must be a list");
-         if(!isEnvironment(rho)) error("'rho' should be an environment");
-         PROTECT(ans = allocVector(VECSXP, n));
-         for(i = 0; i < n; i++) {
-           defineVar(install("x"), VECTOR_ELT(list, i), rho);
-           SET_VECTOR_ELT(ans, i, eval(expr, rho));
-         }
-         setAttrib(ans, R_NamesSymbol, getAttrib(list, R_NamesSymbol));
-         UNPROTECT(1);
-         return(ans);
-       }
-     #+END_SRC
-
-     Protects a SEXP =ans= to return; this constructs a functions via
-     =lang2=:
-
-     #+BEGIN_SRC c
-       SEXP lapply2(SEXP list, SEXP fn, SEXP rho)
-       {
-         R_len_t i, n = length(list);
-         SEXP R_fcall, ans;
-            
-         if(!isNewList(list)) error("'list' must be a list");
-         if(!isFunction(fn)) error("'fn' must be a function");
-         if(!isEnvironment(rho)) error("'rho' should be an environment");
-         PROTECT(R_fcall = lang2(fn, R_NilValue));
-         PROTECT(ans = allocVector(VECSXP, n));
-         for(i = 0; i < n; i++) {
-           SETCADR(R_fcall, VECTOR_ELT(list, i));
-           SET_VECTOR_ELT(ans, i, eval(R_fcall, rho));
-         }
-         setAttrib(ans, R_NamesSymbol, getAttrib(list, R_NamesSymbol));
-         UNPROTECT(2);
-         return(ans);
-       }
-     #+END_SRC
-**** [[http://cran.r-project.org/doc/manuals/R-exts.html#Zero_002dfinding][Zero]] finding
-     #+BEGIN_SRC c
-       SEXP mkans(double x)
-       {
-         SEXP ans;
-         PROTECT(ans = allocVector(REALSXP, 1));
-         REAL(ans)[0] = x;
-         UNPROTECT(1);
-         return ans;
-       }
-            
-       double feval(double x, SEXP f, SEXP rho)
-       {
-         defineVar(install("x"), mkans(x), rho);
-         return(REAL(eval(f, rho))[0]);
-       }
-            
-       SEXP zero(SEXP f, SEXP guesses, SEXP stol, SEXP rho)
-       {
-         double x0 = REAL(guesses)[0], x1 = REAL(guesses)[1],
-           tol = REAL(stol)[0];
-         double f0, f1, fc, xc;
-            
-         if(tol <= 0.0) error("non-positive tol value");
-         f0 = feval(x0, f, rho); f1 = feval(x1, f, rho);
-         if(f0 == 0.0) return mkans(x0);
-         if(f1 == 0.0) return mkans(x1);
-         if(f0*f1 > 0.0) error("x[0] and x[1] have the same sign");
-            
-         for(;;) {
-           xc = 0.5*(x0+x1);
-           if(fabs(x0-x1) < tol) return  mkans(xc);
-           fc = feval(xc, f, rho);
-           if(fc == 0) return  mkans(xc);
-           if(f0*fc > 0.0) {
-             x0 = xc; f0 = fc;
-           } else {
-             x1 = xc; f1 = fc;
-           }
-         }
-       }
-     #+END_SRC
-
-     Good stuff in there with =mkans=.
-**** [[http://cran.r-project.org/doc/manuals/R-exts.html#Parsing-R-code-from-C][Parsing]] R
-     #+BEGIN_SRC c
-            #include <R.h>
-            #include <Rinternals.h>
-            #include <R_ext/Parse.h>
-            
-       SEXP menu_ttest3()
-       {
-         char cmd[256];
-         SEXP cmdSexp, cmdexpr, ans = R_NilValue;
-         ParseStatus status;
-               ...
-           if(done == 1) {
-             PROTECT(cmdSexp = allocVector(STRSXP, 1));
-             SET_STRING_ELT(cmdSexp, 0, mkChar(cmd));
-             cmdexpr = PROTECT(R_ParseVector(cmdSexp, -1, &status, R_NilValue));
-             if (status != PARSE_OK) {
-               UNPROTECT(2);
-               error("invalid call %s", cmd);
-             }
-             /* Loop is needed here as EXPSEXP will be of length > 1 */
-             for(R_len_t i = 0; i < length(cmdexpr); i++)
-               ans = eval(VECTOR_ELT(cmdexpr, i), R_GlobalEnv);
-             UNPROTECT(2);
-           }
-           return ans;
-       }
-     #+END_SRC
-**** [[http://cran.r-project.org/doc/manuals/R-exts.html#Printing][Printing]]
-     #+BEGIN_QUOTE
-     The most useful function for printing from a C routine compiled
-     into R is Rprintf. This is used in exactly the same way as
-     printf, but is guaranteed to write to R's output (which might be
-     a GUI console rather than a file, and can be re-directed by
-     sink). It is wise to write complete lines (including the "\n")
-     before returning to R. It is defined in R_ext/Print.h. 
-
-     The function REprintf is similar but writes on the error stream
-     (stderr) which may or may not be different from the standard
-     output stream. 
-
-     Functions Rvprintf and REvprintf are analogues using the vprintf
-     interface. Because that is a C99 interface, they are only defined
-     by R_ext/Print.h in C++ code if the macro R_USE_C99_IN_CXX is
-     defined when it is included.
-     #+END_QUOTE
-
-     Hence, we can define [[http://cran.r-project.org/doc/manuals/R-exts.html#Setting-R-callbacks][callbacks]] like e.g.:
-
-     #+BEGIN_SRC c
-       extern void (*ptr_R_WriteConsole)(const char *, int);
-     #+END_SRC
-
-     I vaguely remember doing this for rJava.
-**** The [[http://cran.r-project.org/doc/manuals/R-exts.html#Organization-of-header-files][headers]]
 * TODO 3.9
   #+BEGIN_SRC scheme
     (use data-structures
@@ -4685,6 +2471,2222 @@
      there that needs to be done.
 
 * TODOs
+** TODO 3.7
+   See [[http://en.wikipedia.org/wiki/Convex_hull_algorithms][convex hulls]]. It turns out that we don't have to model it as all
+   positions in the plane; let's model it as the corners of polygons.
+   We have to have a notion of "reachable" vertices, however. Can we
+   create the space as random polygons; and draw a graph of reachable
+   vertices? What's the best way to draw the vertices and path?
+
+   What's the trick for coming up with non-intersecting polygons? Is
+   this important? I think so, since we'll otherwise search unreachable
+   vertices; unless we can merge the polygons: but there's no guarantee
+   that the polygons will intersect at integer-valued x-ys.
+
+   See [[http://compgeom.cs.uiuc.edu/~jeffe/open/randompoly.html][random simple polygons]] (might be best to avoid [[http://en.wikipedia.org/wiki/Polygon#Self-intersecting_polygons][self-intersecting
+   ones]]); also, [[http://www.dcc.fc.up.pt/~apt/onlinepapers/caepia03.pdf][random orthogonal polygons]]. Nothing yet on
+   random-non-intersecting polygons; does it suffice to reject
+   points-in-preëxisting-polygons? You also have to take care not to
+   enclose prexisting points in new polygons. If we were drawing
+   parallel planes in e.g. three dimensions, this would be less of a
+   concern. Feasible? Sure. How do we draw it?
+
+   "Random non-overlapping polygons" might be more fruitful; seems like
+   it would be worthwhile to simply start drawing them at random,
+   rejecting overlapping ones until we reach $n$.
+
+   (See [[http://www.cgal.org/][CGAL]], incidentally: it even contains [[http://www.cgal.org/Manual/latest/doc_html/cgal_manual/packages.html#part_XVIII][visualization]] and
+   [[http://www.cgal.org/Manual/latest/doc_html/cgal_manual/packages.html#part_VI][polygon-operations]]; [[http://www.cgal.org/Manual/latest/doc_html/cgal_manual/Generator_ref/Function_random_polygon_2.html][random polygons]].)
+
+   Talking about [[http://cgal-discuss.949826.n4.nabble.com/Random-Polygon-Generator-tp951608p951609.html][convex hulls and voronoi diagrams]] to construct random
+   simple polygons; I wonder if CGAL wouldn't come in handy, after all.
+   Write the Scheme bindings? Ouch.
+
+   Can we just do a [[http://en.wikipedia.org/wiki/Voronoi_diagram][Voronoi tesselation]] and call it a day? It seems
+   like it has all the properties we're looking for: non-overlapping
+   simple polygons, unreachable points. Let's do it!
+
+   At this point, though, isn't it indistinguishable from drawing
+   random points in the plane and searching with a straight-line
+   heuristic? Yes. Voronoi diagrams are irrelevant. We could, of
+   course, generate them for the hell of it (using continuous, not
+   discrete, coördinates); and use their boundaries as our vertices.
+   Why? It's pretty. Still have to figure out how to draw them, though.
+
+   [[http://stackoverflow.com/questions/5608381/plotting-and-coloring-data-on-irregular-grid][Delaunay triangulation in R]], incidentally; using =spatstat= and
+   =maptools=, also =latticeExtra=.
+
+   Voronoi diagrams are [[http://stackoverflow.com/a/3083145][one-liners in R]]; [[http://stackoverflow.com/a/9405831][another example]]. See also [[http://www.carsonfarmer.com/2009/09/voronoi-polygons-with-r/][sp
+   and deldir]]. [[http://www.cgal.org/Manual/latest/doc_html/cgal_manual/packages.html#part_IX][CGAL]] does it, too, of course.
+
+   See [[http://en.wikipedia.org/wiki/Lloyd's_algorithm][Lloyd's algorithm]], [[http://en.wikipedia.org/wiki/Bowyer%E2%80%93Watson_algorithm][Bowyer-Watson]], and [[http://en.wikipedia.org/wiki/Fortune's_algorithm][Fortune]]; an alternative is
+   [[http://en.wikipedia.org/wiki/Delaunay_triangulation][Delaunay triangulation]], too. Basically, we have random points; and
+   want to divvy them up into coincident, non-overlapping, convex
+   polygons. There's a number of [[http://en.wikipedia.org/wiki/Delaunay_triangulation#Algorithms][algorithms]] for Delaunay triangulation;
+   one of which is $O(n^2)$.
+
+   What about just a [[http://en.wikipedia.org/wiki/Euclidean_minimum_spanning_tree][Euclidean minimum spanning tree]]? We can even find
+   one in [[http://en.wikipedia.org/wiki/Euclidean_minimum_spanning_tree#Algorithms_for_computing_EMSTs_in_two_dimensions][O(n log n)]].
+
+   Look no further than [[http://www.cs.uu.nl/geobook/][Computational Geometry]]: implementable
+   algorithms, detailed explanations. Next candidate for LACSRG,
+   incidentally?
+
+   We might as well go [[http://dl.acm.org/citation.cfmid%3D10549][straight to Fortune]]; Berg is somewhat irritating
+   with internal references; [[https://kedras.mif.vu.lt/bastys/academic/ATE/delaunay/FortuneDemo.htm][Èuk Roman]] did a sub-adequate job.
+
+   [[http://ect.bell-labs.com/who/sjf/][Steven's own implementation]] in c
+
+   Has some [[http://www.tcs.tifr.res.in/~workshop/bhu_igga/workshop.beamer.pdf][good non-optimal]] algorithms; [[http://www.ams.sunysb.edu/~jsbm/courses/345/11/lecture-Voronoi.ppt][n^2]].
+
+   [[http://www.ams.org/samplings/feature-column/fcarc-voronoi][Good prose from AMS]]:
+
+   #+BEGIN_QUOTE
+   If the next event that the sweep line encounters is a site event, we
+   simply insert the new site into our list of sites in the order in
+   which the corresponding parabolic arc appears on the beach line. We
+   then record the fact that we have encountered a new edge in the
+   diagram.
+
+   If the next event that the sweep line encounters is a circle event,
+   we record the fact that we have encountered a vertex in the diagram
+   and that this vertex is the endpoint of the edges corresponding to
+   the two breakpoints that have come together. We also record the new
+   edge corresponding to the new breakpoint that results from the
+   circle event.
+
+   Whether we encounter a site or circle event, we will always check to
+   see if we have added a new triple of parabolic arcs on the beach
+   line that may lead to a future circle event. It is also possible
+   that we will remove a future circle event from consideration if the
+   triple of parabolic arcs that led to it no longer exists after the
+   event.
+   #+END_QUOTE
+
+   Berg is pretty good, actually:
+
+   #+BEGIN_QUOTE
+   Now we know where and how the combinatorial structure of the beach
+   line changes: at a site event a new arc appears, and at a circle
+   event an existing arc drops out. We also know how this relates to
+   the Voronoi diagram under construction: at a site event a new edge
+   starts to grow, and at a circle event two growing edges meet to form
+   a vertex.
+   #+END_QUOTE
+
+   On the justification for $\mathcal{T}$, which changes:
+
+   #+BEGIN_QUOTE
+   The paradigm involves maintaining the intersection of the Voronoi
+   diagram with the sweep line. Unfortunately this is not so easy,
+   because the part of Vor(P) above depends not only on the sites that
+   lie above $\ell$ but also on sites below $\ell$. Stated differently,
+   when the sweep line reaches the topmost vertex of the Voronoi cell
+   $V(p_i)$ it has not yet encountered the corresponding site $p_i$.
+   Hence, we do not have all the information needed to compute the
+   vertex. We are forced to apply the plane sweep paradigm in a
+   slightly different fashion: instead of maintaining the intersection
+   of the Voronoi diagram with the sweep line, we maintain information
+   about the part of the Voronoi diagram of the sites above $\ell$ that
+   cannot be changed by sites below $\ell$.
+   #+END_QUOTE
+
+   Sweep line $\ell$; the beach line, however:
+
+   #+BEGIN_QUOTE
+   The locus of points that are closer to any site above $\ell$ than to
+   $\ell$ itself is bounded by parabolic arcs. We call this sequence of
+   parabolic arcs the beach line.
+
+   The beach line is x-monotone, that is, every vertical line
+   intersects it in exactly one point.
+   #+END_QUOTE
+
+   Breakpoints:
+
+   #+BEGIN_QUOTE
+   Notice that the breakpoints between the different parabolic arcs
+   forming the beach line lie on edges of the Voronoi diagram . . . the
+   breakpoints exactly trace out the Voronoi diagram while the sweep
+   line moves from top to bottom.
+
+   So, instead of maintaining the intersection of $Vor(P)$ with $\ell$,
+   we maintain the beach line as we move our sweep line $\ell$. We do
+   not maintain the beach line explicitly, since it changes
+   continuously as $\ell$ moves.
+
+   [The beach line's combinatorial structure changes] when a new
+   parabolic arc appears on it, and when a parabolic arc shrinks to a
+   point and disappears.
+   #+END_QUOTE
+
+   On site events:
+
+   #+BEGIN_QUOTE
+   [A new arc appears on the beach line] when the sweep line $\ell$
+   reaches a new site. The parabola defined by this site is at first a
+   degenerate parabola with zero width: a vertical line segment
+   connecting the new site to the beach line. As the sweep line
+   contiues to move downward the new parabola gets wider and wider.
+
+   We call the event where a new site is encountered a site event.
+
+   At a site event two new breakpoints appear, which start tracing out
+   edges. In fact, the new breakpoints coincide at first, and then move
+   in opposite directions to trace out the same edge. Initially, this
+   edge is not connected to the rest of the Voronoi diagram . . . Later
+   on, the growing edge will run into another edge, and it becomes
+   connected to the rest of the diagram.
+   #+END_QUOTE
+
+   Site events and beach lines:
+
+   #+BEGIN_QUOTE
+   The only way a new arc can appear on the beach line is through a
+   site event.
+
+   The beach line consists of at most $2n - 1$ parabolic arcs: each
+   site encountered gives rise to one new arc and the splitting of at
+   most one existing arc into two.
+   #+END_QUOTE
+
+   Circle events:
+
+   #+BEGIN_QUOTE
+   The second type of event is where an existing arc of the beach line
+   shrinks to a point and disappears. Three arcs $\alpha$,
+   $\alpha^\prime$, $\alpha^{\prime\prime}$ are defined by three sites
+   $p_i$, $p_j$, and $p_k$. At the moment $a^\prime$ disappears, the
+   parabolas defined by these three sites pass through a common point
+   $q$. Point $q$ is equidistant from $\ell$ and each of the three sites.
+   Hence, there is a circle passing through $p_i$, $p_j$, and $p_k$
+   with $q$ as its center and whose lowest point lies on $\ell$. The
+   point $q$ is a vertex of the Voronoi diagram.
+
+   We call the event where the sweep line reaches the lowest point of a
+   circle through three sites defining consecutive arcs on the beach
+   line a cirle event.
+   #+END_QUOTE
+
+   Circle events and arcs:
+
+   #+BEGIN_QUOTE
+   The onl way in which an existing arc can disappear from the beach
+   line is through a circle event.
+
+   At a site event a new arc appears, and at a circle event an existing
+   arc drops out.
+
+   At a site event a new edge starts to grow, and at a circle event two
+   growing edges meet to form a vertex.
+   #+END_QUOTE
+
+   Data structures:
+
+   #+BEGIN_QUOTE
+   We need a data structure that stores the part of the Voronoi diagram
+   computed thus far. We also need the two `standard' data structures
+   for any sweep line algorithm: an even queue and a structure that
+   represents the status of the sweep line. Here the latter structure
+   is a representation of the beach line.
+
+   We store the Voronoi diagram as a doubly-connected edge list.
+
+   The beach line is represented by a balanced binary search tree
+   $\mathcal{T}$. Its leaves correspond to the arcs of the beach
+   line--which is $x$-monotone--in an ordered manner: the leftmost leaf
+   represents the leftmost arc, and so on. Each leaf $\mu$ stores the
+   site that defines the arc it represents. The internal nodes of
+   $\mathcal{T}$ represent the breakpoints on the beach line. A
+   breakpoint is stored at an internal node by an ordered tuple of site
+   $<p_i, p_j>$, where $p_i$ defines the parabola left of the
+   breakpoint and $p_j$ defines the parabola to the right. We can find
+   in $O(\log n)$ the arc of the beach line lying above a new site. At
+   an internal node, we simply compare the $x$-coördinate of the new
+   site with the $x$-coördinate of the breakpoint, which can be
+   computed from the tuple of sites and the position of the sweep line
+   in constant time.
+
+   In $\mathcal{T}$ we also store pointers to the other two data
+   structures used during the sweep. Each leaf of $\mathcal{T}$,
+   representing arc $\alpha$, stores a pointer to a circle event in the
+   event queue in which $\alpha$ will disappear. This pointer is =nil=
+   if no circle event exists where $\alpha$ will disappear, or this
+   circle event hasn't been detected yet. Every internal node $v$ has a
+   pointer to a half-edge in the doubly-connected edge list of the
+   Voronoi diagram. $v$ has a pointer to one of the half-edges of the
+   edge being traced out by the breakpoint represented by $v$.
+
+   The event queue $\mathcal{Q}$ is implemented as a priority queue,
+   where the priority of an event is its $y$-coördinate. It stores the
+   upcoming events that are already known. For a site event we simply
+   store the site itself. For a circle event the event point that we
+   store is the lowest point of the circle, with a pointer to the leaf
+   in $\mathcal{T}$ that represents the arc that will disappear in the
+   event.
+   #+END_QUOTE
+
+   Detection of circle events:
+
+   #+BEGIN_QUOTE
+   All the site events are known in advance, but the circle events are
+   not.
+
+   During the sweep the beach line changes its topological structure at
+   every event. This may cause new triples of consecutive arcs to
+   appear on the beach line and it may cause existing triples to
+   disappear. For every three consecutive arcs on the beach line that
+   define a potential circle event, the potential event is stored in
+   the event queue $\mathcal{Q}$.
+
+   There can be consecutive triples whose two breakpoints do not
+   converge. It can also happen that the triple disappears before the
+   event has taken place: $false alarm$.
+
+   At every event, it checks all the new triples of consecutive arcs
+   that appear. At a site event we can get three new triples: one where
+   the new arc is the left arc of the triple, on where it is the middle
+   arc, and one where it is the right arc. When such a new triple has
+   converging breakpoints, the event is inserted into the event queue
+   $\mathcal{Q}$. In the case of a site event, the triple with the new
+   arc being the middle one can never cause a circle event, because the
+   left and right arc of the triple come from the same parabola and
+   therefore the breakpoints must diverge.
+
+   For all disappearing triples it is checked whether they have a
+   corresponding event in $\mathcal{Q}$. If so, the event is a false
+   alarm, and it is deleted from $\mathcal{Q}$. This can be done using
+   the pointers we have from the leaves in $\mathcal{T}$ to the
+   corresponding circle events in $\mathcal{Q}$.
+   #+END_QUOTE
+
+   Voronoi vertices and circle events:
+
+   #+BEGIN_QUOTE
+   Every Voronoi vertex is detected by means of a circle event.
+
+   The corresponding circle event is in $\mathcal{Q}$ just before the
+   event takes place, and the Voronoi vertex is detected.
+   #+END_QUOTE
+
+   The algorithm:
+
+   #+BEGIN_QUOTE
+   After the event queue $\mathcal{Q}$ is empty, the beach line hasn't
+   disappeared yet. The breakpoints correspond to the half-infinite
+   edges of the Voronoi diagram. We must add a bounding box to which
+   these edges can be attached.
+   #+END_QUOTE
+
+   [[https://github.com/gorhill/Javascript-Voronoi/blob/master/rhill-voronoi-core.js][Javascript Voronoi]], by the way; 
+
+**** TODO Implementation
+     #+BEGIN_QUOTE
+     At a site event two new breakpoints appear, which start tracing
+     out edges. In fact, the new breakpoints coincide at first, and
+     then move in opposite directions to trace out the same edge.
+     #+END_QUOTE
+
+     #+BEGIN_QUOTE
+     A breakpoint is stored at an internal node by an ordered tuple of
+     sites pi , p j , where pi defines the parabola left of the
+     breakpoint and p j defines the parabola to the right.
+     #+END_QUOTE
+
+     Computing the breakpoint (from [[http://www.skynet.ie/~sos/mapviewer/docs/Voronoi_Diagram_Notes_1.pdf][here]]):
+
+ # <<computing-breakpoint>>
+     #+BEGIN_QUOTE
+     Between each consecutive pair of sites pi and pj , there is a
+     breakpoint. Although the breakpoint moves as a function of the
+     sweep line, observe that it is possible to compute the exact
+     location of the breakpoint as a function of pi , pj , and the
+     current y-coordinate of the sweep line. In particular, the
+     breakpoint is the center of a circle that passes through pi , pj
+     and is tangent to the sweep line. Thus, as with beach lines, we do
+     not explicitly store breakpoints. Rather, we compute them only
+     when we need them.
+
+     Given a fixed location of the sweep line, determine the arc of the
+     beach line that intersects a given vertical line. This can be done
+     by a binary search on the breakpoints, which are computed “on the
+     fly”. (Think about this.)
+     #+END_QUOTE
+
+     They're talking about consecutive triples on the beach-line, by
+     the way; is this a factor of $x$-monotonicity?
+
+     #+BEGIN_QUOTE
+     For each consecutive triple pi , pj , pk on the beach line, we
+     compute the circumcircle of these points. (We’ll leave the messy
+     algebraic details as an exercise, but this can be done in O(1)
+     time.) If the lower endpoint of the circle (the minimum
+     y-coordinate on the circle) lies below the sweep line, then we
+     create a vertex event whose y-coordinate is the y-coordinate of
+     the bottom endpoint of the circumcircle. We store this in the
+     priority queue. Each such event in the priority queue has a cross
+     link back to the triple of sites that generated it, and each
+     consecutive triple of sites has a cross link to the event that it
+     generated in the priority queue.
+     #+END_QUOTE
+
+     This is pretty cool:
+
+     #+BEGIN_QUOTE
+     Let pi be the current site. We shoot a vertical ray up to
+     determine the arc that lies immediately above this point in the
+     beach line. Let pj be the corresponding site. We split this arc,
+     replacing it with the triple of arcs pj , pi , pj which we insert
+     into the beach line. Also we create new (dangling) edge for the
+     Voronoi diagram which lies on the bisector between pi and pj .
+     Some old triples that involved pj may be deleted and some new
+     triples involving pi will be inserted. For example, suppose that
+     prior to insertion we had the beach-line sequence p1 , p2 , pj ,
+     p3 , p4 . The insertion of pi splits the arc pj into two arcs,
+     denoted pj and pj . Although these are separate arcs, they involve
+     the same site, pj . The new sequence is p1 , p2 , pj , pi , pj ,
+     p3 , p4 . Any event associated with the old triple p2 , pj , p3
+     will be deleted. We also consider the creation of new events for
+     the triples p2 , pj , pi and pi , pj , p3 . Note that the new
+     triple pj , pi , pj cannot generate an event because it only
+     involves two distinct sites.
+     #+END_QUOTE
+
+     Also for vertices:
+
+     #+BEGIN_QUOTE
+     Let pi , pj , and pk be the three sites that generate this event
+     (from left to right). We delete the arc for pj from the beach
+     line. We create a new vertex in the Voronoi diagram, and tie the
+     edges for the bisectors (pi , pj ), (pj , pk ) to it, and start a
+     new edge for the bisector (pi , pk ) that starts growing down
+     below. Finally, we delete any events that arose from triples
+     involving this arc of pj , and generate new events corresponding
+     to consecutive triples involving pi and pk (there are two of
+     them). For example, suppose that prior to insertion we had the
+     beach-line sequence p1 , pi , pj , pk , p2 . After the event we
+     have the sequence p1 , pi , pk , p2 . We remove any events
+     associated with the triples p1 , pi , pj and pj , pk , p2 . (The
+     event pi , pj , pk has already been removed since we are
+     processing it now.) We also consider the creation of new events
+     for the triples p1 , pi , pk and pi , pk , p2 .
+     #+END_QUOTE
+
+     About the appearance and disappearance of triples (how to find
+     triples?):
+
+     #+BEGIN_QUOTE
+     So what the algorithm does is this. At every event, it checks all
+     the new triples of consecutive arcs that appear. For instance, at
+     a site event we can get three new triples: one where the new arc
+     is the left arc of the triple, one where it is the middle arc, and
+     one where it is the right arc.
+     #+END_QUOTE
+
+     Let's table Voronoi for the time being, or at least out-source it
+     to R; even shit as trivial as finding the center of circles
+     between two points and a tangent seems difficult.
+
+     Can't we just hard-code the determinant and solve the equations;
+     how did Fortune do it?
+***** TODO Binary search on breakpoints
+      See [[computing-breakpoint]].
+
+      [[http://math.stackexchange.com/questions/101986/how-to-determine-an-equation-of-a-circle-using-a-line-and-two-points-on-a-circle][Circle from two points and a line]]; there are two.
+
+      [[http://mathforum.org/library/drmath/view/55239.html][Symbolic solution]] (given three points):
+
+      #+BEGIN_EXAMPLE
+        This can all be done symbolically, of course, but you'll get some 
+        pretty complicated expressions for h and k. The simplest forms of 
+        these involve determinants, if you know what they are:
+
+                 |x1^2+y1^2  y1  1|        |x1  x1^2+y1^2  1|
+                 |x2^2+y2^2  y2  1|        |x2  x2^2+y2^2  1|
+                 |x3^2+y3^2  y3  1|        |x3  x3^2+y3^2  1|
+             h = ------------------,   k = ------------------
+                     |x1  y1  1|               |x1  y1  1|
+                   2*|x2  y2  1|             2*|x2  y2  1|
+                     |x3  y3  1|               |x3  y3  1|
+      #+END_EXAMPLE
+**** Visualization
+     Some [[http://www.csee.umbc.edu/~chang/cs641.s01/voronoi/][screencaps]] from the Odgaard-Nielsen program.
+**** TODO Test data
+     =tripack= has an interesting test-case:
+
+     #+BEGIN_EXAMPLE
+       > tritest
+       $x
+        [1] 0.00 1.00 0.50 0.15 0.85 0.50 0.00 1.00 0.35 0.65 0.65 0.35
+
+       $y
+        [1] 0.00 0.00 0.15 0.50 0.50 0.85 1.00 1.00 0.35 0.35 0.65 0.65
+     #+END_EXAMPLE
+
+     #+BEGIN_EXAMPLE
+       > voronoi.mosaic(tritest)
+       voronoi mosaic:
+       nodes: (x,y): neighbours (<0: dummy node)
+       1: (0.5,-0.7583333): 7 2 -1
+       2: (0.2392857,0.1107143): 8 3 1
+       3: (0.1107143,0.2392857): 9 4 2
+       4: (-0.7583333,0.5): 10 -2 3
+       5: (1.758333,0.5): 11 6 -3
+       6: (0.8892857,0.2392857): 12 7 5
+       7: (0.7607143,0.1107143): 8 1 6
+       8: (0.5,0.30625): 17 2 7
+       9: (0.30625,0.5): 18 10 3
+       10: (0.1107143,0.7607143): 14 4 9
+       11: (0.8892857,0.7607143): 16 12 5
+       12: (0.69375,0.5): 17 6 11
+       13: (0.5,1.758333): -4 14 16
+       14: (0.2392857,0.8892857): 10 15 13
+       15: (0.5,0.69375): 18 16 14
+       16: (0.7607143,0.8892857): 11 13 15
+       17: (0.5,0.5): 12 18 8
+       18: (0.5,0.5): 15 9 17
+       dummy nodes: (x,y)
+       1: (0.5,-3.275)
+       2: (-3.275,0.5)
+       3: (4.275,0.5)
+       4: (0.5,4.275)      
+     #+END_EXAMPLE
+
+     Uh, oh; floating-point difficulties:
+
+     #+BEGIN_EXAMPLE
+       > voronoi.mosaic(c(0, sqrt(1/2), 1), c(1, sqrt(1/2), 0))
+       voronoi mosaic:
+       nodes: (x,y): neighbours (<0: dummy node)
+       1: (2.680315e-16,2.680315e-16): -1 -2 -3 
+       dummy nodes: (x,y)
+       1: (2.680315e-16,2.680315e-16)
+       2: (2.680315e-16,2.680315e-16)
+       3: (2.680315e-16,2.680315e-16)
+     #+END_EXAMPLE
+
+     From Steven's implementation:
+
+     #+BEGIN_EXAMPLE
+       λ ~/prg/c/fortune/ master cat | ./voronoi
+       0 1
+       0.70710678118 0.70710678118
+       1 0
+       s 1.000000 0.000000
+       s 0.707107 0.707107
+       l -0.414214 1.000000 -0.000000
+       s 0.000000 1.000000
+       l -1.000000 1.000000 0.000000
+       v -0.000000 -0.000000
+       l 1.000000 -0.414214 -0.000000
+       e 1 -1 0
+       e 2 0 -1
+       e 0 0 -1
+     #+END_EXAMPLE
+
+     It appears as though he generates the bisecting-lines upon finding
+     points; keeps track of partial edges on those lines.
+
+     #+BEGIN_QUOTE
+     s a b
+     indicates that an input point at coordinates 
+     l a b c
+     indicates a line with equation ax + by = c.
+     v a b
+     indicates a vertex at  a b.
+     e l v1 v2
+     indicates a Voronoi segment which is a subsegment of line number l;
+     with endpoints numbered v1 and v2.  If v1 or v2 is -1, the line
+     extends to infinity.
+     #+END_QUOTE
+**** Several implementations and "low-level" pseudo-code
+     [[http://blog.ivank.net/fortunes-algorithm-and-implementation.html]]
+**** Fortune's notes
+     [[http://www.skynet.ie/~sos/mapviewer/docs/Voronoi_Diagram_Notes_1.pdf][Here]] and [[http://www.skynet.ie/~sos/mapviewer/docs/Voronoi_Diagram_Notes_2.pdf][here]]; gotten from [[http://www.skynet.ie/~sos/mapviewer/voronoi.php][here]].
+
+     Site event:
+
+     #+BEGIN_QUOTE
+     Let pi be the current site. We shoot a vertical ray up to
+     determine the arc that lies immediately above this point in the
+     beach line. Let pj be the corresponding site. We split this arc,
+     replacing it with the triple of arcs pj , pi , pj which we insert
+     into the beach line. Also we create new (dangling) edge for the
+     Voronoi diagram which lies on the bisector between pi and pj .
+     Some old triples that involved pj may be deleted and some new
+     triples involving pi will be inserted.
+     #+END_QUOTE
+
+     Vertex event:
+
+     #+BEGIN_QUOTE
+     Let pi , pj , and pk be the three sites that generate this event
+     (from left to right). We delete the arc for pj from the beach
+     line. We create a new vertex in the Voronoi diagram, and tie the
+     edges for the bisectors (pi , pj ), (pj , pk ) to it, and start a
+     new edge for the bisector (pi , pk ) that starts growing down
+     below. Finally, we delete any events that arose from triples
+     involving this arc of pj , and generate new events corresponding
+     to consecutive triples involving pi and pk (there are two of
+     them).
+     #+END_QUOTE
+**** Voronoi toy
+     http://nodename.com/blog/2009/05/11/a-voronoi-toy/
+
+     Points to [[http://netlib.org/voronoi/sweep2][this implementation]] of Fortune's.
+**** Good overview
+     See [[http://nms.csail.mit.edu/~aklmiu/6.838/L7.pdf][here]]; actually breaks down the change in the tree and
+     double-linked list.
+**** TODO Calculate convergence of breakpoints
+     [[http://cgm.cs.mcgill.ca/~mcleish/644/Projects/DerekJohns/Sweep.htm][Good animations]]; still doesn't elaborate on how to calculate
+     whether the breakpoints converge.
+
+     #+BEGIN_QUOTE
+     First of all, there can be consecutive triples whose two
+     breakpoints do not converge, that is, the directions in which they
+     move are such that they will not meet in the future; this happens
+     when the breakpoints move along two bisectors away from the
+     intersection point. In this case the triple does not define a
+     potential circle event.
+     #+END_QUOTE
+
+     [[http://stackoverflow.com/questions/9612065/breakpoint-convergence-in-fortunes-algorithm][Someone answered their own question]]:
+
+     #+BEGIN_QUOTE
+     As long as three sites are not collinear, then the edges that
+     perpendicularly bisect the segments between the sites are also
+     tangent to the circle whose edge contains all three sites.
+     Therefore the breakpoints defined by a triple of Voronoi sites
+     converge if the center of the circle defined by the three sites is
+     in front of the middle site, where "in front" and "behind" depend
+     on the coordinate system and sweepline alignment you have chosen.
+     #+END_QUOTE
+**** TODO Doubly-connect edge list
+     See [[http://en.wikipedia.org/wiki/Doubly_connected_edge_list][here]]:
+
+     #+BEGIN_QUOTE
+     DCEL is more than just a doubly linked list of edges. In the
+     general case, a DCEL contains a record for each edge, vertex and
+     face of the subdivision. Each record may contain additional
+     information, for example, a face may contain the name of the area.
+     Each edge usually bounds two faces and it is therefore convenient
+     to regard each edge as half-edge. Each half-edge bounds a single
+     face and thus has a pointer to that face. A half-edge has a
+     pointer to the next half-edge and previous half-edge of the same
+     face. To reach the other face, we can go to the twin of the
+     half-edge and then traverse the other face. Each half-edge also
+     has a pointer to its origin vertex (the destination vertex can be
+     obtained by querying the origin of its twin).
+
+     Each vertex v contains the coordinates of the vertex and also
+     stores a pointer to an arbitrary edge that has v as its origin.
+     Each face stores a pointer to some half-edge of its outer boundary
+     (if the face is unbounded then pointer is null). It also has a
+     list of half-edges, one for each hole that may be incident within
+     the face. If the vertices or faces do not hold any interesting
+     information, there is no need to store them, thus saving space and
+     reducing the data structure complexity.
+     #+END_QUOTE
+**** TODO $O(n^2 \log n)$ intersection of all the half-planes
+     Bisector between two points: perpendicular; points that are the
+     same distance from $p$ and $q$.
+
+     From [[http://www.cs.tufts.edu/g/163/notes05/voronoi_handout.pdf][Tufts]]:
+
+     #+BEGIN_QUOTE
+     A naive approach to construct of a Voronoi diagram is to determine
+     the region for each site, one at a time. Since each region is the
+     intersection of n − 1 half-planes, we can use an O(n log n)
+     half-plane intersection algorithm to determine this region.
+     Repeating for all n points, we have an O(n2 log n) algorithm.
+     #+END_QUOTE
+
+     Finally understand Berg's reference to chapter 4: they employ a
+     sweep-line for intersection.
+
+     [[http://cgm.cs.mcgill.ca/~mcleish/644/Projects/DerekJohns/First%2520Attempt.htm][Another description]]:
+
+     #+BEGIN_QUOTE
+     For all pairs of sites, find their perpendicular bisector. This
+     calculation takes O(n log n) time and is done once. Next, we take
+     all the open half-planes that contain a site and calculate the
+     intersection of these half-planes to obtain the Voronoi cell for
+     this site. An optimal algorithm for computing the intersection of
+     half-planes is O(n log n) [1]. Repeat for every site. The overall
+     complexity then becomes O(n2 log n).
+     #+END_QUOTE
+**** Voronoi over Delaunay
+     See [[http://cran.r-project.org/web/packages/tripack/tripack.pdf][here]]:
+
+     #+BEGIN_QUOTE
+     This function creates a Voronoi mosaic.
+
+     It creates first a Delaunay triangulation, determines the
+     circumcircle centers of its triangles, and connects these points
+     according to the neighbourhood relations between the triangles.
+     #+END_QUOTE
+*** TODO Voronoi
+    - [[http://cs.nyu.edu/~ajsecord/npar2002/html/stipples-node2.html][Lloyd's]] and minimum energy
+    - See the description of [[http://en.wikipedia.org/wiki/K-means_clustering#Algorithms][k-means]]
+    - R [[http://en.wikibooks.org/wiki/Data_Mining_Algorithms_In_R/Clustering/K-Means#Implementation][implementations]] of k-means
+*** TODO Triangulation
+    Can't we do some sort of Delaunay triangulation and remove edges to
+    produce more complex polygons?
+
+    From [[http://www.comp.lancs.ac.uk/~kristof/research/notes/voronoi/][here]]:
+
+    #+BEGIN_QUOTE
+    The Voronoi cells/polygons are sometimes also called Thiessen
+    Polytopes or Dirichlet Regions.
+    #+END_QUOTE
+
+    Ah, interesting! And on the dual-graph relationship:
+
+    #+BEGIN_QUOTE
+    The Delaunay triangulation is the dual structure of the Voronoi
+    diagram in $R^2$. By dual, we mean to draw a line segment between
+    two Voronoi vertices if their Voronoi polygons have a common edge,
+    or in more mathematical terminology: there is a natural bijection
+    between the two which reverses the face inclusions.
+    #+END_QUOTE
+
+    A [[http://www.comp.lancs.ac.uk/~kristof/research/notes/voronoi/voronoi.pdf][pretty good chapter]] on Voronoi
+
+    [[http://www.ae.metu.edu.tr/tuncer/ae546/prj/delaunay/][Triangulation algorithms]]
+
+    [[http://mathworld.wolfram.com/VoronoiPolygon.html][Voronoi polygon]]
+
+    [[http://en.wikipedia.org/wiki/Fundamental_polygon][Metric fundamental polygon]]
+
+    [[http://www.cs.umd.edu/class/spring2012/cmsc754/Lects/lect14.pdf][Incremental Delaunay]]
+
+    Oh, shit: [[http://people.csail.mit.edu/indyk/6.838-old/handouts/lec8.pdf][step-by-step Voronoi]]
+
+    [[http://www.springerlink.com/index/p8377h68j82l6860.pdf][Fantastic paper by Knuth, et al.]]
+
+    This is good for an [[http://en.wikipedia.org/wiki/Delaunay_triangulation#Algorithms][intuition]], incidentally:
+
+    #+BEGIN_QUOTE
+    In mathematics and computational geometry, a Delaunay triangulation
+    for a set P of points in a plane is a triangulation DT(P) such that
+    no point in P is inside the circumcircle of any triangle in DT(P).
+    Delaunay triangulations maximize the minimum angle of all the
+    angles of the triangles in the triangulation; they tend to avoid
+    skinny triangles.
+    #+END_QUOTE
+**** TODO Matrices
+     Not a bad [[http://science.kennesaw.edu/~plaval/math3260/det1.pdf][recursive determinant]] (use only the first row).
+
+     #+BEGIN_SRC scheme
+       (use debug srfi-25)
+
+       (include "arlib")
+       (include "play")
+       (let (;; (array (make-array (shape 0 3 0 3) 1))
+             (array (array (shape 0 4 0 4)
+                           7 4 2 0
+                           6 3 -1 2
+                           4 6 2 5
+                           8 2 -7 1)))
+         (play array)
+         (array-for-each-index array (lambda x (debug x))))      
+     #+END_SRC
+
+     No; let's hard-code the 4x4 determinant: atlas-laplace is failing;
+     and we can't do LU-decomp for every matrix.
+
+     #+BEGIN_SRC scheme
+       (use srfi-25 test)
+
+       ;;; Slightly embarrasing; but atlas-laplace won't install, and I don't
+       ;;; feel like incurring the O(n!) penalty of recursive Leibniz. See
+       ;;; <http://www.euclideanspace.com/maths/algebra/matrix/functions/determinant/fourD/index.htm>.
+       ;;; 
+       ;;; m03 * m12 * m21 * m30 -
+       ;;; m02 * m13 * m21 * m30 -
+       ;;; m03 * m11 * m22 * m30 +
+       ;;; m01 * m13 * m22 * m30 +
+       ;;; m02 * m11 * m23 * m30 -
+       ;;; m01 * m12 * m23 * m30 -
+       ;;; m03 * m12 * m20 * m31 +
+       ;;; m02 * m13 * m20 * m31 +
+       ;;; m03 * m10 * m22 * m31 -
+       ;;; m00 * m13 * m22 * m31 -
+       ;;; m02 * m10 * m23 * m31 +
+       ;;; m00 * m12 * m23 * m31 +
+       ;;; m03 * m11 * m20 * m32 -
+       ;;; m01 * m13 * m20 * m32 -
+       ;;; m03 * m10 * m21 * m32 +
+       ;;; m00 * m13 * m21 * m32 +
+       ;;; m01 * m10 * m23 * m32 -
+       ;;; m00 * m11 * m23 * m32 -
+       ;;; m02 * m11 * m20 * m33 +
+       ;;; m01 * m12 * m20 * m33 +
+       ;;; m02 * m10 * m21 * m33 -
+       ;;; m00 * m12 * m21 * m33 -
+       ;;; m01 * m10 * m22 * m33 +
+       ;;; m00 * m11 * m22 * m33
+       (define (4d-determinant m)
+         (+ (* (array-ref m 0 3) (array-ref m 1 2) (array-ref m 2 1) (array-ref m 3 0))
+            (- (* (array-ref m 0 2) (array-ref m 1 3) (array-ref m 2 1) (array-ref m 3 0)))
+            (- (* (array-ref m 0 3) (array-ref m 1 1) (array-ref m 2 2) (array-ref m 3 0)))
+            (* (array-ref m 0 1) (array-ref m 1 3) (array-ref m 2 2) (array-ref m 3 0))
+            (* (array-ref m 0 2) (array-ref m 1 1) (array-ref m 2 3) (array-ref m 3 0))
+            (- (* (array-ref m 0 1) (array-ref m 1 2) (array-ref m 2 3) (array-ref m 3 0)))
+            (- (* (array-ref m 0 3) (array-ref m 1 2) (array-ref m 2 0) (array-ref m 3 1)))
+            (* (array-ref m 0 2) (array-ref m 1 3) (array-ref m 2 0) (array-ref m 3 1))
+            (* (array-ref m 0 3) (array-ref m 1 0) (array-ref m 2 2) (array-ref m 3 1))
+            (- (* (array-ref m 0 0) (array-ref m 1 3) (array-ref m 2 2) (array-ref m 3 1)))
+            (- (* (array-ref m 0 2) (array-ref m 1 0) (array-ref m 2 3) (array-ref m 3 1)))
+            (* (array-ref m 0 0) (array-ref m 1 2) (array-ref m 2 3) (array-ref m 3 1))
+            (* (array-ref m 0 3) (array-ref m 1 1) (array-ref m 2 0) (array-ref m 3 2))
+            (- (* (array-ref m 0 1) (array-ref m 1 3) (array-ref m 2 0) (array-ref m 3 2)))
+            (- (* (array-ref m 0 3) (array-ref m 1 0) (array-ref m 2 1) (array-ref m 3 2)))
+            (* (array-ref m 0 0) (array-ref m 1 3) (array-ref m 2 1) (array-ref m 3 2))
+            (* (array-ref m 0 1) (array-ref m 1 0) (array-ref m 2 3) (array-ref m 3 2))
+            (- (* (array-ref m 0 0) (array-ref m 1 1) (array-ref m 2 3) (array-ref m 3 2)))
+            (- (* (array-ref m 0 2) (array-ref m 1 1) (array-ref m 2 0) (array-ref m 3 3)))
+            (* (array-ref m 0 1) (array-ref m 1 2) (array-ref m 2 0) (array-ref m 3 3))
+            (* (array-ref m 0 2) (array-ref m 1 0) (array-ref m 2 1) (array-ref m 3 3))
+            (- (* (array-ref m 0 0) (array-ref m 1 2) (array-ref m 2 1) (array-ref m 3 3)))
+            (- (* (array-ref m 0 1) (array-ref m 1 0) (array-ref m 2 2) (array-ref m 3 3)))
+            (* (array-ref m 0 0) (array-ref m 1 1) (array-ref m 2 2) (array-ref m 3 3))))
+
+       (let ((array (array (shape 0 4 0 4)
+                           7 4 2 0
+                           6 3 -1 2
+                           4 6 2 5
+                           8 2 -7 1)))
+         ;; <http://www.intmath.com/matrices-determinants/2-large-determinants.php>
+         (test -279 (4d-determinant array)))
+     #+END_SRC
+*** TODO EMST
+    There are even [[http://zachjorgensen.com/ictai06.pdf][EMST-based clustering algorithms]].
+*** TODO Fortune's algorithm
+    Maybe we can lick this with a combination of
+
+    #+BEGIN_QUOTE
+    In mathematics, a Voronoi diagram is a special kind of
+    decomposition of a metric space, determined by distances to a
+    specified family of objects (subsets) in the space. These objects
+    are usually called the sites or the generators (but other names are
+    used, such as "seeds") and to each such object one associates a
+    corresponding Voronoi cell, namely the set of all points in the
+    given space whose distance to the given object is not greater than
+    their distance to the other objects.
+    #+END_QUOTE
+*** TODO Plotting Voronoi
+    See [[http://had.co.nz/ggplot2/geom_path.html][path]] and [[http://had.co.nz/ggplot2/geom_segment.html][segment]]. We might actually build this Scheme-R bridge.
+    I'd like to do that; and Voronoi; and document [[https://github.com/klutometis/cock][cock]].
+
+    Start and end points: furthest points from one another? Better
+    would be if we could come up with a convex hull, calculate its
+    centroid, and find two vertices of maximum length whose adjoining
+    line approximately hits it. That way, paths are forced to go
+    through the interesting center.
+
+    #+BEGIN_SRC R :tangle voronoi.R :shebang #!/usr/bin/env Rscript
+      library(deldir)
+      library(ggplot2)
+      library(proto)
+      library(debug)
+      library(hash)
+
+      n.vertices <- 100
+      ## tiles <- subset(deldir(rnorm(n.vertices),
+      ##                        rnorm(n.vertices))$dirsgs, !(bp1 | bp2))
+      tiles <- deldir(rnorm(n.vertices), rnorm(n.vertices))$dirsgs
+
+      coordinates.to.key <- function(x, y)
+        sprintf('%s,%s', x, y)
+
+      coordinates.to.vertex <- function(x, y)
+        proto(x=x, y=y)
+
+      vertices <- hash()
+      neighbors <- hash()
+
+      for (tile in apply(tiles, 1, list)) {
+        x1 <- tile[[1]][[1]]
+        y1 <- tile[[1]][[2]]
+        x2 <- tile[[1]][[3]]
+        y2 <- tile[[1]][[4]]
+
+        k1 <- coordinates.to.key(x1, y1)
+        k2 <- coordinates.to.key(x2, y2)
+
+        vertices[k1] <-
+          coordinates.to.vertex(x1, y1)
+        vertices[k2] <-
+          coordinates.to.vertex(x2, y2)
+
+        n1 <- if (has.key(k1, neighbors)) neighbors[[k1]] else NULL
+        n2 <- if (has.key(k2, neighbors)) neighbors[[k2]] else NULL
+
+        neighbors[k1] <- union(k2, n1)
+        neighbors[k2] <- union(k1, n2)
+      }
+
+      ## Leftest vertex as start
+      leftest.vertex <- proto(x=Inf)
+
+      ## Rightest vertex as end
+      rightest.vertex <- proto(x=-Inf)
+
+      for (vertex in as.list(vertices)) {
+        if (vertex$x < leftest.vertex$x)
+          leftest.vertex <<- vertex
+
+        if (vertex$x > rightest.vertex$x)
+          rightest.vertex <<- vertex
+      }
+
+      start <- coordinates.to.key(leftest.vertex$x,
+                                  leftest.vertex$y)
+      end <- coordinates.to.key(rightest.vertex$x,
+                                rightest.vertex$y)
+
+      ## Node is abstract; vertex has a location.
+      nodes <- keys(vertices)
+
+      sink('/tmp/fifo')
+      for (node in nodes) {
+        vertex <- vertices[[node]]
+        cat(sprintf('(vertex %s %s %s)', node, vertex$x, vertex$y))
+      }
+
+      for (node in nodes) {
+        cat(sprintf('(neighbor %s %s)',
+                    node,
+                    do.call(paste, as.list(neighbors[[node]]))))
+      }
+
+      cat(sprintf('(start %s)', start))
+      cat(sprintf('(end %s)', end))
+      sink()
+
+      ## path.file <- file('/tmp/harro-thar', 'wt')
+      ## for (node in nodes[sample(length(nodes), 10)])
+      ##   writeLines(node, path.file)
+      ## close(path.file)
+
+      ## path <- readLines('/tmp/harro-thar')
+
+      ## With fifos, we have to have a header line, for some reason.
+      ## close(stdout())
+      ## fifo <- file('/tmp/fifo', 'r', blocking=FALSE)
+      ## path <- readChar(fifo, nchars=1)
+      path <- readChar('/tmp/fifo', nchars=10)
+      ## path <- readLines('/tmp/fifo', n=1)
+      debug(path)
+
+      path <- nodes[1:2]
+
+      vertex.path <-
+        Map(function(node) vertices[[node]], path)
+      vertex.path.x <- function(vertex.path)
+        unlist(Map(function(vertex) vertex$x, vertex.path))
+      vertex.path.y <- function(vertex.path)
+        unlist(Map(function(vertex) vertex$y, vertex.path))
+
+      png('voronoi.png', width=1024, heigh=768)
+      qplot(tiles$x1,
+            tiles$y1,
+            xlab="",
+            ylab="") +
+        opts(legend.position='none') +
+        geom_point(aes(x=leftest.vertex$x,
+                       y=leftest.vertex$y,
+                       alpha=1.0),
+                   shape=1,
+                   size=5) +
+        geom_text(aes(x=leftest.vertex$x,
+                      y=leftest.vertex$y,
+                      label='Start',
+                      alpha=1.0),
+                  size=3) +
+        geom_point(aes(x=rightest.vertex$x,
+                       y=rightest.vertex$y,
+                       alpha=1.0),
+                   shape=1,
+                   size=5) +
+        geom_text(aes(x=rightest.vertex$x,
+                      y=rightest.vertex$y,
+                      label='End',
+                      alpha=1.0),
+                  size=3) +
+        geom_segment(aes(x=tiles$x1,
+                         xend=tiles$x2,
+                         yend=tiles$y2,
+                         yend=tiles$y2,
+                         alpha=1.0)) +
+        geom_text(aes(x=tiles$x1 + (tiles$x2 - tiles$x1) / 2,
+                      y=tiles$y1 + (tiles$y2 - tiles$y1) / 2,
+                      label=signif(sqrt((tiles$x2 - tiles$x1) ^ 2 +
+                        (tiles$y2 - tiles$y1) ^ 2),
+                        digits=2),
+                      alpha=1.0),
+                  size=3) +
+        ## We have to do this in segments, if we want to be able to model
+        ## bi-directional search.
+        geom_path(aes(x=vertex.path.x(vertex.path),
+                      y=vertex.path.y(vertex.path),
+                      alpha=1.0),
+                  color='red',
+                  size=2.0) +
+        geom_point(aes(x=tiles$x1,
+                       y=tiles$y1,
+                       alpha=1.0))
+      dev.off()
+
+    #+END_SRC
+
+    #+BEGIN_SRC scheme :tangle voronoi.scm :shebang #!/usr/bin/env chicken-scheme
+      (use debug extras posix shell srfi-18)
+
+      (with-input-from-file "/tmp/fifo"
+        (lambda () (debug (read-lines))))
+
+      ;; (system "cat /tmp/tempc74e.tmp > /tmp/fifo")
+      ;; (system "echo harro > /tmp/fifo")
+
+      (with-output-to-file "/tmp/fifo"
+        (lambda ()
+          (display "oeutnho\004\n\n")
+          (flush-output)))
+
+      #;
+      (thread-start!
+       (lambda ()
+         (with-output-to-file "/tmp/fifo"
+           (lambda ()
+             (display "oeutnhoeutnh\n")
+             (flush-output)))))
+
+      ;; (with-output-to-file "/tmp/fifo"
+      ;;   (lambda ()
+      ;;     (display "harro, welt\n")
+      ;;     (flush-output)))
+
+      ;; (capture "./voronoi.R")
+      #;
+      (receive (in out id err)
+        (process* "./voronoi.R" '())
+        (debug (read-all err))
+        ;; (close-input-port err)
+        (debug (read-all in))
+        ;; (close-input-port in)
+        ;; (with-output-to-port out
+        ;;   (lambda ()
+        ;;     (display "harro\n")))
+        ;; (flush-output)
+        ;; (system "cat tempc74e.tmp > /tmp/fifo &")
+        #;
+        (thread-start!
+        (lambda ()
+        (with-output-to-file "/tmp/fifo"
+        (lambda ()
+        (display "oeutnhoeutnh\n")))))
+        ;; (with-input-from-file "/tmp/fifo"
+        ;;   (read))
+        ;; (read-all in)
+        ;; (close-input-port err)
+        ;; (read-all err)
+        )
+      ;; (with-output-to-file "/tmp/fifo"
+      ;;   (lambda ()
+      ;;     (display "harro thar\n")
+      ;;     (display "harro thar\n")))
+      ;; (flush-output)
+
+    #+END_SRC
+
+    #+BEGIN_SRC sh :tangle voronoi.sh :shebang #!/usr/bin/env sh
+      ./voronoi.scm &
+      ./voronoi.R
+      # ls -altrc
+    #+END_SRC
+
+    What about using Scheme to write R? [[http://cran.r-project.org/doc/manuals/R-exts.html#Linking-GUIs-and-other-front_002dends-to-R][Embedded R]], of course; from C
+    first and then from Chicken? See [[file:/usr/local/src/R/src/unix/system.txt][system.txt]], [[file:/usr/local/src/R/src/unix/Rembedded.c][Rembedded.c]], &c.
+    [[file:/usr/local/src/R/tests/Embedding/embeddedRCall.c][embeddedRCall.c]] is cool, too. [[file:/usr/local/src/R/src/gnuwin32/front-ends/rtest.c][Minimal Windows example]].
+
+    We're probably just talking about the [[http://cran.r-project.org/doc/manuals/R-exts.html#The-R-API][C-api]] in R, aren't we?
+
+    [[http://rpy.sourceforge.net/][An example in Python]]; someone embedded it in [[http://www.joeconway.com/plr/][PostgreSQL]].
+
+    Christ, [[http://biostat.mc.vanderbilt.edu/wiki/pub/Main/RApacheProject/paper.pdf][they]] even did a [[http://biostat.mc.vanderbilt.edu/rapache/][mod_R]] (a.k.a. rApache). Take a look at [[http://common-lisp.net/project/rcl/][RCL]],
+    the CL-interface?
+
+    [[file:/usr/local/src/R/tests/Embedding/Rpackage.c][Rpackage.c]] and [[file:/usr/local/src/R/tests/Embedding/tryEval.c][tryEval.c]] have some possibly interesting
+    initialization code.
+
+    See [[http://www.omegahat.org/RSPython/][RSPython]], [[http://rpy.sourceforge.net/rpy.html][rpy]], [[http://rpy.sourceforge.net/rpy2.html][rpy2]].
+**** TODO Embedded R
+     [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/introduction.html][rpy2]] has =robjects=, which does lookup on =.globalEnv=. Has a
+     callable R-vector type; allows calling of arbitrary R code. The
+     ``R singleton.'' There's =r_repr=: R-representation? Deals with
+     the specific vector-types.
+
+     Have to call on vectors:
+
+     #+BEGIN_EXAMPLE
+       >>> rsum = robjects.r['sum']
+       >>> rsum(robjects.IntVector([1,2,3]))[0]
+       6L    
+     #+END_EXAMPLE
+
+     Passes keyword arguments:
+
+     #+BEGIN_EXAMPLE
+       >>> rsort = robjects.r['sort']
+       >>> res = rsort(robjects.IntVector([1,2,3]), decreasing=True)
+       >>> print(res.r_repr())
+       c(3L, 2L, 1L)
+     #+END_EXAMPLE
+
+     Has a specific =r.X11()= call; there's a whole spiel about
+     processing interactive events; they talk about that a little [[http://cran.r-project.org/doc/manuals/R-exts.html#Meshing-event-loops][here]].
+
+     It looks like the example code deals a lot with special
+     vector-types.
+
+     There's mechanisms for accessing fields:
+
+     #+BEGIN_EXAMPLE
+       >>> print(lm_D9.names)
+        [1] "coefficients"  "residuals"     "effects"       "rank"
+        [5] "fitted.values" "assign"        "qr"            "df.residual"
+        [9] "contrasts"     "xlevels"       "call"          "terms"
+       [13] "model"
+     #+END_EXAMPLE
+
+     A lot of invocation of the R-singleton:
+
+     #+BEGIN_EXAMPLE
+       import rpy2.robjects as robjects
+
+       r = robjects.r
+
+       m = r.matrix(r.rnorm(100), ncol=5)
+       pca = r.princomp(m)
+       r.plot(pca, main="Eigen values")
+       r.biplot(pca, main="biplot")
+     #+END_EXAMPLE
+
+     Importing packages:
+
+     #+BEGIN_EXAMPLE
+       from rpy2.robjects.packages import importr
+
+       base     = importr('base')
+       stats    = importr('stats')
+       graphics = importr('graphics')
+
+       m = base.matrix(stats.rnorm(100), ncol = 5)
+       pca = stats.princomp(m)
+       graphics.plot(pca, main = "Eigen values")
+       stats.biplot(pca, main = "biplot")
+     #+END_EXAMPLE
+
+     It assigns variables to the imported packages so that you can
+     reference shit.
+
+     [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/robjects_rinstance.html][The instance of R]]; on which: call arbitrary code, too:
+
+     #+BEGIN_EXAMPLE
+       >>> print(robjects.r('1+2'))
+       [1] 3
+       >>> sqr = robjects.r('function(x) x^2')
+       >>> print(sqr)
+       function (x)
+       x^2
+       >>> print(sqr(2))
+       [1] 4
+     #+END_EXAMPLE
+
+     Something about an R-representation:
+
+     #+BEGIN_QUOTE
+     The astute reader will quickly realize that R objects named by
+     python variables can be plugged into code through their R
+     representation:
+
+     #+BEGIN_EXAMPLE
+       >>> x = robjects.r.rnorm(100)
+       >>> robjects.r('hist(%s, xlab="x", main="hist(x)")' %x.r_repr())
+     #+END_EXAMPLE
+     #+END_QUOTE
+
+     [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/robjects_environments.html][Assigning to environment]]:
+
+     #+BEGIN_EXAMPLE
+       >>> robjects.r.ls(globalenv)
+       >>> robjects.globalenv["a"] = 123
+       >>> print(robjects.r.ls(globalenv))
+     #+END_EXAMPLE
+
+     Oh, shit: [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/robjects_formulae.html][formulae]]; [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/robjects_oop.html][fucking OO]]; [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/vector.html][specialized vectors]], along with
+     subsetting. Specialized =NA=, too. Special-casing operators, too.
+     =DataFrame=.
+
+     [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/robjects_convert.html][Type-conversion]] between R <-> Python: =ri2py=, =py2ri=, =py2ro=,
+     &c. [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/graphics.html][Graphics]] require special handling. [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/interactive.html][Interactive]].
+
+     [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/rinterface.html][Low-level interface]]: =initr=, =endr=, &c. =globalenv=, =baseenv=,
+     &c.
+
+     Oh, shit:
+
+     #+BEGIN_QUOTE
+     Rpy2 is using its own reference counting system in order to bridge
+     R with Python and keep the pass-by-reference approach familiar to
+     Python users.
+     #+END_QUOTE
+
+     Calling Python from R:
+
+     #+BEGIN_QUOTE
+     As could be expected from R’s functional roots, functions are
+     first-class objects. This means that the use of callback functions
+     as passed as parameters is not seldom, and this also means that
+     the Python programmer has to either be able write R code for
+     functions as arguments, or have a way to pass Python functions to
+     R as genuine R functions. That last option is becoming possible,
+     in other words one can write a Python function and expose it to R
+     in such a way that the embedded R engine can use as a regular R
+     function.
+     #+END_QUOTE
+
+     They have support for closures; [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/rinterface.html#index-19][enumeration of R-types]]. Don't
+     forget about [[http://rpy.sourceforge.net/rpy2/doc-2.3/html/server.html#][Rserve]].
+
+     [[http://rpy.sourceforge.net/rpy/doc/rpy_html/Invocation.html#Invocation][rpy]] looks less magical; [[http://rpy.sourceforge.net/rpy/doc/rpy_html/R-objects-look-up.html#R-objects-look-up][name-munging]]; [[http://rpy.sourceforge.net/rpy/doc/rpy_html/Methods-of-Robj-type.html#Methods-of-Robj-type][awkward calling]]; [[http://rpy.sourceforge.net/rpy/doc/rpy_html/Sequence-protocol.html#Sequence-protocol][slices are
+     not supported]]; [[http://rpy.sourceforge.net/rpy/doc/rpy_html/R-to-Python.html#R-to-Python][conversions]]; [[http://rpy.sourceforge.net/rpy/doc/rpy_html/No-conversion.html#No-conversion][Robj object]]; 
+
+     [[http://www.omegahat.org/RSPython/overview.pdf][RSPython]] looks lower-level and possibly simpler; is it a good
+     candidate for emulation? Heh: they did the [[http://www.omegahat.org/RSPython/PythonFromR.pdf][reverse]] with a
+     =.Python= form in R.
+
+     Ah: the [[http://www.omegahat.org/RSPython/Conversion.pdf][customizable convertes]] you see in =rpy=, too.
+
+     They also [[file:/usr/local/src/RSPython/src/RCall.c][count references]], apparently; [[file:/usr/local/src/RSPython/inst/Python/RS.py][RS.py]] is refreshingly (or
+     deceptively) simple. (The whole thing is packaged as an R-package,
+     by the way.)
+
+     Here's [[file:/usr/local/src/RSPython/src/PythonCall.c][some meat]]; see:
+
+     #+BEGIN_QUOTE
+     This handles calling R from Python.
+
+     This code is quickly thrown together for the purposes of a)
+     learning about the Python internals and C API, and b) to
+     illustrate to others how one might embed R in Python or other
+     applications and programming environments.
+
+     There is a lot more to come, specifically the ability to be able
+     to pass Python objects to R by "reference" and have R operate on
+     these by calling methods in those objects that result in calls to
+     Python functions/methods.
+     #+END_QUOTE
+
+     Interesting:
+
+     #+BEGIN_QUOTE
+     This is the routine that implements Python calling an S function
+     with a simple, ordered list of arguments (i.e. no named S
+     arguments, etc.). This converts the Python arguments into S
+     objects.
+
+     This gets 4 arguments:
+       1) the name of the function to call
+       2) the un-named arguments as a Tuple
+       3) the named arguments (that do not use ``reserved'' words)
+       4) a convert argument.    
+     #+END_QUOTE
+
+     [[http://cran.r-project.org/doc/manuals/R-exts.html#Attributes][Install]] pops things in the symbol-table, incidentally.
+
+     #+BEGIN_SRC c :tangle Reval.h
+       #include <chicken.h>
+
+       C_word Reval(char* function, C_word args);
+
+     #+END_SRC
+
+     #+BEGIN_SRC c :tangle Reval.c
+       #include <assert.h>
+       #include <string.h>
+
+       #include <Rinternals.h>
+       #include <Rdefines.h>
+       #include <Rembedded.h>
+
+       #include <chicken.h>
+
+       SEXP toR(C_word arg) {
+         if (C_truep(C_i_flonump(arg))) {
+           return ScalarReal(C_flonum_magnitude(arg));
+         } else if (C_truep(C_fixnump(arg))) {
+           return ScalarInteger(C_num_to_int(arg));
+         } else if (C_truep(C_booleanp(arg))) {
+           return ScalarLogical(C_truep(arg) ? 1 : 0);
+         } else if (C_truep(C_stringp(arg))) {
+           return ScalarString(Rf_mkChar(C_string_or_null(arg)));
+         } else if (C_truep(C_vectorp(arg))) {
+           /* Is this where we need to type the vector; or can we just
+              VECSXP? We probably need to type the vector. Can we stick e.g.
+              STRSXP in an INTSXP, though?
+
+              See e.g. getListElementType in RPythonConverters.c; see also
+              do_c_dflt in bind.c. What about calling the actual R function?
+              It's too bad do_c or do_c_dflt aren't exposed in
+              Rinternals.h.
+
+              The call to R is slower, but guaranteed to be semantically
+              correct. */
+           int length = C_unfix(C_i_vector_length(arg));
+           SEXP c = allocVector(LANGSXP, length + 1);
+           SEXP ci = c;
+           SETCAR(c, Rf_findFun(Rf_install("c"), R_GlobalEnv));
+           int i;
+           for (i = 0; i < length; i++) {
+             ci = CDR(ci);
+             SETCAR(ci, toR(C_i_vector_ref(arg, C_fix(i))));
+           }
+           int error = 0;
+           return R_tryEval(c, R_GlobalEnv, &error);
+         } else if (C_truep(C_pointerp(arg))) {
+           return *((SEXP *) C_c_pointer_or_null(arg));
+         }
+         /* What the fuck is this, if not above? There should be some
+            symmetry: if I don't know what the hell it is, it's a pointer
+            (and vice versa). */
+         return R_NilValue;
+       }
+
+       void Reval(C_word c, C_word self, C_word k, C_word name, C_word args) {
+         int nargs = C_num_to_int(C_i_length(args));
+         SEXP expression = allocVector(LANGSXP, nargs + 1);
+         /* Have to check this for R_NilValue; see e.g. RNamedCall.c. */
+         SEXP function = Rf_findFun(Rf_install(C_c_string(name)), R_GlobalEnv);
+
+         SETCAR(expression, function);
+         SEXP iterexp = CDR(expression);
+
+         while (!C_truep(C_i_nullp(args))) {
+           SETCAR(iterexp, toR(C_i_car(args)));
+           args = C_i_cdr(args);
+           iterexp = CDR(iterexp);
+         }
+
+         int error = 0;
+         SEXP Rvalue = R_tryEval(expression, R_GlobalEnv, &error);
+         if (!error) {
+           switch (TYPEOF(Rvalue)) {
+           case REALSXP:
+             {
+               int length = Rf_length(Rvalue);
+               if (length == 1) {
+                 C_word *value = C_alloc(C_SIZEOF_FLONUM);
+                 C_kontinue(k, C_flonum(&value, REAL(Rvalue)[0]));
+               } else {
+                 C_word *v = C_alloc(C_SIZEOF_VECTOR(length)),
+                   *v0 = v;
+                 *(v++) = C_VECTOR_TYPE | length;
+                 int i;
+                 for (i = 0; i < length; i++) {
+                   C_word *value = C_alloc(C_SIZEOF_FLONUM);
+                   *(v++) = C_flonum(&value, REAL(Rvalue)[i]);
+                 }
+                 C_kontinue(k, (C_word) v0);
+               }
+             }
+           case INTSXP:
+             {
+               int length = Rf_length(Rvalue);
+               if (length == 1) {
+                 C_kontinue(k, C_fix(INTEGER(Rvalue)[0]));
+               } else {
+                 C_word *v = C_alloc(C_SIZEOF_VECTOR(length)),
+                   *v0 = v;
+                 *(v++) = C_VECTOR_TYPE | length;
+                 int i;
+                 for (i = 0; i < length; i++)
+                   *(v++) = C_fix(INTEGER(Rvalue)[i]);
+                 C_kontinue(k, (C_word) v0);
+               }
+             }
+           case LGLSXP:
+             {
+               int length = Rf_length(Rvalue);
+               if (length == 1) {
+                 C_kontinue(k, LOGICAL(Rvalue)[0] ? C_SCHEME_TRUE : C_SCHEME_FALSE);
+               } else {
+                 C_word *v = C_alloc(C_SIZEOF_VECTOR(length)),
+                   *v0 = v;
+                 *(v++) = C_VECTOR_TYPE | length;
+                 int i;
+                 for (i = 0; i < length; i++)
+                   *(v++) = LOGICAL(Rvalue)[i] ?
+                     C_SCHEME_TRUE : C_SCHEME_FALSE;
+                 C_kontinue(k, (C_word) v0);
+               }
+             }
+           case STRSXP:
+             {
+               int length = Rf_length(Rvalue);
+               if (length == 1) {
+                 const char *string = CHAR(STRING_ELT(Rvalue, 0));
+                 C_word *value = C_alloc(C_SIZEOF_STRING(strlen(string)));
+                 C_kontinue(k, C_string(&value, strlen(string), (char *) string));
+               } else {
+                 C_word *v = C_alloc(C_SIZEOF_VECTOR(length)),
+                   *v0 = v;
+                 *(v++) = C_VECTOR_TYPE | length;
+                 int i;
+                 for (i = 0; i < length; i++) {
+                   const char *string = CHAR(STRING_ELT(Rvalue, i));
+                   C_word *value = C_alloc(C_SIZEOF_STRING(strlen(string)));
+                   *(v++) = C_string(&value, strlen(string), (char *) string);
+                 }
+                 C_kontinue(k, (C_word) v0);
+               }
+             }
+           case VECSXP:
+             {
+               C_word *list = C_alloc(C_SIZEOF_LIST(1)); 
+               C_kontinue(k, C_a_i_list1(&list, 1, C_fix(1)));
+             }
+           default:
+             {
+               C_word *pointer = C_alloc(C_SIZEOF_POINTER);
+               /* We probably need to allocate a new structure, copy Rvalue
+                  thither, and free at some point; don't we? Or at least
+                  protect the value?
+
+                  PROTECT and UNPROTECT preserve within calls, while
+                  R_PreserveObject and R_ReleaseObject preserve past calls;
+                  see:
+                  <http://r.789695.n4.nabble.com/R-PreserveObject-R-ReleaseObject-reference-counting-needed-td997167.html>*/
+               C_kontinue(k, C_mpointer(&pointer, &Rvalue));
+             }
+           }
+         }
+         C_kontinue(k, C_SCHEME_UNDEFINED);
+       }
+
+     #+END_SRC
+
+     #+BEGIN_SRC scheme :tangle R-test.scm
+       (use debug dollar lolevel miscmacros test)
+
+       #>
+       #include "Reval.h"
+       #include <Rembedded.h>
+       <#
+
+       (foreign-code
+        #<<END
+        Rf_initEmbeddedR(4, (char*[]) {"R-test",
+                                       "--slave",
+                                       "--vanilla",
+                                       "--args"}) ;
+       END
+       )
+
+       (define Reval (##core#primitive "Reval"))
+
+       ;;; We should avoid this trick and just use varargs.
+       (define (R-eval f . args)
+         (Reval f args))
+
+       (debug (R-eval "rep" 2 10))
+       (debug (R-eval "rep" 2.1 10))
+       (debug (R-eval "rep" #t 10))
+       (debug (R-eval "rep" #f 10))
+       (debug (R-eval "rep" "harro" 10))
+       (debug (R-eval "c" 2.023989823989823))
+       (debug (R-eval "c" 1))
+       (debug (R-eval "c" 2))
+       (debug (R-eval "c" 3))
+       (debug (R-eval "c" "harro"))
+       (debug (R-eval "c" '#(10 11)))
+       (debug (R-eval "list" "harro"))
+       (let ((env (R-eval "new.env")))
+         (R-eval "print" env))
+
+     #+END_SRC
+
+     #+BEGIN_SRC makefile :tangle R-test.mk :shebang #!/usr/bin/unexpand -t 4
+       R_FLAGS := $(shell R CMD config --cppflags) \
+           $(shell R CMD config --ldflags)
+
+       CHICKEN_FLAGS := $(shell csc -cflags -ldflags -libs)
+
+       all: R-test
+
+       Reval.o: Reval.c
+           gcc $(R_FLAGS) $(CHICKEN_FLAGS) -c -o $@ $^
+
+       R-test: Reval.o R-test.scm
+           csc $(R_FLAGS) -o $@ $^      
+     #+END_SRC
+
+     Keep [[file:/usr/local/lib64/R/include/Rinternals.h][Rinternals.h]] handy: there's good stuff in there about types,
+     &c. Not to mention the [[http://cran.r-project.org/doc/manuals/R-ints.html][R internals]] doc. [[file:/usr/local/lib64/R/include/Rdefines.h][Rdefines.h]] has stuff like
+     =NEW_NUMERIC=, by the way.
+
+     There's a missing argument marker:
+
+     #+BEGIN_SRC c
+       LibExtern SEXP  R_MissingArg;       /* Missing argument marker */
+     #+END_SRC
+
+     Do we need to have a special symbol, e.g. =*missing*=? Named
+     variables have to be handled, too. See e.g. keywords and kvlists.
+
+     Can we create a SEXP in Scheme before we pass it to R, and
+     UNPROTECT it in the destructor? I wonder if we'll have impedence
+     mismatch between R and Scheme GC. God, I hope not. Or can we pass
+     primitive types to see and do the primitive -> SEXP calculus in C?
+
+     Look at the [[http://wiki.call-cc.org/eggref/4/lua][lua egg]], by the way, for a good, basic, thoughtful
+     API; cf. [[http://wiki.call-cc.org/eggref/4/bind][bind]] and [[http://wiki.call-cc.org/eggref/4/dollar][dollar]]. Lua doesn't drop into C at all, it's
+     all-dollar. Ah, it's all in the associated =.c= and =.h= files;
+     wait: that's the entirety of Lua? Wow. =lua-main.scm= is
+     beautiful, but maybe that's because Lua was built from the ground
+     up as an embeddable. R, maybe not so much. Can be coerced, though.
+
+     Can we confine the complexities of e.g. =SEXP= to embedded C; or
+     do we have to go through the whole =define-foreign-record-type=
+     rigmarole?
+
+     See [[file:/usr/local/src/RSPython/src/RPythonConverters.c][RPythonConverters.c]], incidentally, for some conversion
+     goodness. [[file:/usr/local/src/RSPython/inst/include/RSCommon.h][Mother-fuckers]]:
+
+     #+BEGIN_SRC c
+       typedef SEXP USER_OBJECT_;
+     #+END_SRC
+
+     Uses =getListElementType= to simplify to vectors when there are
+     homogenous datatypes; we can just use native vectors, right?
+     Native vectors are of course heterogenous in Scheme.
+
+     Can we write write a C-function that takes a =C_word=
+     (representing a list somehow), and returns a =C_word= representing
+     the R-object? RSPython has an optional translate thing. Should we
+     force the user to package things as R-objects; or should we
+     translate transparently? I'm loathe to do the latter; initial
+     hypothesis, however?
+
+     See [[file:/usr/local/src/chicken-4.7.0.6/chicken.h][chicken.h]] for things like =C_inline C_word C_a_i_list1(C_word
+     **a, int n, C_word x1)=, which create lists;
+
+     On [[http://cran.r-project.org/doc/manuals/R-exts.html#Garbage-Collection][PROTECT]]: they unprotect return before =return=. How much of the
+     conversion can we do in Scheme? Seems more flexible that way.
+
+     Is =C_c_pointer= useful for returning opaque R-objects, by the
+     way? =C_pointer_to_object=?
+
+     There's a [[file:/usr/local/lib64/R/include/Rinternals.h][reason]], incidentally, why things come up as both vectors
+     and lists:
+
+     #+BEGIN_SRC c
+       #define IS_LIST(x)      IS_VECTOR(x)
+     #+END_SRC
+
+     How do we distinguish true lists from vectors? Maybe try the
+     =Rf_isList=, =Rf_isPairList=, &c. from =Rinternals.h=.
+
+     Here's the list:
+
+     #+BEGIN_SRC c
+       Rboolean Rf_isArray(SEXP);
+       Rboolean Rf_isFactor(SEXP);
+       Rboolean Rf_isFrame(SEXP);
+       Rboolean Rf_isFunction(SEXP);
+       Rboolean Rf_isInteger(SEXP);
+       Rboolean Rf_isLanguage(SEXP);
+       Rboolean Rf_isList(SEXP);
+       Rboolean Rf_isMatrix(SEXP);
+       Rboolean Rf_isNewList(SEXP);
+       Rboolean Rf_isNumber(SEXP);
+       Rboolean Rf_isNumeric(SEXP);
+       Rboolean Rf_isPairList(SEXP);
+       Rboolean Rf_isPrimitive(SEXP);
+       Rboolean Rf_isTs(SEXP);
+       Rboolean Rf_isUserBinop(SEXP);
+       Rboolean Rf_isValidString(SEXP);
+       Rboolean Rf_isValidStringF(SEXP);
+       Rboolean Rf_isVector(SEXP);
+       Rboolean Rf_isVectorAtomic(SEXP);
+       Rboolean Rf_isVectorList(SEXP);
+       Rboolean Rf_isVectorizable(SEXP);
+     #+END_SRC
+
+     Oh, yeah: there was that whole [[http://cran.r-project.org/doc/manuals/R-exts.html#Handling-lists][newList]] thing. Can we cherry-pick
+     the things that have obvious Scheme counterparts
+
+     From [[http://cran.r-project.org/doc/manuals/R-lang.html#Attributes][R-lang]]:
+
+     #+BEGIN_QUOTE
+     Matrices and arrays are simply vectors with the attribute dim and
+     optionally dimnames attached to the vector.
+     #+END_QUOTE
+
+     [[http://cran.r-project.org/doc/manuals/R-lang.html#Factors][Factors]] sounds like enums:
+
+     #+BEGIN_QUOTE
+     Factors are currently implemented using an integer array to
+     specify the actual levels and a second array of names that are
+     mapped to the integers.
+     #+END_QUOTE
+
+     I wonder if =Rf_isFrame= applies to dataframes.
+
+     This is cool, by the way; these guys dispatch on [[http://cran.r-project.org/doc/manuals/R-exts.html#Calling-_002eExternal][TYPEOF(el)]]:
+
+     #+BEGIN_SRC c
+       #include <R_ext/PrtUtil.h>
+
+       SEXP showArgs(SEXP args)
+       {
+         args = CDR(args); /* skip 'name' */
+         for(int i = 0; args != R_NilValue; i++, args = CDR(args)) {
+           const char *name =
+             isNull(TAG(args)) ? "" : CHAR(PRINTNAME(TAG(args)));
+           SEXP el = CAR(args);
+           if (length(el) == 0) {
+             Rprintf("[%d] '%s' R type, length 0\n", i+1, name);
+             continue;
+           }
+           switch(TYPEOF(el)) {
+           case REALSXP:
+             Rprintf("[%d] '%s' %f\n", i+1, name, REAL(el)[0]);
+             break;
+           case LGLSXP:
+           case INTSXP:
+             Rprintf("[%d] '%s' %d\n", i+1, name, INTEGER(el)[0]);
+             break;
+           case CPLXSXP:
+             {
+               Rcomplex cpl = COMPLEX(el)[0];
+               Rprintf("[%d] '%s' %f + %fi\n", i+1, name, cpl.r, cpl.i);
+             }
+             break;
+           case STRSXP:
+             Rprintf("[%d] '%s' %s\n", i+1, name,
+                     CHAR(STRING_ELT(el, 0)));
+             break;
+           default:
+             Rprintf("[%d] '%s' R type\n", i+1, name);
+           }
+         }
+         return(R_NilValue);
+       }
+     #+END_SRC
+
+     Here's another list:
+
+     #+BEGIN_SRC c
+       #undef isNull
+       #define isNull(s)   (TYPEOF(s) == NILSXP)
+       #undef isSymbol
+       #define isSymbol(s) (TYPEOF(s) == SYMSXP)
+       #undef isLogical
+       #define isLogical(s)    (TYPEOF(s) == LGLSXP)
+       #undef isReal
+       #define isReal(s)   (TYPEOF(s) == REALSXP)
+       #undef isComplex
+       #define isComplex(s)    (TYPEOF(s) == CPLXSXP)
+       #undef isExpression
+       #define isExpression(s) (TYPEOF(s) == EXPRSXP)
+       #undef isEnvironment
+       #define isEnvironment(s) (TYPEOF(s) == ENVSXP)
+       #undef isString
+       #define isString(s) (TYPEOF(s) == STRSXP)
+       #undef isObject
+       #define isObject(s) (OBJECT(s) != 0)
+     #+END_SRC
+
+     And yet another unadorned list:
+
+     #+BEGIN_SRC c
+       #define isArray         Rf_isArray
+       #define isBasicClass            Rf_isBasicClass
+       #define isComplex       Rf_isComplex
+       #define isEnvironment       Rf_isEnvironment
+       #define isExpression        Rf_isExpression
+       #define isFactor        Rf_isFactor
+       #define isFrame         Rf_isFrame
+       #define isFree          Rf_isFree
+       #define isFunction      Rf_isFunction
+       #define isInteger       Rf_isInteger
+       #define isLanguage      Rf_isLanguage
+       #define isList          Rf_isList
+       #define isLogical       Rf_isLogical
+       #define isSymbol        Rf_isSymbol
+       #define isMatrix        Rf_isMatrix
+       #define isNewList       Rf_isNewList
+       #define isNull          Rf_isNull
+       #define isNumeric       Rf_isNumeric
+       #define isNumber        Rf_isNumber
+       #define isObject        Rf_isObject
+       #define isOrdered       Rf_isOrdered
+       #define isPairList      Rf_isPairList
+       #define isPrimitive     Rf_isPrimitive
+       #define isReal          Rf_isReal
+       #define isS4            Rf_isS4
+       #define isString        Rf_isString
+       #define isTs            Rf_isTs
+       #define isUnordered     Rf_isUnordered
+       #define isUnsorted      Rf_isUnsorted
+       #define isUserBinop     Rf_isUserBinop
+       #define isValidString       Rf_isValidString
+       #define isValidStringF      Rf_isValidStringF
+       #define isVector        Rf_isVector
+       #define isVectorAtomic      Rf_isVectorAtomic
+       #define isVectorizable      Rf_isVectorizable
+       #define isVectorList        Rf_isVectorList
+     #+END_SRC
+
+     Here's a list of SEXP-types that we could dispatch on via e.g.
+     =switch= or some data-driven mechanism:
+
+     #+BEGIN_SRC c
+       #define NILSXP       0    /* nil = NULL */
+       #define SYMSXP       1    /* symbols */
+       #define LISTSXP      2    /* lists of dotted pairs */
+       #define CLOSXP       3    /* closures */
+       #define ENVSXP       4    /* environments */
+       #define PROMSXP      5    /* promises: [un]evaluated closure arguments */
+       #define LANGSXP      6    /* language constructs (special lists) */
+       #define SPECIALSXP   7    /* special forms */
+       #define BUILTINSXP   8    /* builtin non-special forms */
+       #define CHARSXP      9    /* "scalar" string type (internal only)*/
+       #define LGLSXP      10    /* logical vectors */
+       #define INTSXP      13    /* integer vectors */
+       #define REALSXP     14    /* real variables */
+       #define CPLXSXP     15    /* complex variables */
+       #define STRSXP      16    /* string vectors */
+       #define DOTSXP      17    /* dot-dot-dot object */
+       #define ANYSXP      18    /* make "any" args work.
+                        Used in specifying types for symbol
+                        registration to mean anything is okay  */
+       #define VECSXP      19    /* generic vectors */
+       #define EXPRSXP     20    /* expressions vectors */
+       #define BCODESXP    21    /* byte code */
+       #define EXTPTRSXP   22    /* external pointer */
+       #define WEAKREFSXP  23    /* weak reference */
+       #define RAWSXP      24    /* raw bytes */
+       #define S4SXP       25    /* S4, non-vector */
+
+       /* used for detecting PROTECT issues in memory.c */
+       #define NEWSXP      30    /* fresh node creaed in new page */
+       #define FREESXP     31    /* node released by GC */
+
+       #define FUNSXP      99    /* Closure or Builtin or Special */
+     #+END_SRC
+
+     No, the whole fucking calculus in [[file:/usr/local/src/R/src/include/Rinlinedfuns.h][Rinlinedfuns.h]] regarding e.g.
+     =isPairList= is relatively complex. Yeah; frame is dataframe, by
+     the way:
+
+     #+BEGIN_SRC c
+       INLINE_FUN Rboolean isFrame(SEXP s)
+       {   
+         SEXP klass;
+         int i;
+         if (OBJECT(s)) {
+           klass = getAttrib(s, R_ClassSymbol);
+           for (i = 0; i < length(klass); i++)
+             if (!strcmp(CHAR(STRING_ELT(klass, i)), "data.frame")) return TRUE;
+         }
+         return FALSE;
+       }      
+     #+END_SRC
+
+     Levels can be symbols, can't they?
+
+     Here's the difference between numeric and number:
+
+     #+BEGIN_SRC c
+       INLINE_FUN Rboolean isNumeric(SEXP s)
+       {   
+         switch(TYPEOF(s)) {
+         case INTSXP:
+           if (inherits(s,"factor")) return FALSE;
+         case LGLSXP:
+         case REALSXP:
+           return TRUE;
+         default:
+           return FALSE;
+         }
+       }
+
+       /** Is an object "Numeric" or  complex */
+       INLINE_FUN Rboolean isNumber(SEXP s)
+       {   
+         switch(TYPEOF(s)) {
+         case INTSXP:
+           if (inherits(s,"factor")) return FALSE;
+         case LGLSXP:
+         case REALSXP:
+         case CPLXSXP:
+           return TRUE;
+         default:
+           return FALSE;
+         }
+       }
+     #+END_SRC
+
+     That's cool; they have scalar constructors:
+
+     #+BEGIN_SRC c
+       INLINE_FUN SEXP ScalarLogical(int x)
+       {   
+         SEXP ans = allocVector(LGLSXP, 1);
+         if (x == NA_LOGICAL) LOGICAL(ans)[0] = NA_LOGICAL;
+         else LOGICAL(ans)[0] = (x != 0);
+         return ans;
+       }
+     #+END_SRC
+
+     Making a named vector:
+
+     #+BEGIN_SRC c
+       /**
+        * Create a named vector of type TYP
+        *
+        * @example const char *nms[] = {"xi", "yi", "zi", ""};
+        *          mkNamed(VECSXP, nms);  =~= R  list(xi=, yi=, zi=)
+        *
+        * @param TYP a vector SEXP type (e.g. REALSXP)
+        * @param names names of list elements with null string appended
+        *
+        * @return (pointer to a) named vector of type TYP
+        */
+       INLINE_FUN SEXP mkNamed(SEXPTYPE TYP, const char **names)
+       {   
+         SEXP ans, nms;
+         int i, n;
+
+         for (n = 0; strlen(names[n]) > 0; n++) {}
+         ans = PROTECT(allocVector(TYP, n));
+         nms = PROTECT(allocVector(STRSXP, n));
+         for (i = 0; i < n; i++)
+           SET_STRING_ELT(nms, i, mkChar(names[i]));
+         setAttrib(ans, R_NamesSymbol, nms);
+         UNPROTECT(2);
+         return ans;
+       }      
+     #+END_SRC
+
+     Making strings:
+
+     #+BEGIN_SRC c
+       /* short cut for  ScalarString(mkChar(s)) : */
+       INLINE_FUN SEXP mkString(const char *s)
+       {   
+         SEXP t;
+
+         PROTECT(t = allocVector(STRSXP, 1));
+         SET_STRING_ELT(t, 0, mkChar(s));
+         UNPROTECT(1);
+         return t;
+       }      
+     #+END_SRC
+
+     More basic tests:
+
+     #+BEGIN_SRC c
+       Rboolean (Rf_isNull)(SEXP s);
+       Rboolean (Rf_isSymbol)(SEXP s);
+       Rboolean (Rf_isLogical)(SEXP s);
+       Rboolean (Rf_isReal)(SEXP s);
+       Rboolean (Rf_isComplex)(SEXP s);
+       Rboolean (Rf_isExpression)(SEXP s);
+       Rboolean (Rf_isEnvironment)(SEXP s);
+       Rboolean (Rf_isString)(SEXP s);
+       Rboolean (Rf_isObject)(SEXP s);
+     #+END_SRC
+
+     [[http://www.jetcafe.org/jim/c-style.html#Naming][Funny]]:
+
+     #+BEGIN_QUOTE
+     In short, follow "Mike's Rule" to make variable name size
+     proportional to scope:
+     #+BEGIN_EXAMPLE
+     length(name(variable)) ~ log(countlines(scope(variable)))
+     #+END_EXAMPLE
+     #+END_QUOTE
+
+     Need an =Rvalue=, =Rfind=, or =Rget= to look up variables in a
+     given environment (default to e.g. =R_GlobalEnv=).
+
+     [[http://api.call-cc.org/doc/cairo][Cairo]] is replete with instances of allocating f64-vectors for e.g.
+     pointers in Scheme before descending into C. We could probably do
+     that before-hand, since we know the arguments; not necessarily the
+     size, though? Sure: if we do the translation from within Scheme.
+     Nursery takes care of garbage collection, I believe.
+
+     #+BEGIN_SRC scheme :tangle minimal-segv.scm
+       (use debug
+            miscmacros)
+
+       (define (give-me-some-shit)
+         ((foreign-primitive
+           scheme-object
+           ()
+           "C_word *value = C_alloc(C_SIZEOF_FLONUM);"
+           "return(C_flonum(&value, 1.234));")))
+
+       (dotimes (i 100000)
+         (debug (give-me-some-shit)))      
+     #+END_SRC
+
+     Is [[http://paste.call-cc.org/pasteid%3Dd91e9ef5c6f671e7d20b408ea9144cacc1fbae47][this]] interesting? I like [[file:/usr/local/src/chicken-eggs/s11n/trunk/s11n-c.c][s11n-c.c]]. What's the equivalent of
+     symbols in R, by the way?
+
+     Disjoint predicates in Scheme:
+
+     - boolean?
+     - symbol?
+     - char?
+     - vector?
+     - procedure?
+     - pair?
+     - number?
+     - string?
+     - port?
+
+     How many of them can we support without trickery? Yet to do: char,
+     pair, symbol, vector.
+
+     To return opaque pointers, do we need =C_pointer_to_object=? How
+     do we tag it? =C_taggedmpointer=, =C_taggedmpointer_or_false=.
+     =C_make_pointer=, =C_make_tagged_pointer=. Shit: they're CPS.
+
+     [[https://groups.google.com/d/msg/julia-dev/p5R7_xo7sRE/VnC6ZoCv-OUJ][Length vs. truelength]]; [[http://r.789695.n4.nabble.com/R-PreserveObject-R-ReleaseObject-reference-counting-needed-td997167.html][R_PreserveObject and R_ReleaseObject]]. We
+     might have to use them.
+
+     [[file:/usr/local/src/R/src/main/bind.c][Vector-type calculus]]:
+
+     #+BEGIN_SRC c
+       SEXP attribute_hidden do_c_dflt(SEXP call, SEXP op, SEXP args, SEXP env)
+       {
+         SEXP ans, t;
+         int mode, recurse, usenames;
+         struct BindData data;
+         struct NameData nameData;
+
+         /*    data.deparse_level = 1;  Initialize this early. */
+
+         /* Method dispatch has failed; run the default code. */
+         /* By default we do not recurse, but this can be over-ridden */
+         /* by an optional "recursive" argument. */
+
+         usenames = 1;
+         recurse = 0;
+         /* this was only done for length(args) > 1 prior to 1.5.0,
+            _but_ `recursive' might be the only argument */
+         PROTECT(args = ExtractOptionals(args, &recurse, &usenames, call));
+
+         /* Determine the type of the returned value. */
+         /* The strategy here is appropriate because the */
+         /* object being operated on is a pair based list. */
+
+         data.ans_flags  = 0;
+         data.ans_length = 0;
+         data.ans_nnames = 0;
+
+         for (t = args; t != R_NilValue; t = CDR(t)) {
+           if (usenames && !data.ans_nnames) {
+             if (!isNull(TAG(t))) data.ans_nnames = 1;
+             else data.ans_nnames = HasNames(CAR(t));
+           }
+           AnswerType(CAR(t), recurse, usenames, &data);
+         }
+
+         /* If a non-vector argument was encountered (perhaps a list if */
+         /* recursive is FALSE) then we must return a list.    Otherwise, */
+         /* we use the natural coercion for vector types. */
+
+         mode = NILSXP;
+         if (data.ans_flags & 512)    mode = EXPRSXP;
+         else if (data.ans_flags & 256) mode = VECSXP;
+         else if (data.ans_flags & 128) mode = STRSXP;
+         else if (data.ans_flags &  64) mode = CPLXSXP;
+         else if (data.ans_flags &  32) mode = REALSXP;
+         else if (data.ans_flags &  16) mode = INTSXP;
+         else if (data.ans_flags & 2) mode = LGLSXP;
+         else if (data.ans_flags & 1) mode = RAWSXP;
+
+         /* Allocate the return value and set up to pass through */
+         /* the arguments filling in values of the returned object. */
+
+         PROTECT(ans = allocVector(mode, data.ans_length));
+         data.ans_ptr = ans;
+         data.ans_length = 0;
+         t = args;
+
+         if (mode == VECSXP || mode == EXPRSXP) {
+           if (!recurse) {
+             while (args != R_NilValue) {
+               ListAnswer(CAR(args), 0, &data, call);
+               args = CDR(args);
+             }
+           }
+           else ListAnswer(args, recurse, &data, call);
+           data.ans_length = length(ans);
+         }
+         else if (mode == STRSXP)
+           StringAnswer(args, &data, call);
+         else if (mode == CPLXSXP)
+           ComplexAnswer(args, &data, call);
+         else if (mode == REALSXP)
+           RealAnswer(args, &data, call);
+         else if (mode == RAWSXP)
+           RawAnswer(args, &data, call);
+         else if (mode == LGLSXP)
+           LogicalAnswer(args, &data, call);
+         else /* integer */
+           IntegerAnswer(args, &data, call);
+         args = t;
+
+         /* Build and attach the names attribute for the returned object. */
+
+         if (data.ans_nnames && data.ans_length > 0) {
+           PROTECT(data.ans_names = allocVector(STRSXP, data.ans_length));
+           data.ans_nnames = 0;
+           while (args != R_NilValue) {
+             nameData.seqno = 0;
+             nameData.firstpos = 0;
+             nameData.count = 0;
+             NewExtractNames(CAR(args), R_NilValue, TAG(args), recurse, &data, &nameData);
+             args = CDR(args);
+           }
+           setAttrib(ans, R_NamesSymbol, data.ans_names);
+           UNPROTECT(1);
+         }
+         UNPROTECT(2);
+         R_FreeStringBufferL(&cbuff);
+         return ans;
+       } /* do_c */
+
+     #+END_SRC
+***** On [[http://cran.r-project.org/doc/manuals/R-exts.html#Handling-lists][lists]]
+      #+BEGIN_QUOTE
+      List elements can be retrieved or set by direct access to the
+      elements of the generic vector. Suppose we have a list object a
+      <- list(f = 1, g = 2, h = 3)
+
+      Then we can access a$g as =a[[2]]= by 
+      #+BEGIN_SRC c
+        double g;
+        ....
+        g = REAL(VECTOR_ELT(a, 1))[0];
+      #+END_SRC
+
+      This can rapidly become tedious, and the following function
+      (based on one in package stats) is very useful:
+
+      #+BEGIN_SRC c
+        /* get the list element named str, or return NULL */
+
+        SEXP getListElement(SEXP list, const char *str)
+        {
+          SEXP elmt = R_NilValue, names = getAttrib(list,
+                                                    R_NamesSymbol);
+
+          for (R_len_t i = 0; i < length(list); i++)
+            if(strcmp(CHAR(STRING_ELT(names, i)), str) == 0) {
+              elmt = VECTOR_ELT(list, i);
+              break;
+            }
+          return elmt;
+        }
+      #+END_SRC
+
+      and enables us to say 
+
+      #+BEGIN_SRC c
+        double g;
+        g = REAL(getListElement(a, "g"))[0];
+      #+END_SRC
+      #+END_QUOTE
+***** Finding [[http://cran.r-project.org/doc/manuals/R-exts.html#Finding-and-setting-variables][variables]]
+      #+BEGIN_SRC c
+        SEXP getvar(SEXP name, SEXP rho)
+        {
+          SEXP ans;
+
+          if(!isString(name) || length(name) != 1)
+            error("name is not a single string");
+          if(!isEnvironment(rho))
+            error("rho should be an environment");
+          ans = findVar(install(CHAR(STRING_ELT(name, 0))), rho);
+          Rprintf("first value is %f\n", REAL(ans)[0]);
+          return(R_NilValue);
+        }
+      #+END_SRC
+
+      #+BEGIN_SRC c
+        void defineVar(SEXP symbol, SEXP value, SEXP rho);
+        void setVar(SEXP symbol, SEXP value, SEXP rho);
+      #+END_SRC
+***** [[http://cran.r-project.org/doc/manuals/R-exts.html#Named-objects-and-copying][Copying]] objects
+      #+BEGIN_QUOTE
+      It is safe to modify the value of any SEXP for which NAMED(foo)
+      is zero, and if NAMED(foo) is two, the value should be duplicated
+      (via a call to duplicate) before any modification. Note that it
+      is the responsibility of the author of the code making the
+      modification to do the duplication, even if it is x whose value
+      is being modified after y <- x.
+      #+END_QUOTE
+***** [[http://cran.r-project.org/doc/manuals/R-exts.html#Evaluating-R-expressions-from-C][Evaluating]] R expressions
+      #+BEGIN_SRC c
+        SEXP lapply(SEXP list, SEXP expr, SEXP rho)
+        {
+          R_len_t i, n = length(list);
+          SEXP ans;
+
+          if(!isNewList(list)) error("'list' must be a list");
+          if(!isEnvironment(rho)) error("'rho' should be an environment");
+          PROTECT(ans = allocVector(VECSXP, n));
+          for(i = 0; i < n; i++) {
+            defineVar(install("x"), VECTOR_ELT(list, i), rho);
+            SET_VECTOR_ELT(ans, i, eval(expr, rho));
+          }
+          setAttrib(ans, R_NamesSymbol, getAttrib(list, R_NamesSymbol));
+          UNPROTECT(1);
+          return(ans);
+        }
+      #+END_SRC
+
+      Protects a SEXP =ans= to return; this constructs a functions via
+      =lang2=:
+
+      #+BEGIN_SRC c
+        SEXP lapply2(SEXP list, SEXP fn, SEXP rho)
+        {
+          R_len_t i, n = length(list);
+          SEXP R_fcall, ans;
+
+          if(!isNewList(list)) error("'list' must be a list");
+          if(!isFunction(fn)) error("'fn' must be a function");
+          if(!isEnvironment(rho)) error("'rho' should be an environment");
+          PROTECT(R_fcall = lang2(fn, R_NilValue));
+          PROTECT(ans = allocVector(VECSXP, n));
+          for(i = 0; i < n; i++) {
+            SETCADR(R_fcall, VECTOR_ELT(list, i));
+            SET_VECTOR_ELT(ans, i, eval(R_fcall, rho));
+          }
+          setAttrib(ans, R_NamesSymbol, getAttrib(list, R_NamesSymbol));
+          UNPROTECT(2);
+          return(ans);
+        }
+      #+END_SRC
+***** [[http://cran.r-project.org/doc/manuals/R-exts.html#Zero_002dfinding][Zero]] finding
+      #+BEGIN_SRC c
+        SEXP mkans(double x)
+        {
+          SEXP ans;
+          PROTECT(ans = allocVector(REALSXP, 1));
+          REAL(ans)[0] = x;
+          UNPROTECT(1);
+          return ans;
+        }
+
+        double feval(double x, SEXP f, SEXP rho)
+        {
+          defineVar(install("x"), mkans(x), rho);
+          return(REAL(eval(f, rho))[0]);
+        }
+
+        SEXP zero(SEXP f, SEXP guesses, SEXP stol, SEXP rho)
+        {
+          double x0 = REAL(guesses)[0], x1 = REAL(guesses)[1],
+            tol = REAL(stol)[0];
+          double f0, f1, fc, xc;
+
+          if(tol <= 0.0) error("non-positive tol value");
+          f0 = feval(x0, f, rho); f1 = feval(x1, f, rho);
+          if(f0 == 0.0) return mkans(x0);
+          if(f1 == 0.0) return mkans(x1);
+          if(f0*f1 > 0.0) error("x[0] and x[1] have the same sign");
+
+          for(;;) {
+            xc = 0.5*(x0+x1);
+            if(fabs(x0-x1) < tol) return  mkans(xc);
+            fc = feval(xc, f, rho);
+            if(fc == 0) return  mkans(xc);
+            if(f0*fc > 0.0) {
+              x0 = xc; f0 = fc;
+            } else {
+              x1 = xc; f1 = fc;
+            }
+          }
+        }
+      #+END_SRC
+
+      Good stuff in there with =mkans=.
+***** [[http://cran.r-project.org/doc/manuals/R-exts.html#Parsing-R-code-from-C][Parsing]] R
+      #+BEGIN_SRC c
+             #include <R.h>
+             #include <Rinternals.h>
+             #include <R_ext/Parse.h>
+
+        SEXP menu_ttest3()
+        {
+          char cmd[256];
+          SEXP cmdSexp, cmdexpr, ans = R_NilValue;
+          ParseStatus status;
+                ...
+            if(done == 1) {
+              PROTECT(cmdSexp = allocVector(STRSXP, 1));
+              SET_STRING_ELT(cmdSexp, 0, mkChar(cmd));
+              cmdexpr = PROTECT(R_ParseVector(cmdSexp, -1, &status, R_NilValue));
+              if (status != PARSE_OK) {
+                UNPROTECT(2);
+                error("invalid call %s", cmd);
+              }
+              /* Loop is needed here as EXPSEXP will be of length > 1 */
+              for(R_len_t i = 0; i < length(cmdexpr); i++)
+                ans = eval(VECTOR_ELT(cmdexpr, i), R_GlobalEnv);
+              UNPROTECT(2);
+            }
+            return ans;
+        }
+      #+END_SRC
+***** [[http://cran.r-project.org/doc/manuals/R-exts.html#Printing][Printing]]
+      #+BEGIN_QUOTE
+      The most useful function for printing from a C routine compiled
+      into R is Rprintf. This is used in exactly the same way as
+      printf, but is guaranteed to write to R's output (which might be
+      a GUI console rather than a file, and can be re-directed by
+      sink). It is wise to write complete lines (including the "\n")
+      before returning to R. It is defined in R_ext/Print.h. 
+
+      The function REprintf is similar but writes on the error stream
+      (stderr) which may or may not be different from the standard
+      output stream. 
+
+      Functions Rvprintf and REvprintf are analogues using the vprintf
+      interface. Because that is a C99 interface, they are only defined
+      by R_ext/Print.h in C++ code if the macro R_USE_C99_IN_CXX is
+      defined when it is included.
+      #+END_QUOTE
+
+      Hence, we can define [[http://cran.r-project.org/doc/manuals/R-exts.html#Setting-R-callbacks][callbacks]] like e.g.:
+
+      #+BEGIN_SRC c
+        extern void (*ptr_R_WriteConsole)(const char *, int);
+      #+END_SRC
+
+      I vaguely remember doing this for rJava.
+***** The [[http://cran.r-project.org/doc/manuals/R-exts.html#Organization-of-header-files][headers]]
 ** TODO 3.4
    Found this note:[fn:9]
 
