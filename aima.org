@@ -1457,6 +1457,9 @@
               queue-remove!
               queue-empty?))
     
+    ;;; Binary heap package is weird; took pains to do it functionally. We
+    ;;; just need a straight-forward, destructive one. Hmm: thanks the
+    ;;; Olympioi we wrote one for CLRS. Is it servicable?
     (define (make-heap)
       (make-binary-heap
        (lambda (c1 c2)
@@ -1490,18 +1493,18 @@
               (uniform-cost (uniform-cost start end neighbors)))
           (plot-tessellation/animation
            tessellation
-           uniform-cost
-           "Uniform-Cost"
+           (predecessor-path uniform-cost)
+           "Uniform-cost"
            "uniform-cost")
           (plot-tessellation/animation
            tessellation
-           depth-first
-           "Depth-First"
+           (predecessor-path depth-first)
+           "Depth-first"
            "depth-first")
           (plot-tessellation/animation
            tessellation
-           breadth-first
-           "Breadth-First"
+           (predecessor-path breadth-first)
+           "Breadth-first"
            "breadth-first"))))
     
   #+END_SRC
