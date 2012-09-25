@@ -1416,7 +1416,7 @@
                 ;; (debug parent)
                 (hash-table-set! visited (node-state parent) #f)
                 (if (eq? (node-state parent) end)
-                    parent
+                    (predecessor-path parent)
                     (let ((unvisited-children
                            (filter (lambda (child)
                                      (hash-table-ref/default
@@ -1493,17 +1493,17 @@
               (uniform-cost (uniform-cost start end neighbors)))
           (plot-tessellation/animation
            tessellation
-           (predecessor-path uniform-cost)
+           uniform-cost
            "Uniform-cost"
            "uniform-cost")
           (plot-tessellation/animation
            tessellation
-           (predecessor-path depth-first)
+           depth-first
            "Depth-first"
            "depth-first")
           (plot-tessellation/animation
            tessellation
-           (predecessor-path breadth-first)
+           breadth-first
            "Breadth-first"
            "breadth-first"))))
     
