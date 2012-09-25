@@ -1508,6 +1508,17 @@
            "breadth-first"))))
     
   #+END_SRC
+
+  Testing a node for a goal-state when it is selected for expansion is
+  more conservative; does it lead to suboptimal results if we fail to
+  do so for breadth-first?
+
+  We're going to have to use our own heap-implementation,
+  incidentally, for e.g. uniform-cost and A*; since Ivan's [[http://wiki.call-cc.org/eggref/4/binary-heap][binary-heap]]
+  doesn't do key-resizing.
+
+  We're going to have to handle dynamic resizing, though
+  (=heap-merge!=?); and add key- and payload-accessors.
 * TODO 3.9
   #+BEGIN_SRC scheme
     (use data-structures
