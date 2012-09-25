@@ -1391,7 +1391,11 @@
    Is this reminiscent of Knuth's conjecture?
 * TODO 3.7
   #+BEGIN_SRC scheme :tangle 3.7.scm :shebang #!/usr/bin/env chicken-scheme
-    (use aima-tessellation data-structures debug stack)
+    (use aima-tessellation
+         binary-heap
+         data-structures
+         debug
+         stack)
     
     (define (search start
                     end
@@ -1423,6 +1427,7 @@
                       ;; (debug parent children unvisited-children)
                       (for-each
                           (lambda (child)
+                            ;; (debug child parent (node-state parent))
                             (let ((node (make-node child
                                                    parent
                                                    #f
@@ -1452,22 +1457,52 @@
               queue-remove!
               queue-empty?))
     
+    (define (make-heap)
+      (make-binary-heap
+       (lambda (c1 c2)
+         (cond ((> c1 c2) -1)
+               ((= c1 c2) 0)
+               ((< c1 c2) 1)))))
+    
+    (define (uniform-cost start end neighbors)
+      (let ((heap (make-heap)))
+        (search start
+                end
+                neighbors
+                (lambda () heap)
+                (lambda (frontier node)
+                  (if (zero? (heap 'size))
+                      (set! heap (make-heap)))
+                  (set! heap ((heap 'put) (node-path-cost node) node)))
+                (lambda (frontier)
+                  (let ((max (cdr ((heap 'get-max)))))
+                    (set! heap ((heap 'delete-max)))
+                    max))
+                (lambda (frontier)
+                  (heap 'empty?)))))
+    
     (let ((tessellation (tessellate)))
       (let ((start (tessellation-start tessellation))
             (end (tessellation-end tessellation))
             (neighbors (tessellation-neighbors tessellation)))
         (let ((breadth-first (breadth-first start end neighbors))
-              (depth-first (depth-first start end neighbors)))
-          (plot-tessellation
+              (depth-first (depth-first start end neighbors))
+              (uniform-cost (uniform-cost start end neighbors)))
+          (plot-tessellation/animation
+           tessellation
+           uniform-cost
+           "Uniform-Cost"
+           "uniform-cost")
+          (plot-tessellation/animation
            tessellation
            depth-first
            "Depth-First"
-           "depth-first.png")
-          (plot-tessellation
+           "depth-first")
+          (plot-tessellation/animation
            tessellation
            breadth-first
            "Breadth-First"
-           "breadth-first.png"))))
+           "breadth-first"))))
     
   #+END_SRC
 * TODO 3.9
