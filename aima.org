@@ -1495,17 +1495,21 @@
            tessellation
            uniform-cost
            "Uniform-cost"
-           "uniform-cost")
+           "uniform-cost.avi")
           (plot-tessellation/animation
            tessellation
            depth-first
            "Depth-first"
-           "depth-first")
+           "depth-first.avi")
           (plot-tessellation/animation
            tessellation
            breadth-first
            "Breadth-first"
-           "breadth-first"))))
+           "breadth-first.avi")
+          (join-animations "search.avi"
+                           "depth-first.avi"
+                           "breadth-first.avi"
+                           "uniform-cost.avi"))))
     
   #+END_SRC
 
