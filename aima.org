@@ -1876,6 +1876,9 @@
       (+ (abs (- (row k j) (row k i)))
          (abs (- (col k j) (col k i)))))
     
+    (define (tile->integer tile)
+      (if (blank? tile) 0 tile))
+    
     (define (n-puzzle k)
       (let ((game (vector-unfold (lambda (i) (moves k i)) (* k k))))
         game))
@@ -1885,8 +1888,7 @@
        (cons blank (iota (- (* k k) 1) 1))))
     
     (define (tile->char tile)
-      (integer->char
-       (+ (if (blank? tile) 0 tile) 48)))
+      (integer->char (+ (tile->integer tile) 48)))
     
     (define (state->string state)
       (list->string
