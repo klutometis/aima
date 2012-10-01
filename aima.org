@@ -2627,7 +2627,20 @@
      there that needs to be done.
 
 * TODOs
-** TODO 3.7
+** DONE 3.7
+   CLOSED: [2012-10-01 Mon 03:29]
+  Testing a node for a goal-state when it is selected for expansion is
+  more conservative; does it lead to suboptimal results if we fail to
+  do so for breadth-first?
+
+  We're going to have to use our own heap-implementation,
+  incidentally, for e.g. uniform-cost and A*; since Ivan's [[http://wiki.call-cc.org/eggref/4/binary-heap][binary-heap]]
+  doesn't do key-resizing.
+
+  We're going to have to handle dynamic resizing, though
+  (=heap-merge!=?); and add key- and payload-accessors.
+** DONE 3.7
+   CLOSED: [2012-10-01 Mon 03:29]
    See [[http://en.wikipedia.org/wiki/Convex_hull_algorithms][convex hulls]]. It turns out that we don't have to model it as all
    positions in the plane; let's model it as the corners of polygons.
    We have to have a notion of "reachable" vertices, however. Can we
@@ -4856,7 +4869,8 @@
 
       I vaguely remember doing this for rJava.
 ***** The [[http://cran.r-project.org/doc/manuals/R-exts.html#Organization-of-header-files][headers]]
-** TODO 3.4
+** DONE 3.4
+   CLOSED: [2012-10-01 Mon 03:29]
    Found this note:[fn:9]
 
    #+BEGIN_QUOTE
@@ -5074,9 +5088,11 @@
    number of even-length cycles.
 
    Wolfram has a [[http://mathworld.wolfram.com/PermutationCycle.html][better article on cycles]], incidentally.
-** TODO Focus on one or two problems for the coming week.
+** DONE Focus on one or two problems for the coming week.
+   CLOSED: [2012-10-01 Mon 03:29]
    Assign people to be responsible for them.
-** TODO Modify 2.11 to list available actions?
+** CANCELED Modify 2.11 to list available actions?
+   CLOSED: [2012-10-01 Mon 03:30]
    No: that changes the problem.
 ** TODO A listing environment
 ** TODO Blog about barabási-albert vs. depth-first graph-creation.
@@ -6546,7 +6562,8 @@
    Algorithm2e has to be wrapped in dollars, which sucks; also:
    bizarre camel-case macros. Looks good, otherwise. Has no functions,
    apparently, either.
-** TODO Should we tangle to a bunch of text files?
+** CANCELED Should we tangle to a bunch of text files?
+   CLOSED: [2012-10-01 Mon 03:30]
    Looking for an alternative to the big-ass pdf.
 ** DONE Reimplement the Lisp environment in Scheme.
   CLOSED: [2012-06-01 Fri 03:09]
