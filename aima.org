@@ -1932,15 +1932,6 @@
       (let* ((random-game (make-random-game k))
              (game (random-game)))
         (debug
-         (state->string (game-state game))
-         (state->string (game-state start))
-         (levenshtein-distance/transpose-byte
-          (state->string (game-state game))
-          (state->string (game-state start)))
-         (levenshtein-distance/byte
-          (state->string (game-state game))
-          (state->string (game-state start))))
-        (debug
          (map node-state
               (breadth-first
                game
