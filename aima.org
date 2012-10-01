@@ -1426,7 +1426,7 @@
          (let search ()
            ;; (debug frontier)
            (if (frontier-empty? frontier)
-               (error "SEARCH -- Search failed")
+               (error "Search failed -- SEARCH")
                (let* ((parent (frontier-delete! frontier))
                       (children (hash-table-ref neighbors (node-state parent))))
                  ;; (debug parent)
