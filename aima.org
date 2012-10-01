@@ -1556,7 +1556,11 @@
    CLOSED: [2012-10-01 Mon 05:10]
    See [[http://youtu.be/eKs33D2UgtY?hd%3D1][the video]]: A* = uniform-cost > greedy-best-first >
    breadth-first > depth-first.
-* TODO 3.9
+* DONE 3.9
+  CLOSED: [2012-10-01 Mon 05:21]
+  - CLOSING NOTE [2012-10-01 Mon 05:21] \\
+    Limited solution; could be generalized to generate all paths and
+    different configurations.
   [[https://github.com/glenn-brown/MissionariesCannibals][Glenn's]] is better: it captures all paths.
   #+BEGIN_SRC scheme
     (use data-structures
