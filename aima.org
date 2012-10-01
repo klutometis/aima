@@ -1879,6 +1879,14 @@
     (define (tile->integer tile)
       (if (blank? tile) 0 tile))
     
+    (define (make-manhattan-distance-heuristic k)
+      (lambda (node)
+        (vector-fold (lambda (i distance tile)
+                       (+ distance
+                          (manhattan-distance k i (tile->integer tile))))
+                     0
+                     (game-state (node-state node)))))
+    
     (define (n-puzzle k)
       (let ((game (vector-unfold (lambda (i) (moves k i)) (* k k))))
         game))
