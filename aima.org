@@ -1788,8 +1788,8 @@
               (compose cdr heap-extract-extremum!)
               heap-empty?))
     
-    (define (uniform-cost start end path-cost children distance goal?)
-      (best-first start end children path-cost distance goal? node-path-cost))
+    (define (uniform-cost start end children distance goal?)
+      (best-first start end children distance goal? node-path-cost))
     
     (define (greedy-best-first start end children distance goal? heuristic)
       (best-first
