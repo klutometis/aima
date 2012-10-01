@@ -1457,19 +1457,42 @@
               queue-remove!
               queue-empty?))
     
-    (define (uniform-cost start end neighbors)
+    (define (best-first start end neighbors f)
       (search start
               end
               neighbors
               make-min-heap
               (lambda (heap node)
                 (let ((key (heap-key/datum heap node))
-                      (path-cost (node-path-cost node)))
+                      (path-cost (f node)))
                   (if (and key (< path-cost key))
                       (heap-change-key! heap node path-cost)
                       (heap-insert! heap (cons path-cost node)))))
               (compose cdr heap-extract-extremum!)
               heap-empty?))
+    
+    (define (uniform-cost start end neighbors)
+      (best-first start end neighbors node-path-cost))
+    
+    (define (make-straight-line-distance-heuristic end)
+      (lambda (node) (point-distance (node-state node) end)))
+    
+    (define (greedy-best-first start end neighbors)
+      (best-first
+       start
+       end
+       neighbors
+       (make-straight-line-distance-heuristic end)))
+    
+    (define (a* start end neighbors)
+      (best-first
+       start
+       end
+       neighbors
+       (let ((straight-line-distance-heuristic
+              (make-straight-line-distance-heuristic end)))
+         (lambda (node) (+ (node-path-cost node)
+                      (straight-line-distance-heuristic node))))))
     
     (let ((tessellation (tessellate)))
       (let ((start (tessellation-start tessellation))
@@ -1477,12 +1500,24 @@
             (neighbors (tessellation-neighbors tessellation)))
         (let ((breadth-first (breadth-first start end neighbors))
               (depth-first (depth-first start end neighbors))
-              (uniform-cost (uniform-cost start end neighbors)))
+              (uniform-cost (uniform-cost start end neighbors))
+              (greedy-best-first (greedy-best-first start end neighbors))
+              (a* (a* start end neighbors)))
+          (plot-tessellation/animation
+           tessellation
+           a*
+           "A*"
+           "a-star.avi")
           (plot-tessellation/animation
            tessellation
            uniform-cost
            "Uniform-cost"
            "uniform-cost.avi")
+          (plot-tessellation/animation
+           tessellation
+           greedy-best-first
+           "Greedy best-first"
+           "greedy-best-first.avi")
           (plot-tessellation/animation
            tessellation
            depth-first
@@ -1494,7 +1529,9 @@
            "Breadth-first"
            "breadth-first.avi")
           (join-animations "search.avi"
+                           "a-star.avi"
                            "uniform-cost.avi"
+                           "greedy-best-first.avi"
                            "breadth-first.avi"
                            "depth-first.avi"))))
     
