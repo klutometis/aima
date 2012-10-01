@@ -1389,164 +1389,173 @@
         of the corresponding jug(s).
    - Goal test :: Does any jug contain one gallon?
    Is this reminiscent of Knuth's conjecture?
-* TODO 3.7
-  #+BEGIN_SRC scheme :tangle 3.7.scm :shebang #!/usr/bin/env chicken-scheme
-    (use aima-tessellation
-         data-structures
-         debug
-         heap
-         stack)
-    
-    (define (search start
-                    end
-                    neighbors
-                    make-frontier
-                    frontier-add!
-                    frontier-delete!
-                    frontier-empty?)
-      (let ((visited (make-hash-table))
-            (frontier (make-frontier)))
-        (frontier-add! frontier (make-node start #f #f 0))
-        (let search ()
-          ;; (debug frontier)
-          (if (frontier-empty? frontier)
-              (error "SEARCH -- Search failed")
-              (let* ((parent (frontier-delete! frontier))
-                     (children (hash-table-ref neighbors (node-state parent))))
-                ;; (debug parent)
-                (hash-table-set! visited (node-state parent) #f)
-                (if (eq? (node-state parent) end)
-                    (reverse (predecessor-path parent))
-                    (let ((unvisited-children
-                           (filter (lambda (child)
-                                     (hash-table-ref/default
-                                      visited
-                                      child
-                                      #t))
-                                   children)))
-                      ;; (debug parent children unvisited-children)
-                      (for-each
-                          (lambda (child)
-                            ;; (debug child parent (node-state parent))
-                            (let ((node (make-node child
-                                                   parent
-                                                   #f
-                                                   (+ (node-path-cost parent)
-                                                      (point-distance
-                                                       child
-                                                       (node-state parent))))))
-                              (frontier-add! frontier node)))
-                        unvisited-children)
-                      (search))))))))
-    
-    (define (depth-first start end neighbors)
-      (search start
-              end
-              neighbors
-              make-stack
-              stack-push!
-              stack-pop!
-              stack-empty?))
-    
-    (define (breadth-first start end neighbors)
-      (search start
-              end
-              neighbors
-              make-queue
-              queue-add!
-              queue-remove!
-              queue-empty?))
-    
-    (define (best-first start end neighbors f)
-      (search start
-              end
-              neighbors
-              make-min-heap
-              (lambda (heap node)
-                (let ((key (heap-key/datum heap node))
-                      (path-cost (f node)))
-                  (if (and key (< path-cost key))
-                      (heap-change-key! heap node path-cost)
-                      (heap-insert! heap (cons path-cost node)))))
-              (compose cdr heap-extract-extremum!)
-              heap-empty?))
-    
-    (define (uniform-cost start end neighbors)
-      (best-first start end neighbors node-path-cost))
-    
-    (define (make-straight-line-distance-heuristic end)
-      (lambda (node) (point-distance (node-state node) end)))
-    
-    (define (greedy-best-first start end neighbors)
-      (best-first
-       start
-       end
-       neighbors
-       (make-straight-line-distance-heuristic end)))
-    
-    (define (a* start end neighbors)
-      (best-first
-       start
-       end
-       neighbors
-       (let ((straight-line-distance-heuristic
-              (make-straight-line-distance-heuristic end)))
-         (lambda (node) (+ (node-path-cost node)
-                      (straight-line-distance-heuristic node))))))
-    
-    (let ((tessellation (tessellate)))
-      (let ((start (tessellation-start tessellation))
-            (end (tessellation-end tessellation))
-            (neighbors (tessellation-neighbors tessellation)))
-        (let ((breadth-first (breadth-first start end neighbors))
-              (depth-first (depth-first start end neighbors))
-              (uniform-cost (uniform-cost start end neighbors))
-              (greedy-best-first (greedy-best-first start end neighbors))
-              (a* (a* start end neighbors)))
-          (plot-tessellation/animation
-           tessellation
-           a*
-           "A*"
-           "a-star.avi")
-          (plot-tessellation/animation
-           tessellation
-           uniform-cost
-           "Uniform-cost"
-           "uniform-cost.avi")
-          (plot-tessellation/animation
-           tessellation
-           greedy-best-first
-           "Greedy best-first"
-           "greedy-best-first.avi")
-          (plot-tessellation/animation
-           tessellation
-           depth-first
-           "Depth-first"
-           "depth-first.avi")
-          (plot-tessellation/animation
-           tessellation
-           breadth-first
-           "Breadth-first"
-           "breadth-first.avi")
-          (join-animations "search.avi"
-                           "a-star.avi"
-                           "uniform-cost.avi"
-                           "greedy-best-first.avi"
-                           "breadth-first.avi"
-                           "depth-first.avi"))))
-    
-  #+END_SRC
-
-  Testing a node for a goal-state when it is selected for expansion is
-  more conservative; does it lead to suboptimal results if we fail to
-  do so for breadth-first?
-
-  We're going to have to use our own heap-implementation,
-  incidentally, for e.g. uniform-cost and A*; since Ivan's [[http://wiki.call-cc.org/eggref/4/binary-heap][binary-heap]]
-  doesn't do key-resizing.
-
-  We're going to have to handle dynamic resizing, though
-  (=heap-merge!=?); and add key- and payload-accessors.
+* DONE 3.7
+  CLOSED: [2012-10-01 Mon 05:10]
+** DONE a
+   CLOSED: [2012-10-01 Mon 05:10]
+   If the space is continuous, there are infinitely many states and
+   paths; if discrete, there are $xy$ states and $< (xy)!$ paths to
+   the goal. (Take the special case where the [[http://mathforum.org/library/drmath/view/70459.html][start and end are in
+   opposite corners]]: is it the case that you have ${x + y \choose
+   x} paths$?)
+** DONE b
+   CLOSED: [2012-10-01 Mon 05:10]
+   By the triangle inequality, any divergence from the vertices could
+   be shortened by travelling straight to a vertex; the state space is
+   now the vertices corresponding to edges of polygons.
+** DONE c
+   CLOSED: [2012-10-01 Mon 05:10]
+# <<3.7c>>
+   #+BEGIN_SRC scheme :tangle 3.7.scm :shebang #!/usr/bin/env chicken-scheme
+     (use aima-tessellation
+          data-structures
+          debug
+          heap
+          stack)
+     
+     (define (search start
+                     end
+                     neighbors
+                     make-frontier
+                     frontier-add!
+                     frontier-delete!
+                     frontier-empty?)
+       (let ((visited (make-hash-table))
+             (frontier (make-frontier)))
+         (frontier-add! frontier (make-node start #f #f 0))
+         (let search ()
+           ;; (debug frontier)
+           (if (frontier-empty? frontier)
+               (error "SEARCH -- Search failed")
+               (let* ((parent (frontier-delete! frontier))
+                      (children (hash-table-ref neighbors (node-state parent))))
+                 ;; (debug parent)
+                 (hash-table-set! visited (node-state parent) #f)
+                 (if (eq? (node-state parent) end)
+                     (reverse (predecessor-path parent))
+                     (let ((unvisited-children
+                            (filter (lambda (child)
+                                      (hash-table-ref/default
+                                       visited
+                                       child
+                                       #t))
+                                    children)))
+                       ;; (debug parent children unvisited-children)
+                       (for-each
+                           (lambda (child)
+                             ;; (debug child parent (node-state parent))
+                             (let ((node (make-node child
+                                                    parent
+                                                    #f
+                                                    (+ (node-path-cost parent)
+                                                       (point-distance
+                                                        child
+                                                        (node-state parent))))))
+                               (frontier-add! frontier node)))
+                         unvisited-children)
+                       (search))))))))
+     
+     (define (depth-first start end neighbors)
+       (search start
+               end
+               neighbors
+               make-stack
+               stack-push!
+               stack-pop!
+               stack-empty?))
+     
+     (define (breadth-first start end neighbors)
+       (search start
+               end
+               neighbors
+               make-queue
+               queue-add!
+               queue-remove!
+               queue-empty?))
+     
+     (define (best-first start end neighbors f)
+       (search start
+               end
+               neighbors
+               make-min-heap
+               (lambda (heap node)
+                 (let ((key (heap-key/datum heap node))
+                       (path-cost (f node)))
+                   (if (and key (< path-cost key))
+                       (heap-change-key! heap node path-cost)
+                       (heap-insert! heap (cons path-cost node)))))
+               (compose cdr heap-extract-extremum!)
+               heap-empty?))
+     
+     (define (uniform-cost start end neighbors)
+       (best-first start end neighbors node-path-cost))
+     
+     (define (make-straight-line-distance-heuristic end)
+       (lambda (node) (point-distance (node-state node) end)))
+     
+     (define (greedy-best-first start end neighbors)
+       (best-first
+        start
+        end
+        neighbors
+        (make-straight-line-distance-heuristic end)))
+     
+     (define (a* start end neighbors)
+       (best-first
+        start
+        end
+        neighbors
+        (let ((straight-line-distance-heuristic
+               (make-straight-line-distance-heuristic end)))
+          (lambda (node) (+ (node-path-cost node)
+                       (straight-line-distance-heuristic node))))))
+     
+     (let ((tessellation (tessellate)))
+       (let ((start (tessellation-start tessellation))
+             (end (tessellation-end tessellation))
+             (neighbors (tessellation-neighbors tessellation)))
+         (let ((breadth-first (breadth-first start end neighbors))
+               (depth-first (depth-first start end neighbors))
+               (uniform-cost (uniform-cost start end neighbors))
+               (greedy-best-first (greedy-best-first start end neighbors))
+               (a* (a* start end neighbors)))
+           (plot-tessellation/animation
+            tessellation
+            a*
+            "A*"
+            "a-star.avi")
+           (plot-tessellation/animation
+            tessellation
+            uniform-cost
+            "Uniform-cost"
+            "uniform-cost.avi")
+           (plot-tessellation/animation
+            tessellation
+            greedy-best-first
+            "Greedy best-first"
+            "greedy-best-first.avi")
+           (plot-tessellation/animation
+            tessellation
+            depth-first
+            "Depth-first"
+            "depth-first.avi")
+           (plot-tessellation/animation
+            tessellation
+            breadth-first
+            "Breadth-first"
+            "breadth-first.avi")
+           (join-animations "search.avi"
+                            "a-star.avi"
+                            "uniform-cost.avi"
+                            "greedy-best-first.avi"
+                            "breadth-first.avi"
+                            "depth-first.avi"))))
+     
+   #+END_SRC
+** DONE d
+   CLOSED: [2012-10-01 Mon 05:10]
+   See [[http://youtu.be/eKs33D2UgtY?hd%3D1][the video]]: A* = uniform-cost > greedy-best-first >
+   breadth-first > depth-first.
 * TODO 3.9
   #+BEGIN_SRC scheme
     (use data-structures
