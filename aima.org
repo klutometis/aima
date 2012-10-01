@@ -1675,7 +1675,156 @@
   Need a graph of possible moves (initially hard-coded for 3x3?); and
   a Manhattan distance calculator. Can we have an abstract game-graph?
 
-  #+BEGIN_SRC scheme
+  #+BEGIN_SRC scheme :tangle search.scm
+    (use data-structures
+         debug
+         heap
+         stack)
+    
+    (define-record node
+      ;; @("Data structure for graphs"
+      ;;   (state "An indexable point")
+      ;;   (parent "The node-predecessor")
+      ;;   (action "Not used")
+      ;;   (path-cost "Cost of the path up to this point"))
+      state
+      parent
+      action
+      path-cost)
+    
+    (define (predecessor-path node)
+      ;; @("List the predecessors of this node."
+      ;;   (node "The node to predecess")
+      ;;   (@to "list"))
+      (let iter ((path (list node)))
+        (let ((parent (node-parent (car path))))
+          (if parent
+              (iter (cons parent path))
+              ;; Do we want to reverse?
+              (reverse path)))))
+    
+    (define (search start
+                    end
+                    children
+                    distance
+                    goal?
+                    make-frontier
+                    frontier-add!
+                    frontier-delete!
+                    frontier-empty?)
+      (let ((visited (make-hash-table))
+            (frontier (make-frontier)))
+        (frontier-add! frontier (make-node start #f #f 0))
+        (let search ()
+          ;; (debug frontier)
+          (if (frontier-empty? frontier)
+              (error "Search failed -- SEARCH")
+              (let* ((parent (frontier-delete! frontier))
+                     (children (children parent)))
+                ;; (debug parent)
+                (hash-table-set! visited (node-state parent) #f)
+                (if (goal? (node-state parent) end)
+                    (reverse (predecessor-path parent))
+                    (let ((unvisited-children
+                           (filter (lambda (child)
+                                     (hash-table-ref/default
+                                      visited
+                                      child
+                                      #t))
+                                   children)))
+                      ;; (debug parent children unvisited-children)
+                      (for-each
+                          (lambda (child)
+                            ;; (debug child parent (node-state parent))
+                            (let ((node (make-node child
+                                                   parent
+                                                   #f
+                                                   (+ (node-path-cost parent)
+                                                      ;; Should this be
+                                                      ;; between two
+                                                      ;; nodes?
+                                                      (distance
+                                                       child
+                                                       (node-state parent))))))
+                              (frontier-add! frontier node)))
+                        unvisited-children)
+                      (search))))))))
+    
+    (define (depth-first start end children distance goal?)
+      (search start
+              end
+              children
+              distance
+              goal?
+              make-stack
+              stack-push!
+              stack-pop!
+              stack-empty?))
+    
+    (define (breadth-first start end children distance goal?)
+      (search start
+              end
+              children
+              distance
+              goal?
+              make-queue
+              queue-add!
+              queue-remove!
+              queue-empty?))
+    
+    (define (best-first start end children distance goal? f)
+      (search start
+              end
+              children
+              distance
+              goal?
+              make-min-heap
+              (lambda (heap node)
+                (let ((key (heap-key/datum heap node))
+                      (path-cost (f node)))
+                  (if (and key (< path-cost key))
+                      (heap-change-key! heap node path-cost)
+                      (heap-insert! heap (cons path-cost node)))))
+              (compose cdr heap-extract-extremum!)
+              heap-empty?))
+    
+    (define (uniform-cost start end path-cost children distance goal?)
+      (best-first start end children path-cost distance goal? node-path-cost))
+    
+    (define (greedy-best-first start end children distance goal? heuristic)
+      (best-first
+       start
+       end
+       children
+       distance
+       goal?
+       heuristic))
+    
+    (define (a* start end children distance goal? heuristic)
+      (best-first
+       start
+       end
+       children
+       distance
+       goal?
+       (lambda (node) (+ (node-path-cost node)
+                    (heuristic node)))))
+    
+    (define-record-and-printer point x y)
+    
+    (define (point-distance p1 p2)
+      ;; @("Calculate the distance between two points."
+      ;;   (p1 "The first point")
+      ;;   (p2 "The second point")
+      ;;   (@to "distance"))
+      (sqrt (+ (expt (- (point-x p1) (point-x p2)) 2)
+               (expt (- (point-y p1) (point-y p2)) 2))))
+    
+    (define (make-straight-line-distance-heuristic end)
+      (lambda (node) (point-distance (node-state node) end)))
+    
+  #+END_SRC
+
     (use (only aima define-record-and-printer)
          debug
          extras
