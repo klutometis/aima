@@ -1392,9 +1392,9 @@
 * TODO 3.7
   #+BEGIN_SRC scheme :tangle 3.7.scm :shebang #!/usr/bin/env chicken-scheme
     (use aima-tessellation
-         binary-heap
          data-structures
          debug
+         heap
          stack)
     
     (define (search start
@@ -1457,32 +1457,19 @@
               queue-remove!
               queue-empty?))
     
-    ;;; Binary heap package is weird; took pains to do it functionally. We
-    ;;; just need a straight-forward, destructive one. Hmm: thanks the
-    ;;; Olympioi we wrote one for CLRS. Is it servicable?
-    (define (make-heap)
-      (make-binary-heap
-       (lambda (c1 c2)
-         (cond ((> c1 c2) -1)
-               ((= c1 c2) 0)
-               ((< c1 c2) 1)))))
-    
     (define (uniform-cost start end neighbors)
-      (let ((heap (make-heap)))
-        (search start
-                end
-                neighbors
-                (lambda () heap)
-                (lambda (frontier node)
-                  (if (zero? (heap 'size))
-                      (set! heap (make-heap)))
-                  (set! heap ((heap 'put) (node-path-cost node) node)))
-                (lambda (frontier)
-                  (let ((max (cdr ((heap 'get-max)))))
-                    (set! heap ((heap 'delete-max)))
-                    max))
-                (lambda (frontier)
-                  (heap 'empty?)))))
+      (search start
+              end
+              neighbors
+              make-min-heap
+              (lambda (heap node)
+                (let ((key (heap-key/datum heap node))
+                      (path-cost (node-path-cost node)))
+                  (if (and key (< path-cost key))
+                      (heap-change-key! heap node path-cost)
+                      (heap-insert! heap (cons path-cost node)))))
+              (compose cdr heap-extract-extremum!)
+              heap-empty?))
     
     (let ((tessellation (tessellate)))
       (let ((start (tessellation-start tessellation))
