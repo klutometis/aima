@@ -1927,19 +1927,20 @@
       ;; (vector= eq? g1 g2)
       (equal? g1 g2))
     
-    (let* ((k 2)
+    (let* ((k 3)
            (start (make-start-game k)))
       (let* ((random-game (make-random-game k))
              (game (random-game)))
         (debug
          (map node-state
-              (breadth-first
+              (a*
                game
                (make-start-game k)
                (lambda (parent)
                  (reachable-games k (node-state parent)))
                (constantly 1)
-               game=)))))
+               game=
+               (make-manhattan-distance-heuristic k))))))
     
   #+END_SRC
 
