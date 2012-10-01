@@ -1830,6 +1830,8 @@
          data-structures
          debug
          extras
+         levenshtein-byte
+         levenshtein-transpose-byte
          srfi-1
          srfi-69
          vector-lib)
@@ -1882,6 +1884,15 @@
       (list->vector
        (cons blank (iota (- (* k k) 1) 1))))
     
+    (define (tile->char tile)
+      (integer->char
+       (+ (if (blank? tile) 0 tile) 48)))
+    
+    (define (state->string state)
+      (list->string
+       (vector->list
+        (vector-map (lambda (i tile) (tile->char tile)) state))))
+    
     (define (make-random-game k)
       (let ((state (make-state k)))
         (lambda ()
@@ -1907,17 +1918,27 @@
       (equal? g1 g2))
     
     (let* ((k 2)
-           (random-game (make-random-game k))
-           (game (random-game)))
-      (debug
-       (map node-state
-            (breadth-first
-             game
-             (make-start-game k)
-             (lambda (parent)
-               (reachable-games k (node-state parent)))
-             (constantly 1)
-             game=))))
+           (start (make-start-game k)))
+      (let* ((random-game (make-random-game k))
+             (game (random-game)))
+        (debug
+         (state->string (game-state game))
+         (state->string (game-state start))
+         (levenshtein-distance/transpose-byte
+          (state->string (game-state game))
+          (state->string (game-state start)))
+         (levenshtein-distance/byte
+          (state->string (game-state game))
+          (state->string (game-state start))))
+        (debug
+         (map node-state
+              (breadth-first
+               game
+               (make-start-game k)
+               (lambda (parent)
+                 (reachable-games k (node-state parent)))
+               (constantly 1)
+               game=)))))
     
   #+END_SRC
 
