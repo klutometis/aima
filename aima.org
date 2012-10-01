@@ -1671,6 +1671,168 @@
       (search start end))
     
   #+END_SRC
+* TODO 3.22
+  Need a graph of possible moves (initially hard-coded for 3x3?); and
+  a Manhattan distance calculator. Can we have an abstract game-graph?
+
+  #+BEGIN_SRC scheme
+    (use (only aima define-record-and-printer)
+         debug
+         extras
+         srfi-1
+         srfi-69
+         vector-lib)
+    
+    (define-record-and-printer tile
+      moves)
+    
+    (define-record-and-printer blank)
+    (define blank (make-blank))
+    
+    (define-record-and-printer game
+      state
+      blank)
+    
+    (define (top? k i)
+      (< i k))
+    
+    (define (left? k i)
+      (zero? (modulo i k)))
+    
+    (define (right? k i)
+      (zero? (modulo (+ i 1) k)))
+    
+    (define (bottom? k i)
+      (>= i (* k (- k 1))))
+    
+    (define (up k i)
+      (- i k))
+    
+    (define (down k i)
+      (+ i k))
+    
+    (define (left k i)
+      (- i 1))
+    
+    (define (right k i)
+      (+ i 1))
+    
+    (define (moves k i)
+      (let ((up (and (not (top? k i)) (up k i)))
+            (down (and (not (bottom? k i)) (down k i)))
+            (left (and (not (left? k i)) (left k i)))
+            (right (and (not (right? k i)) (right k i))))
+        (filter values (list up down left right))))
+    
+    (define (row k i)
+      (inexact->exact (floor (/ i k))))
+    
+    (define (col k i)
+      (modulo i k))
+    
+    (define (manhattan-distance k i j)
+      (+ (abs (- (row k j) (row k i)))
+         (abs (- (col k j) (col k i)))))
+    
+    (define (n-puzzle k)
+      (let ((game (vector-unfold (lambda (i) (moves k i)) (* k k))))
+        game))
+    
+    (define (make-state k)
+      (list->vector
+       (cons blank (iota (- (* k k) 1) 1))))
+    
+    (define (make-random-game k)
+      (let ((state (make-state k)))
+        (lambda ()
+          (do ((state (vector-copy state))
+               (i (- (* k k) 1) (- i 1)))
+              ((< i 1) (make-game state (vector-index blank? state)))
+            (let ((j (random (+ i 1))))
+              (vector-swap! state i j))))))
+    
+    (define (make-start-game k)
+      (make-game (make-state k) 0))
+    
+    (define (reachable-games k game)
+      (let ((moves (moves k (game-blank game))))
+        (map (lambda (move)
+               (let ((state (vector-copy (game-state game))))
+                 (vector-swap! state (game-blank game) move)
+                 (make-game state move)))
+             moves)))
+    
+    (define (game= g1 g2)
+      ;; (vector= eq? g1 g2)
+      (equal? g1 g2))
+    
+    (define-record node
+      ;; @("Data structure for graphs"
+      ;;   (state "An indexable point")
+      ;;   (parent "The node-predecessor")
+      ;;   (action "Not used")
+      ;;   (path-cost "Cost of the path up to this point"))
+      state
+      parent
+      action
+      path-cost)
+    
+    (define (predecessor-path node)
+      ;; @("List the predecessors of this node."
+      ;;   (node "The node to predecess")
+      ;;   (@to "list"))
+      (let iter ((path (list node)))
+        (let ((parent (node-parent (car path))))
+          (if parent
+              (iter (cons parent path))
+              path))))
+    
+    (define (search k start end)
+      (let ((visited (make-hash-table))
+            (frontier (make-queue)))
+        (queue-add! frontier (make-node start #f #f 0))
+        (let search ()
+          (if (queue-empty? frontier)
+              (error "Search failed -- SEARCH")
+              (let* ((parent (queue-remove! frontier))
+                     (children (reachable-games k (node-state parent))))
+                (debug (node-state parent))
+                (hash-table-set! visited (node-state parent) #f)
+                (debug (hash-table-size visited))
+                (if (game= (node-state parent) end)
+                    (predecessor-path parent)
+                    (let ((unvisited-children
+                           (filter (lambda (child)
+                                     (hash-table-ref/default
+                                      visited
+                                      child
+                                      #t))
+                                   children)))
+                      (for-each
+                          (lambda (child)
+                            (let ((node (make-node child
+                                                   parent
+                                                   #f
+                                                   (+ (node-path-cost parent)
+                                                      1))))
+                              (queue-add! frontier node)))
+                        unvisited-children)
+                      (search))))))))
+    
+    (let* ((k 2)
+           (random-game (make-random-game k))
+           (game (random-game)))
+      (map node-state
+           (search k
+                   game
+                   (make-start-game k))))
+    
+  #+END_SRC
+
+  =blank?= could just as well be =zero?=, which would aid in testing
+  vector-equality (could use e.g. ~(vector= = g1 g2)~.
+
+  Animated ditaa for visualization?
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
