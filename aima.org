@@ -1557,6 +1557,7 @@
    See [[http://youtu.be/eKs33D2UgtY?hd%3D1][the video]]: A* = uniform-cost > greedy-best-first >
    breadth-first > depth-first.
 * TODO 3.9
+  [[https://github.com/glenn-brown/MissionariesCannibals][Glenn's]] is better: it captures all paths.
   #+BEGIN_SRC scheme
     (use data-structures
          debug
