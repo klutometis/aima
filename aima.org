@@ -1494,9 +1494,9 @@
            "Breadth-first"
            "breadth-first.avi")
           (join-animations "search.avi"
-                           "depth-first.avi"
+                           "uniform-cost.avi"
                            "breadth-first.avi"
-                           "uniform-cost.avi"))))
+                           "depth-first.avi"))))
     
   #+END_SRC
 
