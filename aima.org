@@ -1416,7 +1416,7 @@
                 ;; (debug parent)
                 (hash-table-set! visited (node-state parent) #f)
                 (if (eq? (node-state parent) end)
-                    (predecessor-path parent)
+                    (reverse (predecessor-path parent))
                     (let ((unvisited-children
                            (filter (lambda (child)
                                      (hash-table-ref/default
