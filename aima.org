@@ -1830,10 +1830,15 @@
          data-structures
          debug
          extras
+         format
+         files
          levenshtein-byte
          levenshtein-transpose-byte
+         miscmacros
+         posix
          srfi-1
          srfi-69
+         shell
          vector-lib)
     
     (include "search.scm")
@@ -1927,20 +1932,98 @@
       ;; (vector= eq? g1 g2)
       (equal? g1 g2))
     
+    (define (ditaa-boundary k)
+      (string-intersperse (make-list (+ k 1) "+") "---"))
+    
+    (define (ditaa-row row)
+      (format
+       "|~a|"
+       (string-intersperse
+        (vector->list
+         (vector-map (lambda (i tile)
+                       (format " ~a " (if (blank? tile) " " tile)))
+                     row))
+        "|")))
+    
+    (define (make-ditaa-row state k i)
+      (ditaa-row (vector-copy state i (+ i k))))
+    
+    (define (ditaa-blank-row k)
+      (ditaa-row (make-vector k blank)))
+    
+    (define (write-ditaa k state)
+      (let ((boundary (ditaa-boundary k))
+            (blank-row (ditaa-blank-row k)))
+        (display boundary)
+        (newline)
+        (do ((i 0 (+ i k)))
+            ((= i (* k k)))
+          (display blank-row)
+          (newline)
+          (display (make-ditaa-row state k i))
+          (newline)
+          (display blank-row)
+          (newline)
+          (display boundary)
+          (newline))))
+    
+    (define (visualize-state k state png)
+      (with-output-to-file png
+        (lambda ()
+          (let ((file (create-temporary-file)))
+            (with-output-to-file file
+              (lambda ()
+                (write-ditaa k state)))
+            (run (ditaa ,file ,png))))))
+    
+    (define (animation-filename directory index)
+      (make-pathname directory (format "~4,48d" index) "png"))
+    
+    (define (visualize-states k states)
+      (let ((directory (create-temporary-directory)))
+        (do ((states states (cdr states))
+             (i 0 (+ i 1)))
+            ((null? states))
+          (visualize-state k
+                           (car states)
+                           (animation-filename
+                            directory
+                            i)))
+        (dotimes (i 10)
+          (visualize-state k
+                           (last states)
+                           (animation-filename
+                            directory
+                            (+ i (length states)))))
+        directory))
+    
+    (define (animate-states/avi k directory avi)
+      ;; See this: <http://thirld.com/blog/tag/imagemagick/>.
+      (run (mencoder ,(format "mf://~a" (make-pathname directory "*.png"))
+                     -mf fps=4:type=png:w=170:h=238
+                     -o ,avi
+                     -ovc lavc)))
+    
+    (define (animate-states/gif k directory gif)
+      (run (convert -delay 20 ,(make-pathname directory "*.png") ,gif)))
+    
     (let* ((k 3)
            (start (make-start-game k)))
       (let* ((random-game (make-random-game k))
              (game (random-game)))
-        (debug
-         (map node-state
-              (a*
-               game
-               (make-start-game k)
-               (lambda (parent)
-                 (reachable-games k (node-state parent)))
-               (constantly 1)
-               game=
-               (make-manhattan-distance-heuristic k))))))
+        (let ((states
+               (map (compose game-state node-state)
+                    (a*
+                     game
+                     (make-start-game k)
+                     (lambda (parent)
+                       (reachable-games k (node-state parent)))
+                     (constantly 1)
+                     game=
+                     (make-manhattan-distance-heuristic k)))))
+          (let ((directory (visualize-states k states)))
+            (animate-states/avi k directory "states.avi")
+            (animate-states/gif k directory "states.gif")))))
     
   #+END_SRC
 
