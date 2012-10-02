@@ -2042,11 +2042,11 @@
            (start (make-start-game k)))
       (let* ((random-game (make-random-game k))
              (game (random-game)))
-        (debug (state->string (game-state game))
-               (state->string (game-state start))
-               (levenshtein-distance/transpose-byte
-                (state->string (game-state game))
-                (state->string (game-state start))))
+        (debug (game-state game)
+               (game-state start)
+               (kendall-tau-distance
+                (list->vector (filter (complement zero?) (vector->list (game-state game))))
+                (list->vector (filter (complement zero?) (vector->list (game-state start))))))
         (let ((states
                (map (compose game-state node-state)
                     (a*
