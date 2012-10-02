@@ -2018,9 +2018,18 @@
                    v1
                    v2))
     
-    (define (kendall-tau-distance v1 v2)
+    (define (contiguize! k v)
+      (do ((i k (+ i (* 2 k))))
+          ((>= i (vector-length v)))
+        (vector-reverse! v i (+ i k))))
+    
+    (define (kendall-tau-distance k v1 v2)
       (if (vector= = (sort v1 <) (sort v2 <))
-          (let ((x->i (make-hash-table)))
+          (let ((v1 (vector-copy v1))
+                (v2 (vector-copy v2))
+                (x->i (make-hash-table)))
+            (contiguize! k v1)
+            (contiguize! k v2)
             (vector-for-each (lambda (i x) (hash-table-set! x->i x i)) v2)
             (let iter ((i 0)
                        (distance 0))
@@ -2045,8 +2054,9 @@
         (debug (game-state game)
                (game-state start)
                (kendall-tau-distance
-                (list->vector (filter (complement zero?) (vector->list (game-state game))))
-                (list->vector (filter (complement zero?) (vector->list (game-state start))))))
+                k
+                (game-state game)
+                (game-state start)))
         (let ((states
                (map (compose game-state node-state)
                     (a*
