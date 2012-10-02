@@ -2018,6 +2018,26 @@
                    v1
                    v2))
     
+    (define (kendall-tau-distance v1 v2)
+      (if (vector= = (sort v1 <) (sort v2 <))
+          (let ((x->i (make-hash-table)))
+            (vector-for-each (lambda (i x) (hash-table-set! x->i x i)) v2)
+            (let iter ((i 0)
+                       (distance 0))
+              (if (or (= i (vector-length v1))
+                      (= i (vector-length v2)))
+                  distance
+                  (let ((x1 (vector-ref v1 i))
+                        (x2 (vector-ref v2 i)))
+                    (if (= x1 x2)
+                        (iter (+ i 1) distance)
+                        (let ((i2 (hash-table-ref x->i x1)))
+                          (vector-swap! v1 i i2)
+                          (iter (+ i 1) (+ distance 1))))))))
+          (error "Vectors incomparable -- KENDALL-TAU-DISTANCE")))
+    
+    (trace kendall-tau-distance)
+    
     (let* ((k 3)
            (start (make-start-game k)))
       (let* ((random-game (make-random-game k))
