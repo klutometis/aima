@@ -1845,8 +1845,8 @@
     
     (define-record-and-printer tile moves)
     
-    (define-record-and-printer blank)
-    (define blank (make-blank))
+    (define blank 0)
+    (define blank? zero?)
     
     (define-record-and-printer game state blank)
     
