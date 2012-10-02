@@ -2128,6 +2128,19 @@
           (kendall-tau-distance (vector 1 2 3 4 5)
                                 (vector 3 4 5 2 1)))
   #+END_SRC
+
+  #+BEGIN_SRC scheme
+    (use debug test vector-lib)
+    
+    (define (contiguize! k v)
+      (do ((i k (+ i (* 2 k))))
+          ((>= i (vector-length v)))
+        (vector-reverse! v i (+ i k))))
+    
+    (let ((v '#(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)))
+      (contiguize! 4 v)
+      (test v '#(0 1 2 3 7 6 5 4 8 9 10 11 15 14 13 12)))
+  #+END_SRC
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
