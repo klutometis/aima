@@ -2239,6 +2239,39 @@
   http://www.math.umt.edu/oliver/parity/nelson.pdf
 
   https://stat.ethz.ch/pipermail/r-help/2008-April/159732.html
+
+  #+BEGIN_SRC R
+    library(debug)
+    
+    n <- 16
+    ## p <- sample(1:n)
+    ## p <- c(0,1,2,5,4,3,7,6,8)
+    p <- c(1,2,3,4,5,6,7,8,9,10,11,12,13,15,14,0)
+    p <- c(1,2,3,4,5,6,7,8,9,10,11,12,13,15,14)
+    p <- c(1,2,3,4,8,7,6,5,9,10,11,12,15,14,13)
+    p <- c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0)
+    p <- c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
+    x <- integer(n)
+    print(p)
+    for (i in 1:n) {
+      ## debug(x)
+      z <- which(!x)[1]
+      print(x)
+      debug("outer", i, z)
+      if (is.na(z)) break
+      repeat {
+        debug("inner", i, z, x[z], p[z], x[p[z]])
+        x[z] <- i
+        z <- p[z]
+        if (x[z]) break
+      }
+    }
+    x
+    clen <- table(x)
+    clen
+    1L - (sum(clen %% 2 == 0) %% 2)*2L
+  #+END_SRC
+
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
