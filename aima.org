@@ -2232,7 +2232,8 @@
            (cycles '#(0 1 2))
            (cycles '#(2 1 0))
            (cycles '#(1 0 2))
-           (cycles '#(0 1 2 5 4 3 6 7 8)))
+           (cycles '#(0 1 2 5 4 3 6 7 8))
+           (cycles '#(1 2 3 4 5 6 7 8 9 10 11 12 13 15 14 0)))
   #+END_SRC
 
   http://www.math.umt.edu/oliver/parity/nelson.pdf
