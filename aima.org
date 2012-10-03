@@ -2041,6 +2041,16 @@
     (define (animate-states/gif k directory gif)
       (run (convert -delay 20 ,(make-pathname directory "*.png") ,gif)))
     
+    (define (solve k game)
+      (map (compose game-state node-state)
+           (a*
+            game
+            (make-start-game k)
+            (lambda (parent)
+              (reachable-games k (node-state parent)))
+            (constantly 1)
+            game=
+            (make-manhattan-distance-heuristic k))))
     
     (let* ((k 3)
            (start (make-start-game k)))
