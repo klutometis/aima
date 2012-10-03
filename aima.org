@@ -2336,6 +2336,11 @@
     (cycles '#(6 1 10 2 7 11 4 14 5 0 9 15 8 12 13 3))
   #+END_SRC
 
+  http://stackoverflow.com/questions/7701345/how-to-programatically-create-a-valid-15-puzzle-in-code
+  http://mathworld.wolfram.com/15Puzzle.html
+  http://www.cs.bham.ac.uk/~mdr/teaching/modules04/java2/TilesSolvability.html
+  http://kevingong.com/Math/SixteenPuzzle.html
+  
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
