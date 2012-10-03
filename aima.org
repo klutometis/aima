@@ -2272,6 +2272,70 @@
     1L - (sum(clen %% 2 == 0) %% 2)*2L
   #+END_SRC
 
+  #+BEGIN_SRC scheme
+    (use debug
+         miscmacros
+         srfi-1
+         srfi-69
+         vector-lib)
+    
+    (define (cycles v)
+      (let ((seen (make-vector (vector-length v) #f)))
+        (let iter ((i 0)
+                   (cycles '()))
+          (debug seen)
+          (if (= i (vector-length v))
+              (begin
+                (debug cycles)
+                (length (filter even? cycles)))
+              (let iter-cycle ((j i)
+                               (length 0))
+                (debug j length)
+                (if (vector-ref seen j)
+                    (iter (+ i 1)
+                          (cons length cycles))
+                    (begin
+                      (vector-set! seen j #t)
+                      (iter-cycle (vector-ref v j)
+                                  (+ length 1)))))))))
+    
+    (define (cycles v)
+      (let ((seen (make-vector (vector-length v) 0)))
+        (do ((i 1 (+ i 1)))
+            ((> i (vector-length v)))
+          (let ((z (vector-index zero? seen)))
+            (debug z)
+            (when z
+              (while (zero? (vector-ref seen z))
+                (debug z)
+                (vector-set! seen z i)
+                (set! z (vector-ref v z))))))
+        seen))
+    
+    (define (cycles v)
+      (let ((cycles (make-hash-table))
+            (seen (make-vector (vector-length v) #f)))
+        (do ((i 0 (+ i 1)))
+            ((= i (vector-length v)))
+          (let iter ((j i))
+            (unless (vector-ref seen j)
+              (vector-set! seen j #t)
+              (hash-table-update!/default
+               cycles
+               i
+               (lambda (length) (+ length 1))
+               0)
+              (iter (vector-ref v j)))))
+        (hash-table->alist cycles)))
+    
+    
+    (cycles '#(1 2 3 4 5 6 7 8 9 10 11 12 13 15 14 0))
+    (cycles '#(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 0))
+    (cycles '#(2 1 3 4 5 6 7 8 9 10 11 12 13 14 15 0))
+    (cycles '#(13 10 11 6 5 7 4 8 1 12 14 9 3 15 2 0))
+    (cycles '#(6 1 10 2 7 11 4 14 5 0 9 15 8 12 13 3))
+  #+END_SRC
+
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
