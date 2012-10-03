@@ -2220,7 +2220,7 @@
                     (begin
                       (hash-table-set! visited next #f)
                       (iter-cycle (vector-ref v next) (+ length 1)))
-                    (if (and (not (zero? length)) (even? length))
+                    (if (even? length)
                         (iter (+ i 1) (+ even-cycles 1))
                         (iter (+ i 1) even-cycles))))))))
     
