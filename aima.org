@@ -2041,45 +2041,6 @@
     (define (animate-states/gif k directory gif)
       (run (convert -delay 20 ,(make-pathname directory "*.png") ,gif)))
     
-    (define (hamming-distance v1 v2)
-      (vector-fold (lambda (i distance x1 x2)
-                     (if (= x1 x2)
-                         (+ distance 1)
-                         distance))
-                   0
-                   v1
-                   v2))
-    
-    (define (contiguize! k v)
-      (do ((i k (+ i (* 2 k))))
-          ((>= i (vector-length v)))
-        (vector-reverse! v i (+ i k))))
-    
-    (define (kendall-tau-distance k v1 v2)
-      (if (vector= = (sort v1 <) (sort v2 <))
-          (let ((v1 (vector-copy v1))
-                (v2 (vector-copy v2))
-                (x->i (make-hash-table)))
-            (contiguize! k v1)
-            (contiguize! k v2)
-            (vector-for-each (lambda (i x) (hash-table-set! x->i x i)) v2)
-            (let iter ((i 0)
-                       (distance 0))
-              (if (or (= i (vector-length v1))
-                      (= i (vector-length v2)))
-                  (begin
-                    (debug v1 v2)
-                    distance)
-                  (let ((x1 (vector-ref v1 i))
-                        (x2 (vector-ref v2 i)))
-                    (if (= x1 x2)
-                        (iter (+ i 1) distance)
-                        (let ((i2 (hash-table-ref x->i x1)))
-                          (vector-swap! v1 i i2)
-                          (iter (+ i 1) (+ distance 1))))))))
-          (error "Vectors incomparable -- KENDALL-TAU-DISTANCE")))
-    
-    (trace kendall-tau-distance)
     
     (let* ((k 3)
            (start (make-start-game k)))
