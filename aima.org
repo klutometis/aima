@@ -2139,6 +2139,32 @@
     (test 3
           (kendall-tau-distance (vector 1 2 3 4 5)
                                 (vector 3 4 5 2 1)))
+    
+    (debug (kendall-tau-distance
+            (vector 1 2 3 4 5 6 7 8 9 10 11 12 13 15 14 0)
+            (vector 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 0)))
+    
+    (debug (kendall-tau-distance
+            (vector 1 2 3 4 5 6 7 8 9 10 11 12 13 15 14 0)
+            (vector 1 2 3 4 5 6 7 8 9 10 11 12 13 14 0 15)))
+    
+    (define (contiguize! k v)
+      (do ((i k (+ i (* 2 k))))
+          ((>= i (vector-length v)))
+        (vector-reverse! v i (+ i k))))
+    
+    (define (contiguize k v)
+      (let ((v (vector-copy v)))
+        (contiguize! k v)
+        v))
+    
+    (debug (kendall-tau-distance
+            (contiguize 4 (vector 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 0))
+            (contiguize 4 (vector 1 2 3 4 5 6 7 8 9 10 11 12 13 15 14 0))))
+    
+    (debug (kendall-tau-distance
+            (contiguize 4 (vector 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 0))
+            (contiguize 4 (vector 1 2 3 4 5 6 7 8 9 10 11 0 13 14 15 12))))
   #+END_SRC
 
   #+BEGIN_SRC scheme
