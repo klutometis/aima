@@ -1910,6 +1910,36 @@
                (vector->list
                 (vector-map (lambda (i tile) (tile->char tile)) state)))))
     
+    (define (inversions v)
+      (let ((inversions (make-hash-table)))
+        (vector-for-each
+         (lambda (i x)
+           (do ((j i (+ j 1)))
+               ((= j (vector-length v)))
+             (when (and (> x (vector-ref v j))
+                        (not (zero? (vector-ref v j))))
+               (hash-table-update!/default inversions x add1 0))))
+         v)
+        (hash-table-fold
+         inversions
+         (lambda (x inversions total) (+ inversions total))
+         0)))
+    
+    ;;; But see
+    ;;; <http://www.cs.bham.ac.uk/~mdr/teaching/modules04/java2/TilesSolvability.html>.
+    (define soluble? (compose even? inversions))
+    
+    (define (soluble? k game)
+      (let ((inversions (inversions (game-state game)))
+            (blank-row (quotient (game-blank game) k)))
+        (debug inversions blank-row (game-state game))
+        (if (odd? k)
+            (even? inversions)
+            (or (and (odd? blank-row)
+                     (even? inversions))
+                (and (even? blank-row)
+                     (odd? inversions))))))
+    
     (define (make-random-game k)
       (let ((state (make-state k)))
         (lambda ()
