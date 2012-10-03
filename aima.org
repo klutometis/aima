@@ -1947,6 +1947,9 @@
         (let ((j (random (+ i 1))))
           (vector-swap! state i j))))
     
+    (define (make-random-soluble-game k)
+      (do ((game (make-random-game k) (make-random-game k)))
+          ((soluble? k game) game)))
     
     (define (make-start-game k)
       (make-game (make-state k) 0))
