@@ -2334,8 +2334,9 @@
          (lambda (i x)
            (do ((j i (+ j 1)))
                ((= j (vector-length v)))
-             (when (> x (vector-ref v j))
-               (hash-table-update!/default inversions x add1 -1))))
+             ;; (debug i j x (vector-ref v j) (> x (vector-ref v j)))
+             (when (and (> x (vector-ref v j)) (positive? (vector-ref v j)))
+               (hash-table-update!/default inversions x add1 0))))
          v)
         (hash-table-fold
          inversions
