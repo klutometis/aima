@@ -1941,13 +1941,12 @@
                      (odd? inversions))))))
     
     (define (make-random-game k)
-      (let ((state (make-state k)))
-        (lambda ()
-          (do ((state (vector-copy state))
-               (i (- (* k k) 1) (- i 1)))
-              ((< i 1) (make-game state (vector-index blank? state)))
-            (let ((j (random (+ i 1))))
-              (vector-swap! state i j))))))
+      (do ((state (make-state k))
+           (i (- (* k k) 1) (- i 1)))
+          ((< i 1) (make-game state (vector-index blank? state)))
+        (let ((j (random (+ i 1))))
+          (vector-swap! state i j))))
+    
     
     (define (make-start-game k)
       (make-game (make-state k) 0))
