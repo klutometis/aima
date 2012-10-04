@@ -1684,11 +1684,11 @@
     (define-record node
       ;; @("Data structure for graphs"
       ;;   (state "An indexable point")
-      ;;   (parent "The node-predecessor")
+      ;;   (predecessor "The node-predecessor")
       ;;   (action "Not used")
       ;;   (path-cost "Cost of the path up to this point"))
       state
-      parent
+      predecessor
       action
       path-cost)
     
@@ -1697,16 +1697,15 @@
       ;;   (node "The node to predecess")
       ;;   (@to "list"))
       (let iter ((path (list node)))
-        (let ((parent (node-parent (car path))))
-          (if parent
-              (iter (cons parent path))
+        (let ((predecessor (node-predecessor (car path))))
+          (if predecessor
+              (iter (cons predecessor path))
               ;; Do we want to reverse?
               (reverse path)))))
     
     (define (search start
-                    end
-                    children
-                    distance
+                    successors
+                    step-cost
                     goal?
                     make-frontier
                     frontier-add!
@@ -1719,64 +1718,61 @@
           ;; (debug frontier)
           (if (frontier-empty? frontier)
               (error "Search failed -- SEARCH")
-              (let* ((parent (frontier-delete! frontier))
-                     (children (children parent)))
-                ;; (debug parent)
-                (hash-table-set! visited (node-state parent) #f)
-                (if (goal? (node-state parent) end)
-                    (reverse (predecessor-path parent))
-                    (let ((unvisited-children
-                           (filter (lambda (child)
+              (let* ((predecessor (frontier-delete! frontier))
+                     (successors (successors predecessor)))
+                ;; (debug predecessor)
+                (hash-table-set! visited (node-state predecessor) #f)
+                (if (goal? (node-state predecessor))
+                    (reverse (predecessor-path predecessor))
+                    (let ((unvisited-successors
+                           (filter (lambda (successor)
                                      (hash-table-ref/default
                                       visited
-                                      child
+                                      successor
                                       #t))
-                                   children)))
-                      ;; (debug parent children unvisited-children)
+                                   successors)))
+                      ;; (debug predecessor successors unvisited-successors)
                       (for-each
-                          (lambda (child)
-                            ;; (debug child parent (node-state parent))
-                            (let ((node (make-node child
-                                                   parent
+                          (lambda (successor)
+                            ;; (debug successor predecessor (node-state predecessor))
+                            (let ((node (make-node successor
+                                                   predecessor
                                                    #f
-                                                   (+ (node-path-cost parent)
+                                                   (+ (node-path-cost predecessor)
                                                       ;; Should this be
                                                       ;; between two
                                                       ;; nodes?
-                                                      (distance
-                                                       child
-                                                       (node-state parent))))))
+                                                      (step-cost
+                                                       successor
+                                                       (node-state predecessor))))))
                               (frontier-add! frontier node)))
-                        unvisited-children)
+                        unvisited-successors)
                       (search))))))))
     
-    (define (depth-first start end children distance goal?)
+    (define (search-depth-first start successors step-cost goal?)
       (search start
-              end
-              children
-              distance
+              successors
+              step-cost
               goal?
               make-stack
               stack-push!
               stack-pop!
               stack-empty?))
     
-    (define (breadth-first start end children distance goal?)
+    (define (search-breadth-first start successors step-cost goal?)
       (search start
-              end
-              children
-              distance
+              successors
+              step-cost
               goal?
               make-queue
               queue-add!
               queue-remove!
               queue-empty?))
     
-    (define (best-first start end children distance goal? f)
+    (define (search-best-first start successors step-cost goal? f)
       (search start
-              end
-              children
-              distance
+              successors
+              step-cost
               goal?
               make-min-heap
               (lambda (heap node)
@@ -1788,27 +1784,34 @@
               heap-extract-extremum!
               heap-empty?))
     
-    (define (uniform-cost start end children distance goal?)
-      (best-first start end children distance goal? node-path-cost))
+    (define (search-uniform-cost start successors step-cost goal?)
+      (search-best-first start
+                         successors
+                         step-cost
+                         goal?
+                         node-path-cost))
     
-    (define (greedy-best-first start end children distance goal? heuristic)
-      (best-first
-       start
-       end
-       children
-       distance
-       goal?
-       heuristic))
+    (define (search-greedy-best-first start
+                                      successors
+                                      step-cost
+                                      goal?
+                                      heuristic)
+      (search-best-first start
+                         successors
+                         step-cost
+                         goal?
+                         heuristic))
     
-    (define (A* start end children distance goal? heuristic)
-      (best-first
-       start
-       end
-       children
-       distance
-       goal?
-       (lambda (node) (+ (node-path-cost node)
-                    (heuristic node)))))
+    (define (A* start successors step-cost goal? heuristic)
+      (search-best-first start
+                         successors
+                         step-cost
+                         goal?
+                         (lambda (node) (+ (node-path-cost node)
+                                      (heuristic node)))))
+    
+    ;; (define (recursive-best-first start successors step-cost goal? heuristic)
+    ;;   )
     
     (define-record-and-printer point x y)
     
@@ -2029,15 +2032,15 @@
       (run (convert -delay 20 ,(make-pathname directory "*.png") ,gif)))
     
     (define (solve k game)
-      (map (compose game-state node-state)
-           (A*
-            game
-            (make-start-game k)
-            (lambda (parent)
-              (reachable-games k (node-state parent)))
-            (constantly 1)
-            game=
-            (make-manhattan-distance-heuristic k))))
+      (let ((start (make-start-game k)))
+        (map (compose game-state node-state)
+             (A*
+              game
+              (lambda (parent)
+                (reachable-games k (node-state parent)))
+              (constantly 1)
+              (lambda (game) (game= start game))
+              (make-manhattan-distance-heuristic k)))))
     
     (let* ((k 3)
            (states (solve k (make-random-soluble-game k))))
