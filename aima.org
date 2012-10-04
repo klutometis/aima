@@ -1881,14 +1881,11 @@
       (+ (abs (- (row k j) (row k i)))
          (abs (- (col k j) (col k i)))))
     
-    (define (tile->integer tile)
-      (if (blank? tile) 0 tile))
-    
     (define (make-manhattan-distance-heuristic k)
       (lambda (node)
         (vector-fold (lambda (i distance tile)
                        (+ distance
-                          (manhattan-distance k i (tile->integer tile))))
+                          (manhattan-distance k i tile)))
                      0
                      (game-state (node-state node)))))
     
@@ -1899,16 +1896,6 @@
     (define (make-state k)
       (list->vector
        (cons blank (iota (- (* k k) 1) 1))))
-    
-    (define (tile->char tile)
-      (integer->char (+ (tile->integer tile) 48)))
-    
-    (define (state->string state)
-      (list->string
-       ;; TODO: This filter doesn't work; take it out.
-       (filter (lambda (char) (not (char=? char #\0)))
-               (vector->list
-                (vector-map (lambda (i tile) (tile->char tile)) state)))))
     
     (define (inversions v)
       (let ((inversions (make-hash-table)))
