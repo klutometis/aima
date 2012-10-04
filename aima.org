@@ -2359,6 +2359,38 @@
     (debug (inversions '#(3 6 5 2 4 7 0 8 1)))
     
   #+END_SRC
+
+  Chapter 3:
+
+  #+BEGIN_QUOTE
+  The transition model, specified by (result s a), returns the state
+  that results from doing action a in state s.
+
+  A path in the state space is a sequence of states connected by a
+  sequence of actions.
+
+  Sometimes the goal is specified by an abstract property rather than
+  an explicitly enumerated set of states (e.g. checkmate).
+
+  A solution to a problem is an action sequence that leads from the
+  initial state to a goal state. Solution quality is measured by the
+  path-cost function.
+  #+END_QUOTE
+
+  Rather than returning a sequence of states (which might be
+  expensive); return, rather, a sequence of actions and reconstitute
+  the state as needed?
+
+  Actions constitute a kind of diff; it's also necessary when
+  instructing an agent based on search.
+
+  Or, maybe it's ok: even AIMA-nodes have state.
+
+  We're lacking actions and transition models; step-cost apparently
+  takes state and action. We're using states as a proxy for actions.
+
+  We'll have to adopt the action-model if we want to make this
+  applicable to agents.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
