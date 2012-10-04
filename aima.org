@@ -1716,7 +1716,7 @@
                     frontier-empty?)
       (let ((visited (make-hash-table))
             (frontier (make-frontier)))
-        (frontier-add! frontier (make-node start #f #f 0))
+        (frontier-add! frontier (make-initial-node start))
         (let search ()
           ;; (debug frontier)
           (if (frontier-empty? frontier)
