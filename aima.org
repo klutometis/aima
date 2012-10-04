@@ -2030,7 +2030,7 @@
     
     (define (solve k game)
       (map (compose game-state node-state)
-           (a*
+           (A*
             game
             (make-start-game k)
             (lambda (parent)
