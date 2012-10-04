@@ -1813,8 +1813,12 @@
                          (lambda (node) (+ (node-path-cost node)
                                       (heuristic node)))))
     
-    ;; (define (recursive-best-first start successors step-cost goal? heuristic)
-    ;;   )
+    (define (recursive-best-first start successors step-cost goal? heuristic)
+      (let iter ((node (make-initial-node start))
+                 (f-limit +inf))
+        (if (goal? (node-state node))
+            (predecessor-path node)
+            (let ((successors (successors (node-state node))))))))
     
     (define-record-and-printer point x y)
     
