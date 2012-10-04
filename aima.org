@@ -1800,7 +1800,7 @@
        goal?
        heuristic))
     
-    (define (a* start end children distance goal? heuristic)
+    (define (A* start end children distance goal? heuristic)
       (best-first
        start
        end
