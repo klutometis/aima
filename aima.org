@@ -1780,12 +1780,12 @@
               goal?
               make-min-heap
               (lambda (heap node)
-                (let ((key (heap-key/datum heap node))
+                (let ((key (heap-key heap node))
                       (path-cost (f node)))
                   (if (and key (< path-cost key))
                       (heap-change-key! heap node path-cost)
-                      (heap-insert! heap (cons path-cost node)))))
-              (compose cdr heap-extract-extremum!)
+                      (heap-insert! heap path-cost node))))
+              heap-extract-extremum!
               heap-empty?))
     
     (define (uniform-cost start end children distance goal?)
