@@ -1782,8 +1782,9 @@
               (lambda (heap node)
                 (let ((key (heap-key heap node))
                       (path-cost (f node)))
-                  (if (and key (< path-cost key))
-                      (heap-change-key! heap node path-cost)
+                  (if key
+                      (if (< path-cost key)
+                          (heap-change-key! heap node path-cost))
                       (heap-insert! heap path-cost node))))
               heap-extract-extremum!
               heap-empty?))
