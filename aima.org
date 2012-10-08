@@ -1820,7 +1820,8 @@
                  (f-limit +inf))
         (if (goal? (node-state node))
             (predecessor-path node)
-            (let ((successors (successors (node-state node))))))))
+            (let ((successors (successors (node-state node))))
+              successors))))
     
     (define-record-and-printer point x y)
     
