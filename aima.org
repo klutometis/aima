@@ -1815,13 +1815,64 @@
                          (lambda (node) (+ (node-path-cost node)
                                       (heuristic node)))))
     
-    (define (recursive-best-first start successors step-cost goal? heuristic)
-      (let iter ((node (make-initial-node start))
-                 (f-limit +inf))
-        (if (goal? (node-state node))
-            (predecessor-path node)
-            (let ((successors (successors (node-state node))))
-              successors))))
+    (define (search-recursive-best-first start
+                                         successors
+                                         step-cost
+                                         goal?
+                                         heuristic)
+      (define (search return predecessor f-limit)
+        (debug (node-state predecessor))
+        (if (goal? (node-state predecessor))
+            (return (predecessor-path predecessor))
+            (let ((successors (successors predecessor)))
+              (if (null? successors)
+                  (values #f +inf)
+                  (let ((heap (make-min-heap)))
+                    (for-each
+                        (lambda (successor)
+                          (let ((successor
+                                  (make-node successor
+                                             predecessor
+                                             #f
+                                             (step-cost
+                                              successor
+                                              (node-state predecessor)))))
+                            (node-path-cost-set!
+                             successor
+                             (max (length (predecessor-path successor))
+                                  (node-path-cost predecessor)))
+                            (heap-insert! heap
+                                          (node-path-cost successor)
+                                          successor)))
+                      successors)
+                    (let iter ()
+                      (debug 'harro)
+                      (let* ((best (heap-extremum heap))
+                             (best-path-cost (node-path-cost best)))
+                        (if (> best-path-cost f-limit)
+                            (values #f best-path-cost)
+                            (let ((alternative
+                                   (if (= (heap-size heap) 1)
+                                       +inf
+                                       (let ((first
+                                              (heap-extract-extremum! heap))
+                                             (alternative
+                                              (node-path-cost
+                                               (heap-extremum heap))))
+                                         (heap-insert!
+                                          heap
+                                          (node-path-cost first)
+                                          first)
+                                         alternative))))
+                              (receive (predecessor best-path-cost)
+                                (search return
+                                        best
+                                        (min f-limit alternative))
+                                (if predecessor
+                                    (values predecessor best-path-cost)
+                                    (iter))))))))))))
+      (call/cc (lambda (return)
+                 (search return (make-initial-node start) +inf))))
     
     (define-record-and-printer point x y)
     
@@ -2044,7 +2095,7 @@
     (define (solve k game)
       (let ((start (make-start-game k)))
         (map (compose game-state node-state)
-             (A*
+             (search-recursive-best-first
               game
               (lambda (parent)
                 (reachable-games k (node-state parent)))
@@ -2053,8 +2104,18 @@
               (make-manhattan-distance-heuristic k)))))
     
     (let* ((k 3)
-           (states (solve k (make-random-soluble-game k))))
-      (debug states))
+           #;(states (solve k (make-random-soluble-game k)))
+           )
+      ;; (debug states)
+      (debug
+       (let ((start (make-start-game k)))
+         (search-recursive-best-first
+          (make-random-soluble-game k)
+          (lambda (parent)
+            (reachable-games k (node-state parent)))
+          (constantly 1)
+          (lambda (game) (game= start game))
+          (make-manhattan-distance-heuristic k)))))
     
   #+END_SRC
 
@@ -2401,6 +2462,8 @@
 
   We'll have to adopt the action-model if we want to make this
   applicable to agents.
+
+  See [[http://aima-python.googlecode.com/svn/trunk/search.py][this recursive best-first-search in Python]], by the way.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
