@@ -1557,6 +1557,8 @@
    CLOSED: [2012-10-01 Mon 05:10]
    See [[http://youtu.be/eKs33D2UgtY?hd%3D1][the video]]: A* = uniform-cost > greedy-best-first >
    breadth-first > depth-first.
+* TODO 3.8
+  
 * DONE 3.9
   CLOSED: [2012-10-01 Mon 05:21]
   - CLOSING NOTE [2012-10-01 Mon 05:21] \\
