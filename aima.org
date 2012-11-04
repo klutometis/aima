@@ -2601,6 +2601,10 @@
    Using the triangle inequality, a straight line between S and E that
    is interrupted by a convex polygon, must have a shortest path along
    the vertices of the interrupting polygon?
+** Sun Nov  4 2012
+   At the [[http://www.meetup.com/LA-Hackathons/events/85658952/][LA Hackathon]] with Ryan; proposed a thing wherein people
+   cherry-pick interesting problems, present them. Optionally
+   collaborate.
 * Notes
 ** 1
    - Two dimensions: thought vs. action, humanity vs. rationality.
