@@ -3393,9 +3393,9 @@
       to combine large blocks of letters that have evolved
       independently to perform useful functions, thus raising the
       level of granularity at which the search operates.
-      - [Each piece of information has to be independently useful, I
+      - \emph{Each piece of information has to be independently useful, I
         suppose; or useful in concert, since it raises the
-        granularity?]
+        granularity?}
     - Schema: substring in which some of the positions can be left
       unspecified; strings that match the schema: instances.
     - If the average fitness of the instances of a schema is above the
@@ -3550,9 +3550,9 @@
       of singleton belief states.)
     - In the belief-state space, the problem is fully observable
       because the agent always knows its own belief state.
-      - [This is an interesting problem: human-like agents whose
+      - \empt{This is an interesting problem: human-like agents whose
         belief states are partially observable; cf. [[http://en.wikipedia.org/wiki/Partially_observable_Markov_decision_process#Belief_MDP][belief-MDPs]]? No,
-        no obvious literature on this one.]
+        no obvious literature on this one.}
     - Solution: sequence of actions; that's because the percepts are
       predictable (even if the environment is nondeterministic).
     - Physical problem P defined by: Actions_P, Result_P, Goal-Test_P,
@@ -3562,16 +3562,83 @@
       - Initial state :: set of all states in P.
       - Actions :: If illegal actions have no effect on the
                    environment, take union of actions in any physical
-                   states: \[Actions(b) = \Union_{s \in
+                   states: \[Actions(b) = \bigcup\limits_{s \in
                    b}Actions_P(s)\]
-      - Transition model :: Deterministic: \[b\prime = Result(b, a) =
-           \{s\prime : s\prime = Result_P(s, a) and s \in b\}.\]
-           Nondeterministic: \[b\prime = Result(b, a) = \{s\prime:
-           s\prime \in Results_P(s, a) and s \in b\} = \Union_{s\in
-           b}Results_P(s, a)\]. Process of generating the new belief
-           state after the action is called the prediction step.
+      - Transition model :: Deterministic: \[b^\prime = Result(b, a) =
+           \{s^\prime : s^\prime = Result_P(s, a) \land s \in b\}.\]
+           Nondeterministic: \[b^\prime = Result(b, a) = \{s^\prime:
+           s^\prime \in Results_P(s, a) \land s \in b\} =
+           \bigcup\limits_{s\in b}Results_P(s, a)\]. Process of
+           generating the new belief state after the action is called
+           the prediction step.
       - Goal test :: All the physical states in it satisfy Goal-Test_P.
       - Path cost :: Assume cost the same
+    - If an action sequence is a solution for a belief state $b$, it
+      is also a solution for any subset of $b$.
+    - Discard a path reaching $\{1, 3, 5, 7\}$ if $\{5, 7\}$ has been
+      generated; if $\{1, 3, 5, 7\}$ solvable, so is $\{5, 7\}$.
+    - Vastness of belief space, exponentially larger than physical
+      state space
+    - Incremental belief-state search
+    - Sensorless 8-puzzle is impossible
+    - If sensing is non-deterministic, we use a =percepts= function
+      that returns a set of possible percepts.
+    - Fully observable problems are a special case where percept(s) =
+      s and sensorless problems are a special case where percept(s) =
+      null.
+    - Actions, step-cost, goal-test are constructed from the physical
+      problem just as for sensorless problems, but the transition
+      model is a bit more complicated.
+    - Transitions from one belief state to the next occuring in three
+      stages:
+      - Prediction stage: given the action $a$ in belief state $b$,
+        the predicted belief state is $\hat{b}$ = predict(b, a).
+      - Observation prediction: set of percepts $o$ that could be
+        observed in the predicted belief
+        state: \[\mathtt{possible-percepts}(\hat{b}) = \{o: o =
+        \mathtt{percept}(s) \land s \in \hat{b}\}\]
+      - Update stage: for each possible percept, the belie state that
+        would result from the percept. $b_o$ is the set of states in
+        $\hat{b}$ that could have produced the percept: \[b_o =
+        update(\hat{b}, o) = \{s: o = \mathtt{percept}(s) \land s
+        \in \hat{b}\}\]
+    - Each updated belief state $b_o$ can be no larger than the
+      predicted belief state $\hat{b}$; observations can only help
+      reduce uncertainty compared to the sensorless case.
+    - For deterministic sensing, the belief states for the different
+      possible percepts will be disjoint, forming a partition of the
+      original predicted belief state.
+    - The possible belief states resulting from a given action and the
+      subsequent possible percepts: \[\begin{split}\mathtt{results}(b, a) = \{b_o :
+      b_o &= \mathtt{update}(\mathtt{predict}(b, a), o) \land \\ o &\in
+      \mathtt{possible-percepts}(\mathtt{predict}(b, a))\}\end{split}\]
+*** Solving POPs (partially observable problems)
+    - Derive =results= function for a nondeterministic belief-state
+      problem from an underlying physical problem and the =percept=
+      function.
+    - Given such a formulation, =and-or= can be applied directly to
+      derive a solution.
+    - Because we supplied a belief-state problem to =and-or=, it
+      returned a conditional plan that tests the belief stat rather
+      than the actual state.
+    - One can improve on thes by checking for previously generated
+      belief states that are subsets or supersets of the current
+      state; incremental search algorithms.
+    - Agent formulates a problem, calls =and-or-graph-search= to solve
+      it, executes the solution.
+    - Solution will be conditional rather than a sequence.
+    - Agent will need to maintain its belief state as it performs
+      actions and receives percepts.
+    - This resembles prediction-observation-update; simpler: percept
+      given by the environment.
+    - Given initial belief state $b$, action $a$, percept $o$; new
+      belief state is: \[b^\prime =
+      \mathtt{update}(\mathtt{predict}(b, a), o)\]
+    - Recursive state estimator
+    - Localization
+    - With nondeterministic actions, the =predict= step grows the belief
+      state; but the =update= step shrinks it back down--as long as
+      the percepts provide some useful identifying information.
 ** Lectures
 *** 1
     - AI: mapping from sensors to actuators
