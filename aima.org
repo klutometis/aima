@@ -3639,6 +3639,125 @@
     - With nondeterministic actions, the =predict= step grows the belief
       state; but the =update= step shrinks it back down--as long as
       the percepts provide some useful identifying information.
+*** Online search
+    - Offline search: compute a complete solution and then execute
+    - Online: interleaving computation and action
+    - Dynamic environments with computation penalty; contingencies
+      that actually arise
+    - Necessary for unknown environments
+    - Assume deterministic and fully observable environment
+    - Actions :: list of actions allowed in state $s$
+    - Step-cost :: $c(s, a, s^\prime)$; can't be used until the agent
+                   knows that $s^\prime$ is the outcome.
+    - Goal-test :: goal-test(s)
+    - Cannot determine $result(s, a)$ except by actually being in $s$
+      and doing $a$.
+    - Might have access to a heuristic $h(s)$.
+    - Competitive ratio: actual cost / cost of the path the agent would follow if it
+      knew the search space in advance
+    - If some actions irreversible, dead-end
+    - No algorithm can avoid dead-ends in all state spaces
+    - Adversary argument: imagine an adversary constructing the
+      state-space while the agent explores it
+    - Assume state-space safely explorable
+    - State spaces with reversible actions (mazes, 8-puzzles) can be
+      viewed as undirected graphs
+    - No bounded competitive ratio can be guaranteed if there are
+      paths of unbounded cost
+    - Describe performance in terms of entire state space
+    - An online algorithm can discover successors for a node that it
+      physically occupies.
+    - Local order, depth-first search
+    - Agent stores $result(s, a)$ in a table; online search, the agent
+      has to backtrack physically; in depth-first search, this means
+      going back to the state from which the agent most recently
+      entered the current state.
+    - Algorithm keeps a table that lists, for each state, the
+      predecessory states to which the agent has not yet
+      backtracked.[fn:12]
+    - For finding a goal, agent's competitive ratio could be bad if it
+      goes off on a long excursion; online variant of iterative
+      deepening solves this problem.[fn:13]
+      #+BEGIN_SRC org
+        ,- online-dfs-agent(state) -> action
+        ,  - let
+        ,    - result, indexed by state and action
+        ,    - untried, state -> untried actions
+        ,    - unbacktracked, state -> backtracks not yet tried
+        ,    - prev-state
+        ,    - prev-action
+        ,    - if goal-test(state) -> stop
+        ,    - if state is not in untried
+        ,      - untried(state) <- actions(state)
+        ,    - if prev-state is not null
+        ,      - begin
+        ,        - result(prev-state, prev-action) <- state
+        ,        - push prev-state unto unbacktracked(state)
+        ,    - if untried(state) is empty
+        ,      - if unbacktracked(state) is empty -> stop
+        ,      - else prev-action <- inverse of prev-action (such that result(state,
+        ,        action) = pop(unbacktracked(state))
+        ,    - else prev-action <- pop(untried(state))
+        ,    - prev-state <- state
+        ,    - return prev-action
+      #+END_SRC
+    - Only works in state spaces where actions are reversible.[fn:14]
+*** Local online search
+    - Like depth-first search, hill-climbing search has the property
+      of locality in node expansion.
+    - Keeps one state in memory; leaves agent stranded at local
+      maximum.
+    - Random restarts cannot be used: can't teleport to new state.
+    - Instead of random restarts: random walk.[fn:15]
+    - Random walk will eventually find a goal, given finite state
+      space.
+    - Augmenting hill-climbing with memory
+    - Store a current-best-estimate $H(s)$ of the cost to reach the
+      goal; $H(s)$ starts out as the heuristic $h(s)$ and is updated
+      as the agent gains experience in the state space.
+      #+BEGIN_SRC org
+        ,- LRTA*-agent(s') -> action
+        ,  - let result: indexed by state and action
+        ,    - H: cost-estimated indexed by state
+        ,    - s, a: previous state and action
+        ,    - if goal-test(s') -> stop
+        ,    - if s' is not in H, H(s') <- h(s')
+        ,    - if s is not null:
+        ,      - begin
+        ,        - result(s, a) <- s'
+        ,          # Looks like dynamic programming?
+        ,        - H(s) <- min_{b in actions(s)} LRTA*-cost(s, b, result(s, b), H)
+        ,    - a <- action b in actions(s') that minimizes LRTA*-cost(s', b,
+        ,      result(s', b), H)
+        ,    - s <- s'
+        ,    - a
+        ,- LRTA*-cost(s, a, s', H) -> cost-estimate
+        ,  - if s' is undefined the return h(s)
+        ,  - else return c(s, a, s') + H(s')
+      #+END_SRC
+    - Actions that have not been tried in a state $s$ are always
+      assumed tolead immediately to the goal with the least possible
+      cost, namely $h(s)$: optimism under uncertainty.
+    - LRTA* gueranteed to find a goal in any finite, safely explorable
+      state-space. Unlike A*, not complete for infinite state spaces.
+    - Would like an agent to learn that up increases the y-coordinate
+      unless there is a wall: formal and explicitly manipulable
+      representation for general rules; so far, hidden inside
+      block-box =result= function.
+*** Summary
+    - Local-search methods operate on complete-state formulations;
+      stochastic algorithms like simulated annealing
+    - Local search in continuous spaces: linear programming, convex
+      optimization
+    - Genetic algorithm, stochastic hill-climbing search
+    - Nondeterministic environments, =and-or= search; contingent plans
+    - Partially observable, belief state; set of possible states
+    - Sensorless problems, belief-state =and-or= search
+    - Exploration problems; online search
+    - Genetic programming related to genetic algorithms: programs
+      rather than strings; expansion trees: splicing subtrees rather
+      than substrings. Guarantees that offspring all well-formed
+      expressions.[fn:16]
 ** Lectures
 *** 1
     - AI: mapping from sensors to actuators
@@ -3796,6 +3915,8 @@
      there that needs to be done.
 
 * TODOs
+** TODO Voronoi
+   Never got a chance to implement from scratch; [[http://www.youtube.com/watch?v%3DxMhBobFoQbk&feature%3Drelated][should have watched]]?
 ** DONE 3.7
    CLOSED: [2012-10-01 Mon 03:29]
   Testing a node for a goal-state when it is selected for expansion is
@@ -7786,3 +7907,18 @@
 
 [fn:11] One based on [[http://demonstrations.wolfram.com/FourColoringPlanarGraphs/][Kempe's method]], for instance; or [[http://www.sciencedirect.com/science/article/pii/S0167637704000409][Byskov's]] (which
   is $O(1.7504^n))$.
+
+[fn:12] Don't forget that we have to have knowledge of which actions
+  are inverses of one another.
+
+[fn:13] We really need to go back and finish up ch. 3: fundamental;
+  things build upon it.
+
+[fn:14] We inadvertently dealt with an irreversible scenario in ch. 2,
+  where we linked up random graphs with asymmetrical connections
+  (going e.g. right was not necesarrily the inverse of going left).
+
+[fn:15] Underscores that hill-climbing is an optimization algorithm
+  unconcerned with path; thus, random restarts.
+
+[fn:16] Be nice to take a look at some of the literature.
