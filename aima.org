@@ -2478,6 +2478,14 @@
   applicable to agents.
 
   See [[http://aima-python.googlecode.com/svn/trunk/search.py][this recursive best-first-search in Python]], by the way.
+* DONE 4.1
+  CLOSED: [2012-11-16 Fri 17:04]
+  - a :: Local beam search with $k = 1$ is hill-climbing.
+  - b :: Local beam with $k_0 = 1$ and $k_{max} = \infty$ is
+         breadth-first in discrete problem-spaces.
+  - c :: Simulating annealing at $T = 0$ is random walk.
+  - d :: Simulating annealing at $T = \infty$ is hill-climbing.
+  - e :: Genetic algorithm at $N = 1$ is a stochastic hill-climbing.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
