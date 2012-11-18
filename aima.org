@@ -2486,6 +2486,16 @@
   - c :: Simulating annealing at $T = 0$ is random walk.
   - d :: Simulating annealing at $T = \infty$ is hill-climbing.
   - e :: Genetic algorithm at $N = 1$ is a stochastic hill-climbing.
+* TODO 4.2
+  From p. 131: "Local search algorithms typically use a complete-state
+  formulation, where each state has 8 queens on the board, one per
+  column."
+
+  From p. 132: "Starting from a randomly generated 8-queens state,
+  steepest-ascent hill climbing gets stuck $86\%$ of the time, solving
+  only $14\%$ of problem instances."
+
+  Initial state is complete and random.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
