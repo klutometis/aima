@@ -1961,8 +1961,10 @@
    #+BEGIN_SRC scheme
      (use debug
           define-record-and-printer
+          disjoint-set
           heap
           random-bsd
+          R
           srfi-69)
      
      (define-record-and-printer point x y)
@@ -1991,7 +1993,11 @@
        (let ((graph (make-hash-table)))
          (for-each (lambda (p1)
                      (for-each (lambda (p2)
-                                 (if (not (eq? p1 p2))
+                                 (if (not (or (eq? p1 p2)
+                                              #;(memq p1
+                                              #;(hash-table-ref/default
+                                              #;graph p2 '()))
+                                              ))
                                      (connect! graph p1 p2)))
                        points))
            points)
@@ -1999,6 +2005,7 @@
      
      ;; (let* ((points (make-random-points 10))
      ;;        (graph (complete-graph points)))
+     ;;   (debug (hash-table->alist graph))
      ;;   (let ((heap (make-min-heap)))
      ;;     (hash-table-walk graph
      ;;                      (lambda (from tos)
@@ -2011,7 +2018,7 @@
      ;;       (let ((from-to (heap-extract-extremum! heap)))
      ;;         (debug (point-distance (car from-to) (cdr from-to)))))))
      
-     (define make-disjoint-set make-hash-table)
+     ;; (define make-disjoint-set make-hash-table)
      
      (define (make-set set element)
        (let ((set-marker (gensym)))
@@ -2021,13 +2028,14 @@
      (define (find-set set element)
        (hash-table-ref set element))
      
+     ;;; Union has to set all elements!
      (define (set-union! set e1 e2)
        (hash-table-set! set e2 (hash-table-ref set e1)))
      
      (define (minimum-spanning-tree graph)
-       (let ((set (make-disjoint-set))
+       (let ((set (make-disjoint-set values eq?))
              (tree (make-hash-table)))
-         (for-each (lambda (node) (make-set set node))
+         (for-each (lambda (node) (disjoint-set:make set node))
            (hash-table-keys graph))
          (let ((edges (make-min-heap)))
            (hash-table-walk
@@ -2041,14 +2049,31 @@
              (let ((edge (heap-extract-extremum! edges)))
                (let ((from (car edge))
                      (to (cdr edge)))
-                 (unless (eq? (find-set set from)
-                              (find-set set to))
-                   (biconnect! tree from to)
-                   (biconnect! tree to from)
-                   (set-union! set from to)))))
+                 (unless (eq? (disjoint-set:find set from)
+                              (disjoint-set:find set to))
+                   ;; (biconnect! tree from to)
+                   (connect! tree from to)
+                   (disjoint-set:union set from to)))))
            tree)))
      
-     (pp (hash-table->alist (minimum-spanning-tree (complete-graph (make-random-points 10)))))
+     (with-output-to-file "harro.dot"
+       (lambda ()
+         (let ((tree (minimum-spanning-tree (complete-graph (make-random-points 10)))))
+           (pp (hash-table->alist tree) (current-error-port))
+           ;; (debug (length (hash-table->alist tree))
+           ;;        (hash-table-keys tree)
+           ;;        (hash-table->alist tree))
+           ;; (- (apply + (map length (hash-table->alist tree)))
+           ;;    (length (hash-table->alist tree)))
+           (display "digraph G {graph[splines=true];")
+           (for-each (lambda (node) (format #t "\"~a\";" node))
+             (hash-table-keys tree))
+           (hash-table-walk tree
+                            (lambda (from tos)
+                              (for-each (lambda (to)
+                                          (format #t "\"~a\" -> \"~a\";" from to))
+                                tos)))
+           (display "}"))))
      
    #+END_SRC
 * DONE 4.1
