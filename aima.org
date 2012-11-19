@@ -1961,18 +1961,13 @@
    We can use a heap to pop things off.
 
    #+BEGIN_SRC scheme
-     (use debug
+     (use aima-search
+          debug
           define-record-and-printer
           heap
           random-bsd
           R
           srfi-69)
-     
-     (define-record-and-printer point x y)
-     
-     (define (point-distance p1 p2)
-       (sqrt (+ (expt (- (point-x p1) (point-x p2)) 2)
-                (expt (- (point-y p1) (point-y p2)) 2))))
      
      (define (make-random-points n)
        (do ((points '() (cons (make-point (random-real) (random-real)) points))
@@ -2057,12 +2052,72 @@
                             tos)))
        (display "}"))
      
-     (with-output-to-file "tree.dot"
-       (lambda ()
-         (write-tree-as-dot
-          (minimum-spanning-tree
-           (complete-graph
-            (make-random-points 10))))))
+     ;; (with-output-to-file "tree.dot"
+     ;;   (lambda ()
+     ;;     (write-tree-as-dot
+     ;;      (minimum-spanning-tree
+     ;;       (complete-graph
+     ;;        (make-random-points 10))))))
+     
+     (define (tree-cost tree)
+       (apply + (hash-table-map tree
+                                (lambda (from tos)
+                                  (apply +
+                                         (map (lambda (to) (point-distance from to))
+                                              tos))))))
+     
+     (define (make-tour points)
+       (let ((tour (make-hash-table))
+             (points (cons (car points) (reverse points))))
+         (do ((from (drop-right points 1) (cdr from))
+              (to (cdr points) (cdr to)))
+             ((null? from) tour)
+           (hash-table-set! tour (car from) (list (car to))))
+         ;; (debug (hash-table->alist tour))
+         tour))
+     
+     (define (nearest-neighbor from points)
+       (let ((neighbors (make-min-heap)))
+         (for-each (lambda (to) (heap-insert! neighbors (point-distance from to) to))
+           points)
+         (heap-extract-extremum! neighbors)))
+     
+     (let* ((graph (complete-graph (make-random-points 10)))
+            (points (hash-table-keys graph))
+            (start (car points)))
+       (with-output-to-file "tour.dot"
+         (lambda ()
+           (write-tree-as-dot
+            (make-tour
+             (map node-state
+                  (A* start
+                      (lambda (node)
+                        (let ((point (node-state node)))
+                          ;; (debug (hash-table-ref/default graph point '()))
+                          (hash-table-ref/default graph point '())))
+                      point-distance
+                      (lambda (node) (= (length (predecessor-path node)) (length points)))
+                      (lambda (node)
+                        (let* ((visited-points (map node-state (predecessor-path node)))
+                               (unvisited-points (lset-difference eq? points visited-points))
+                               (unvisited-tree (minimum-spanning-tree (complete-graph unvisited-points))))
+                          (let ((point (node-state node)))
+                            (let ((nearest-neighbor
+                                   (if (null? unvisited-points)
+                                       0
+                                       (point-distance
+                                        point
+                                        (nearest-neighbor point unvisited-points))))
+                                  (nearest-start
+                                   (if (null? unvisited-points)
+                                       0
+                                       (point-distance
+                                        start
+                                        (nearest-neighbor start unvisited-points)))))
+                              (+ nearest-neighbor
+                                 (* (tree-cost unvisited-tree) 2)
+                                 nearest-start))))))))))))
+     
    #+END_SRC
 
    We have the MST; how to use it as a heuristic? [[http://www.csie.ntu.edu.tw/~ai2007s/hw/hw02_s.pdf%0A][This cat]] works an
