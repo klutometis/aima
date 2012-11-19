@@ -1675,236 +1675,11 @@
     
   #+END_SRC
 * TODO 3.22
-  Need a graph of possible moves (initially hard-coded for 3x3?); and
-  a Manhattan distance calculator. Can we have an abstract game-graph?
-
-  #+BEGIN_SRC scheme :tangle search.scm
-    (use data-structures
-         debug
-         heap
-         stack)
-    
-    (define-record node
-      ;; @("Data structure for graphs"
-      ;;   (state "An indexable point")
-      ;;   (predecessor "The node-predecessor")
-      ;;   (action "Not used")
-      ;;   (path-cost "Cost of the path up to this point"))
-      state
-      predecessor
-      action
-      path-cost)
-    
-    (define (make-initial-node state)
-      (make-node state #f #f 0))
-    
-    (define (predecessor-path node)
-      ;; @("List the predecessors of this node."
-      ;;   (node "The node to predecess")
-      ;;   (@to "list"))
-      (let iter ((path (list node)))
-        (let ((predecessor (node-predecessor (car path))))
-          (if predecessor
-              (iter (cons predecessor path))
-              ;; Do we want to reverse?
-              (reverse path)))))
-    
-    (define (search start
-                    successors
-                    step-cost
-                    goal?
-                    make-frontier
-                    frontier-add!
-                    frontier-delete!
-                    frontier-empty?)
-      (let ((visited (make-hash-table))
-            (frontier (make-frontier)))
-        (frontier-add! frontier (make-initial-node start))
-        (let search ()
-          ;; (debug frontier)
-          (if (frontier-empty? frontier)
-              (error "Search failed -- SEARCH")
-              (let* ((predecessor (frontier-delete! frontier))
-                     (successors (successors predecessor)))
-                ;; (debug predecessor)
-                (hash-table-set! visited (node-state predecessor) #f)
-                (if (goal? (node-state predecessor))
-                    (reverse (predecessor-path predecessor))
-                    (let ((unvisited-successors
-                           (filter (lambda (successor)
-                                     (hash-table-ref/default
-                                      visited
-                                      successor
-                                      #t))
-                                   successors)))
-                      ;; (debug predecessor successors unvisited-successors)
-                      (for-each
-                          (lambda (successor)
-                            ;; (debug successor predecessor (node-state predecessor))
-                            (let ((node (make-node successor
-                                                   predecessor
-                                                   #f
-                                                   (+ (node-path-cost predecessor)
-                                                      ;; Should this be
-                                                      ;; between two
-                                                      ;; nodes?
-                                                      (step-cost
-                                                       successor
-                                                       (node-state predecessor))))))
-                              (frontier-add! frontier node)))
-                        unvisited-successors)
-                      (search))))))))
-    
-    (define (search-depth-first start successors step-cost goal?)
-      (search start
-              successors
-              step-cost
-              goal?
-              make-stack
-              stack-push!
-              stack-pop!
-              stack-empty?))
-    
-    (define (search-breadth-first start successors step-cost goal?)
-      (search start
-              successors
-              step-cost
-              goal?
-              make-queue
-              queue-add!
-              queue-remove!
-              queue-empty?))
-    
-    (define (search-best-first start successors step-cost goal? f)
-      (search start
-              successors
-              step-cost
-              goal?
-              make-min-heap
-              (lambda (heap node)
-                (let ((key (heap-key heap node))
-                      (path-cost (f node)))
-                  (if key
-                      (if (< path-cost key)
-                          (heap-change-key! heap node path-cost))
-                      (heap-insert! heap path-cost node))))
-              heap-extract-extremum!
-              heap-empty?))
-    
-    (define (search-uniform-cost start successors step-cost goal?)
-      (search-best-first start
-                         successors
-                         step-cost
-                         goal?
-                         node-path-cost))
-    
-    (define (search-greedy-best-first start
-                                      successors
-                                      step-cost
-                                      goal?
-                                      heuristic)
-      (search-best-first start
-                         successors
-                         step-cost
-                         goal?
-                         heuristic))
-    
-    (define (A* start successors step-cost goal? heuristic)
-      (search-best-first start
-                         successors
-                         step-cost
-                         goal?
-                         (lambda (node) (+ (node-path-cost node)
-                                      (heuristic node)))))
-    
-    (define (search-recursive-best-first start
-                                         successors
-                                         step-cost
-                                         goal?
-                                         heuristic)
-      (define (search return predecessor f-limit)
-        (debug (node-state predecessor))
-        (if (goal? (node-state predecessor))
-            (return (predecessor-path predecessor))
-            (let ((successors (successors predecessor)))
-              (if (null? successors)
-                  (values #f +inf)
-                  (let ((heap (make-min-heap)))
-                    (for-each
-                        (lambda (successor)
-                          (let ((successor
-                                  (make-node successor
-                                             predecessor
-                                             #f
-                                             (step-cost
-                                              successor
-                                              (node-state predecessor)))))
-                            (node-path-cost-set!
-                             successor
-                             (max (length (predecessor-path successor))
-                                  (node-path-cost predecessor)))
-                            (heap-insert! heap
-                                          (node-path-cost successor)
-                                          successor)))
-                      successors)
-                    (let iter ()
-                      (let* ((best (heap-extremum heap))
-                             (best-path-cost (node-path-cost best)))
-                        (debug heap
-                               (heap-size heap)
-                               (node-state (heap-extremum heap)))
-                        (if (> best-path-cost f-limit)
-                            (values #f best-path-cost)
-                            (let ((alternative
-                                   (if (= (heap-size heap) 1)
-                                       +inf
-                                       (let ((first
-                                              (heap-extract-extremum! heap))
-                                             (alternative
-                                              (node-path-cost
-                                               (heap-extremum heap))))
-                                         (debug heap
-                                                (heap-size heap)
-                                                (node-state (heap-extremum heap))
-                                                (node-path-cost first)
-                                                first
-                                                (node-state first)
-                                                'iter
-                                                (heap-member? heap first))
-                                         (heap-delete! heap first)
-                                         (debug 'iter (heap-member? heap first))
-                                         (heap-insert!
-                                          heap
-                                          (node-path-cost first)
-                                          first)
-                                         alternative))))
-                              (receive (predecessor best-path-cost)
-                                (search return
-                                        best
-                                        (min f-limit alternative))
-                                (if predecessor
-                                    (values predecessor best-path-cost)
-                                    (iter))))))))))))
-      (call/cc (lambda (return)
-                 (search return (make-initial-node start) +inf))))
-    
-    (define-record-and-printer point x y)
-    
-    (define (point-distance p1 p2)
-      ;; @("Calculate the distance between two points."
-      ;;   (p1 "The first point")
-      ;;   (p2 "The second point")
-      ;;   (@to "distance"))
-      (sqrt (+ (expt (- (point-x p1) (point-x p2)) 2)
-               (expt (- (point-y p1) (point-y p2)) 2))))
-    
-    (define (make-straight-line-distance-heuristic end)
-      (lambda (node) (point-distance (node-state node) end)))
-    
-  #+END_SRC
+  We've only gotten as far as applying A* to 8-puzzles.
 
   #+BEGIN_SRC scheme :tangle 3.22.scm :shebang #!/usr/bin/env chicken-scheme
-    (use (only aima define-record-and-printer)
+    (use aima-search
+         define-record-and-printer
          data-structures
          debug
          extras
@@ -1918,8 +1693,6 @@
          srfi-69
          shell
          vector-lib)
-    
-    (include "search.scm")
     
     (define-record-and-printer tile moves)
     
@@ -2109,7 +1882,7 @@
     (define (solve k game)
       (let ((start (make-start-game k)))
         (map (compose game-state node-state)
-             (search-recursive-best-first
+             (A*
               game
               (lambda (parent)
                 (reachable-games k (node-state parent)))
@@ -2118,366 +1891,26 @@
               (make-manhattan-distance-heuristic k)))))
     
     (let* ((k 3)
-           #;(states (solve k (make-random-soluble-game k)))
-           )
-      ;; (debug states)
-      (debug
-       (let ((start (make-start-game k)))
-         (search-recursive-best-first
-          (make-random-soluble-game k)
-          (lambda (parent)
-            (reachable-games k (node-state parent)))
-          (constantly 1)
-          (lambda (game) (game= start game))
-          (make-manhattan-distance-heuristic k)))))
-    
+           (states (solve k (make-random-soluble-game k))))
+      (debug states)
+      (animate-states/avi k (visualize-states k states) "3.22.avi"))    
   #+END_SRC
+* TODO 3.30
+** TODO a
+   Whereas the TSP states that all points should be connected
+   (minimizing total distance) and traversable only once, MSTs connect
+   all points (minimizing total distance; relaxing the single-visit
+   constraint.
+** TODO b
+   MST dominates[fn:17] straight-line distance by the triangle
+   inequality: straight-line distance must be the shortest distance
+   between points $A$ and $C$, but an MST might have zero or more
+   intermediate points $B_0 \dots $B_n$ between $A$ and $B$.
 
-  =blank?= could just as well be =zero?=, which would aid in testing
-  vector-equality (could use e.g. ~(vector= = g1 g2)~.
-
-  Animated ditaa for visualization?
-
-  #+BEGIN_SRC scheme
-    (use debug
-         vector-lib)
-    
-    (define (hamming-distance v1 v2)
-      (vector-fold (lambda (i distance x1 x2)
-                     (if (= x1 x2)
-                         distance
-                         (+ distance 1)))
-                   0
-                   v1
-                   v2))
-    
-    (define (transpositions v1 v2)
-      (let iter ((i 0)
-                 (transpositions 0))
-        (if (= i (vector-length v1))
-            transpositions
-            ())))
-    
-    (debug (hamming-distance '#(0 1 2 3 4 5 6 7 8)
-                             '#(3 6 1 4 2 8 5 0 7))
-           (hamming-distance '#(0 1 2 3 4 5 6 7 8)
-                             '#(8 1 3 4 0 2 7 6 5))
-           (hamming-distance '#(1 2 3 4 5 6 7 8 0)
-                             '#(1 2 3 4 5 6 8 7 0)))
-    ;;; edit
-  #+END_SRC
-
-  #+BEGIN_SRC scheme
-    (use data-structures
-         debug
-         srfi-69
-         test
-         vector-lib)
-    
-    (define (kendall-tau-distance v1 v2)
-      (if (vector= = (sort v1 <) (sort v2 <))
-          (let ((x->i (make-hash-table)))
-            (vector-for-each (lambda (i x) (hash-table-set! x->i x i)) v2)
-            (let iter ((i 0)
-                       (distance 0))
-              (if (or (= i (vector-length v1))
-                      (= i (vector-length v2)))
-                  distance
-                  (let ((x1 (vector-ref v1 i))
-                        (x2 (vector-ref v2 i)))
-                    (if (= x1 x2)
-                        (iter (+ i 1) distance)
-                        (let ((i2 (hash-table-ref x->i x1)))
-                          (vector-swap! v1 i i2)
-                          (iter (+ i 1) (+ distance 1))))))))
-          (error "Vectors incomparable -- KENDALL-TAU-DISTANCE")))
-    
-    (test 3
-          (kendall-tau-distance (vector 1 2 3 4 5)
-                                (vector 3 4 5 2 1)))
-    
-    (debug (kendall-tau-distance
-            (vector 1 2 3 4 5 6 7 8 9 10 11 12 13 15 14 0)
-            (vector 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 0)))
-    
-    (debug (kendall-tau-distance
-            (vector 1 2 3 4 5 6 7 8 9 10 11 12 13 15 14 0)
-            (vector 1 2 3 4 5 6 7 8 9 10 11 12 13 14 0 15)))
-    
-    (define (contiguize! k v)
-      (do ((i k (+ i (* 2 k))))
-          ((>= i (vector-length v)))
-        (vector-reverse! v i (+ i k))))
-    
-    (define (contiguize k v)
-      (let ((v (vector-copy v)))
-        (contiguize! k v)
-        v))
-    
-    (debug (kendall-tau-distance
-            (contiguize 4 (vector 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 0))
-            (contiguize 4 (vector 1 2 3 4 5 6 7 8 9 10 11 12 13 15 14 0))))
-    
-    (debug (kendall-tau-distance
-            (contiguize 4 (vector 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 0))
-            (contiguize 4 (vector 1 2 3 4 5 6 7 8 9 10 11 0 13 14 15 12))))
-  #+END_SRC
-
-  #+BEGIN_SRC scheme
-    (use debug test vector-lib)
-    
-    (define (contiguize! k v)
-      (do ((i k (+ i (* 2 k))))
-          ((>= i (vector-length v)))
-        (vector-reverse! v i (+ i k))))
-    
-    (let ((v '#(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)))
-      (contiguize! 4 v)
-      (test v '#(0 1 2 3 7 6 5 4 8 9 10 11 15 14 13 12)))
-  #+END_SRC
-
-  [[http://math.stackexchange.com/questions/65923/how-does-one-compute-the-sign-of-a-permutation][Sign of permutation]], with reference to n-puzzles; [[http://mathoverflow.net/questions/72669/finding-the-parity-of-a-permutation-in-little-space][parity of
-  permutation]].
-
-  #+BEGIN_SRC scheme
-    (use debug
-         srfi-69
-         vector-lib)
-    
-    (define (unvisited? unvisited i)
-      (hash-table-ref/default unvisited i #t))
-    
-    (define (cycles v)
-      (let ((visited (make-hash-table)))
-        (vector-for-each
-            (lambda (i x)
-              (debug i x)
-              (let iter ((next i)
-                         (length 0))
-                (debug next length)
-                (if (unvisited? visited next)
-                    (begin
-                      (hash-table-set! visited next #f)
-                      (iter x
-                            (+ length 1)))
-                    (debug length))))
-            v)))
-    
-    (define (cycles v)
-      (let ((visited (make-hash-table)))
-        (let iter ((i 0)
-                   (even-cycles 0))
-          (if (= i (vector-length v))
-              even-cycles
-              (let iter-cycle ((next i)
-                               (length 0))
-                (debug next length)
-                (if (unvisited? visited next)
-                    (begin
-                      (hash-table-set! visited next #f)
-                      (iter-cycle (vector-ref v next) (+ length 1)))
-                    (if (even? length)
-                        (iter (+ i 1) (+ even-cycles 1))
-                        (iter (+ i 1) even-cycles))))))))
-    
-    (debug (cycles '#(3 4 5 2 1 0))
-           (cycles '#(0 1 2 4 3 5))
-           (cycles '#(3 1 2 0 4 5))
-           (cycles '#(0 1 2 3))
-           (cycles '#(0 1 3 2))
-           (cycles '#(0 1 2))
-           (cycles '#(2 1 0))
-           (cycles '#(1 0 2))
-           (cycles '#(0 1 2 5 4 3 6 7 8))
-           (cycles '#(1 2 3 4 5 6 7 8 9 10 11 12 13 15 14 0)))
-  #+END_SRC
-
-  http://www.math.umt.edu/oliver/parity/nelson.pdf
-
-  https://stat.ethz.ch/pipermail/r-help/2008-April/159732.html
-
-  #+BEGIN_SRC R
-    library(debug)
-    
-    n <- 16
-    ## p <- sample(1:n)
-    ## p <- c(0,1,2,5,4,3,7,6,8)
-    p <- c(1,2,3,4,5,6,7,8,9,10,11,12,13,15,14,0)
-    p <- c(1,2,3,4,5,6,7,8,9,10,11,12,13,15,14)
-    p <- c(1,2,3,4,8,7,6,5,9,10,11,12,15,14,13)
-    p <- c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0)
-    p <- c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
-    x <- integer(n)
-    print(p)
-    for (i in 1:n) {
-      ## debug(x)
-      z <- which(!x)[1]
-      print(x)
-      debug("outer", i, z)
-      if (is.na(z)) break
-      repeat {
-        debug("inner", i, z, x[z], p[z], x[p[z]])
-        x[z] <- i
-        z <- p[z]
-        if (x[z]) break
-      }
-    }
-    x
-    clen <- table(x)
-    clen
-    1L - (sum(clen %% 2 == 0) %% 2)*2L
-  #+END_SRC
-
-  #+BEGIN_SRC scheme
-    (use debug
-         miscmacros
-         srfi-1
-         srfi-69
-         vector-lib)
-    
-    (define (cycles v)
-      (let ((seen (make-vector (vector-length v) #f)))
-        (let iter ((i 0)
-                   (cycles '()))
-          (debug seen)
-          (if (= i (vector-length v))
-              (begin
-                (debug cycles)
-                (length (filter even? cycles)))
-              (let iter-cycle ((j i)
-                               (length 0))
-                (debug j length)
-                (if (vector-ref seen j)
-                    (iter (+ i 1)
-                          (cons length cycles))
-                    (begin
-                      (vector-set! seen j #t)
-                      (iter-cycle (vector-ref v j)
-                                  (+ length 1)))))))))
-    
-    (define (cycles v)
-      (let ((seen (make-vector (vector-length v) 0)))
-        (do ((i 1 (+ i 1)))
-            ((> i (vector-length v)))
-          (let ((z (vector-index zero? seen)))
-            (debug z)
-            (when z
-              (while (zero? (vector-ref seen z))
-                (debug z)
-                (vector-set! seen z i)
-                (set! z (vector-ref v z))))))
-        seen))
-    
-    (define (cycles v)
-      (let ((cycles (make-hash-table))
-            (seen (make-vector (vector-length v) #f)))
-        (do ((i 0 (+ i 1)))
-            ((= i (vector-length v)))
-          (let iter ((j i))
-            (unless (vector-ref seen j)
-              (vector-set! seen j #t)
-              (hash-table-update!/default
-               cycles
-               i
-               (lambda (length) (+ length 1))
-               0)
-              (iter (vector-ref v j)))))
-        (hash-table->alist cycles)))
-    
-    
-    (cycles '#(1 2 3 4 5 6 7 8 9 10 11 12 13 15 14 0))
-    (cycles '#(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 0))
-    (cycles '#(2 1 3 4 5 6 7 8 9 10 11 12 13 14 15 0))
-    (cycles '#(13 10 11 6 5 7 4 8 1 12 14 9 3 15 2 0))
-    (cycles '#(6 1 10 2 7 11 4 14 5 0 9 15 8 12 13 3))
-  #+END_SRC
-
-  http://stackoverflow.com/questions/7701345/how-to-programatically-create-a-valid-15-puzzle-in-code
-  http://mathworld.wolfram.com/15Puzzle.html
-  http://www.cs.bham.ac.uk/~mdr/teaching/modules04/java2/TilesSolvability.html
-  http://kevingong.com/Math/SixteenPuzzle.html
-  
-  #+BEGIN_SRC scheme
-    (use debug
-         srfi-69
-         test
-         vector-lib)
-    
-    (define (inversions v)
-      (let ((inversions (make-hash-table)))
-        (vector-for-each
-         (lambda (i x)
-           (do ((j i (+ j 1)))
-               ((= j (vector-length v)))
-             ;; (debug i j x (vector-ref v j) (> x (vector-ref v j)))
-             (when (and (> x (vector-ref v j)) (positive? (vector-ref v j)))
-               (hash-table-update!/default inversions x add1 0))))
-         v)
-        (hash-table-fold
-         inversions
-         (lambda (x inversions total) (+ inversions total))
-         0)))
-    
-    ;;; But see
-    ;;; <http://www.cs.bham.ac.uk/~mdr/teaching/modules04/java2/TilesSolvability.html>.
-    (define soluble? (compose even? inversions))
-    
-    (test-assert
-     (not (soluble? '#(1 2 3 4 5 6 7 8 9 10 11 12 13 15 14 0))))
-    (test-assert
-     (soluble? '#(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 0)))
-    (test-assert
-     (not (soluble? '#(2 1 3 4 5 6 7 8 9 10 11 12 13 14 15 0))))
-    (test-assert
-     (soluble? '#(6 1 10 2 7 11 4 14 5 0 9 15 8 12 13 3)))
-    (test-assert
-     (not (soluble? '#(13 10 11 6 5 7 4 8 1 12 14 9 3 15 2 0))))
-    (test-assert
-     (soluble? '#(1 2 3 0)))
-    (test-assert
-     (not (soluble? '#(2 1 3 0))))
-    (test-assert
-     (soluble? '#(1 2 0 3)))
-    (test-assert
-     (soluble? '#(0 2 1 3)))
-    
-    (debug (inversions '#(3 6 5 2 4 7 0 8 1)))
-    
-  #+END_SRC
-
-  Chapter 3:
-
-  #+BEGIN_QUOTE
-  The transition model, specified by (result s a), returns the state
-  that results from doing action a in state s.
-
-  A path in the state space is a sequence of states connected by a
-  sequence of actions.
-
-  Sometimes the goal is specified by an abstract property rather than
-  an explicitly enumerated set of states (e.g. checkmate).
-
-  A solution to a problem is an action sequence that leads from the
-  initial state to a goal state. Solution quality is measured by the
-  path-cost function.
-  #+END_QUOTE
-
-  Rather than returning a sequence of states (which might be
-  expensive); return, rather, a sequence of actions and reconstitute
-  the state as needed?
-
-  Actions constitute a kind of diff; it's also necessary when
-  instructing an agent based on search.
-
-  Or, maybe it's ok: even AIMA-nodes have state.
-
-  We're lacking actions and transition models; step-cost apparently
-  takes state and action. We're using states as a proxy for actions.
-
-  We'll have to adopt the action-model if we want to make this
-  applicable to agents.
-
-  See [[http://aima-python.googlecode.com/svn/trunk/search.py][this recursive best-first-search in Python]], by the way.
+   Best case, $B_0 \dots B_N$ follow a straight line; and cannot do
+   any better (if constrained by three-dimension space, or
+   disregarding quantum effects).
+** TODO c
 * DONE 4.1
   CLOSED: [2012-11-16 Fri 17:04]
   - a :: Local beam search with $k = 1$ is hill-climbing.
@@ -2496,6 +1929,8 @@
   only $14\%$ of problem instances."
 
   Initial state is complete and random.
+* TODO 4.3
+  
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
@@ -3933,6 +3368,580 @@
      there that needs to be done.
 
 * TODOs
+** DONE 3.22
+   Need a graph of possible moves (initially hard-coded for 3x3?); and
+   a Manhattan distance calculator. Can we have an abstract game-graph?
+
+   #+BEGIN_SRC scheme :tangle search.scm
+     (use data-structures
+          debug
+          heap
+          stack)
+
+     (define-record node
+       ;; @("Data structure for graphs"
+       ;;   (state "An indexable point")
+       ;;   (predecessor "The node-predecessor")
+       ;;   (action "Not used")
+       ;;   (path-cost "Cost of the path up to this point"))
+       state
+       predecessor
+       action
+       path-cost)
+
+     (define (make-initial-node state)
+       (make-node state #f #f 0))
+
+     (define (predecessor-path node)
+       ;; @("List the predecessors of this node."
+       ;;   (node "The node to predecess")
+       ;;   (@to "list"))
+       (let iter ((path (list node)))
+         (let ((predecessor (node-predecessor (car path))))
+           (if predecessor
+               (iter (cons predecessor path))
+               ;; Do we want to reverse?
+               (reverse path)))))
+
+     (define (search start
+                     successors
+                     step-cost
+                     goal?
+                     make-frontier
+                     frontier-add!
+                     frontier-delete!
+                     frontier-empty?)
+       (let ((visited (make-hash-table))
+             (frontier (make-frontier)))
+         (frontier-add! frontier (make-initial-node start))
+         (let search ()
+           ;; (debug frontier)
+           (if (frontier-empty? frontier)
+               (error "Search failed -- SEARCH")
+               (let* ((predecessor (frontier-delete! frontier))
+                      (successors (successors predecessor)))
+                 ;; (debug predecessor)
+                 (hash-table-set! visited (node-state predecessor) #f)
+                 (if (goal? (node-state predecessor))
+                     (reverse (predecessor-path predecessor))
+                     (let ((unvisited-successors
+                            (filter (lambda (successor)
+                                      (hash-table-ref/default
+                                       visited
+                                       successor
+                                       #t))
+                                    successors)))
+                       ;; (debug predecessor successors unvisited-successors)
+                       (for-each
+                           (lambda (successor)
+                             ;; (debug successor predecessor (node-state predecessor))
+                             (let ((node (make-node successor
+                                                    predecessor
+                                                    #f
+                                                    (+ (node-path-cost predecessor)
+                                                       ;; Should this be
+                                                       ;; between two
+                                                       ;; nodes?
+                                                       (step-cost
+                                                        successor
+                                                        (node-state predecessor))))))
+                               (frontier-add! frontier node)))
+                         unvisited-successors)
+                       (search))))))))
+
+     (define (search-depth-first start successors step-cost goal?)
+       (search start
+               successors
+               step-cost
+               goal?
+               make-stack
+               stack-push!
+               stack-pop!
+               stack-empty?))
+
+     (define (search-breadth-first start successors step-cost goal?)
+       (search start
+               successors
+               step-cost
+               goal?
+               make-queue
+               queue-add!
+               queue-remove!
+               queue-empty?))
+
+     (define (search-best-first start successors step-cost goal? f)
+       (search start
+               successors
+               step-cost
+               goal?
+               make-min-heap
+               (lambda (heap node)
+                 (let ((key (heap-key heap node))
+                       (path-cost (f node)))
+                   (if key
+                       (if (< path-cost key)
+                           (heap-change-key! heap node path-cost))
+                       (heap-insert! heap path-cost node))))
+               heap-extract-extremum!
+               heap-empty?))
+
+     (define (search-uniform-cost start successors step-cost goal?)
+       (search-best-first start
+                          successors
+                          step-cost
+                          goal?
+                          node-path-cost))
+
+     (define (search-greedy-best-first start
+                                       successors
+                                       step-cost
+                                       goal?
+                                       heuristic)
+       (search-best-first start
+                          successors
+                          step-cost
+                          goal?
+                          heuristic))
+
+     (define (A* start successors step-cost goal? heuristic)
+       (search-best-first start
+                          successors
+                          step-cost
+                          goal?
+                          (lambda (node) (+ (node-path-cost node)
+                                       (heuristic node)))))
+
+     (define (search-recursive-best-first start
+                                          successors
+                                          step-cost
+                                          goal?
+                                          heuristic)
+       (define (search return predecessor f-limit)
+         (debug (node-state predecessor))
+         (if (goal? (node-state predecessor))
+             (return (predecessor-path predecessor))
+             (let ((successors (successors predecessor)))
+               (if (null? successors)
+                   (values #f +inf)
+                   (let ((heap (make-min-heap)))
+                     (for-each
+                         (lambda (successor)
+                           (let ((successor
+                                   (make-node successor
+                                              predecessor
+                                              #f
+                                              (step-cost
+                                               successor
+                                               (node-state predecessor)))))
+                             (node-path-cost-set!
+                              successor
+                              (max (length (predecessor-path successor))
+                                   (node-path-cost predecessor)))
+                             (heap-insert! heap
+                                           (node-path-cost successor)
+                                           successor)))
+                       successors)
+                     (let iter ()
+                       (let* ((best (heap-extremum heap))
+                              (best-path-cost (node-path-cost best)))
+                         (debug heap
+                                (heap-size heap)
+                                (node-state (heap-extremum heap)))
+                         (if (> best-path-cost f-limit)
+                             (values #f best-path-cost)
+                             (let ((alternative
+                                    (if (= (heap-size heap) 1)
+                                        +inf
+                                        (let ((first
+                                               (heap-extract-extremum! heap))
+                                              (alternative
+                                               (node-path-cost
+                                                (heap-extremum heap))))
+                                          (debug heap
+                                                 (heap-size heap)
+                                                 (node-state (heap-extremum heap))
+                                                 (node-path-cost first)
+                                                 first
+                                                 (node-state first)
+                                                 'iter
+                                                 (heap-member? heap first))
+                                          (heap-delete! heap first)
+                                          (debug 'iter (heap-member? heap first))
+                                          (heap-insert!
+                                           heap
+                                           (node-path-cost first)
+                                           first)
+                                          alternative))))
+                               (receive (predecessor best-path-cost)
+                                 (search return
+                                         best
+                                         (min f-limit alternative))
+                                 (if predecessor
+                                     (values predecessor best-path-cost)
+                                     (iter))))))))))))
+       (call/cc (lambda (return)
+                  (search return (make-initial-node start) +inf))))
+
+     (define-record-and-printer point x y)
+
+     (define (point-distance p1 p2)
+       ;; @("Calculate the distance between two points."
+       ;;   (p1 "The first point")
+       ;;   (p2 "The second point")
+       ;;   (@to "distance"))
+       (sqrt (+ (expt (- (point-x p1) (point-x p2)) 2)
+                (expt (- (point-y p1) (point-y p2)) 2))))
+
+     (define (make-straight-line-distance-heuristic end)
+       (lambda (node) (point-distance (node-state node) end)))
+
+   #+END_SRC   
+
+   =blank?= could just as well be =zero?=, which would aid in testing
+   vector-equality (could use e.g. ~(vector= = g1 g2)~.
+
+   Animated ditaa for visualization?
+
+   #+BEGIN_SRC scheme
+     (use debug
+          vector-lib)
+
+     (define (hamming-distance v1 v2)
+       (vector-fold (lambda (i distance x1 x2)
+                      (if (= x1 x2)
+                          distance
+                          (+ distance 1)))
+                    0
+                    v1
+                    v2))
+
+     (define (transpositions v1 v2)
+       (let iter ((i 0)
+                  (transpositions 0))
+         (if (= i (vector-length v1))
+             transpositions
+             ())))
+
+     (debug (hamming-distance '#(0 1 2 3 4 5 6 7 8)
+                              '#(3 6 1 4 2 8 5 0 7))
+            (hamming-distance '#(0 1 2 3 4 5 6 7 8)
+                              '#(8 1 3 4 0 2 7 6 5))
+            (hamming-distance '#(1 2 3 4 5 6 7 8 0)
+                              '#(1 2 3 4 5 6 8 7 0)))
+     ;;; edit
+   #+END_SRC
+
+   #+BEGIN_SRC scheme
+     (use data-structures
+          debug
+          srfi-69
+          test
+          vector-lib)
+
+     (define (kendall-tau-distance v1 v2)
+       (if (vector= = (sort v1 <) (sort v2 <))
+           (let ((x->i (make-hash-table)))
+             (vector-for-each (lambda (i x) (hash-table-set! x->i x i)) v2)
+             (let iter ((i 0)
+                        (distance 0))
+               (if (or (= i (vector-length v1))
+                       (= i (vector-length v2)))
+                   distance
+                   (let ((x1 (vector-ref v1 i))
+                         (x2 (vector-ref v2 i)))
+                     (if (= x1 x2)
+                         (iter (+ i 1) distance)
+                         (let ((i2 (hash-table-ref x->i x1)))
+                           (vector-swap! v1 i i2)
+                           (iter (+ i 1) (+ distance 1))))))))
+           (error "Vectors incomparable -- KENDALL-TAU-DISTANCE")))
+
+     (test 3
+           (kendall-tau-distance (vector 1 2 3 4 5)
+                                 (vector 3 4 5 2 1)))
+
+     (debug (kendall-tau-distance
+             (vector 1 2 3 4 5 6 7 8 9 10 11 12 13 15 14 0)
+             (vector 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 0)))
+
+     (debug (kendall-tau-distance
+             (vector 1 2 3 4 5 6 7 8 9 10 11 12 13 15 14 0)
+             (vector 1 2 3 4 5 6 7 8 9 10 11 12 13 14 0 15)))
+
+     (define (contiguize! k v)
+       (do ((i k (+ i (* 2 k))))
+           ((>= i (vector-length v)))
+         (vector-reverse! v i (+ i k))))
+
+     (define (contiguize k v)
+       (let ((v (vector-copy v)))
+         (contiguize! k v)
+         v))
+
+     (debug (kendall-tau-distance
+             (contiguize 4 (vector 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 0))
+             (contiguize 4 (vector 1 2 3 4 5 6 7 8 9 10 11 12 13 15 14 0))))
+
+     (debug (kendall-tau-distance
+             (contiguize 4 (vector 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 0))
+             (contiguize 4 (vector 1 2 3 4 5 6 7 8 9 10 11 0 13 14 15 12))))
+   #+END_SRC
+
+   #+BEGIN_SRC scheme
+     (use debug test vector-lib)
+
+     (define (contiguize! k v)
+       (do ((i k (+ i (* 2 k))))
+           ((>= i (vector-length v)))
+         (vector-reverse! v i (+ i k))))
+
+     (let ((v '#(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)))
+       (contiguize! 4 v)
+       (test v '#(0 1 2 3 7 6 5 4 8 9 10 11 15 14 13 12)))
+   #+END_SRC
+
+   [[http://math.stackexchange.com/questions/65923/how-does-one-compute-the-sign-of-a-permutation][Sign of permutation]], with reference to n-puzzles; [[http://mathoverflow.net/questions/72669/finding-the-parity-of-a-permutation-in-little-space][parity of
+   permutation]].
+
+   #+BEGIN_SRC scheme
+     (use debug
+          srfi-69
+          vector-lib)
+
+     (define (unvisited? unvisited i)
+       (hash-table-ref/default unvisited i #t))
+
+     (define (cycles v)
+       (let ((visited (make-hash-table)))
+         (vector-for-each
+             (lambda (i x)
+               (debug i x)
+               (let iter ((next i)
+                          (length 0))
+                 (debug next length)
+                 (if (unvisited? visited next)
+                     (begin
+                       (hash-table-set! visited next #f)
+                       (iter x
+                             (+ length 1)))
+                     (debug length))))
+             v)))
+
+     (define (cycles v)
+       (let ((visited (make-hash-table)))
+         (let iter ((i 0)
+                    (even-cycles 0))
+           (if (= i (vector-length v))
+               even-cycles
+               (let iter-cycle ((next i)
+                                (length 0))
+                 (debug next length)
+                 (if (unvisited? visited next)
+                     (begin
+                       (hash-table-set! visited next #f)
+                       (iter-cycle (vector-ref v next) (+ length 1)))
+                     (if (even? length)
+                         (iter (+ i 1) (+ even-cycles 1))
+                         (iter (+ i 1) even-cycles))))))))
+
+     (debug (cycles '#(3 4 5 2 1 0))
+            (cycles '#(0 1 2 4 3 5))
+            (cycles '#(3 1 2 0 4 5))
+            (cycles '#(0 1 2 3))
+            (cycles '#(0 1 3 2))
+            (cycles '#(0 1 2))
+            (cycles '#(2 1 0))
+            (cycles '#(1 0 2))
+            (cycles '#(0 1 2 5 4 3 6 7 8))
+            (cycles '#(1 2 3 4 5 6 7 8 9 10 11 12 13 15 14 0)))
+   #+END_SRC
+
+   http://www.math.umt.edu/oliver/parity/nelson.pdf
+
+   https://stat.ethz.ch/pipermail/r-help/2008-April/159732.html
+
+   #+BEGIN_SRC R
+     library(debug)
+
+     n <- 16
+     ## p <- sample(1:n)
+     ## p <- c(0,1,2,5,4,3,7,6,8)
+     p <- c(1,2,3,4,5,6,7,8,9,10,11,12,13,15,14,0)
+     p <- c(1,2,3,4,5,6,7,8,9,10,11,12,13,15,14)
+     p <- c(1,2,3,4,8,7,6,5,9,10,11,12,15,14,13)
+     p <- c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0)
+     p <- c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
+     x <- integer(n)
+     print(p)
+     for (i in 1:n) {
+       ## debug(x)
+       z <- which(!x)[1]
+       print(x)
+       debug("outer", i, z)
+       if (is.na(z)) break
+       repeat {
+         debug("inner", i, z, x[z], p[z], x[p[z]])
+         x[z] <- i
+         z <- p[z]
+         if (x[z]) break
+       }
+     }
+     x
+     clen <- table(x)
+     clen
+     1L - (sum(clen %% 2 == 0) %% 2)*2L
+   #+END_SRC
+
+   #+BEGIN_SRC scheme
+     (use debug
+          miscmacros
+          srfi-1
+          srfi-69
+          vector-lib)
+
+     (define (cycles v)
+       (let ((seen (make-vector (vector-length v) #f)))
+         (let iter ((i 0)
+                    (cycles '()))
+           (debug seen)
+           (if (= i (vector-length v))
+               (begin
+                 (debug cycles)
+                 (length (filter even? cycles)))
+               (let iter-cycle ((j i)
+                                (length 0))
+                 (debug j length)
+                 (if (vector-ref seen j)
+                     (iter (+ i 1)
+                           (cons length cycles))
+                     (begin
+                       (vector-set! seen j #t)
+                       (iter-cycle (vector-ref v j)
+                                   (+ length 1)))))))))
+
+     (define (cycles v)
+       (let ((seen (make-vector (vector-length v) 0)))
+         (do ((i 1 (+ i 1)))
+             ((> i (vector-length v)))
+           (let ((z (vector-index zero? seen)))
+             (debug z)
+             (when z
+               (while (zero? (vector-ref seen z))
+                 (debug z)
+                 (vector-set! seen z i)
+                 (set! z (vector-ref v z))))))
+         seen))
+
+     (define (cycles v)
+       (let ((cycles (make-hash-table))
+             (seen (make-vector (vector-length v) #f)))
+         (do ((i 0 (+ i 1)))
+             ((= i (vector-length v)))
+           (let iter ((j i))
+             (unless (vector-ref seen j)
+               (vector-set! seen j #t)
+               (hash-table-update!/default
+                cycles
+                i
+                (lambda (length) (+ length 1))
+                0)
+               (iter (vector-ref v j)))))
+         (hash-table->alist cycles)))
+
+
+     (cycles '#(1 2 3 4 5 6 7 8 9 10 11 12 13 15 14 0))
+     (cycles '#(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 0))
+     (cycles '#(2 1 3 4 5 6 7 8 9 10 11 12 13 14 15 0))
+     (cycles '#(13 10 11 6 5 7 4 8 1 12 14 9 3 15 2 0))
+     (cycles '#(6 1 10 2 7 11 4 14 5 0 9 15 8 12 13 3))
+   #+END_SRC
+
+   http://stackoverflow.com/questions/7701345/how-to-programatically-create-a-valid-15-puzzle-in-code
+   http://mathworld.wolfram.com/15Puzzle.html
+   http://www.cs.bham.ac.uk/~mdr/teaching/modules04/java2/TilesSolvability.html
+   http://kevingong.com/Math/SixteenPuzzle.html
+
+   #+BEGIN_SRC scheme
+     (use debug
+          srfi-69
+          test
+          vector-lib)
+
+     (define (inversions v)
+       (let ((inversions (make-hash-table)))
+         (vector-for-each
+          (lambda (i x)
+            (do ((j i (+ j 1)))
+                ((= j (vector-length v)))
+              ;; (debug i j x (vector-ref v j) (> x (vector-ref v j)))
+              (when (and (> x (vector-ref v j)) (positive? (vector-ref v j)))
+                (hash-table-update!/default inversions x add1 0))))
+          v)
+         (hash-table-fold
+          inversions
+          (lambda (x inversions total) (+ inversions total))
+          0)))
+
+     ;;; But see
+     ;;; <http://www.cs.bham.ac.uk/~mdr/teaching/modules04/java2/TilesSolvability.html>.
+     (define soluble? (compose even? inversions))
+
+     (test-assert
+      (not (soluble? '#(1 2 3 4 5 6 7 8 9 10 11 12 13 15 14 0))))
+     (test-assert
+      (soluble? '#(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 0)))
+     (test-assert
+      (not (soluble? '#(2 1 3 4 5 6 7 8 9 10 11 12 13 14 15 0))))
+     (test-assert
+      (soluble? '#(6 1 10 2 7 11 4 14 5 0 9 15 8 12 13 3)))
+     (test-assert
+      (not (soluble? '#(13 10 11 6 5 7 4 8 1 12 14 9 3 15 2 0))))
+     (test-assert
+      (soluble? '#(1 2 3 0)))
+     (test-assert
+      (not (soluble? '#(2 1 3 0))))
+     (test-assert
+      (soluble? '#(1 2 0 3)))
+     (test-assert
+      (soluble? '#(0 2 1 3)))
+
+     (debug (inversions '#(3 6 5 2 4 7 0 8 1)))
+
+   #+END_SRC
+
+   Chapter 3:
+
+   #+BEGIN_QUOTE
+   The transition model, specified by (result s a), returns the state
+   that results from doing action a in state s.
+
+   A path in the state space is a sequence of states connected by a
+   sequence of actions.
+
+   Sometimes the goal is specified by an abstract property rather than
+   an explicitly enumerated set of states (e.g. checkmate).
+
+   A solution to a problem is an action sequence that leads from the
+   initial state to a goal state. Solution quality is measured by the
+   path-cost function.
+   #+END_QUOTE
+
+   Rather than returning a sequence of states (which might be
+   expensive); return, rather, a sequence of actions and reconstitute
+   the state as needed?
+
+   Actions constitute a kind of diff; it's also necessary when
+   instructing an agent based on search.
+
+   Or, maybe it's ok: even AIMA-nodes have state.
+
+   We're lacking actions and transition models; step-cost apparently
+   takes state and action. We're using states as a proxy for actions.
+
+   We'll have to adopt the action-model if we want to make this
+   applicable to agents.
+
+   See [[http://aima-python.googlecode.com/svn/trunk/search.py][this recursive best-first-search in Python]], by the way.
 ** TODO Voronoi
    Never got a chance to implement from scratch; [[http://www.youtube.com/watch?v%3DxMhBobFoQbk&feature%3Drelated][should have watched]]?
 ** DONE 3.7
