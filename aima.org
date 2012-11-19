@@ -7949,3 +7949,7 @@
   unconcerned with path; thus, random restarts.
 
 [fn:16] Be nice to take a look at some of the literature.
+
+[fn:17] From [[http://en.wikipedia.org/wiki/Heuristic_function][heuristic function]]: "if, for any given state, $h2$ will
+  always be greater than or equal to $h1$; we can say that $h2$
+  dominates $h1$."
