@@ -1911,6 +1911,32 @@
    any better (if constrained by three-dimension space, or
    disregarding quantum effects).
 ** TODO c
+   #+BEGIN_SRC scheme
+     (use aima-search
+          debug
+          extras
+          lolevel
+          random-bsd
+          test)
+     
+     (define (make-random-points n)
+       (do ((points '() (cons (make-point (random-real) (random-real)) points))
+            (n n (- n 1)))
+           ((zero? n) points)))
+     
+     (randomize 0)
+     (test '(#(point 0.917756787181357 0.014503760244948)
+             #(point 0.182243740737884 0.222769906458184)
+             #(point 0.254000634233175 0.179812326085674)
+             #(point 0.926341976132823 0.118316212304605)
+             #(point 0.467849216952573 0.0142746775993328)
+             #(point 0.913224195689647 0.430542990820318)
+             #(point 0.360349150321226 0.64218713670766)
+             #(point 0.0427818455795276 0.919137354588936)
+             #(point 0.203195544766634 0.0902104548313956)
+             #(point 0.72382773905288 0.00514485046497615))
+           (map record->vector (make-random-points 10)))
+   #+END_SRC
 * DONE 4.1
   CLOSED: [2012-11-16 Fri 17:04]
   - a :: Local beam search with $k = 1$ is hill-climbing.
