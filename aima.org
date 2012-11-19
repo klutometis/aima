@@ -1961,7 +1961,6 @@
    #+BEGIN_SRC scheme
      (use debug
           define-record-and-printer
-          disjoint-set
           heap
           random-bsd
           R
@@ -1993,32 +1992,13 @@
        (let ((graph (make-hash-table)))
          (for-each (lambda (p1)
                      (for-each (lambda (p2)
-                                 (if (not (or (eq? p1 p2)
-                                              #;(memq p1
-                                              #;(hash-table-ref/default
-                                              #;graph p2 '()))
-                                              ))
+                                 (if (not (eq? p1 p2))
                                      (connect! graph p1 p2)))
                        points))
            points)
          graph))
      
-     ;; (let* ((points (make-random-points 10))
-     ;;        (graph (complete-graph points)))
-     ;;   (debug (hash-table->alist graph))
-     ;;   (let ((heap (make-min-heap)))
-     ;;     (hash-table-walk graph
-     ;;                      (lambda (from tos)
-     ;;                        (for-each (lambda (to)
-     ;;                                    (debug (point-distance from to) from to)
-     ;;                                    (heap-insert! heap (point-distance from to) (cons from to)))
-     ;;                          tos)))
-     ;;     (do ((heap heap))
-     ;;         ((heap-empty? heap))
-     ;;       (let ((from-to (heap-extract-extremum! heap)))
-     ;;         (debug (point-distance (car from-to) (cdr from-to)))))))
-     
-     ;; (define make-disjoint-set make-hash-table)
+     (define make-disjoint-set make-hash-table)
      
      (define (make-set set element)
        (let ((set-marker (gensym)))
@@ -2028,14 +2008,20 @@
      (define (find-set set element)
        (hash-table-ref set element))
      
-     ;;; Union has to set all elements!
+     ;;; This is a painful linear-time union; according to CLRS, we can do
+     ;;; better.
      (define (set-union! set e1 e2)
-       (hash-table-set! set e2 (hash-table-ref set e1)))
+       (let ((m1 (hash-table-ref set e1))
+             (m2 (hash-table-ref set e2)))
+         (hash-table-walk set
+                          (lambda (element marker)
+                            (if (eq? marker m2)
+                                (hash-table-set! set element m1))))))
      
      (define (minimum-spanning-tree graph)
-       (let ((set (make-disjoint-set values eq?))
+       (let ((set (make-disjoint-set))
              (tree (make-hash-table)))
-         (for-each (lambda (node) (disjoint-set:make set node))
+         (for-each (lambda (node) (make-set set node))
            (hash-table-keys graph))
          (let ((edges (make-min-heap)))
            (hash-table-walk
@@ -2049,33 +2035,39 @@
              (let ((edge (heap-extract-extremum! edges)))
                (let ((from (car edge))
                      (to (cdr edge)))
-                 (unless (eq? (disjoint-set:find set from)
-                              (disjoint-set:find set to))
-                   ;; (biconnect! tree from to)
-                   (connect! tree from to)
-                   (disjoint-set:union set from to)))))
+                 (unless (eq? (find-set set from)
+                              (find-set set to))
+                   (biconnect! tree from to)
+                   ;; (connect! tree from to)
+                   (set-union! set from to)))))
            tree)))
      
-     (with-output-to-file "harro.dot"
-       (lambda ()
-         (let ((tree (minimum-spanning-tree (complete-graph (make-random-points 10)))))
-           (pp (hash-table->alist tree) (current-error-port))
-           ;; (debug (length (hash-table->alist tree))
-           ;;        (hash-table-keys tree)
-           ;;        (hash-table->alist tree))
-           ;; (- (apply + (map length (hash-table->alist tree)))
-           ;;    (length (hash-table->alist tree)))
-           (display "digraph G {graph[splines=true];")
-           (for-each (lambda (node) (format #t "\"~a\";" node))
-             (hash-table-keys tree))
-           (hash-table-walk tree
-                            (lambda (from tos)
-                              (for-each (lambda (to)
-                                          (format #t "\"~a\" -> \"~a\";" from to))
-                                tos)))
-           (display "}"))))
+     (define (write-tree-as-dot tree)
+       ;; (pp (hash-table->alist tree) (current-error-port))
+       (display "digraph G {graph[splines=true];")
+       (for-each (lambda (node) (format #t "\"~a\";" node))
+         (hash-table-keys tree))
+       (hash-table-walk tree
+                        (lambda (from tos)
+                          (for-each (lambda (to)
+                                      (format #t "\"~a\" -> \"~a\"[label=\"~a\"];"
+                                              from to (point-distance from to)))
+                            tos)))
+       (display "}"))
      
+     (with-output-to-file "tree.dot"
+       (lambda ()
+         (write-tree-as-dot
+          (minimum-spanning-tree
+           (complete-graph
+            (make-random-points 10))))))
    #+END_SRC
+
+   We have the MST; how to use it as a heuristic? [[http://www.csie.ntu.edu.tw/~ai2007s/hw/hw02_s.pdf%0A][This cat]] works an
+   example; [[http://stackoverflow.com/questions/5344705/how-can-the-a-algorithm-be-applied-to-the-traveling-salesman-problem][some skepticism]]; [[https://docs.google.com/viewer?a%3Dv&q%3Dcache:PFuiFmd75KkJ:www.cse.iitb.ac.in/~cs344/seminars_2012/TSP_final.pptx%2Btsp%2Ba-star&hl%3Den&gl%3Dus&pid%3Dbl&srcid%3DADGEESiMONRCnGugbh-N9DZWx8m5FvpAEc0LetHheEeqoo4nG_bt27Ykbl8t2rRM8gEv96gr2A4JQs1DCVmoKHvDCoEn4E0d8PoNOrtbdy9uvLF45jtrxS9J2WM2nsUVG490yjRria7a&sig%3DAHIEtbSqk9nF0duEXLacGJUJedds6KkMbg][thorough]]; [[http://www.personal.kent.edu/~rmuhamma/Compgeometry/MyCG/CG-Applets/TSP/notspcli.htm][dynamic]] programming? [[http://stackoverflow.com/questions/4453477/using-a-to-solve-travelling-salesman-problem][Reasoning
+   answers]]; [[http://www.public.asu.edu/~huanliu/AI04S/project1.htm][a solution]] for the heuristic: nearest neighbor + 2 *
+   length(MST) for unvisited nodes + nearest distance from unvisited
+   city to start city.
 * DONE 4.1
   CLOSED: [2012-11-16 Fri 17:04]
   - a :: Local beam search with $k = 1$ is hill-climbing.
