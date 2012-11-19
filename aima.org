@@ -2125,6 +2125,14 @@
    answers]]; [[http://www.public.asu.edu/~huanliu/AI04S/project1.htm][a solution]] for the heuristic: nearest neighbor + 2 *
    length(MST) for unvisited nodes + nearest distance from unvisited
    city to start city.
+
+   We're going to have to modify search, unfortunately, since it only
+   work on a goal-state; we're going to have to look at the whole
+   graph and see whether we've visited every node.
+
+   On the other hand, if we pass the node to =goal?= and not merely
+   the node's state; we could do a =predecessor-path=. =Step-cost=,
+   too, only compares states; that's ok, though, isn't it?
 * DONE 4.1
   CLOSED: [2012-11-16 Fri 17:04]
   - a :: Local beam search with $k = 1$ is hill-climbing.
