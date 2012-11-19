@@ -1685,8 +1685,8 @@
          extras
          format
          files
-         levenshtein-byte
-         levenshtein-transpose-byte
+         ;; levenshtein-byte
+         ;; levenshtein-transpose-byte
          miscmacros
          posix
          srfi-1
@@ -1887,13 +1887,15 @@
               (lambda (parent)
                 (reachable-games k (node-state parent)))
               (constantly 1)
-              (lambda (game) (game= start game))
+              (lambda (node)
+                (let ((game (node-state node)))
+                  (game= start game)))
               (make-manhattan-distance-heuristic k)))))
     
     (let* ((k 3)
            (states (solve k (make-random-soluble-game k))))
       (debug states)
-      (animate-states/avi k (visualize-states k states) "3.22.avi"))    
+      (animate-states/avi k (visualize-states k states) "3.22.avi"))
   #+END_SRC
 * TODO 3.30
 ** TODO a
