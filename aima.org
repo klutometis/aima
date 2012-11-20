@@ -2066,13 +2066,21 @@
                                          (map (lambda (to) (point-distance from to))
                                               tos))))))
      
-     (define (make-tour points)
-       (let ((tour (make-hash-table))
-             (points (cons (car points) (reverse points))))
+     (define (make-tree points)
+       (let ((tour (make-hash-table)))
          (do ((from (drop-right points 1) (cdr from))
               (to (cdr points) (cdr to)))
              ((null? from) tour)
            (hash-table-set! tour (car from) (list (car to))))
+         ;; (debug (hash-table->alist tour))
+         tour))
+     
+     (define (make-tour points)
+       (let ((tour (make-hash-table)))
+         (do ((from (drop-right points 1) (cdr from))
+              (to (cdr points) (cdr to)))
+             ((null? from) tour)
+           (hash-table-set! tour (car from) (car to)))
          ;; (debug (hash-table->alist tour))
          tour))
      
@@ -2082,41 +2090,56 @@
            points)
          (heap-extract-extremum! neighbors)))
      
+     (define (graph-tour tour)
+       (display "x,y,xend,yend\n")
+       (hash-table-walk
+        tour
+        (lambda (from to)
+          (format #t "~a,~a,~a,~a~%"
+                  (point-x from)
+                  (point-y from)
+                  (point-x to)
+                  (point-y to)))))
+     
+     (define (tour start graph points)
+       (cons start
+             (reverse
+              (map node-state
+                   (A* start
+                       (lambda (node)
+                         (let ((point (node-state node)))
+                           (hash-table-ref/default graph point '())))
+                       point-distance
+                       (lambda (node) (= (length (predecessor-path node)) (length points)))
+                       (lambda (node)
+                         (let* ((visited-points (map node-state (predecessor-path node)))
+                                (unvisited-points (lset-difference eq? points visited-points))
+                                (unvisited-tree (minimum-spanning-tree (complete-graph unvisited-points))))
+                           (let ((point (node-state node)))
+                             (let ((nearest-neighbor
+                                    (if (null? unvisited-points)
+                                        0
+                                        (point-distance
+                                         point
+                                         (nearest-neighbor point unvisited-points))))
+                                   (nearest-start
+                                    (if (null? unvisited-points)
+                                        0
+                                        (point-distance
+                                         start
+                                         (nearest-neighbor start unvisited-points)))))
+                               (+ nearest-neighbor
+                                  (* (tree-cost unvisited-tree) 2)
+                                  nearest-start))))))))))
+     
      (let* ((graph (complete-graph (make-random-points 10)))
             (points (hash-table-keys graph))
             (start (car points)))
-       (with-output-to-file "tour.dot"
-         (lambda ()
-           (write-tree-as-dot
-            (make-tour
-             (map node-state
-                  (A* start
-                      (lambda (node)
-                        (let ((point (node-state node)))
-                          ;; (debug (hash-table-ref/default graph point '()))
-                          (hash-table-ref/default graph point '())))
-                      point-distance
-                      (lambda (node) (= (length (predecessor-path node)) (length points)))
-                      (lambda (node)
-                        (let* ((visited-points (map node-state (predecessor-path node)))
-                               (unvisited-points (lset-difference eq? points visited-points))
-                               (unvisited-tree (minimum-spanning-tree (complete-graph unvisited-points))))
-                          (let ((point (node-state node)))
-                            (let ((nearest-neighbor
-                                   (if (null? unvisited-points)
-                                       0
-                                       (point-distance
-                                        point
-                                        (nearest-neighbor point unvisited-points))))
-                                  (nearest-start
-                                   (if (null? unvisited-points)
-                                       0
-                                       (point-distance
-                                        start
-                                        (nearest-neighbor start unvisited-points)))))
-                              (+ nearest-neighbor
-                                 (* (tree-cost unvisited-tree) 2)
-                                 nearest-start))))))))))))
+       (let ((tour (tour start graph points)))
+         ;; (graph-tour tour)
+         (debug start tour (hash-table->alist (make-tour tour)))
+         (with-output-to-file "tour.csv"
+           (lambda () (graph-tour (make-tour tour))))))
      
    #+END_SRC
 
@@ -2133,6 +2156,32 @@
    On the other hand, if we pass the node to =goal?= and not merely
    the node's state; we could do a =predecessor-path=. =Step-cost=,
    too, only compares states; that's ok, though, isn't it?
+
+   #+BEGIN_SRC R
+     library(ggplot2)
+     
+     data <- read.csv("tour.csv")
+     start <- data[1,]
+     p <- ggplot() +
+       geom_segment(aes(x=x, y=y, xend=xend, yend=yend),
+                    data=data) +
+       geom_point(aes(x=x, y=y),
+                  data=start,
+                  shape=1,
+                  size=5) +
+       geom_text(aes(x=data$x + (data$xend - data$x) / 2,
+                     y=data$y + (data$yend - data$y) / 2),
+                 label=signif(sqrt((data$xend - data$x) ^ 2 +
+                   (data$yend - data$y) ^ 2),
+                   digits=2)) +
+       geom_point(aes(x=x, y=y), data=data) +
+       geom_text(aes(x=data$x, y=data$y),
+                 label=sprintf('(%s, %s)',
+                   signif(data$x, digits=2),
+                   signif(data$y, digits=2)))
+     plot(p)
+     
+   #+END_SRC
 * DONE 4.1
   CLOSED: [2012-11-16 Fri 17:04]
   - a :: Local beam search with $k = 1$ is hill-climbing.
