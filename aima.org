@@ -2163,12 +2163,8 @@
      data <- read.csv("tour.csv")
      start <- data[1,]
      p <- ggplot() +
-       geom_segment(aes(x=x, y=y, xend=xend, yend=yend),
+       geom_segment(aes(x=x, y=y, xend=xend, yend=yend, color="A*"),
                     data=data) +
-       geom_point(aes(x=x, y=y),
-                  data=start,
-                  shape=1,
-                  size=5) +
        geom_text(aes(x=data$x + (data$xend - data$x) / 2,
                      y=data$y + (data$yend - data$y) / 2),
                  label=signif(sqrt((data$xend - data$x) ^ 2 +
@@ -2178,7 +2174,8 @@
        geom_text(aes(x=data$x, y=data$y),
                  label=sprintf('(%s, %s)',
                    signif(data$x, digits=2),
-                   signif(data$y, digits=2)))
+                   signif(data$y, digits=2))) +
+       labs(color="Search")
      plot(p)
      
    #+END_SRC
