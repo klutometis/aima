@@ -2101,7 +2101,10 @@
                   (point-x to)
                   (point-y to)))))
      
-     (define (graph-tour tour)
+     (define (tour-length tour)
+       (apply + (hash-table-map tour point-distance)))
+     
+     (define (graph-tour tour strategy)
        (let ((data
               (hash-table-map
                tour
@@ -2109,14 +2112,16 @@
                  (vector (point-x from)
                          (point-y from)
                          (point-x to)
-                         (point-y to))))))
+                         (point-y to)))))
+             (tour-length (tour-length tour)))
          (let* ((data (R (data.frame (t (matrix ,(list->vector data)
                                                 nrow: 4)))))
                 (data (R (colnames<- ,data (c "x" "y" "xend" "yend")))))
-           (let ((x (R* ($ ,data x)))
-                 (y (R* ($ ,data y)))
-                 (xend (R* ($ ,data xend)))
-                 (yend (R* ($ ,data yend))))
+           (R (assign "data" ,data))
+           (let ((x (R* ($ data x)))
+                 (y (R* ($ data y)))
+                 (xend (R* ($ data xend)))
+                 (yend (R* ($ data yend))))
              (R (library "ggplot2"))
              (R (png "tour.png"
                      height: 768
@@ -2125,12 +2130,17 @@
              (R (assign "y" ,y))
              (R (assign "xend" ,xend))
              (R (assign "yend" ,yend))
+             (R (print x))
+             (R (print y))
+             (R (print xend))
+             (R (print yend))
              (R (plot (Reduce
                        %+%
                        (list (geom_segment (aes x: x
                                                 y: y
                                                 xend: xend
-                                                yend: yend))
+                                                yend: yend
+                                                color: ,strategy))
                              (geom_text (aes x: (+ x (/ (- xend x) 2))
                                              y: (+ y (/ (- yend y) 2)))
                                         label: (signif (sqrt (+ (^ (- xend x) 2)
@@ -2145,7 +2155,10 @@
                                                         (signif y digits: 2)))
                              (theme_gray base_size: 18)
                              (xlab "x")
-                             (ylab "y"))
+                             (ylab "y")
+                             (labs color: "Strategy"
+                                   title: (sprintf "Hamiltonian cycle of length %s"
+                                                   (signif ,tour-length digits: 2))))
                        (ggplot))))
              (R (dev.off))))))
      
@@ -2183,12 +2196,13 @@
      (let* ((graph (complete-graph (make-random-points 10)))
             (points (hash-table-keys graph))
             (start (car points)))
-       (let ((tour (tour start graph points)))
+       (let* ((tour (tour start graph points))
+              (tour (make-tour tour)))
          ;; (graph-tour tour)
          ;; (debug start tour (hash-table->alist (make-tour tour)))
          ;; (with-output-to-file "tour.csv"
          ;;   (lambda () (graph-tour (make-tour tour))))
-         (graph-tour (make-tour tour))))
+         (graph-tour tour "A*")))
      
    #+END_SRC
 
