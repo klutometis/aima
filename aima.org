@@ -1960,7 +1960,7 @@
 
    We can use a heap to pop things off.
 
-   #+BEGIN_SRC scheme
+   #+BEGIN_SRC scheme :tangle tour.scm :shebang #!/usr/bin/env chicken-scheme
      (use aima-search
           debug
           define-record-and-printer
@@ -2101,6 +2101,59 @@
                   (point-x to)
                   (point-y to)))))
      
+     (define (graph-tour tour)
+       (let ((data
+              (hash-table-map
+               tour
+               (lambda (from to)
+                 (vector (point-x from)
+                         (point-y from)
+                         (point-x to)
+                         (point-y to))))))
+         (let* ((data (R (data.frame (t (matrix ,(list->vector data)
+                                                nrow: 4)))))
+                (data (R (colnames<- ,data (c "x" "y" "xend" "yend")))))
+           (let ((x (R* ($ ,data x)))
+                 (y (R* ($ ,data y)))
+                 (xend (R* ($ ,data xend)))
+                 (yend (R* ($ ,data yend))))
+             (R (print ,x))
+             (R (library "ggplot2"))
+             ;; (R (source "tour.R"))
+             ;; (R (plot.tour ,data)))
+             (R (png "tour.png"
+                     height: 768
+                     width: 1024))
+             ;; (R (plot (qplot ,data)))
+             (R (assign "x" ,x))
+             (R (assign "y" ,y))
+             (R (assign "xend" ,xend))
+             (R (assign "yend" ,yend))
+             (R (plot (%+%
+                       (%+%
+                        (%+%
+                         (%+%
+                          (%+% (ggplot)
+                               (geom_segment (aes x: x
+                                                  y: y
+                                                  xend: xend
+                                                  yend: yend)))
+                          (geom_text (aes x: (+ x (/ (- xend x) 2))
+                                          y: (+ y (/ (- yend y) 2)))
+                                     label: (signif (sqrt (+ (^ (- xend x) 2)
+                                                             (^ (- yend y) 2)))
+                                                    digits: 2)))
+                         (geom_point (aes x: x
+                                          y: y)))
+                        (geom_text (aes x: x
+                                        y: y)
+                                   label: (sprintf "(%s, %s)"
+                                                   (signif x digits: 2)
+                                                   (signif y digits: 2))))
+                       (theme_gray base_size: 18))))
+             (R (dev.off)))
+         )))
+     
      (define (tour start graph points)
        (cons start
              (reverse
@@ -2137,9 +2190,10 @@
             (start (car points)))
        (let ((tour (tour start graph points)))
          ;; (graph-tour tour)
-         (debug start tour (hash-table->alist (make-tour tour)))
-         (with-output-to-file "tour.csv"
-           (lambda () (graph-tour (make-tour tour))))))
+         ;; (debug start tour (hash-table->alist (make-tour tour)))
+         ;; (with-output-to-file "tour.csv"
+         ;;   (lambda () (graph-tour (make-tour tour))))
+         (graph-tour (make-tour tour))))
      
    #+END_SRC
 
@@ -2157,26 +2211,28 @@
    the node's state; we could do a =predecessor-path=. =Step-cost=,
    too, only compares states; that's ok, though, isn't it?
 
-   #+BEGIN_SRC R
+   #+BEGIN_SRC R :tangle tour.R
      library(ggplot2)
      
-     data <- read.csv("tour.csv")
-     start <- data[1,]
-     p <- ggplot() +
-       geom_segment(aes(x=x, y=y, xend=xend, yend=yend, color="A*"),
-                    data=data) +
-       geom_text(aes(x=data$x + (data$xend - data$x) / 2,
-                     y=data$y + (data$yend - data$y) / 2),
-                 label=signif(sqrt((data$xend - data$x) ^ 2 +
-                   (data$yend - data$y) ^ 2),
-                   digits=2)) +
-       geom_point(aes(x=x, y=y), data=data) +
-       geom_text(aes(x=data$x, y=data$y),
-                 label=sprintf('(%s, %s)',
-                   signif(data$x, digits=2),
-                   signif(data$y, digits=2))) +
-       labs(color="Search")
-     plot(p)
+     ## data <- read.csv("tour.csv")
+     ## start <- data[1,]
+     plot.tour <- function(data) {
+       str(data)
+       p <- ggplot() +
+         geom_segment(aes(x=x, y=y, xend=xend, yend=yend, color="A*"), data=data) +
+           geom_text(aes(x=data$x + (data$xend - data$x) / 2,
+                         y=data$y + (data$yend - data$y) / 2),
+                     label=signif(sqrt((data$xend - data$x) ^ 2 +
+                       (data$yend - data$y) ^ 2),
+                       digits=2)) +
+                         geom_point(aes(x=x, y=y), data=data) +
+                           geom_text(aes(x=data$x, y=data$y),
+                                     label=sprintf('(%s, %s)',
+                                       signif(data$x, digits=2),
+                                       signif(data$y, digits=2))) +
+                                         labs(color="Search")
+       plot(p)
+     }
      
    #+END_SRC
 * DONE 4.1
