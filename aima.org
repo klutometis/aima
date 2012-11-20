@@ -2130,10 +2130,37 @@
              (R (assign "y" ,y))
              (R (assign "xend" ,xend))
              (R (assign "yend" ,yend))
-             (R (print x))
-             (R (print y))
-             (R (print xend))
-             (R (print yend))
+             ;; (R (print x))
+             ;; (R (print y))
+             ;; (R (print xend))
+             ;; (R (print yend))
+             ;; (R (plot (Reduce
+             ;;           %+%
+             ;;           (list (geom_segment (aes x: x
+             ;;                                    y: y
+             ;;                                    xend: xend
+             ;;                                    yend: yend
+             ;;                                    color: ,strategy))
+             ;;                 (geom_text (aes x: (+ x (/ (- xend x) 2))
+             ;;                                 y: (+ y (/ (- yend y) 2)))
+             ;;                            label: (signif (sqrt (+ (^ (- xend x) 2)
+             ;;                                                    (^ (- yend y) 2)))
+             ;;                                           digits: 2))
+             ;;                 (geom_point (aes x: x y: y)
+             ;;                             size: 3)
+             ;;                 (geom_text (aes x: x
+             ;;                                 y: y)
+             ;;                            label: (sprintf "(%s, %s)"
+             ;;                                            (signif x digits: 2)
+             ;;                                            (signif y digits: 2)))
+             ;;                 (theme_gray base_size: 18)
+             ;;                 (xlab "x")
+             ;;                 (ylab "y")
+             ;;                 (labs color: "Strategy"
+             ;;                       title: (sprintf "Hamiltonian cycle of length %s"
+             ;;                                       (signif ,tour-length digits: 2))))
+             ;;           (ggplot))))
+             (R (ggplot))
              (R (plot (Reduce
                        %+%
                        (list (geom_segment (aes x: x
