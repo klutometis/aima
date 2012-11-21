@@ -2114,79 +2114,45 @@
                          (point-x to)
                          (point-y to)))))
              (tour-length (tour-length tour)))
+         (R (library "ggplot2"))
          (let* ((data (R (data.frame (t (matrix ,(list->vector data)
                                                 nrow: 4)))))
                 (data (R (colnames<- ,data (c "x" "y" "xend" "yend")))))
-           (R (assign "data" ,data))
-           (let ((x (R* ($ data x)))
-                 (y (R* ($ data y)))
-                 (xend (R* ($ data xend)))
-                 (yend (R* ($ data yend))))
-             (R (library "ggplot2"))
-             (R (png "tour.png"
-                     height: 768
-                     width: 1024))
+           (let ((x (R* ($ ,data x)))
+                 (y (R* ($ ,data y)))
+                 (xend (R* ($ ,data xend)))
+                 (yend (R* ($ ,data yend))))
              (R (assign "x" ,x))
              (R (assign "y" ,y))
              (R (assign "xend" ,xend))
              (R (assign "yend" ,yend))
-             ;; (R (print x))
-             ;; (R (print y))
-             ;; (R (print xend))
-             ;; (R (print yend))
-             ;; (R (plot (Reduce
-             ;;           %+%
-             ;;           (list (geom_segment (aes x: x
-             ;;                                    y: y
-             ;;                                    xend: xend
-             ;;                                    yend: yend
-             ;;                                    color: ,strategy))
-             ;;                 (geom_text (aes x: (+ x (/ (- xend x) 2))
-             ;;                                 y: (+ y (/ (- yend y) 2)))
-             ;;                            label: (signif (sqrt (+ (^ (- xend x) 2)
-             ;;                                                    (^ (- yend y) 2)))
-             ;;                                           digits: 2))
-             ;;                 (geom_point (aes x: x y: y)
-             ;;                             size: 3)
-             ;;                 (geom_text (aes x: x
-             ;;                                 y: y)
-             ;;                            label: (sprintf "(%s, %s)"
-             ;;                                            (signif x digits: 2)
-             ;;                                            (signif y digits: 2)))
-             ;;                 (theme_gray base_size: 18)
-             ;;                 (xlab "x")
-             ;;                 (ylab "y")
-             ;;                 (labs color: "Strategy"
-             ;;                       title: (sprintf "Hamiltonian cycle of length %s"
-             ;;                                       (signif ,tour-length digits: 2))))
-             ;;           (ggplot))))
-             (R (ggplot))
-             (R (plot (Reduce
-                       %+%
-                       (list (geom_segment (aes x: x
-                                                y: y
-                                                xend: xend
-                                                yend: yend
-                                                color: ,strategy))
-                             (geom_text (aes x: (+ x (/ (- xend x) 2))
-                                             y: (+ y (/ (- yend y) 2)))
-                                        label: (signif (sqrt (+ (^ (- xend x) 2)
-                                                                (^ (- yend y) 2)))
-                                                       digits: 2))
-                             (geom_point (aes x: x y: y)
-                                         size: 3)
-                             (geom_text (aes x: x
-                                             y: y)
-                                        label: (sprintf "(%s, %s)"
-                                                        (signif x digits: 2)
-                                                        (signif y digits: 2)))
-                             (theme_gray base_size: 18)
-                             (xlab "x")
-                             (ylab "y")
-                             (labs color: "Strategy"
-                                   title: (sprintf "Hamiltonian cycle of length %s"
-                                                   (signif ,tour-length digits: 2))))
-                       (ggplot))))
+             (R (png "tour.png" height: 768 width: 1024))
+             (R (plot
+                 (%+%
+                  (%+%
+                   (%+%
+                    (%+%
+                     (%+%
+                      (%+% (ggplot)
+                           (geom_segment (aes x: x
+                                              y: y
+                                              xend: xend
+                                              yend: yend
+                                              color: ,strategy)))
+                      (geom_text (aes x: (+ x (/ (- xend x) 2))
+                                      y: (+ y (/ (- yend y) 2)))
+                                 label: (signif (sqrt (+ (^ (- xend x) 2)
+                                                         (^ (- yend y) 2)))
+                                                digits: 2)))
+                     (geom_point (aes x: x y: y)
+                                 size: 3))
+                    (geom_text (aes x: x
+                                    y: y)
+                               label: (sprintf "(%s, %s)"
+                                               (signif x digits: 2)
+                                               (signif y digits: 2))))
+                   (xlab "x"))
+                  (ylab "y"))))
              (R (dev.off))))))
      
      (define (tour start graph points)
