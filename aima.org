@@ -2126,7 +2126,7 @@
              (R (assign "y" ,y))
              (R (assign "xend" ,xend))
              (R (assign "yend" ,yend))
-             (R (png "tour.png" height: 768 width: 1024))
+             (R (png "tour.png" height: 768 width: 1024 type: "cairo"))
              (R (plot
                  (%+%
                   (%+%
@@ -2146,7 +2146,8 @@
                                                           (^ (- yend y) 2)))
                                                  digits: 2)))
                       (geom_point (aes x: x y: y)
-                                  size: 3))
+                                  ;; size: 3
+                                  ))
                      (geom_text (aes x: x
                                      y: y)
                                 label: (sprintf "(%s, %s)"
