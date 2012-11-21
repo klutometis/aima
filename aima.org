@@ -2134,28 +2134,27 @@
                     (%+%
                      (%+%
                       (%+%
-                       (%+%
-                        (%+% (ggplot)
-                             (geom_segment (aes x: x
-                                                y: y
-                                                xend: xend
-                                                yend: yend
-                                                color: ,strategy)))
-                        (geom_text (aes x: (+ x (/ (- xend x) 2))
-                                        y: (+ y (/ (- yend y) 2)))
-                                   label: (signif (sqrt (+ (^ (- xend x) 2)
-                                                           (^ (- yend y) 2)))
-                                                  digits: 2)))
-                       (geom_point (aes x: x y: y)
-                                   size: 3))
-                      (geom_text (aes x: x
-                                      y: y)
-                                 label: (sprintf "(%s, %s)"
-                                                 (signif x digits: 2)
-                                                 (signif y digits: 2))))
-                     (xlab "x"))
-                    (ylab "y"))
-                   (labs color: "Search")))))
+                       (%+% (ggplot)
+                            (geom_segment (aes x: x
+                                               y: y
+                                               xend: xend
+                                               yend: yend
+                                               color: ,strategy)))
+                       (geom_text (aes x: (+ x (/ (- xend x) 2))
+                                       y: (+ y (/ (- yend y) 2)))
+                                  label: (signif (sqrt (+ (^ (- xend x) 2)
+                                                          (^ (- yend y) 2)))
+                                                 digits: 2)))
+                      (geom_point (aes x: x y: y)
+                                  size: 3))
+                     (geom_text (aes x: x
+                                     y: y)
+                                label: (sprintf "(%s, %s)"
+                                                (signif x digits: 2)
+                                                (signif y digits: 2))))
+                    (xlab "x"))
+                   (ylab "y"))
+                  (labs color: "Search"))))
              (R (dev.off))))))
      
      (define (tour start graph points)
