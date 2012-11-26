@@ -1945,6 +1945,8 @@
    #+END_SRC
 ** DONE d
    CLOSED: [2012-11-26 Mon 15:06]
+   [[file:img/3-30.png][Here's an example of a solved TSP]].
+
    Let's start with Kruskal on a completely connected graph. We can do
    disjoint sets with hash-tables, I think; the elements of the
    hash-table can either point to the hash-table itself (which we'll
@@ -1973,11 +1975,6 @@
           random-bsd
           R
           srfi-69)
-     
-     (define (make-random-points n)
-       (do ((points '() (cons (make-point (random-real) (random-real)) points))
-            (n n (- n 1)))
-           ((zero? n) points)))
      
      (define (connect! graph from to)
        (hash-table-update!/default graph
@@ -2131,7 +2128,7 @@
              (R (assign "y" ,y))
              (R (assign "xend" ,xend))
              (R (assign "yend" ,yend))
-             (R (png "tour.png" height: 768 width: 1024 type: "cairo"))
+             (R (png "img/3-30.png" height: 768 width: 1024 type: "cairo"))
              (R (plot
                  (%+%
                   (%+%
@@ -2263,7 +2260,7 @@
   only $14\%$ of problem instances."
 
   Initial state is complete and random.
-* TODO 4.3  
+* TODO 4.3
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
