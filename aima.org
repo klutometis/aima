@@ -1897,13 +1897,16 @@
       (debug states)
       (animate-states/avi k (visualize-states k states) "3.22.avi"))
   #+END_SRC
-* TODO 3.30
-** TODO a
+* DONE 3.30
+  CLOSED: [2012-11-26 Mon 15:06]
+** DONE a
+   CLOSED: [2012-11-26 Mon 15:06]
    Whereas the TSP states that all points should be connected
    (minimizing total distance) and traversable only once, MSTs connect
    all points (minimizing total distance; relaxing the single-visit
    constraint.
-** TODO b
+** DONE b
+   CLOSED: [2012-11-26 Mon 15:06]
    MST dominates[fn:17] straight-line distance by the triangle
    inequality: straight-line distance must be the shortest distance
    between points $A$ and $C$, but an MST might have zero or more
@@ -1912,7 +1915,8 @@
    Best case, $B_0 \dots B_N$ follow a straight line; and cannot do
    any better (if constrained by three-dimension space, or
    disregarding quantum effects).
-** TODO c
+** DONE c
+   CLOSED: [2012-11-26 Mon 15:06]
    #+BEGIN_SRC scheme
      (use aima-search
           debug
@@ -1939,7 +1943,8 @@
              #(point 0.72382773905288 0.00514485046497615))
            (map record->vector (make-random-points 10)))
    #+END_SRC
-** TODO d
+** DONE d
+   CLOSED: [2012-11-26 Mon 15:06]
    Let's start with Kruskal on a completely connected graph. We can do
    disjoint sets with hash-tables, I think; the elements of the
    hash-table can either point to the hash-table itself (which we'll
@@ -1960,7 +1965,7 @@
 
    We can use a heap to pop things off.
 
-   #+BEGIN_SRC scheme :tangle tour.scm :shebang #!/usr/bin/env chicken-scheme
+   #+BEGIN_SRC scheme :tangle 3.30.scm :shebang #!/usr/bin/env chicken-scheme
      (use aima-search
           debug
           define-record-and-printer
