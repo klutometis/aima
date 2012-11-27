@@ -1945,7 +1945,10 @@
    #+END_SRC
 ** DONE d
    CLOSED: [2012-11-26 Mon 15:06]
-   [[file:img/3-30.png][Here's an example of a solved TSP]].
+   #+CAPTION: An example of a solved TSP
+   #+ATTR_HTML: alt="Solved TSP"
+   #+ATTR_LATEX: placement=[H]
+   [[./img/3-30.png]]
 
    Let's start with Kruskal on a completely connected graph. We can do
    disjoint sets with hash-tables, I think; the elements of the
