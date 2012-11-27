@@ -1970,7 +1970,8 @@
 
    We can use a heap to pop things off.
 
-   #+BEGIN_SRC scheme :tangle 3.30.scm :shebang #!/usr/bin/env chicken-scheme
+   #+BEGIN_SRC scheme :tangle tsp.scm
+     
      (use aima-search
           debug
           define-record-and-printer
@@ -2109,7 +2110,7 @@
      (define (tour-length tour)
        (apply + (hash-table-map tour point-distance)))
      
-     (define (graph-tour tour strategy)
+     (define (graph-tour tour strategy output)
        (let ((data
               (hash-table-map
                tour
@@ -2131,7 +2132,7 @@
              (R (assign "y" ,y))
              (R (assign "xend" ,xend))
              (R (assign "yend" ,yend))
-             (R (png "img/3-30.png" height: 768 width: 1024 type: "cairo"))
+             (R (png ,output height: 768 width: 1024 type: "cairo"))
              (R (plot
                  (%+%
                   (%+%
@@ -2161,7 +2162,9 @@
                     (xlab "x"))
                    (ylab "y"))
                   (labs color: "Search"))))
-             (R (dev.off))))))
+             (R (dev.off))))))   
+   #+END_SRC
+
      
      (define (tour start graph points)
        (cons start
