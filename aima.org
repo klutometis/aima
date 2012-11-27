@@ -2368,6 +2368,8 @@
            (let ((points (make-random-points 10)))
              (let ((hill-climbing-tour (hill-climbing points))
                    (A*-tour (A*-tour (car points) (complete-graph points) points)))
+               (debug hill-climbing-tour
+                      A*-tour)
                (iter (- n 1)
                      (cons (tour-length (make-tour hill-climbing-tour))
                            hill-climbing-tours)
