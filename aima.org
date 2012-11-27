@@ -2268,6 +2268,80 @@
 
   Initial state is complete and random.
 * TODO 4.3
+  Thanks, John Montgomery, for the suggestion to [[http://www.psychicorigami.com/2007/04/17/tackling-the-travelling-salesman-problem-part-one/][reverse]] pairs of
+  cities or the cities intervening pairs.
+
+  [[http://osdir.com/ml/plt-scheme/2009-08/msg00134.html][Shuffling a list]]; [[http://mumble.net/~campbell/scheme/shuffle.scm][Riastradh's]]; [[http://codeimmersion.i3ci.hampshire.edu/2009/09/20/a-simple-scheme-shuffle/][O(n log n)]], I believe.
+
+  #+BEGIN_SRC scheme :tangle 4.3.scm :shebang #!/usr/bin/env chicken-scheme
+    (include "tsp.scm")
+    
+    (use aima-search
+         data-structures
+         debug
+         heap
+         vector-lib)
+    
+    (define (shuffle! v)
+      (do ((n (vector-length v) (- n 1)))
+          ((zero? n) v)
+        (let* ((r (random n)) (t (vector-ref v r)))
+          (vector-set! v r (vector-ref v (- n 1)))
+                (vector-set! v (- n 1) t))))
+    
+    (define (shuffle v)
+      (let ((v (vector-copy v)))
+        (shuffle! v)
+        v))
+    
+    (define (tour-distance tour)
+      (do ((i 0 (+ i 1))
+           (j 1 (modulo (+ j 1) (vector-length tour)))
+           (distance 0 (+ distance (point-distance (vector-ref tour i)
+                                                   (vector-ref tour j)))))
+          ((= i (vector-length tour)) distance)))
+    
+    (define (successors tour)
+      (do ((i 0 (+ i 1))
+           (successors
+            '()
+            (append
+             (do ((j i (+ j 1))
+                  (successors '() (cons (let ((tour (vector-copy tour)))
+                                          (vector-swap! tour i j)
+                                          tour)
+                                        successors)))
+                 ((= j (vector-length tour)) successors))
+             successors)
+            ))
+          ((= i (- (vector-length tour) 1)) successors)))
+    
+    (define (min-successor successors)
+      (let ((tours (make-min-heap)))
+        (for-each (lambda (successor)
+                    (heap-insert! tours (tour-distance successor) successor))
+          successors)
+        (heap-extract-extremum! tours)))
+    
+    (define (hill-climbing tour successor)
+      (let iter ((tour tour))
+        (let ((next-tour (min-successor (successors tour))))
+          (if (>= (tour-distance next-tour)
+                  (tour-distance tour))
+              tour
+              (iter next-tour)))))
+    
+    (let* ((points (list->vector (make-random-points 10)))
+           (tour (shuffle points)))
+      ;; (debug (tour-distance tour)
+      ;;        (tour-distance (min-successor (successors tour))))
+      (let ((tour (hill-climbing tour min-successor)))
+        (graph-tour (make-tour (cons (vector-ref tour (- (vector-length tour) 1))
+                                     (vector->list tour)))
+                    "Hill-climbing"
+                    "img/4-3.png")))
+    
+  #+END_SRC
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
