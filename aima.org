@@ -2162,13 +2162,9 @@
                     (xlab "x"))
                    (ylab "y"))
                   (labs color: "Search"))))
-             (R (dev.off))))))   
-   #+END_SRC
-
-   #+BEGIN_SRC scheme :tangle 3.30.scm :shebang #!/usr/bin/env chicken-scheme
-     (include "tsp.scm")
+             (R (dev.off))))))
      
-     (define (tour start graph points)
+     (define (A*-tour start graph points)
        (cons start
              (reverse
               (map node-state
@@ -2199,16 +2195,23 @@
                                   (* (tree-cost unvisited-tree) 2)
                                   nearest-start))))))))))
      
+     
+   #+END_SRC
+
+   #+BEGIN_SRC scheme :tangle 3.30.scm :shebang #!/usr/bin/env chicken-scheme
+     (include "tsp.scm")
+     
      (let* ((graph (complete-graph (make-random-points 10)))
             (points (hash-table-keys graph))
             (start (car points)))
-       (let* ((tour (tour start graph points))
+       (let* ((tour (A*-tour start graph points))
               (tour (make-tour tour)))
          ;; (graph-tour tour)
          ;; (debug start tour (hash-table->alist (make-tour tour)))
          ;; (with-output-to-file "tour.csv"
          ;;   (lambda () (graph-tour (make-tour tour))))
          (graph-tour tour "A*" "img/3-30.png")))
+     
    #+END_SRC
 
    We have the MST; how to use it as a heuristic? [[http://www.csie.ntu.edu.tw/~ai2007s/hw/hw02_s.pdf%0A][This cat]] works an
@@ -2280,6 +2283,8 @@
          data-structures
          debug
          heap
+         srfi-1
+         statistics
          vector-lib)
     
     (define (shuffle! v)
@@ -2323,23 +2328,51 @@
           successors)
         (heap-extract-extremum! tours)))
     
-    (define (hill-climbing tour successor)
-      (let iter ((tour tour))
+    (define (hill-climbing points)
+      (let iter ((tour (shuffle (list->vector points))))
         (let ((next-tour (min-successor (successors tour))))
           (if (>= (tour-distance next-tour)
                   (tour-distance tour))
-              tour
+              (cons (vector-ref tour (- (vector-length tour) 1))
+                    (vector->list tour))
               (iter next-tour)))))
     
-    (let* ((points (list->vector (make-random-points 10)))
-           (tour (shuffle points)))
-      ;; (debug (tour-distance tour)
-      ;;        (tour-distance (min-successor (successors tour))))
-      (let ((tour (hill-climbing tour min-successor)))
-        (graph-tour (make-tour (cons (vector-ref tour (- (vector-length tour) 1))
-                                     (vector->list tour)))
-                    "Hill-climbing"
-                    "img/4-3.png")))
+    ;; (let ((points (make-random-points 10)))
+    ;;   (let ((hill-climbing-tour (hill-climbing points))
+    ;;         (A*-tour (A*-tour (car points) (complete-graph points) points)))
+    ;;     (debug (tour-length (make-tour hill-climbing-tour))
+    ;;            (tour-length (make-tour A*-tour)))
+    ;;     ;; (graph-tour (make-tour (cons (vector-ref tour (- (vector-length tour) 1))
+    ;;     ;;                              (vector->list tour)))
+    ;;     ;;             "Hill-climbing"
+    ;;     ;;             "img/4-3.png")
+    ;;     ))
+    
+    ;; (map (lambda (i)
+    ;;        (let ((points (make-random-points 10)))
+    ;;          (debug i)
+    ;;          (let ((hill-climbing-tour (hill-climbing points))
+    ;;                (A*-tour (A*-tour (car points) (complete-graph points) points)))
+    ;;            (cons (tour-length (make-tour hill-climbing-tour))
+    ;;                  (tour-length (make-tour A*-tour))))))
+    ;;      (iota 100))
+    
+    (debug
+     (let iter ((n 100)
+                (hill-climbing-tours '())
+                (A*-tours '()))
+       (debug n)
+       (if (zero? n)
+           (cons (mean hill-climbing-tours)
+                 (mean A*-tours))
+           (let ((points (make-random-points 10)))
+             (let ((hill-climbing-tour (hill-climbing points))
+                   (A*-tour (A*-tour (car points) (complete-graph points) points)))
+               (iter (- n 1)
+                     (cons (tour-length (make-tour hill-climbing-tour))
+                           hill-climbing-tours)
+                     (cons (tour-length (make-tour A*-tour))
+                           A*-tours)))))))
     
   #+END_SRC
 * Meetups
