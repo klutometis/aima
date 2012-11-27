@@ -2165,6 +2165,8 @@
              (R (dev.off))))))   
    #+END_SRC
 
+   #+BEGIN_SRC scheme :tangle 3.30.scm :shebang #!/usr/bin/env chicken-scheme
+     (include "tsp.scm")
      
      (define (tour start graph points)
        (cons start
@@ -2206,8 +2208,7 @@
          ;; (debug start tour (hash-table->alist (make-tour tour)))
          ;; (with-output-to-file "tour.csv"
          ;;   (lambda () (graph-tour (make-tour tour))))
-         (graph-tour tour "A*")))
-     
+         (graph-tour tour "A*" "img/3-30.png")))
    #+END_SRC
 
    We have the MST; how to use it as a heuristic? [[http://www.csie.ntu.edu.tw/~ai2007s/hw/hw02_s.pdf%0A][This cat]] works an
