@@ -2464,7 +2464,7 @@
     ;;      (iota 100))
     
     (debug
-     (let iter ((n 100)
+     (let iter ((n 1)
                 (hill-climbing-tours '())
                 (A*-tours '()))
        (debug n)
@@ -2474,6 +2474,16 @@
            (let ((points (make-random-points 10)))
              (let ((hill-climbing-tour (hill-climbing points))
                    (A*-tour (A*-tour (car points) (complete-graph points) points)))
+               (debug hill-climbing-tour
+                      (tour-length (make-tour hill-climbing-tour))
+                      A*-tour
+                      (tour-length (make-tour A*-tour)))
+               (graph-tour (make-tour hill-climbing-tour)
+                           "Hill climbing"
+                           "hill-climbing.png")
+               (graph-tour (make-tour A*-tour)
+                           "A*"
+                           "a-star.png")
                (iter (- n 1)
                      (cons (tour-length (make-tour hill-climbing-tour))
                            hill-climbing-tours)
@@ -2620,6 +2630,12 @@
    At the [[http://www.meetup.com/LA-Hackathons/events/85658952/][LA Hackathon]] with Ryan; proposed a thing wherein people
    cherry-pick interesting problems, present them. Optionally
    collaborate.
+** Mon Nov 26 2012
+   - Come up with pathological cases: different costs from A $\to$ B
+     vs. B $\to$ A.
+   - Recombination of paths?
+   - A*, hill-climbing, and GA applied to TSP.
+   - [[http://webcache.googleusercontent.com/search?q%3Dcache:jhd41bMWVwYJ:ma.ttforbes.com/A*%252520and%252520the%252520Traveling%252520Salesman%252520Problem%2B&cd%3D6&hl%3Den&ct%3Dclnk&gl%3Dus&client%3Dopera][Matt Forbes]]
 * Notes
 ** 1
    - Two dimensions: thought vs. action, humanity vs. rationality.
