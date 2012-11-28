@@ -1971,10 +1971,10 @@
    We can use a heap to pop things off.
 
    #+BEGIN_SRC scheme :tangle tsp.scm
-     
      (use aima-search
           debug
           define-record-and-printer
+          files
           heap
           random-bsd
           R
@@ -2110,59 +2110,148 @@
      (define (tour-length tour)
        (apply + (hash-table-map tour point-distance)))
      
-     (define (graph-tour tour strategy output)
-       (let ((data
+     (define (tour->data tour)
+       (let* ((tour
+               (hash-table-map
+                tour
+                (lambda (from to)
+                  (vector (point-x from)
+                          (point-y from)
+                          (point-x to)
+                          (point-y to)))))
+              (tour (R (data.frame (t (matrix ,(list->vector tour) nrow: 4))))))
+         (R (colnames<- ,tour (c "x" "y" "xend" "yend")))))
+     
+     (define (tour->vectors tour)
+       (let ((tour
               (hash-table-map
                tour
                (lambda (from to)
-                 (vector (point-x from)
-                         (point-y from)
-                         (point-x to)
-                         (point-y to)))))
-             (tour-length (tour-length tour)))
-         (R (library "ggplot2"))
-         (let* ((data (R (data.frame (t (matrix ,(list->vector data)
-                                                nrow: 4)))))
-                (data (R (colnames<- ,data (c "x" "y" "xend" "yend")))))
-           (let ((x (R* ($ ,data x)))
-                 (y (R* ($ ,data y)))
-                 (xend (R* ($ ,data xend)))
-                 (yend (R* ($ ,data yend))))
-             (R (assign "x" ,x))
-             (R (assign "y" ,y))
-             (R (assign "xend" ,xend))
-             (R (assign "yend" ,yend))
-             (R (png ,output height: 768 width: 1024 type: "cairo"))
-             (R (plot
-                 (%+%
-                  (%+%
-                   (%+%
-                    (%+%
+                 (list (point-x from)
+                       (point-y from)
+                       (point-x to)
+                       (point-y to))))))
+         (values (list->vector (map car tour))
+                 (list->vector (map cadr tour))
+                 (list->vector (map caddr tour))
+                 (list->vector (map cadddr tour)))))
+     
+     (define (tree->vectors tree)
+       (let ((tree
+              (hash-table-fold
+               tree
+               (lambda (from tos segments)
+                 (append
+                  (map (lambda (to)
+                         (list (point-x from)
+                               (point-y from)
+                               (point-x to)
+                               (point-y to)))
+                       tos)
+                  segments))
+               '())))
+         (values (list->vector (map car tree))
+                 (list->vector (map cadr tree))
+                 (list->vector (map caddr tree))
+                 (list->vector (map cadddr tree)))))
+     
+     ;;; Let's define a ggplot abstraction, and even consider adding it to
+     ;;; R. It might actually be useful here to be able to start and stop R
+     ;;; sessions so that we're starting fresh. This whole thing depends on
+     ;;; mutation, after all, since I can't just pass objects to ggplot:
+     ;;; there's language tricks afoot.
+     (define graph-tour
+       (case-lambda
+        ((tour strategy output)
+         (graph-tour tour strategy output #f))
+        ((tour strategy output tree)
+         (let ((data (tour->data tour))
+               (tour-length (tour-length tour)))
+           (R (library "ggplot2"))
+           (call-with-values (lambda () (tour->vectors tour))
+             (lambda (x y xend yend)
+               (R (assign "x" ,x))
+               (R (assign "y" ,y))
+               (R (assign "xend" ,xend))
+               (R (assign "yend" ,yend))
+               (R (png ,output height: 768 width: 1024 type: "cairo"))
+               (if tree
+                   (call-with-values (lambda () (tree->vectors tree))
+                     (lambda (x y xend yend)
+                       (R (assign "x_tree" ,x))
+                       (R (assign "y_tree" ,y))
+                       (R (assign "xend_tree" ,xend))
+                       (R (assign "yend_tree" ,yend))
+                       (debug x y xend yend)
+                       (R
+                        (plot
+                         (%+%
+                          (%+%
+                           (%+%
+                            (%+%
+                             (%+%
+                              (%+%
+                               (%+%
+                                (%+% (ggplot)
+                                     (geom_segment (aes x: x_tree
+                                                        y: y_tree
+                                                        xend: xend_tree
+                                                        yend: yend_tree
+                                                        color: "MST")))
+                                (geom_segment (aes x: x
+                                                   y: y
+                                                   xend: xend
+                                                   yend: yend
+                                                   color: ,strategy)))
+                               (geom_text (aes x: (+ x (/ (- xend x) 2))
+                                               y: (+ y (/ (- yend y) 2)))
+                                          label: (signif (sqrt (+ (^ (- xend x) 2)
+                                                                  (^ (- yend y) 2)))
+                                                         digits: 2)))
+                              (geom_point (aes x: x y: y)
+                                          ;; size: 3
+                                          ))
+                             (geom_text (aes x: x
+                                             y: y)
+                                        label: (sprintf "(%s, %s)"
+                                                        (signif x digits: 2)
+                                                        (signif y digits: 2))))
+                            (xlab "x"))
+                           (ylab "y"))
+                          (labs color: "Search"))))))
+                   (R
+                    (plot
                      (%+%
                       (%+%
-                       (%+% (ggplot)
-                            (geom_segment (aes x: x
-                                               y: y
-                                               xend: xend
-                                               yend: yend
-                                               color: ,strategy)))
-                       (geom_text (aes x: (+ x (/ (- xend x) 2))
-                                       y: (+ y (/ (- yend y) 2)))
-                                  label: (signif (sqrt (+ (^ (- xend x) 2)
-                                                          (^ (- yend y) 2)))
-                                                 digits: 2)))
-                      (geom_point (aes x: x y: y)
-                                  ;; size: 3
-                                  ))
-                     (geom_text (aes x: x
-                                     y: y)
-                                label: (sprintf "(%s, %s)"
-                                                (signif x digits: 2)
-                                                (signif y digits: 2))))
-                    (xlab "x"))
-                   (ylab "y"))
-                  (labs color: "Search"))))
-             (R (dev.off))))))
+                       (%+%
+                        (%+%
+                         (%+%
+                          (%+%
+                           (%+% (ggplot)
+                                (geom_segment (aes x: x
+                                                   y: y
+                                                   xend: xend
+                                                   yend: yend
+                                                   color: ,strategy)))
+                           (geom_text (aes x: (+ x (/ (- xend x) 2))
+                                           y: (+ y (/ (- yend y) 2)))
+                                      label: (signif (sqrt (+ (^ (- xend x) 2)
+                                                              (^ (- yend y) 2)))
+                                                     digits: 2)))
+                          (geom_point (aes x: x y: y)
+                                      ;; size: 3
+                                      ))
+                         (geom_text (aes x: x
+                                         y: y)
+                                    label: (sprintf "(%s, %s)"
+                                                    (signif x digits: 2)
+                                                    (signif y digits: 2))))
+                        (xlab "x"))
+                       (ylab "y"))
+                      (labs color: "Search"))))) 
+               (R (dev.off))))))))
+     
+     (define graph? (make-parameter #t))
      
      (define (A*-tour start graph points)
        (cons start
@@ -2178,6 +2267,22 @@
                          (let* ((visited-points (map node-state (predecessor-path node)))
                                 (unvisited-points (lset-difference eq? points visited-points))
                                 (unvisited-tree (minimum-spanning-tree (complete-graph unvisited-points))))
+                           (debug (hash-table->alist unvisited-tree)
+                                  (make-tour visited-points)
+                                  (length (hash-table-keys unvisited-tree))
+                                  (length visited-points))
+                           (when (> (length visited-points) 1)
+                             (graph-tour (make-tour visited-points)
+                                         "A*"
+                                         (create-temporary-file)
+                                         unvisited-tree))
+                           (when (and (graph?)
+                                      (= (length (hash-table-keys unvisited-tree)) 5))
+                             (graph-tour (make-tour visited-points)
+                                         "A*"
+                                         "a-star-with-mst.png"
+                                         unvisited-tree)
+                             (graph? #f))
                            (let ((point (node-state node)))
                              (let ((nearest-neighbor
                                     (if (null? unvisited-points)
@@ -2210,7 +2315,8 @@
          ;; (debug start tour (hash-table->alist (make-tour tour)))
          ;; (with-output-to-file "tour.csv"
          ;;   (lambda () (graph-tour (make-tour tour))))
-         (graph-tour tour "A*" "img/3-30.png")))
+         ;; (graph-tour tour "A*" "img/3-30.png")
+         2))
      
    #+END_SRC
 
