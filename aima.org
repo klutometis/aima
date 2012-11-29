@@ -1977,9 +1977,11 @@
           files
           format
           heap
-          random-bsd
           R
-          srfi-69)
+          random-bsd
+          shell
+          srfi-69
+          vector-lib)
      
      (define (connect! graph from to)
        (hash-table-update!/default graph
@@ -2172,86 +2174,154 @@
              (R (segments ,x ,y ,xend ,yend))
              (R (dev.off))))))
      
-     (define (graph-tour-with-tree strategy output tour tree points)
-       (let-values (((x y xend yend) (tour->vectors tour))
+     (define (points->vectors points)
+       (let ((tour (map (lambda (from to)
+                          (list (point-x from)
+                                (point-y from)
+                                (point-x to)
+                                (point-y to)))
+                        (drop-right points 1)
+                        (cdr points))))
+         (values (list->vector (map car tour))
+                 (list->vector (map cadr tour))
+                 (list->vector (map caddr tour))
+                 (list->vector (map cadddr tour)))))
+     
+     (define with-R-output-to-png
+       (case-lambda
+        ((output thunk) (with-R-output-to-png output thunk 1024 768))
+        ((output thunk width height)
+         (R (png ,output
+                 width: ,width
+                 height: ,height
+                 type: "cairo"))
+         (thunk)
+         (R (dev.off)))))
+     
+     (define (plot-points x y main)
+       (R (plot ,x
+                ,y
+                xlab: "x"
+                ylab: "y"
+                main: ,main))
+       (R (text ,x
+                ,y
+                ,(vector-map (lambda (i x y)
+                               (format "(~,2f ~,2f)" x y))
+                             x
+                             y)
+                pos: 1)))
+     
+     (define plot-segments
+       (case-lambda
+        ((x y xend yend)
+         (plot-segments x y xend yend 1))
+        ((x y xend yend col)
+         (R (segments ,x ,y ,xend ,yend col: ,col)))))
+     
+     (define (highlight-segments x y xend yend)
+       (plot-segments x y xend yend 2))
+     
+     (define (plot-tree x y xend yend)
+       (plot-segments x y xend yend 3))
+     
+     (define (make-main main tour)
+       (format "~a (length: ~,2f)" main (tour-length (make-tour tour))))
+     
+     (define (graph-tour-with-tree output main x-points y-points visited-points tree)
+       (let-values (((x y xend yend) (points->vectors visited-points))
                     ((x-tree y-tree xend-tree yend-tree) (tree->vectors tree)))
-         (R (png ,output height: 768 width: 1024 type: "cairo"))
-         (R (plot ,(list->vector (map point-x points))
-                  ,(list->vector (map point-y points))))
-         (when (positive? (vector-length x))
-           (R (segments ,x ,y ,xend ,yend col: 1))
-           ;; Last segment isn't necessarily the last on the path, since
-           ;; we're using hash-tables.
-           ;; (R (segments ,(vector-ref x (- (vector-length x) 1))
-           ;;              ,(vector-ref y (- (vector-length y) 1))
-           ;;              ,(vector-ref xend (- (vector-length xend) 1))
-           ;;              ,(vector-ref yend (- (vector-length yend) 1))
-           ;;              col: 2))
-           )
-         (when (positive? (vector-length x-tree))
-           (R (segments ,x-tree ,y-tree ,xend-tree ,yend-tree col: 2)))
-         (R (dev.off))))
+         (with-R-output-to-png
+          output
+          (lambda ()
+            (plot-points x-points y-points (make-main main visited-points))
+            (when (positive? (vector-length x))
+              (plot-segments x y xend yend)
+              (highlight-segments (vector-ref x 0)
+                                  (vector-ref y 0)
+                                  (vector-ref xend 0)
+                                  (vector-ref yend 0)))
+            (when (positive? (vector-length x-tree))
+              (plot-tree x-tree y-tree xend-tree yend-tree))))))
+     
+     (define (x-points points)
+       (list->vector (map point-x points)))
+     
+     (define (y-points points)
+       (list->vector (map point-y points)))
+     
+     (define (graph-tour output main points tour)
+       (with-R-output-to-png
+        output
+        (lambda ()
+          (plot-points (x-points points)
+                       (y-points points)
+                       (make-main main tour))
+          (call-with-values (lambda () (points->vectors tour))
+            (lambda (x y xend yend)
+              (plot-segments x y xend yend))))))
      
      (define graph? (make-parameter #t))
      
-     (define (A*-tour start graph points)
-       (let ((dir (create-temporary-directory))
-             (n 0))
-         (cons start
-               (reverse
-                (map node-state
-                     (A* start
-                         (lambda (node)
-                           (let ((point (node-state node)))
-                             (hash-table-ref/default graph point '())))
-                         point-distance
-                         (lambda (node) (= (length (predecessor-path node)) (length points)))
-                         (lambda (node)
-                           (let* ((visited-points (map node-state (predecessor-path node)))
-                                  (unvisited-points (lset-difference eq? points visited-points))
-                                  (unvisited-tree (minimum-spanning-tree (complete-graph unvisited-points))))
-                             ;; (debug (hash-table->alist unvisited-tree)
-                             ;;        (make-tour visited-points)
-                             ;;        (length (hash-table-keys unvisited-tree))
-                             ;;        (length visited-points))
-                             ;; (when (> (length visited-points) 1)
-                             ;;   (graph-tour (make-tour visited-points)
-                             ;;               "A*"
-                             ;;               (begin (set! n (+ n 1))
-                             ;;                      (make-pathname dir (number->string n) ".png"))
-                             ;;               unvisited-tree
-                             ;;               (make-tour visited-points)))
-                             ;; (when (and (graph?)
-                             ;;            (= (length (hash-table-keys unvisited-tree)) 5))
-                             ;;   (graph-tour (make-tour visited-points)
-                             ;;               "A*"
-                             ;;               "a-star-with-mst.png"
-                             ;;               unvisited-tree)
-                             ;;   (graph? #f))
-                             (debug n)
-                             (graph-tour-with-tree
-                              "A*"
-                              (begin (set! n (+ n 1))
-                                     (make-pathname dir (format "~4,48d" n) ".png"))
-                              (make-tour visited-points)
-                              unvisited-tree
-                              points)
+     (define A*-tour
+       (case-lambda
+        ((start graph points)
+         (A*-tour start graph points #f))
+        ((start graph points animation)
+         (define (goal? node)
+           (= (length (predecessor-path node))
+              (length points)))
+         (let ((dir (create-temporary-directory))
+               (n 0)
+               (x-points (x-points points))
+               (y-points (y-points points))
+               (main "TSP with A* and MST"))
+           (cons start
+                 (reverse
+                  (map node-state
+                       (A* start
+                           (lambda (node)
                              (let ((point (node-state node)))
-                               (let ((nearest-neighbor
-                                      (if (null? unvisited-points)
-                                          0
-                                          (point-distance
-                                           point
-                                           (nearest-neighbor point unvisited-points))))
-                                     (nearest-start
-                                      (if (null? unvisited-points)
-                                          0
-                                          (point-distance
-                                           start
-                                           (nearest-neighbor start unvisited-points)))))
-                                 (+ nearest-neighbor
-                                    (* (tree-cost unvisited-tree) 2)
-                                    nearest-start)))))))))))
+                               (hash-table-ref/default graph point '())))
+                           point-distance
+                           goal?
+                           (lambda (node)
+                             (let* ((visited-points (map node-state (predecessor-path node)))
+                                    (unvisited-points (lset-difference eq? points visited-points))
+                                    (unvisited-tree (minimum-spanning-tree
+                                                     (complete-graph unvisited-points))))
+                               (when animation
+                                 (debug n)
+                                 (graph-tour-with-tree
+                                  (begin (set! n (+ n 1))
+                                         (make-pathname dir (format "~4,48d" n) ".png"))
+                                  main
+                                  x-points
+                                  y-points
+                                  visited-points
+                                  unvisited-tree)
+                                 (when (goal? node)
+                                   (let ((fps 25))
+                                     ;; Make the animation pause at the
+                                     ;; finished frame for a couple seconds.
+                                     (let ((tour
+                                            (cons start
+                                                  (map node-state
+                                                       (predecessor-path node)))))
+                                       (do ((i (* fps 2) (- i 1)))
+                                           ((zero? i))
+                                         (debug (+ n i))
+                                         (graph-tour
+                                          (make-pathname dir (format "~4,48d" (+ n i)) ".png")
+                                          main
+                                          points
+                                          tour)))
+                                     (run (cd ,dir &&
+                                              mencoder mf://*.png
+                                              -mf ,(format "type=png:fps=~a" fps)
+                                              -ovc lavc
+                                              -o ,(make-pathname (current-directory) animation))))))
+                               (* (tree-cost unvisited-tree) 2))))))))))) 
      
      
    #+END_SRC
@@ -2261,16 +2331,11 @@
      
      (include "tsp.scm")
      
-     (let* ((graph (complete-graph (make-random-points 20)))
+     (let* ((graph (complete-graph (make-random-points 30)))
             (points (hash-table-keys graph))
             (start (car points)))
-       (let* ((tour (A*-tour start graph points))
-              (tour (make-tour tour)))
-         ;; (graph-tour tour)
-         ;; (debug start tour (hash-table->alist (make-tour tour)))
-         ;; (with-output-to-file "tour.csv"
-         ;;   (lambda () (graph-tour (make-tour tour))))
-         (graph-tour "A*" "harro.png" tour)))     
+       (let* ((tour (A*-tour start graph points "a-star.avi")))
+         (graph-tour "a-star.png" "TSP with A* and MST" points tour)))
      
    #+END_SRC
 
