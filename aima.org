@@ -2226,7 +2226,10 @@
        (plot-segments x y xend yend 3))
      
      (define (make-main main tour)
-       (format "~a (length: ~,2f)" main (tour-length (make-tour tour))))
+       (format "~a (length: ~,2f)" main
+               (if (> (length tour) 1)
+                (tour-length (make-tour tour))
+                0)))
      
      (define (graph-tour-with-tree output main x-points y-points visited-points tree)
        (let-values (((x y xend yend) (points->vectors visited-points))
