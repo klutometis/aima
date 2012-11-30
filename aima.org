@@ -2336,7 +2336,7 @@
      
      (include "tsp.scm")
      
-     (let* ((graph (complete-graph (make-random-points 30)))
+     (let* ((graph (complete-graph (make-random-points 20)))
             (points (hash-table-keys graph))
             (start (car points)))
        (let* ((tour (A*-tour start graph points "a-star.avi")))
