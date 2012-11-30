@@ -2237,7 +2237,9 @@
          (with-R-output-to-png
           output
           (lambda ()
-            (plot-points x-points y-points (make-main main visited-points))
+            (plot-points x-points y-points
+                         (make-main main
+                                    (cdr visited-points)))
             (when (positive? (vector-length x))
               (plot-segments x y xend yend)
               (highlight-segments (vector-ref x 0)
