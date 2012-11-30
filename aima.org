@@ -2163,16 +2163,16 @@
      ;;; sessions so that we're starting fresh. This whole thing depends on
      ;;; mutation, after all, since I can't just pass objects to ggplot:
      ;;; there's language tricks afoot.
-     (define (graph-tour strategy output tour)
-       (let ((data (tour->data tour))
-             (tour-length (tour-length tour)))
-         (R (library "ggplot2"))
-         (call-with-values (lambda () (tour->vectors tour))
-           (lambda (x y xend yend)
-             (R (png ,output height: 768 width: 1024 type: "cairo"))
-             (R (plot ,x ,y))
-             (R (segments ,x ,y ,xend ,yend))
-             (R (dev.off))))))
+     ;; (define (graph-tour strategy output tour)
+     ;;   (let ((data (tour->data tour))
+     ;;         (tour-length (tour-length tour)))
+     ;;     (R (library "ggplot2"))
+     ;;     (call-with-values (lambda () (tour->vectors tour))
+     ;;       (lambda (x y xend yend)
+     ;;         (R (png ,output height: 900 width: 1600 type: "cairo"))
+     ;;         (R (plot ,x ,y))
+     ;;         (R (segments ,x ,y ,xend ,yend))
+     ;;         (R (dev.off))))))
      
      (define (points->vectors points)
        (let ((tour (map (lambda (from to)
