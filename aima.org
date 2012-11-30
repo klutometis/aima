@@ -1950,6 +1950,8 @@
    #+ATTR_LATEX: placement=[H]
    [[./img/3-30.png]]
 
+   [[http://youtu.be/MQM_AZ4Is2s][Here's a link to the video]].
+
    Let's start with Kruskal on a completely connected graph. We can do
    disjoint sets with hash-tables, I think; the elements of the
    hash-table can either point to the hash-table itself (which we'll
@@ -2048,41 +2050,12 @@
                    (set-union! set from to)))))
            tree)))
      
-     (define (write-tree-as-dot tree)
-       ;; (pp (hash-table->alist tree) (current-error-port))
-       (display "digraph G {graph[splines=true];")
-       (for-each (lambda (node) (format #t "\"~a\";" node))
-         (hash-table-keys tree))
-       (hash-table-walk tree
-                        (lambda (from tos)
-                          (for-each (lambda (to)
-                                      (format #t "\"~a\" -> \"~a\"[label=\"~a\"];"
-                                              from to (point-distance from to)))
-                            tos)))
-       (display "}"))
-     
-     ;; (with-output-to-file "tree.dot"
-     ;;   (lambda ()
-     ;;     (write-tree-as-dot
-     ;;      (minimum-spanning-tree
-     ;;       (complete-graph
-     ;;        (make-random-points 10))))))
-     
      (define (tree-cost tree)
        (apply + (hash-table-map tree
                                 (lambda (from tos)
                                   (apply +
                                          (map (lambda (to) (point-distance from to))
                                               tos))))))
-     
-     (define (make-tree points)
-       (let ((tour (make-hash-table)))
-         (do ((from (drop-right points 1) (cdr from))
-              (to (cdr points) (cdr to)))
-             ((null? from) tour)
-           (hash-table-set! tour (car from) (list (car to))))
-         ;; (debug (hash-table->alist tour))
-         tour))
      
      (define (make-tour points)
        (let ((tour (make-hash-table)))
@@ -2093,51 +2066,8 @@
          ;; (debug (hash-table->alist tour))
          tour))
      
-     (define (nearest-neighbor from points)
-       (let ((neighbors (make-min-heap)))
-         (for-each (lambda (to) (heap-insert! neighbors (point-distance from to) to))
-           points)
-         (heap-extract-extremum! neighbors)))
-     
-     (define (graph-tour tour)
-       (display "x,y,xend,yend\n")
-       (hash-table-walk
-        tour
-        (lambda (from to)
-          (format #t "~a,~a,~a,~a~%"
-                  (point-x from)
-                  (point-y from)
-                  (point-x to)
-                  (point-y to)))))
-     
      (define (tour-length tour)
        (apply + (hash-table-map tour point-distance)))
-     
-     (define (tour->data tour)
-       (let* ((tour
-               (hash-table-map
-                tour
-                (lambda (from to)
-                  (vector (point-x from)
-                          (point-y from)
-                          (point-x to)
-                          (point-y to)))))
-              (tour (R (data.frame (t (matrix ,(list->vector tour) nrow: 4))))))
-         (R (colnames<- ,tour (c "x" "y" "xend" "yend")))))
-     
-     (define (tour->vectors tour)
-       (let ((tour
-              (hash-table-map
-               tour
-               (lambda (from to)
-                 (list (point-x from)
-                       (point-y from)
-                       (point-x to)
-                       (point-y to))))))
-         (values (list->vector (map car tour))
-                 (list->vector (map cadr tour))
-                 (list->vector (map caddr tour))
-                 (list->vector (map cadddr tour)))))
      
      (define (tree->vectors tree)
        (let ((tree
@@ -2158,22 +2088,6 @@
                  (list->vector (map caddr tree))
                  (list->vector (map cadddr tree)))))
      
-     ;;; Let's define a ggplot abstraction, and even consider adding it to
-     ;;; R. It might actually be useful here to be able to start and stop R
-     ;;; sessions so that we're starting fresh. This whole thing depends on
-     ;;; mutation, after all, since I can't just pass objects to ggplot:
-     ;;; there's language tricks afoot.
-     ;; (define (graph-tour strategy output tour)
-     ;;   (let ((data (tour->data tour))
-     ;;         (tour-length (tour-length tour)))
-     ;;     (R (library "ggplot2"))
-     ;;     (call-with-values (lambda () (tour->vectors tour))
-     ;;       (lambda (x y xend yend)
-     ;;         (R (png ,output height: 900 width: 1600 type: "cairo"))
-     ;;         (R (plot ,x ,y))
-     ;;         (R (segments ,x ,y ,xend ,yend))
-     ;;         (R (dev.off))))))
-     
      (define (points->vectors points)
        (let ((tour (map (lambda (from to)
                           (list (point-x from)
@@ -2189,7 +2103,7 @@
      
      (define with-R-output-to-png
        (case-lambda
-        ((output thunk) (with-R-output-to-png output thunk 1024 768))
+        ((output thunk) (with-R-output-to-png output thunk 1600 900))
         ((output thunk width height)
          (R (png ,output
                  width: ,width
@@ -2203,21 +2117,25 @@
                 ,y
                 xlab: "x"
                 ylab: "y"
-                main: ,main))
+                main: ,main
+                cex.lab: 2
+                cex.axis: 2
+                cex.main: 2))
        (R (text ,x
                 ,y
                 ,(vector-map (lambda (i x y)
                                (format "(~,2f ~,2f)" x y))
                              x
                              y)
-                pos: 1)))
+                pos: 1
+                cex: 2)))
      
      (define plot-segments
        (case-lambda
         ((x y xend yend)
          (plot-segments x y xend yend 1))
         ((x y xend yend col)
-         (R (segments ,x ,y ,xend ,yend col: ,col)))))
+         (R (segments ,x ,y ,xend ,yend col: ,col lwd: 3)))))
      
      (define (highlight-segments x y xend yend)
        (plot-segments x y xend yend 2))
@@ -2266,8 +2184,6 @@
             (lambda (x y xend yend)
               (plot-segments x y xend yend))))))
      
-     (define graph? (make-parameter #t))
-     
      (define A*-tour
        (case-lambda
         ((start graph points)
@@ -2306,7 +2222,7 @@
                                   visited-points
                                   unvisited-tree)
                                  (when (goal? node)
-                                   (let ((fps 4))
+                                   (let ((fps 6))
                                      ;; Make the animation pause at the
                                      ;; finished frame for a couple seconds.
                                      (let ((tour
@@ -2326,9 +2242,7 @@
                                               -mf ,(format "type=png:fps=~a" fps)
                                               -ovc lavc
                                               -o ,(make-pathname (current-directory) animation))))))
-                               (* (tree-cost unvisited-tree) 2))))))))))) 
-     
-     
+                               (* (tree-cost unvisited-tree) 2)))))))))))
    #+END_SRC
 
    #+BEGIN_SRC scheme :tangle 3.30.scm :shebang #!/usr/bin/env chicken-scheme
@@ -2339,9 +2253,8 @@
      (let* ((graph (complete-graph (make-random-points 20)))
             (points (hash-table-keys graph))
             (start (car points)))
-       (let* ((tour (A*-tour start graph points "a-star.avi")))
-         (graph-tour "a-star.png" "TSP with A* and MST" points tour)))
-     
+       (let* ((tour (A*-tour start graph points "3.30.avi")))
+         (graph-tour "3.30.png" "TSP with A* and MST" points tour)))
    #+END_SRC
 
    We have the MST; how to use it as a heuristic? [[http://www.csie.ntu.edu.tw/~ai2007s/hw/hw02_s.pdf%0A][This cat]] works an
