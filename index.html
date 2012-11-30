@@ -7,7 +7,7 @@
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="title" content="Some notes and solutions to Russell and Norvig's Artificial Intelligence: A Modern Approach (AIMA, 3rd edition)"/>
 <meta name="generator" content="Org-mode"/>
-<meta name="generated" content="2012-11-26 15:35:26 PST"/>
+<meta name="generated" content="2012-11-30T03:27-0800"/>
 <meta name="author" content="Peter Danenberg"/>
 <meta name="description" content=""/>
 <meta name="keywords" content=""/>
@@ -61,6 +61,30 @@
   /*]]>*/-->
 </style>
 <script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
 <!--/*--><![CDATA[/*><!--*/
  function CodeHighlightOn(elem, id)
  {
@@ -83,6 +107,56 @@
 /*]]>*///-->
 </script>
 <script type="text/javascript" src="http://orgmode.org/mathjax/MathJax.js">
+/**
+ *
+ * @source: http://orgmode.org/mathjax/MathJax.js
+ *
+ * @licstart  The following is the entire license notice for the
+ *  JavaScript code in http://orgmode.org/mathjax/MathJax.js.
+ *
+ * Copyright (C) 2012  MathJax
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @licend  The above is the entire license notice
+ * for the JavaScript code in http://orgmode.org/mathjax/MathJax.js.
+ *
+ */
+
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code below.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code below is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code below.
+*/
 <!--/*--><![CDATA[/*><!--*/
     MathJax.Hub.Config({
         // Only one of the two following lines, depending on user settings
@@ -282,6 +356,7 @@
 <li><a href="#sec-43-7">43.7 Mon Aug 27 2012</a></li>
 <li><a href="#sec-43-8">43.8 Mon Sep 10 2012</a></li>
 <li><a href="#sec-43-9">43.9 Sun Nov  4 2012</a></li>
+<li><a href="#sec-43-10">43.10 Mon Nov 26 2012</a></li>
 </ul>
 </li>
 <li><a href="#sec-44">44 Notes</a>
@@ -357,7 +432,7 @@
 </div>
 
 <div id="outline-container-1" class="outline-2">
-<h2 id="sec-1"><span class="section-number-2">1</span> <span class="done DONE"> DONE</span> 1.1</h2>
+<h2 id="sec-1"><span class="section-number-2">1</span> <span class="done DONE">DONE</span> 1.1</h2>
 <div class="outline-text-2" id="text-1">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2011-10-10 Mon 03:03</span></span><br/>
@@ -390,7 +465,7 @@
 </div>
 
 <div id="outline-container-2" class="outline-2">
-<h2 id="sec-2"><span class="section-number-2">2</span> <span class="done DONE"> DONE</span> 1.2</h2>
+<h2 id="sec-2"><span class="section-number-2">2</span> <span class="done DONE">DONE</span> 1.2</h2>
 <div class="outline-text-2" id="text-2">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2011-10-10 Mon 03:03</span></span><br/>
@@ -421,7 +496,7 @@
 </div>
 
 <div id="outline-container-3" class="outline-2">
-<h2 id="sec-3"><span class="section-number-2">3</span> <span class="done DONE"> DONE</span> 1.3</h2>
+<h2 id="sec-3"><span class="section-number-2">3</span> <span class="done DONE">DONE</span> 1.3</h2>
 <div class="outline-text-2" id="text-3">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2011-10-12 Wed 12:58</span></span><br/>
@@ -442,7 +517,7 @@
 </div>
 
 <div id="outline-container-4" class="outline-2">
-<h2 id="sec-4"><span class="section-number-2">4</span> <span class="done DONE"> DONE</span> 1.4</h2>
+<h2 id="sec-4"><span class="section-number-2">4</span> <span class="done DONE">DONE</span> 1.4</h2>
 <div class="outline-text-2" id="text-4">
 
 <p>  Tom Evan's ANALOGY is an ad-hoc geometric solver, and would not
@@ -453,7 +528,7 @@
 </div>
 
 <div id="outline-container-5" class="outline-2">
-<h2 id="sec-5"><span class="section-number-2">5</span> <span class="done DONE"> DONE</span> 1.5</h2>
+<h2 id="sec-5"><span class="section-number-2">5</span> <span class="done DONE">DONE</span> 1.5</h2>
 <div class="outline-text-2" id="text-5">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-05-28 Mon 21:35</span></span><br/>
@@ -499,7 +574,7 @@
 </div>
 
 <div id="outline-container-6" class="outline-2">
-<h2 id="sec-6"><span class="section-number-2">6</span> <span class="done DONE"> DONE</span> 1.6</h2>
+<h2 id="sec-6"><span class="section-number-2">6</span> <span class="done DONE">DONE</span> 1.6</h2>
 <div class="outline-text-2" id="text-6">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-05-28 Mon 21:43</span></span><br/>
@@ -528,7 +603,7 @@ to predict their behavior.
 </div>
 
 <div id="outline-container-7" class="outline-2">
-<h2 id="sec-7"><span class="section-number-2">7</span> <span class="done DONE"> DONE</span> 1.7</h2>
+<h2 id="sec-7"><span class="section-number-2">7</span> <span class="done DONE">DONE</span> 1.7</h2>
 <div class="outline-text-2" id="text-7">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-05-31 Thu 02:17</span></span><br/>
@@ -555,7 +630,7 @@ to predict their behavior.
 </div>
 
 <div id="outline-container-8" class="outline-2">
-<h2 id="sec-8"><span class="section-number-2">8</span> <span class="done DONE"> DONE</span> 1.8</h2>
+<h2 id="sec-8"><span class="section-number-2">8</span> <span class="done DONE">DONE</span> 1.8</h2>
 <div class="outline-text-2" id="text-8">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-05-31 Thu 02:17</span></span><br/>
@@ -574,7 +649,7 @@ to predict their behavior.
 </div>
 
 <div id="outline-container-9" class="outline-2">
-<h2 id="sec-9"><span class="section-number-2">9</span> <span class="done DONE"> DONE</span> 1.9</h2>
+<h2 id="sec-9"><span class="section-number-2">9</span> <span class="done DONE">DONE</span> 1.9</h2>
 <div class="outline-text-2" id="text-9">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-05-31 Thu 02:19</span></span><br/>
@@ -592,7 +667,7 @@ to predict their behavior.
 </div>
 
 <div id="outline-container-10" class="outline-2">
-<h2 id="sec-10"><span class="section-number-2">10</span> <span class="done DONE"> DONE</span> 1.10</h2>
+<h2 id="sec-10"><span class="section-number-2">10</span> <span class="done DONE">DONE</span> 1.10</h2>
 <div class="outline-text-2" id="text-10">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-05-31 Thu 02:28</span></span><br/>
@@ -610,14 +685,14 @@ to predict their behavior.
 </div>
 
 <div id="outline-container-11" class="outline-2">
-<h2 id="sec-11"><span class="section-number-2">11</span> <span class="done DONE"> DONE</span> 1.11</h2>
+<h2 id="sec-11"><span class="section-number-2">11</span> <span class="done DONE">DONE</span> 1.11</h2>
 <div class="outline-text-2" id="text-11">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-05-31 Thu 02:35</span></span><br/>
   "Surely computers . . . can do only what their programmers tell
   them" might have been the case, if it weren't for the fact that
   programmers can program machines to do things even they couldn't do
-  (cf. chess programs that outstrip their masters).<sup><a class="footref" name="fnr.1" href="#fn.1">1</a></sup>
+  (cf. chess programs that outstrip their masters).<sup><a class="footref" name="fnr-.1" href="#fn-.1">1</a></sup>
 </p>
 <p>
   This seems like a paradox I don't adequately know how to explain; if
@@ -627,7 +702,7 @@ to predict their behavior.
 </div>
 
 <div id="outline-container-12" class="outline-2">
-<h2 id="sec-12"><span class="section-number-2">12</span> <span class="done DONE"> DONE</span> 1.12</h2>
+<h2 id="sec-12"><span class="section-number-2">12</span> <span class="done DONE">DONE</span> 1.12</h2>
 <div class="outline-text-2" id="text-12">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-05-31 Thu 02:41</span></span><br/>
@@ -646,7 +721,7 @@ to predict their behavior.
 </div>
 
 <div id="outline-container-13" class="outline-2">
-<h2 id="sec-13"><span class="section-number-2">13</span> <span class="done DONE"> DONE</span> 1.13</h2>
+<h2 id="sec-13"><span class="section-number-2">13</span> <span class="done DONE">DONE</span> 1.13</h2>
 <div class="outline-text-2" id="text-13">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-05-31 Thu 02:48</span></span><br/>
@@ -663,7 +738,7 @@ to predict their behavior.
 </div>
 
 <div id="outline-container-14" class="outline-2">
-<h2 id="sec-14"><span class="section-number-2">14</span> <span class="done DONE"> DONE</span> 1.14</h2>
+<h2 id="sec-14"><span class="section-number-2">14</span> <span class="done DONE">DONE</span> 1.14</h2>
 <div class="outline-text-2" id="text-14">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2011-10-10 Mon 03:52</span></span><br/>
@@ -708,7 +783,7 @@ to predict their behavior.
 </div>
 
 <div id="outline-container-15" class="outline-2">
-<h2 id="sec-15"><span class="section-number-2">15</span> <span class="done DONE"> DONE</span> 1.15</h2>
+<h2 id="sec-15"><span class="section-number-2">15</span> <span class="done DONE">DONE</span> 1.15</h2>
 <div class="outline-text-2" id="text-15">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-05-31 Thu 03:05</span></span><br/>
@@ -741,7 +816,7 @@ to predict their behavior.
 </div>
 
 <div id="outline-container-16" class="outline-2">
-<h2 id="sec-16"><span class="section-number-2">16</span> <span class="done DONE"> DONE</span> 2.1</h2>
+<h2 id="sec-16"><span class="section-number-2">16</span> <span class="done DONE">DONE</span> 2.1</h2>
 <div class="outline-text-2" id="text-16">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-06-11 Mon 00:51</span></span><br/>
@@ -752,7 +827,7 @@ to predict their behavior.
 </p>
 <p>
   This is because the lifetime of an agent is measured by the total
-  number of percepts it receives <sup><a class="footref" name="fnr.2" href="#fn.2">2</a></sup> <sup><a class="footref" name="fnr.3" href="#fn.3">3</a></sup>.
+  number of percepts it receives <sup><a class="footref" name="fnr-.2" href="#fn-.2">2</a></sup> <sup><a class="footref" name="fnr-.3" href="#fn-.3">3</a></sup>.
 </p>
 <p>
   Let \(t\) be the time step the agent has reached; if \(t \leq T\), the
@@ -796,7 +871,7 @@ to predict their behavior.
 </div>
 
 <div id="outline-container-17" class="outline-2">
-<h2 id="sec-17"><span class="section-number-2">17</span> <span class="done DONE"> DONE</span> 2.2</h2>
+<h2 id="sec-17"><span class="section-number-2">17</span> <span class="done DONE">DONE</span> 2.2</h2>
 <div class="outline-text-2" id="text-17">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-06-11 Mon 17:18</span></span><br/>
@@ -804,7 +879,7 @@ to predict their behavior.
 </div>
 
 <div id="outline-container-17-1" class="outline-3">
-<h3 id="sec-17-1"><span class="section-number-3">17.1</span> <span class="done DONE"> DONE</span> a</h3>
+<h3 id="sec-17-1"><span class="section-number-3">17.1</span> <span class="done DONE">DONE</span> a</h3>
 <div class="outline-text-3" id="text-17-1">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-06-11 Mon 17:18</span></span><br/>
@@ -822,7 +897,7 @@ to predict their behavior.
 </div>
 
 <div id="outline-container-17-2" class="outline-3">
-<h3 id="sec-17-2"><span class="section-number-3">17.2</span> <span class="done DONE"> DONE</span> b</h3>
+<h3 id="sec-17-2"><span class="section-number-3">17.2</span> <span class="done DONE">DONE</span> b</h3>
 <div class="outline-text-3" id="text-17-2">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-06-11 Mon 17:18</span></span><br/>
@@ -834,7 +909,7 @@ to predict their behavior.
 </div>
 
 <div id="outline-container-17-3" class="outline-3">
-<h3 id="sec-17-3"><span class="section-number-3">17.3</span> <span class="done DONE"> DONE</span> c</h3>
+<h3 id="sec-17-3"><span class="section-number-3">17.3</span> <span class="done DONE">DONE</span> c</h3>
 <div class="outline-text-3" id="text-17-3">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-06-11 Mon 17:18</span></span><br/>
@@ -848,7 +923,7 @@ to predict their behavior.
 </div>
 
 <div id="outline-container-18" class="outline-2">
-<h2 id="sec-18"><span class="section-number-2">18</span> <span class="done DONE"> DONE</span> 2.3</h2>
+<h2 id="sec-18"><span class="section-number-2">18</span> <span class="done DONE">DONE</span> 2.3</h2>
 <div class="outline-text-2" id="text-18">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-06-13 Wed 05:40</span></span><br/>
@@ -898,7 +973,7 @@ to predict their behavior.
 </div>
 
 <div id="outline-container-19" class="outline-2">
-<h2 id="sec-19"><span class="section-number-2">19</span> <span class="done DONE"> DONE</span> 2.4</h2>
+<h2 id="sec-19"><span class="section-number-2">19</span> <span class="done DONE">DONE</span> 2.4</h2>
 <div class="outline-text-2" id="text-19">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-06-13 Wed 06:47</span></span><br/>
@@ -1074,7 +1149,7 @@ to predict their behavior.
 </dd>
 <dt>Sensors</dt><dd>See the artifact, understand the auctioneer
 </dd>
-<dt>Characteristics</dt><dd>Partially observable <sup><a class="footref" name="fnr.4" href="#fn.4">4</a></sup>, stochastic,
+<dt>Characteristics</dt><dd>Partially observable <sup><a class="footref" name="fnr-.4" href="#fn-.4">4</a></sup>, stochastic,
        sequential, dynamic, continuous, known
 </dd>
 </dl>
@@ -1085,7 +1160,7 @@ to predict their behavior.
 </div>
 
 <div id="outline-container-20" class="outline-2">
-<h2 id="sec-20"><span class="section-number-2">20</span> <span class="done DONE"> DONE</span> 2.5</h2>
+<h2 id="sec-20"><span class="section-number-2">20</span> <span class="done DONE">DONE</span> 2.5</h2>
 <div class="outline-text-2" id="text-20">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-06-14 Thu 06:44</span></span><br/>
@@ -1131,7 +1206,7 @@ to predict their behavior.
 </div>
 
 <div id="outline-container-21" class="outline-2">
-<h2 id="sec-21"><span class="section-number-2">21</span> <span class="done DONE"> DONE</span> 2.6</h2>
+<h2 id="sec-21"><span class="section-number-2">21</span> <span class="done DONE">DONE</span> 2.6</h2>
 <div class="outline-text-2" id="text-21">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-06-14 Thu 12:06</span></span><br/>
@@ -1179,7 +1254,7 @@ to predict their behavior.
 </div>
 
 <div id="outline-container-22" class="outline-2">
-<h2 id="sec-22"><span class="section-number-2">22</span> <span class="done DONE"> DONE</span> 2.7</h2>
+<h2 id="sec-22"><span class="section-number-2">22</span> <span class="done DONE">DONE</span> 2.7</h2>
 <div class="outline-text-2" id="text-22">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-06-20 Wed 03:52</span></span><br/>
@@ -1195,19 +1270,19 @@ to predict their behavior.
 
 
 
-<pre class="src src-org">- let
-  - state
-  - model
-  - goals
-  - action
-    - define (goal-based-agent percept)
-      - set! state (update-state state action percept model)
-      - let
-        # Shouldn't we distinguish between many different
-        action-sequences; and, if so, how to do so without a utility
-        function: evaluate them against the performance measure?
-        - action-sequence (search goals state)
-          - return (first action-sequence)
+<pre class="src src-org">,- let
+,  - state
+,  - model
+,  - goals
+,  - action
+,    - define (goal-based-agent percept)
+,      - set! state (update-state state action percept model)
+,      - let
+,        # Shouldn't we distinguish between many different
+,        action-sequences; and, if so, how to do so without a utility
+,        function: evaluate them against the performance measure?
+,        - action-sequence (search goals state)
+,          - return (first action-sequence)
 </pre>
 
 </div>
@@ -1221,21 +1296,21 @@ to predict their behavior.
 
 
 
-<pre class="src src-org">- let
-  - state
-  - model
-  - goals
-  - action
-    - define (utility-based-agent percept)
-      - set! state (update-state state action percept model)
-      - let
-        - probabilities (map probability goals)
-        - utilities (map utility goals)
-          - let
-            - expected-utilities (map * probabilities utilities)
-            - goal-of-maximum-expected-utility (max goals expected-utilities)
-            - action-sequence (search goal-of-maximum-expected-utility state)
-              - return (first action-sequence)
+<pre class="src src-org">,- let
+,  - state
+,  - model
+,  - goals
+,  - action
+,    - define (utility-based-agent percept)
+,      - set! state (update-state state action percept model)
+,      - let
+,        - probabilities (map probability goals)
+,        - utilities (map utility goals)
+,          - let
+,            - expected-utilities (map * probabilities utilities)
+,            - goal-of-maximum-expected-utility (max goals expected-utilities)
+,            - action-sequence (search goal-of-maximum-expected-utility state)
+,              - return (first action-sequence)
 </pre>
 
 </div>
@@ -1244,7 +1319,7 @@ to predict their behavior.
 </div>
 
 <div id="outline-container-23" class="outline-2">
-<h2 id="sec-23"><span class="section-number-2">23</span> <span class="done DONE"> DONE</span> 2.8</h2>
+<h2 id="sec-23"><span class="section-number-2">23</span> <span class="done DONE">DONE</span> 2.8</h2>
 <div class="outline-text-2" id="text-23">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-06-21 Thu 04:39</span></span><br/>
@@ -1583,7 +1658,7 @@ that its performance was perfect.
 </div>
 
 <div id="outline-container-24" class="outline-2">
-<h2 id="sec-24"><span class="section-number-2">24</span> <span class="done DONE"> DONE</span> 2.9</h2>
+<h2 id="sec-24"><span class="section-number-2">24</span> <span class="done DONE">DONE</span> 2.9</h2>
 <div class="outline-text-2" id="text-24">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-06-28 Thu 12:47</span></span><br/>
@@ -1630,7 +1705,7 @@ that its performance was perfect.
 </div>
 
 <div id="outline-container-25" class="outline-2">
-<h2 id="sec-25"><span class="section-number-2">25</span> <span class="done DONE"> DONE</span> 2.10</h2>
+<h2 id="sec-25"><span class="section-number-2">25</span> <span class="done DONE">DONE</span> 2.10</h2>
 <div class="outline-text-2" id="text-25">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-06-29 Fri 17:52</span></span><br/>
@@ -1638,7 +1713,7 @@ that its performance was perfect.
 </div>
 
 <div id="outline-container-25-1" class="outline-3">
-<h3 id="sec-25-1"><span class="section-number-3">25.1</span> <span class="done DONE"> DONE</span> a</h3>
+<h3 id="sec-25-1"><span class="section-number-3">25.1</span> <span class="done DONE">DONE</span> a</h3>
 <div class="outline-text-3" id="text-25-1">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-06-29 Fri 13:29</span></span><br/>
@@ -1669,7 +1744,7 @@ that its performance was perfect.
 </div>
 
 <div id="outline-container-25-2" class="outline-3">
-<h3 id="sec-25-2"><span class="section-number-3">25.2</span> <span class="done DONE"> DONE</span> b</h3>
+<h3 id="sec-25-2"><span class="section-number-3">25.2</span> <span class="done DONE">DONE</span> b</h3>
 <div class="outline-text-3" id="text-25-2">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-06-29 Fri 17:52</span></span><br/>
@@ -1740,7 +1815,7 @@ that its performance was perfect.
 </div>
 
 <div id="outline-container-25-3" class="outline-3">
-<h3 id="sec-25-3"><span class="section-number-3">25.3</span> <span class="done DONE"> DONE</span> c</h3>
+<h3 id="sec-25-3"><span class="section-number-3">25.3</span> <span class="done DONE">DONE</span> c</h3>
 <div class="outline-text-3" id="text-25-3">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-06-29 Fri 17:52</span></span><br/>
@@ -1760,7 +1835,7 @@ that its performance was perfect.
 </div>
 
 <div id="outline-container-26" class="outline-2">
-<h2 id="sec-26"><span class="section-number-2">26</span> <span class="done DONE"> DONE</span> 2.11</h2>
+<h2 id="sec-26"><span class="section-number-2">26</span> <span class="done DONE">DONE</span> 2.11</h2>
 <div class="outline-text-2" id="text-26">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-07-16 Mon 16:59</span></span><br/>
@@ -1768,7 +1843,7 @@ that its performance was perfect.
 </div>
 
 <div id="outline-container-26-1" class="outline-3">
-<h3 id="sec-26-1"><span class="section-number-3">26.1</span> <span class="done DONE"> DONE</span> a</h3>
+<h3 id="sec-26-1"><span class="section-number-3">26.1</span> <span class="done DONE">DONE</span> a</h3>
 <div class="outline-text-3" id="text-26-1">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-07-16 Mon 14:00</span></span><br/>
@@ -1806,7 +1881,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-26-2" class="outline-3">
-<h3 id="sec-26-2"><a name="2.11b" id="2.11b"></a><span class="section-number-3">26.2</span> <span class="done DONE"> DONE</span> b</h3>
+<h3 id="sec-26-2"><a name="2.11b" id="2.11b"></a><span class="section-number-3">26.2</span> <span class="done DONE">DONE</span> b</h3>
 <div class="outline-text-3" id="text-26-2">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-07-16 Mon 14:00</span></span><br/>
@@ -1843,7 +1918,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-26-3" class="outline-3">
-<h3 id="sec-26-3"><a name="2.11c" id="2.11c"></a><span class="section-number-3">26.3</span> <span class="done DONE"> DONE</span> c</h3>
+<h3 id="sec-26-3"><a name="2.11c" id="2.11c"></a><span class="section-number-3">26.3</span> <span class="done DONE">DONE</span> c</h3>
 <div class="outline-text-3" id="text-26-3">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-07-16 Mon 14:49</span></span><br/>
@@ -1883,7 +1958,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-26-4" class="outline-3">
-<h3 id="sec-26-4"><span class="section-number-3">26.4</span> <span class="done DONE"> DONE</span> d</h3>
+<h3 id="sec-26-4"><span class="section-number-3">26.4</span> <span class="done DONE">DONE</span> d</h3>
 <div class="outline-text-3" id="text-26-4">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-07-16 Mon 16:58</span></span><br/>
@@ -1945,7 +2020,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-27" class="outline-2">
-<h2 id="sec-27"><span class="section-number-2">27</span> <span class="done DONE"> DONE</span> 2.12</h2>
+<h2 id="sec-27"><span class="section-number-2">27</span> <span class="done DONE">DONE</span> 2.12</h2>
 <div class="outline-text-2" id="text-27">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-07-16 Mon 17:09</span></span><br/>
@@ -1968,7 +2043,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-28" class="outline-2">
-<h2 id="sec-28"><span class="section-number-2">28</span> <span class="done DONE"> DONE</span> 2.13</h2>
+<h2 id="sec-28"><span class="section-number-2">28</span> <span class="done DONE">DONE</span> 2.13</h2>
 <div class="outline-text-2" id="text-28">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-07-16 Mon 17:20</span></span><br/>
@@ -1976,7 +2051,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-28-1" class="outline-3">
-<h3 id="sec-28-1"><span class="section-number-3">28.1</span> <span class="done DONE"> DONE</span> a</h3>
+<h3 id="sec-28-1"><span class="section-number-3">28.1</span> <span class="done DONE">DONE</span> a</h3>
 <div class="outline-text-3" id="text-28-1">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-07-16 Mon 17:20</span></span><br/>
@@ -1995,7 +2070,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-28-2" class="outline-3">
-<h3 id="sec-28-2"><span class="section-number-3">28.2</span> <span class="done DONE"> DONE</span> b</h3>
+<h3 id="sec-28-2"><span class="section-number-3">28.2</span> <span class="done DONE">DONE</span> b</h3>
 <div class="outline-text-3" id="text-28-2">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-07-16 Mon 17:20</span></span><br/>
@@ -2009,7 +2084,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-29" class="outline-2">
-<h2 id="sec-29"><span class="section-number-2">29</span> <span class="done DONE"> DONE</span> 3.1</h2>
+<h2 id="sec-29"><span class="section-number-2">29</span> <span class="done DONE">DONE</span> 3.1</h2>
 <div class="outline-text-2" id="text-29">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-08-19 Sun 03:42</span></span><br/>
@@ -2026,7 +2101,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-30" class="outline-2">
-<h2 id="sec-30"><span class="section-number-2">30</span> <span class="done DONE"> DONE</span> 3.2</h2>
+<h2 id="sec-30"><span class="section-number-2">30</span> <span class="done DONE">DONE</span> 3.2</h2>
 <div class="outline-text-2" id="text-30">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-08-23 Thu 17:21</span></span><br/>
@@ -2041,7 +2116,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-30-1" class="outline-3">
-<h3 id="sec-30-1"><span class="section-number-3">30.1</span> <span class="done DONE"> DONE</span> a</h3>
+<h3 id="sec-30-1"><span class="section-number-3">30.1</span> <span class="done DONE">DONE</span> a</h3>
 <div class="outline-text-3" id="text-30-1">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-08-19 Sun 19:23</span></span><br/>
@@ -2070,7 +2145,7 @@ program rather than from a vast table.
 <p>
    The state space is infinite: you can reach any square, for
    instance, over an unlimited number of noöps (e.g. pressing forward
-   into a wall, turning redundantly, &amp;c.).<sup><a class="footref" name="fnr.5" href="#fn.5">5</a></sup>
+   into a wall, turning redundantly, &amp;c.).<sup><a class="footref" name="fnr-.5" href="#fn-.5">5</a></sup>
 </p>
 <p>
    Let's say that redundant noöps have been pruned, however; and that
@@ -2093,7 +2168,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-30-2" class="outline-3">
-<h3 id="sec-30-2"><span class="section-number-3">30.2</span> <span class="done DONE"> DONE</span> b</h3>
+<h3 id="sec-30-2"><span class="section-number-3">30.2</span> <span class="done DONE">DONE</span> b</h3>
 <div class="outline-text-3" id="text-30-2">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-08-19 Sun 19:23</span></span><br/>
@@ -2130,7 +2205,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-30-3" class="outline-3">
-<h3 id="sec-30-3"><span class="section-number-3">30.3</span> <span class="done DONE"> DONE</span> c</h3>
+<h3 id="sec-30-3"><span class="section-number-3">30.3</span> <span class="done DONE">DONE</span> c</h3>
 <div class="outline-text-3" id="text-30-3">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-08-19 Sun 19:23</span></span><br/>
@@ -2166,7 +2241,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-30-4" class="outline-3">
-<h3 id="sec-30-4"><span class="section-number-3">30.4</span> <span class="done DONE"> DONE</span> d</h3>
+<h3 id="sec-30-4"><span class="section-number-3">30.4</span> <span class="done DONE">DONE</span> d</h3>
 <div class="outline-text-3" id="text-30-4">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-08-19 Sun 19:23</span></span><br/>
@@ -2189,7 +2264,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-31" class="outline-2">
-<h2 id="sec-31"><span class="section-number-2">31</span> <span class="done DONE"> DONE</span> 3.3</h2>
+<h2 id="sec-31"><span class="section-number-2">31</span> <span class="done DONE">DONE</span> 3.3</h2>
 <div class="outline-text-2" id="text-31">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-08-20 Mon 04:40</span></span><br/>
@@ -2197,7 +2272,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-31-1" class="outline-3">
-<h3 id="sec-31-1"><span class="section-number-3">31.1</span> <span class="done DONE"> DONE</span> a</h3>
+<h3 id="sec-31-1"><span class="section-number-3">31.1</span> <span class="done DONE">DONE</span> a</h3>
 <div class="outline-text-3" id="text-31-1">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-08-20 Mon 04:29</span></span><br/>
@@ -2209,7 +2284,7 @@ program rather than from a vast table.
 <dt>Initial state</dt><dd>A friend a each city \(n(\{i, j\})_0\), \(P(\{i,
                       j\})\) are empty.
 </dd>
-<dt>Actions</dt><dd>Each friend moves to a neighboring city <sup><a class="footref" name="fnr.6" href="#fn.6">6</a></sup>.
+<dt>Actions</dt><dd>Each friend moves to a neighboring city <sup><a class="footref" name="fnr-.6" href="#fn-.6">6</a></sup>.
 </dd>
 <dt>Transition model</dt><dd>Each friend moves to a neighboring city.
 </dd>
@@ -2230,7 +2305,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-31-2" class="outline-3">
-<h3 id="sec-31-2"><span class="section-number-3">31.2</span> <span class="done DONE"> DONE</span> b</h3>
+<h3 id="sec-31-2"><span class="section-number-3">31.2</span> <span class="done DONE">DONE</span> b</h3>
 <div class="outline-text-3" id="text-31-2">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-08-20 Mon 04:29</span></span><br/>
@@ -2253,7 +2328,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-31-3" class="outline-3">
-<h3 id="sec-31-3"><span class="section-number-3">31.3</span> <span class="done DONE"> DONE</span> c</h3>
+<h3 id="sec-31-3"><span class="section-number-3">31.3</span> <span class="done DONE">DONE</span> c</h3>
 <div class="outline-text-3" id="text-31-3">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-08-20 Mon 04:29</span></span><br/>
@@ -2276,7 +2351,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-31-4" class="outline-3">
-<h3 id="sec-31-4"><span class="section-number-3">31.4</span> <span class="done DONE"> DONE</span> d</h3>
+<h3 id="sec-31-4"><span class="section-number-3">31.4</span> <span class="done DONE">DONE</span> d</h3>
 <div class="outline-text-3" id="text-31-4">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-08-20 Mon 04:40</span></span><br/>
@@ -2298,7 +2373,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-32" class="outline-2">
-<h2 id="sec-32"><span class="section-number-2">32</span> <span class="done DONE"> DONE</span> 3.4</h2>
+<h2 id="sec-32"><span class="section-number-2">32</span> <span class="done DONE">DONE</span> 3.4</h2>
 <div class="outline-text-2" id="text-32">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-08-23 Thu 05:33</span></span><br/>
@@ -2381,7 +2456,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-33" class="outline-2">
-<h2 id="sec-33"><span class="section-number-2">33</span> <span class="done DONE"> DONE</span> 3.5</h2>
+<h2 id="sec-33"><span class="section-number-2">33</span> <span class="done DONE">DONE</span> 3.5</h2>
 <div class="outline-text-2" id="text-33">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-08-23 Thu 16:32</span></span><br/>
@@ -2412,7 +2487,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-34" class="outline-2">
-<h2 id="sec-34"><span class="section-number-2">34</span> <span class="done DONE"> DONE</span> 3.6</h2>
+<h2 id="sec-34"><span class="section-number-2">34</span> <span class="done DONE">DONE</span> 3.6</h2>
 <div class="outline-text-2" id="text-34">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-08-24 Fri 08:09</span></span><br/>
@@ -2420,7 +2495,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-34-1" class="outline-3">
-<h3 id="sec-34-1"><span class="section-number-3">34.1</span> <span class="done DONE"> DONE</span> a</h3>
+<h3 id="sec-34-1"><span class="section-number-3">34.1</span> <span class="done DONE">DONE</span> a</h3>
 <div class="outline-text-3" id="text-34-1">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-08-24 Fri 08:09</span></span><br/>
@@ -2428,7 +2503,7 @@ program rather than from a vast table.
 <dt>States</dt><dd>An upper bound on the number of 4-colorings is \(4^n\),
                where \(n\) is the number of regions in the plane;
                finding the exact number of colorings (the so-called
-               <a href="http://en.wikipedia.org/wiki/Chromatic_polynomial">chromatic polynomial</a>) is <a href="http://epubs.siam.org/doi/abs/10.1137/S0097539704446797">#P-complete</a>.<sup><a class="footref" name="fnr.7" href="#fn.7">7</a></sup>
+               <a href="http://en.wikipedia.org/wiki/Chromatic_polynomial">chromatic polynomial</a>) is <a href="http://epubs.siam.org/doi/abs/10.1137/S0097539704446797">#P-complete</a>.<sup><a class="footref" name="fnr-.7" href="#fn-.7">7</a></sup>
 
 <p>               
                The map can be modeled as a graph where the nodes
@@ -2451,13 +2526,13 @@ program rather than from a vast table.
 
 <p>
    This assumes that we've <a href="http://en.wikipedia.org/wiki/Graph_coloring#Exact_algorithms">brute-forced</a> all \(4^n\) color-assignments,
-   and are checking them for validity; more efficient algorithms exist.<sup><a class="footref" name="fnr.8" href="#fn.8">8</a></sup>
+   and are checking them for validity; more efficient algorithms exist.<sup><a class="footref" name="fnr-.8" href="#fn-.8">8</a></sup>
 </p></div>
 
 </div>
 
 <div id="outline-container-34-2" class="outline-3">
-<h3 id="sec-34-2"><span class="section-number-3">34.2</span> <span class="done DONE"> DONE</span> b</h3>
+<h3 id="sec-34-2"><span class="section-number-3">34.2</span> <span class="done DONE">DONE</span> b</h3>
 <div class="outline-text-3" id="text-34-2">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-08-24 Fri 08:09</span></span><br/>
@@ -2496,7 +2571,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-34-3" class="outline-3">
-<h3 id="sec-34-3"><span class="section-number-3">34.3</span> <span class="done DONE"> DONE</span> c</h3>
+<h3 id="sec-34-3"><span class="section-number-3">34.3</span> <span class="done DONE">DONE</span> c</h3>
 <div class="outline-text-3" id="text-34-3">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-08-24 Fri 08:09</span></span><br/>
@@ -2522,7 +2597,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-34-4" class="outline-3">
-<h3 id="sec-34-4"><span class="section-number-3">34.4</span> <span class="done DONE"> DONE</span> d</h3>
+<h3 id="sec-34-4"><span class="section-number-3">34.4</span> <span class="done DONE">DONE</span> d</h3>
 <div class="outline-text-3" id="text-34-4">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-08-24 Fri 08:09</span></span><br/>
@@ -2547,7 +2622,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-35" class="outline-2">
-<h2 id="sec-35"><span class="section-number-2">35</span> <span class="done DONE"> DONE</span> 3.7</h2>
+<h2 id="sec-35"><span class="section-number-2">35</span> <span class="done DONE">DONE</span> 3.7</h2>
 <div class="outline-text-2" id="text-35">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-10-01 Mon 05:10</span></span><br/>
@@ -2555,7 +2630,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-35-1" class="outline-3">
-<h3 id="sec-35-1"><span class="section-number-3">35.1</span> <span class="done DONE"> DONE</span> a</h3>
+<h3 id="sec-35-1"><span class="section-number-3">35.1</span> <span class="done DONE">DONE</span> a</h3>
 <div class="outline-text-3" id="text-35-1">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-10-01 Mon 05:10</span></span><br/>
@@ -2568,7 +2643,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-35-2" class="outline-3">
-<h3 id="sec-35-2"><span class="section-number-3">35.2</span> <span class="done DONE"> DONE</span> b</h3>
+<h3 id="sec-35-2"><span class="section-number-3">35.2</span> <span class="done DONE">DONE</span> b</h3>
 <div class="outline-text-3" id="text-35-2">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-10-01 Mon 05:10</span></span><br/>
@@ -2580,7 +2655,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-35-3" class="outline-3">
-<h3 id="sec-35-3"><span class="section-number-3">35.3</span> <span class="done DONE"> DONE</span> c</h3>
+<h3 id="sec-35-3"><span class="section-number-3">35.3</span> <span class="done DONE">DONE</span> c</h3>
 <div class="outline-text-3" id="text-35-3">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-10-01 Mon 05:10</span></span><br/>
@@ -2740,7 +2815,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-35-4" class="outline-3">
-<h3 id="sec-35-4"><span class="section-number-3">35.4</span> <span class="done DONE"> DONE</span> d</h3>
+<h3 id="sec-35-4"><span class="section-number-3">35.4</span> <span class="done DONE">DONE</span> d</h3>
 <div class="outline-text-3" id="text-35-4">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-10-01 Mon 05:10</span></span><br/>
@@ -2752,7 +2827,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-36" class="outline-2">
-<h2 id="sec-36"><span class="section-number-2">36</span> <span class="todo TODO"> TODO</span> 3.8</h2>
+<h2 id="sec-36"><span class="section-number-2">36</span> <span class="todo TODO">TODO</span> 3.8</h2>
 <div class="outline-text-2" id="text-36">
 
 
@@ -2761,7 +2836,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-37" class="outline-2">
-<h2 id="sec-37"><span class="section-number-2">37</span> <span class="done DONE"> DONE</span> 3.9</h2>
+<h2 id="sec-37"><span class="section-number-2">37</span> <span class="done DONE">DONE</span> 3.9</h2>
 <div class="outline-text-2" id="text-37">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-10-01 Mon 05:21</span></span><br/>
@@ -2890,7 +2965,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-38" class="outline-2">
-<h2 id="sec-38"><span class="section-number-2">38</span> <span class="todo TODO"> TODO</span> 3.22</h2>
+<h2 id="sec-38"><span class="section-number-2">38</span> <span class="todo TODO">TODO</span> 3.22</h2>
 <div class="outline-text-2" id="text-38">
 
 <p>  We've only gotten as far as applying A* to 8-puzzles.
@@ -3123,7 +3198,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-39" class="outline-2">
-<h2 id="sec-39"><span class="section-number-2">39</span> <span class="done DONE"> DONE</span> 3.30</h2>
+<h2 id="sec-39"><span class="section-number-2">39</span> <span class="done DONE">DONE</span> 3.30</h2>
 <div class="outline-text-2" id="text-39">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-11-26 Mon 15:06</span></span><br/>
@@ -3131,7 +3206,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-39-1" class="outline-3">
-<h3 id="sec-39-1"><span class="section-number-3">39.1</span> <span class="done DONE"> DONE</span> a</h3>
+<h3 id="sec-39-1"><span class="section-number-3">39.1</span> <span class="done DONE">DONE</span> a</h3>
 <div class="outline-text-3" id="text-39-1">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-11-26 Mon 15:06</span></span><br/>
@@ -3144,11 +3219,11 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-39-2" class="outline-3">
-<h3 id="sec-39-2"><span class="section-number-3">39.2</span> <span class="done DONE"> DONE</span> b</h3>
+<h3 id="sec-39-2"><span class="section-number-3">39.2</span> <span class="done DONE">DONE</span> b</h3>
 <div class="outline-text-3" id="text-39-2">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-11-26 Mon 15:06</span></span><br/>
-   MST dominates<sup><a class="footref" name="fnr.9" href="#fn.9">9</a></sup> straight-line distance by the triangle
+   MST dominates<sup><a class="footref" name="fnr-.9" href="#fn-.9">9</a></sup> straight-line distance by the triangle
    inequality: straight-line distance must be the shortest distance
    between points \(A\) and \(C\), but an MST might have zero or more
    intermediate points $B<sub>0</sub> &hellip; \(B_n\) between \(A\) and \(B\).
@@ -3162,7 +3237,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-39-3" class="outline-3">
-<h3 id="sec-39-3"><span class="section-number-3">39.3</span> <span class="done DONE"> DONE</span> c</h3>
+<h3 id="sec-39-3"><span class="section-number-3">39.3</span> <span class="done DONE">DONE</span> c</h3>
 <div class="outline-text-3" id="text-39-3">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-11-26 Mon 15:06</span></span><br/>
@@ -3200,11 +3275,18 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-39-4" class="outline-3">
-<h3 id="sec-39-4"><span class="section-number-3">39.4</span> <span class="done DONE"> DONE</span> d</h3>
+<h3 id="sec-39-4"><span class="section-number-3">39.4</span> <span class="done DONE">DONE</span> d</h3>
 <div class="outline-text-3" id="text-39-4">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-11-26 Mon 15:06</span></span><br/>
-   <img src="./img/3-30.png"  alt="./img/3-30.png" />.
+   </p>
+<div class="figure">
+<p><img src="./img/3-30.png" alt="Solved TSP" /></p>
+<p>An example of a solved TSP</p>
+</div>
+
+<p>
+   <a href="http://youtu.be/MQM_AZ4Is2s">Here's a link to the video</a>.
 </p>
 <p>
    Let's start with Kruskal on a completely connected graph. We can do
@@ -3237,10 +3319,14 @@ program rather than from a vast table.
 <pre class="src src-scheme">(use aima-search
      debug
      define-record-and-printer
+     files
+     format
      heap
-     random-bsd
      R
-     srfi-69)
+     random-bsd
+     shell
+     srfi-69
+     vector-lib)
 
 (<span style="color: #00cdcd; font-weight: bold;">define</span> (<span style="color: #0000ee; font-weight: bold;">connect!</span> graph from to)
   (hash-table-update!/default graph
@@ -3307,41 +3393,12 @@ program rather than from a vast table.
               (set-union! set from to)))))
       tree)))
 
-(<span style="color: #00cdcd; font-weight: bold;">define</span> (<span style="color: #0000ee; font-weight: bold;">write-tree-as-dot</span> tree)
-  <span style="color: #cdcd00;">;; </span><span style="color: #cdcd00;">(pp (hash-table-&gt;alist tree) (current-error-port))</span>
-  (display <span style="color: #00cd00;">"digraph G {graph[splines=true];"</span>)
-  (<span style="color: #00cdcd; font-weight: bold;">for-each</span> (<span style="color: #00cdcd; font-weight: bold;">lambda</span> (node) (format #t <span style="color: #00cd00;">"\"~a\";"</span> node))
-    (hash-table-keys tree))
-  (hash-table-walk tree
-                   (<span style="color: #00cdcd; font-weight: bold;">lambda</span> (from tos)
-                     (<span style="color: #00cdcd; font-weight: bold;">for-each</span> (<span style="color: #00cdcd; font-weight: bold;">lambda</span> (to)
-                                 (format #t <span style="color: #00cd00;">"\"~a\" -&gt; \"~a\"[label=\"~a\"];"</span>
-                                         from to (point-distance from to)))
-                       tos)))
-  (display <span style="color: #00cd00;">"}"</span>))
-
-<span style="color: #cdcd00;">;; </span><span style="color: #cdcd00;">(with-output-to-file "tree.dot"</span>
-<span style="color: #cdcd00;">;;   </span><span style="color: #cdcd00;">(lambda ()</span>
-<span style="color: #cdcd00;">;;     </span><span style="color: #cdcd00;">(write-tree-as-dot</span>
-<span style="color: #cdcd00;">;;      </span><span style="color: #cdcd00;">(minimum-spanning-tree</span>
-<span style="color: #cdcd00;">;;       </span><span style="color: #cdcd00;">(complete-graph</span>
-<span style="color: #cdcd00;">;;        </span><span style="color: #cdcd00;">(make-random-points 10))))))</span>
-
 (<span style="color: #00cdcd; font-weight: bold;">define</span> (<span style="color: #0000ee; font-weight: bold;">tree-cost</span> tree)
   (apply + (hash-table-map tree
                            (<span style="color: #00cdcd; font-weight: bold;">lambda</span> (from tos)
                              (apply +
                                     (<span style="color: #00cdcd; font-weight: bold;">map</span> (<span style="color: #00cdcd; font-weight: bold;">lambda</span> (to) (point-distance from to))
                                          tos))))))
-
-(<span style="color: #00cdcd; font-weight: bold;">define</span> (<span style="color: #0000ee; font-weight: bold;">make-tree</span> points)
-  (<span style="color: #00cdcd; font-weight: bold;">let</span> ((tour (make-hash-table)))
-    (<span style="color: #00cdcd; font-weight: bold;">do</span> ((from (drop-right points 1) (cdr from))
-         (to (cdr points) (cdr to)))
-        ((null? from) tour)
-      (hash-table-set! tour (car from) (list (car to))))
-    <span style="color: #cdcd00;">;; </span><span style="color: #cdcd00;">(debug (hash-table-&gt;alist tour))</span>
-    tour))
 
 (<span style="color: #00cdcd; font-weight: bold;">define</span> (<span style="color: #0000ee; font-weight: bold;">make-tour</span> points)
   (<span style="color: #00cdcd; font-weight: bold;">let</span> ((tour (make-hash-table)))
@@ -3352,122 +3409,196 @@ program rather than from a vast table.
     <span style="color: #cdcd00;">;; </span><span style="color: #cdcd00;">(debug (hash-table-&gt;alist tour))</span>
     tour))
 
-(<span style="color: #00cdcd; font-weight: bold;">define</span> (<span style="color: #0000ee; font-weight: bold;">nearest-neighbor</span> from points)
-  (<span style="color: #00cdcd; font-weight: bold;">let</span> ((neighbors (make-min-heap)))
-    (<span style="color: #00cdcd; font-weight: bold;">for-each</span> (<span style="color: #00cdcd; font-weight: bold;">lambda</span> (to) (heap-insert! neighbors (point-distance from to) to))
-      points)
-    (heap-extract-extremum! neighbors)))
-
-(<span style="color: #00cdcd; font-weight: bold;">define</span> (<span style="color: #0000ee; font-weight: bold;">graph-tour</span> tour)
-  (display <span style="color: #00cd00;">"x,y,xend,yend\n"</span>)
-  (hash-table-walk
-   tour
-   (<span style="color: #00cdcd; font-weight: bold;">lambda</span> (from to)
-     (format #t <span style="color: #00cd00;">"~a,~a,~a,~a~%"</span>
-             (point-x from)
-             (point-y from)
-             (point-x to)
-             (point-y to)))))
-
 (<span style="color: #00cdcd; font-weight: bold;">define</span> (<span style="color: #0000ee; font-weight: bold;">tour-length</span> tour)
   (apply + (hash-table-map tour point-distance)))
 
-(<span style="color: #00cdcd; font-weight: bold;">define</span> (<span style="color: #0000ee; font-weight: bold;">graph-tour</span> tour strategy)
-  (<span style="color: #00cdcd; font-weight: bold;">let</span> ((data
-         (hash-table-map
-          tour
-          (<span style="color: #00cdcd; font-weight: bold;">lambda</span> (from to)
-            (vector (point-x from)
-                    (point-y from)
-                    (point-x to)
-                    (point-y to)))))
-        (tour-length (tour-length tour)))
-    (R (library <span style="color: #00cd00;">"ggplot2"</span>))
-    (<span style="color: #00cdcd; font-weight: bold;">let*</span> ((data (R (data.frame (t (matrix ,(list-&gt;vector data)
-                                           nrow: 4)))))
-           (data (R (colnames&lt;- ,data (c <span style="color: #00cd00;">"x"</span> <span style="color: #00cd00;">"y"</span> <span style="color: #00cd00;">"xend"</span> <span style="color: #00cd00;">"yend"</span>)))))
-      (<span style="color: #00cdcd; font-weight: bold;">let</span> ((x (R* ($ ,data x)))
-            (y (R* ($ ,data y)))
-            (xend (R* ($ ,data xend)))
-            (yend (R* ($ ,data yend))))
-        (R (assign <span style="color: #00cd00;">"x"</span> ,x))
-        (R (assign <span style="color: #00cd00;">"y"</span> ,y))
-        (R (assign <span style="color: #00cd00;">"xend"</span> ,xend))
-        (R (assign <span style="color: #00cd00;">"yend"</span> ,yend))
-        (R (png <span style="color: #00cd00;">"img/3-30.png"</span> height: 768 width: 1024 type: <span style="color: #00cd00;">"cairo"</span>))
-        (R (plot
-            (%+%
-             (%+%
-              (%+%
-               (%+%
-                (%+%
-                 (%+%
-                  (%+% (ggplot)
-                       (geom_segment (aes x: x
-                                          y: y
-                                          xend: xend
-                                          yend: yend
-                                          color: ,strategy)))
-                  (geom_text (aes x: (+ x (/ (- xend x) 2))
-                                  y: (+ y (/ (- yend y) 2)))
-                             label: (signif (sqrt (+ (^ (- xend x) 2)
-                                                     (^ (- yend y) 2)))
-                                            digits: 2)))
-                 (geom_point (aes x: x y: y)
-                             <span style="color: #cdcd00;">;; </span><span style="color: #cdcd00;">size: 3</span>
-                             ))
-                (geom_text (aes x: x
-                                y: y)
-                           label: (sprintf <span style="color: #00cd00;">"(%s, %s)"</span>
-                                           (signif x digits: 2)
-                                           (signif y digits: 2))))
-               (xlab <span style="color: #00cd00;">"x"</span>))
-              (ylab <span style="color: #00cd00;">"y"</span>))
-             (labs color: <span style="color: #00cd00;">"Search"</span>))))
-        (R (dev.off))))))
+(<span style="color: #00cdcd; font-weight: bold;">define</span> (<span style="color: #0000ee; font-weight: bold;">tree-&gt;vectors</span> tree)
+  (<span style="color: #00cdcd; font-weight: bold;">let</span> ((tree
+         (hash-table-fold
+          tree
+          (<span style="color: #00cdcd; font-weight: bold;">lambda</span> (from tos segments)
+            (append
+             (<span style="color: #00cdcd; font-weight: bold;">map</span> (<span style="color: #00cdcd; font-weight: bold;">lambda</span> (to)
+                    (list (point-x from)
+                          (point-y from)
+                          (point-x to)
+                          (point-y to)))
+                  tos)
+             segments))
+          '())))
+    (values (list-&gt;vector (<span style="color: #00cdcd; font-weight: bold;">map</span> car tree))
+            (list-&gt;vector (<span style="color: #00cdcd; font-weight: bold;">map</span> cadr tree))
+            (list-&gt;vector (<span style="color: #00cdcd; font-weight: bold;">map</span> caddr tree))
+            (list-&gt;vector (<span style="color: #00cdcd; font-weight: bold;">map</span> cadddr tree)))))
 
-(<span style="color: #00cdcd; font-weight: bold;">define</span> (<span style="color: #0000ee; font-weight: bold;">tour</span> start graph points)
-  (cons start
-        (reverse
-         (<span style="color: #00cdcd; font-weight: bold;">map</span> node-state
-              (A* start
-                  (<span style="color: #00cdcd; font-weight: bold;">lambda</span> (node)
-                    (<span style="color: #00cdcd; font-weight: bold;">let</span> ((point (node-state node)))
-                      (hash-table-ref/default graph point '())))
-                  point-distance
-                  (<span style="color: #00cdcd; font-weight: bold;">lambda</span> (node) (= (length (predecessor-path node)) (length points)))
-                  (<span style="color: #00cdcd; font-weight: bold;">lambda</span> (node)
-                    (<span style="color: #00cdcd; font-weight: bold;">let*</span> ((visited-points (<span style="color: #00cdcd; font-weight: bold;">map</span> node-state (predecessor-path node)))
-                           (unvisited-points (lset-difference eq? points visited-points))
-                           (unvisited-tree (minimum-spanning-tree (complete-graph unvisited-points))))
-                      (<span style="color: #00cdcd; font-weight: bold;">let</span> ((point (node-state node)))
-                        (<span style="color: #00cdcd; font-weight: bold;">let</span> ((nearest-neighbor
-                               (<span style="color: #00cdcd; font-weight: bold;">if</span> (null? unvisited-points)
-                                   0
-                                   (point-distance
-                                    point
-                                    (nearest-neighbor point unvisited-points))))
-                              (nearest-start
-                               (<span style="color: #00cdcd; font-weight: bold;">if</span> (null? unvisited-points)
-                                   0
-                                   (point-distance
-                                    start
-                                    (nearest-neighbor start unvisited-points)))))
-                          (+ nearest-neighbor
-                             (* (tree-cost unvisited-tree) 2)
-                             nearest-start))))))))))
+(<span style="color: #00cdcd; font-weight: bold;">define</span> (<span style="color: #0000ee; font-weight: bold;">points-&gt;vectors</span> points)
+  (<span style="color: #00cdcd; font-weight: bold;">let</span> ((tour (<span style="color: #00cdcd; font-weight: bold;">map</span> (<span style="color: #00cdcd; font-weight: bold;">lambda</span> (from to)
+                     (list (point-x from)
+                           (point-y from)
+                           (point-x to)
+                           (point-y to)))
+                   (drop-right points 1)
+                   (cdr points))))
+    (values (list-&gt;vector (<span style="color: #00cdcd; font-weight: bold;">map</span> car tour))
+            (list-&gt;vector (<span style="color: #00cdcd; font-weight: bold;">map</span> cadr tour))
+            (list-&gt;vector (<span style="color: #00cdcd; font-weight: bold;">map</span> caddr tour))
+            (list-&gt;vector (<span style="color: #00cdcd; font-weight: bold;">map</span> cadddr tour)))))
 
-(<span style="color: #00cdcd; font-weight: bold;">let*</span> ((graph (complete-graph (make-random-points 10)))
+(<span style="color: #00cdcd; font-weight: bold;">define</span> <span style="color: #0000ee; font-weight: bold;">with-R-output-to-png</span>
+  (case-lambda
+   ((output thunk) (with-R-output-to-png output thunk 1600 900))
+   ((output thunk width height)
+    (R (png ,output
+            width: ,width
+            height: ,height
+            type: <span style="color: #00cd00;">"cairo"</span>))
+    (thunk)
+    (R (dev.off)))))
+
+(<span style="color: #00cdcd; font-weight: bold;">define</span> (<span style="color: #0000ee; font-weight: bold;">plot-points</span> x y main)
+  (R (plot ,x
+           ,y
+           xlab: <span style="color: #00cd00;">"x"</span>
+           ylab: <span style="color: #00cd00;">"y"</span>
+           main: ,main
+           cex.lab: 2
+           cex.axis: 2
+           cex.main: 2))
+  (R (text ,x
+           ,y
+           ,(vector-map (<span style="color: #00cdcd; font-weight: bold;">lambda</span> (i x y)
+                          (format <span style="color: #00cd00;">"(~,2f ~,2f)"</span> x y))
+                        x
+                        y)
+           pos: 1
+           cex: 2)))
+
+(<span style="color: #00cdcd; font-weight: bold;">define</span> <span style="color: #0000ee; font-weight: bold;">plot-segments</span>
+  (case-lambda
+   ((x y xend yend)
+    (plot-segments x y xend yend 1))
+   ((x y xend yend col)
+    (R (segments ,x ,y ,xend ,yend col: ,col lwd: 3)))))
+
+(<span style="color: #00cdcd; font-weight: bold;">define</span> (<span style="color: #0000ee; font-weight: bold;">highlight-segments</span> x y xend yend)
+  (plot-segments x y xend yend 2))
+
+(<span style="color: #00cdcd; font-weight: bold;">define</span> (<span style="color: #0000ee; font-weight: bold;">plot-tree</span> x y xend yend)
+  (plot-segments x y xend yend 3))
+
+(<span style="color: #00cdcd; font-weight: bold;">define</span> (<span style="color: #0000ee; font-weight: bold;">make-main</span> main tour)
+  (format <span style="color: #00cd00;">"~a (length: ~,2f)"</span> main
+          (<span style="color: #00cdcd; font-weight: bold;">if</span> (&gt; (length tour) 1)
+           (tour-length (make-tour tour))
+           0)))
+
+(<span style="color: #00cdcd; font-weight: bold;">define</span> (<span style="color: #0000ee; font-weight: bold;">graph-tour-with-tree</span> output main x-points y-points visited-points tree)
+  (<span style="color: #00cdcd; font-weight: bold;">let-values</span> (((x y xend yend) (points-&gt;vectors visited-points))
+               ((x-tree y-tree xend-tree yend-tree) (tree-&gt;vectors tree)))
+    (with-R-output-to-png
+     output
+     (<span style="color: #00cdcd; font-weight: bold;">lambda</span> ()
+       (plot-points x-points y-points
+                    (make-main main
+                               (cdr visited-points)))
+       (when (positive? (vector-length x))
+         (plot-segments x y xend yend)
+         (highlight-segments (vector-ref x 0)
+                             (vector-ref y 0)
+                             (vector-ref xend 0)
+                             (vector-ref yend 0)))
+       (when (positive? (vector-length x-tree))
+         (plot-tree x-tree y-tree xend-tree yend-tree))))))
+
+(<span style="color: #00cdcd; font-weight: bold;">define</span> (<span style="color: #0000ee; font-weight: bold;">x-points</span> points)
+  (list-&gt;vector (<span style="color: #00cdcd; font-weight: bold;">map</span> point-x points)))
+
+(<span style="color: #00cdcd; font-weight: bold;">define</span> (<span style="color: #0000ee; font-weight: bold;">y-points</span> points)
+  (list-&gt;vector (<span style="color: #00cdcd; font-weight: bold;">map</span> point-y points)))
+
+(<span style="color: #00cdcd; font-weight: bold;">define</span> (<span style="color: #0000ee; font-weight: bold;">graph-tour</span> output main points tour)
+  (with-R-output-to-png
+   output
+   (<span style="color: #00cdcd; font-weight: bold;">lambda</span> ()
+     (plot-points (x-points points)
+                  (y-points points)
+                  (make-main main tour))
+     (call-with-values (<span style="color: #00cdcd; font-weight: bold;">lambda</span> () (points-&gt;vectors tour))
+       (<span style="color: #00cdcd; font-weight: bold;">lambda</span> (x y xend yend)
+         (plot-segments x y xend yend))))))
+
+(<span style="color: #00cdcd; font-weight: bold;">define</span> <span style="color: #0000ee; font-weight: bold;">A*-tour</span>
+  (case-lambda
+   ((start graph points)
+    (A*-tour start graph points #f))
+   ((start graph points animation)
+    (<span style="color: #00cdcd; font-weight: bold;">define</span> (<span style="color: #0000ee; font-weight: bold;">goal?</span> node)
+      (= (length (predecessor-path node))
+         (length points)))
+    (<span style="color: #00cdcd; font-weight: bold;">let</span> ((dir (create-temporary-directory))
+          (n 0)
+          (x-points (x-points points))
+          (y-points (y-points points))
+          (main <span style="color: #00cd00;">"TSP with A* and MST"</span>))
+      (cons start
+            (reverse
+             (<span style="color: #00cdcd; font-weight: bold;">map</span> node-state
+                  (A* start
+                      (<span style="color: #00cdcd; font-weight: bold;">lambda</span> (node)
+                        (<span style="color: #00cdcd; font-weight: bold;">let</span> ((point (node-state node)))
+                          (hash-table-ref/default graph point '())))
+                      point-distance
+                      goal?
+                      (<span style="color: #00cdcd; font-weight: bold;">lambda</span> (node)
+                        (<span style="color: #00cdcd; font-weight: bold;">let*</span> ((visited-points (<span style="color: #00cdcd; font-weight: bold;">map</span> node-state (predecessor-path node)))
+                               (unvisited-points (lset-difference eq? points visited-points))
+                               (unvisited-tree (minimum-spanning-tree
+                                                (complete-graph unvisited-points))))
+                          (when animation
+                            (debug n)
+                            (graph-tour-with-tree
+                             (<span style="color: #00cdcd; font-weight: bold;">begin</span> (set! n (+ n 1))
+                                    (make-pathname dir (format <span style="color: #00cd00;">"~4,48d"</span> n) <span style="color: #00cd00;">".png"</span>))
+                             main
+                             x-points
+                             y-points
+                             visited-points
+                             unvisited-tree)
+                            (when (goal? node)
+                              (<span style="color: #00cdcd; font-weight: bold;">let</span> ((fps 6))
+                                <span style="color: #cdcd00;">;; </span><span style="color: #cdcd00;">Make the animation pause at the</span>
+                                <span style="color: #cdcd00;">;; </span><span style="color: #cdcd00;">finished frame for a couple seconds.</span>
+                                (<span style="color: #00cdcd; font-weight: bold;">let</span> ((tour
+                                       (cons start
+                                             (<span style="color: #00cdcd; font-weight: bold;">map</span> node-state
+                                                  (predecessor-path node)))))
+                                  (<span style="color: #00cdcd; font-weight: bold;">do</span> ((i (* fps 2) (- i 1)))
+                                      ((zero? i))
+                                    (debug (+ n i))
+                                    (graph-tour
+                                     (make-pathname dir (format <span style="color: #00cd00;">"~4,48d"</span> (+ n i)) <span style="color: #00cd00;">".png"</span>)
+                                     main
+                                     points
+                                     tour)))
+                                (run (cd ,dir &amp;&amp;
+                                         mencoder mf://*.png
+                                         -mf ,(format <span style="color: #00cd00;">"type=png:fps=~a"</span> fps)
+                                         -ovc lavc
+                                         -o ,(make-pathname (current-directory) animation))))))
+                          (* (tree-cost unvisited-tree) 2)))))))))))
+</pre>
+
+
+
+<pre class="src src-scheme">(use format)
+
+(include <span style="color: #00cd00;">"tsp.scm"</span>)
+
+(<span style="color: #00cdcd; font-weight: bold;">let*</span> ((graph (complete-graph (make-random-points 20)))
        (points (hash-table-keys graph))
        (start (car points)))
-  (<span style="color: #00cdcd; font-weight: bold;">let*</span> ((tour (tour start graph points))
-         (tour (make-tour tour)))
-    <span style="color: #cdcd00;">;; </span><span style="color: #cdcd00;">(graph-tour tour)</span>
-    <span style="color: #cdcd00;">;; </span><span style="color: #cdcd00;">(debug start tour (hash-table-&gt;alist (make-tour tour)))</span>
-    <span style="color: #cdcd00;">;; </span><span style="color: #cdcd00;">(with-output-to-file "tour.csv"</span>
-    <span style="color: #cdcd00;">;;   </span><span style="color: #cdcd00;">(lambda () (graph-tour (make-tour tour))))</span>
-    (graph-tour tour <span style="color: #00cd00;">"A*"</span>)))
-
+  (<span style="color: #00cdcd; font-weight: bold;">let*</span> ((tour (A*-tour start graph points <span style="color: #00cd00;">"3.30.avi"</span>)))
+    (graph-tour <span style="color: #00cd00;">"3.30.png"</span> <span style="color: #00cd00;">"TSP with A* and MST"</span> points tour)))
 </pre>
 
 
@@ -3515,13 +3646,28 @@ program rather than from a vast table.
 
 </pre>
 
+
+<p>
+   Try to use ggplot more effectively; actual values? Given ggplot2's
+   aesthetic weirdness with layers, we might have to move to a plot
+   that takes actual vectors.
+</p>
+<p>
+   Don't forget the eternal:
+</p>
+
+
+
+<pre class="src src-sh">mencoder mf://*.png -mf <span style="color: #cdcd00;">type</span>=png:<span style="color: #cdcd00;">fps</span>=4 -ovc lavc -o harro.avi
+</pre>
+
 </div>
 </div>
 
 </div>
 
 <div id="outline-container-40" class="outline-2">
-<h2 id="sec-40"><span class="section-number-2">40</span> <span class="done DONE"> DONE</span> 4.1</h2>
+<h2 id="sec-40"><span class="section-number-2">40</span> <span class="done DONE">DONE</span> 4.1</h2>
 <div class="outline-text-2" id="text-40">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-11-16 Fri 17:04</span></span><br/>
@@ -3544,7 +3690,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-41" class="outline-2">
-<h2 id="sec-41"><span class="section-number-2">41</span> <span class="todo TODO"> TODO</span> 4.2</h2>
+<h2 id="sec-41"><span class="section-number-2">41</span> <span class="todo TODO">TODO</span> 4.2</h2>
 <div class="outline-text-2" id="text-41">
 
 <p>  From p. 131: "Local search algorithms typically use a complete-state
@@ -3563,8 +3709,126 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-42" class="outline-2">
-<h2 id="sec-42"><span class="section-number-2">42</span> <span class="todo TODO"> TODO</span> 4.3</h2>
+<h2 id="sec-42"><span class="section-number-2">42</span> <span class="todo TODO">TODO</span> 4.3</h2>
 <div class="outline-text-2" id="text-42">
+
+<p>  Thanks, John Montgomery, for the suggestion to <a href="http://www.psychicorigami.com/2007/04/17/tackling-the-travelling-salesman-problem-part-one/">reverse</a> pairs of
+  cities or the cities intervening pairs.
+</p>
+<p>
+  <a href="http://osdir.com/ml/plt-scheme/2009-08/msg00134.html">Shuffling a list</a>; <a href="http://mumble.net/~campbell/scheme/shuffle.scm">Riastradh's</a>; <a href="http://codeimmersion.i3ci.hampshire.edu/2009/09/20/a-simple-scheme-shuffle/">O(n log n)</a>, I believe.
+</p>
+
+
+
+<pre class="src src-scheme">(include <span style="color: #00cd00;">"tsp.scm"</span>)
+
+(use aima-search
+     data-structures
+     debug
+     heap
+     srfi-1
+     statistics
+     vector-lib)
+
+(<span style="color: #00cdcd; font-weight: bold;">define</span> (<span style="color: #0000ee; font-weight: bold;">shuffle!</span> v)
+  (<span style="color: #00cdcd; font-weight: bold;">do</span> ((n (vector-length v) (- n 1)))
+      ((zero? n) v)
+    (<span style="color: #00cdcd; font-weight: bold;">let*</span> ((r (random n)) (t (vector-ref v r)))
+      (vector-set! v r (vector-ref v (- n 1)))
+            (vector-set! v (- n 1) t))))
+
+(<span style="color: #00cdcd; font-weight: bold;">define</span> (<span style="color: #0000ee; font-weight: bold;">shuffle</span> v)
+  (<span style="color: #00cdcd; font-weight: bold;">let</span> ((v (vector-copy v)))
+    (shuffle! v)
+    v))
+
+(<span style="color: #00cdcd; font-weight: bold;">define</span> (<span style="color: #0000ee; font-weight: bold;">tour-distance</span> tour)
+  (<span style="color: #00cdcd; font-weight: bold;">do</span> ((i 0 (+ i 1))
+       (j 1 (modulo (+ j 1) (vector-length tour)))
+       (distance 0 (+ distance (point-distance (vector-ref tour i)
+                                               (vector-ref tour j)))))
+      ((= i (vector-length tour)) distance)))
+
+(<span style="color: #00cdcd; font-weight: bold;">define</span> (<span style="color: #0000ee; font-weight: bold;">successors</span> tour)
+  (<span style="color: #00cdcd; font-weight: bold;">do</span> ((i 0 (+ i 1))
+       (successors
+        '()
+        (append
+         (<span style="color: #00cdcd; font-weight: bold;">do</span> ((j i (+ j 1))
+              (successors '() (cons (<span style="color: #00cdcd; font-weight: bold;">let</span> ((tour (vector-copy tour)))
+                                      (vector-swap! tour i j)
+                                      tour)
+                                    successors)))
+             ((= j (vector-length tour)) successors))
+         successors)
+        ))
+      ((= i (- (vector-length tour) 1)) successors)))
+
+(<span style="color: #00cdcd; font-weight: bold;">define</span> (<span style="color: #0000ee; font-weight: bold;">min-successor</span> successors)
+  (<span style="color: #00cdcd; font-weight: bold;">let</span> ((tours (make-min-heap)))
+    (<span style="color: #00cdcd; font-weight: bold;">for-each</span> (<span style="color: #00cdcd; font-weight: bold;">lambda</span> (successor)
+                (heap-insert! tours (tour-distance successor) successor))
+      successors)
+    (heap-extract-extremum! tours)))
+
+(<span style="color: #00cdcd; font-weight: bold;">define</span> (<span style="color: #0000ee; font-weight: bold;">hill-climbing</span> points)
+  (<span style="color: #00cdcd; font-weight: bold;">let</span> <span style="color: #0000ee; font-weight: bold;">iter</span> ((tour (shuffle (list-&gt;vector points))))
+    (<span style="color: #00cdcd; font-weight: bold;">let</span> ((next-tour (min-successor (successors tour))))
+      (<span style="color: #00cdcd; font-weight: bold;">if</span> (&gt;= (tour-distance next-tour)
+              (tour-distance tour))
+          (cons (vector-ref tour (- (vector-length tour) 1))
+                (vector-&gt;list tour))
+          (iter next-tour)))))
+
+<span style="color: #cdcd00;">;; </span><span style="color: #cdcd00;">(let ((points (make-random-points 10)))</span>
+<span style="color: #cdcd00;">;;   </span><span style="color: #cdcd00;">(let ((hill-climbing-tour (hill-climbing points))</span>
+<span style="color: #cdcd00;">;;         </span><span style="color: #cdcd00;">(A*-tour (A*-tour (car points) (complete-graph points) points)))</span>
+<span style="color: #cdcd00;">;;     </span><span style="color: #cdcd00;">(debug (tour-length (make-tour hill-climbing-tour))</span>
+<span style="color: #cdcd00;">;;            </span><span style="color: #cdcd00;">(tour-length (make-tour A*-tour)))</span>
+<span style="color: #cdcd00;">;;     </span><span style="color: #cdcd00;">;; (graph-tour (make-tour (cons (vector-ref tour (- (vector-length tour) 1))</span>
+<span style="color: #cdcd00;">;;     </span><span style="color: #cdcd00;">;;                              (vector-&gt;list tour)))</span>
+<span style="color: #cdcd00;">;;     </span><span style="color: #cdcd00;">;;             "Hill-climbing"</span>
+<span style="color: #cdcd00;">;;     </span><span style="color: #cdcd00;">;;             "img/4-3.png")</span>
+<span style="color: #cdcd00;">;;     </span><span style="color: #cdcd00;">))</span>
+
+<span style="color: #cdcd00;">;; </span><span style="color: #cdcd00;">(map (lambda (i)</span>
+<span style="color: #cdcd00;">;;        </span><span style="color: #cdcd00;">(let ((points (make-random-points 10)))</span>
+<span style="color: #cdcd00;">;;          </span><span style="color: #cdcd00;">(debug i)</span>
+<span style="color: #cdcd00;">;;          </span><span style="color: #cdcd00;">(let ((hill-climbing-tour (hill-climbing points))</span>
+<span style="color: #cdcd00;">;;                </span><span style="color: #cdcd00;">(A*-tour (A*-tour (car points) (complete-graph points) points)))</span>
+<span style="color: #cdcd00;">;;            </span><span style="color: #cdcd00;">(cons (tour-length (make-tour hill-climbing-tour))</span>
+<span style="color: #cdcd00;">;;                  </span><span style="color: #cdcd00;">(tour-length (make-tour A*-tour))))))</span>
+<span style="color: #cdcd00;">;;      </span><span style="color: #cdcd00;">(iota 100))</span>
+
+(debug
+ (<span style="color: #00cdcd; font-weight: bold;">let</span> <span style="color: #0000ee; font-weight: bold;">iter</span> ((n 1)
+            (hill-climbing-tours '())
+            (A*-tours '()))
+   (debug n)
+   (<span style="color: #00cdcd; font-weight: bold;">if</span> (zero? n)
+       (cons (mean hill-climbing-tours)
+             (mean A*-tours))
+       (<span style="color: #00cdcd; font-weight: bold;">let</span> ((points (make-random-points 10)))
+         (<span style="color: #00cdcd; font-weight: bold;">let</span> ((hill-climbing-tour (hill-climbing points))
+               (A*-tour (A*-tour (car points) (complete-graph points) points)))
+           (debug hill-climbing-tour
+                  (tour-length (make-tour hill-climbing-tour))
+                  A*-tour
+                  (tour-length (make-tour A*-tour)))
+           (graph-tour (make-tour hill-climbing-tour)
+                       <span style="color: #00cd00;">"Hill climbing"</span>
+                       <span style="color: #00cd00;">"hill-climbing.png"</span>)
+           (graph-tour (make-tour A*-tour)
+                       <span style="color: #00cd00;">"A*"</span>
+                       <span style="color: #00cd00;">"a-star.png"</span>)
+           (iter (- n 1)
+                 (cons (tour-length (make-tour hill-climbing-tour))
+                       hill-climbing-tours)
+                 (cons (tour-length (make-tour A*-tour))
+                       A*-tours)))))))
+
+</pre>
 
 </div>
 
@@ -3648,7 +3912,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-43-2-1" class="outline-4">
-<h4 id="sec-43-2-1"><span class="section-number-4">43.2.1</span> <span class="done CANCELED"> CANCELED</span> Test a simple agent in each (Python, Java, Clojure) implementation.</h4>
+<h4 id="sec-43-2-1"><span class="section-number-4">43.2.1</span> <span class="done CANCELED">CANCELED</span> Test a simple agent in each (Python, Java, Clojure) implementation.</h4>
 <div class="outline-text-4" id="text-43-2-1">
 
 <p>     <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-06-20 Wed 03:19</span></span><br/>
@@ -3663,7 +3927,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-43-2-2" class="outline-4">
-<h4 id="sec-43-2-2"><span class="section-number-4">43.2.2</span> <span class="done DONE"> DONE</span> Get some standard cables to connect to the projector.</h4>
+<h4 id="sec-43-2-2"><span class="section-number-4">43.2.2</span> <span class="done DONE">DONE</span> Get some standard cables to connect to the projector.</h4>
 <div class="outline-text-4" id="text-43-2-2">
 
 <p>     <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-06-20 Wed 03:19</span></span><br/>
@@ -3672,7 +3936,7 @@ program rather than from a vast table.
 </div>
 
 <div id="outline-container-43-2-3" class="outline-4">
-<h4 id="sec-43-2-3"><span class="section-number-4">43.2.3</span> <span class="done DONE"> DONE</span> See if we can use <code>xrandr</code> to get twin-view with an external HDMI.</h4>
+<h4 id="sec-43-2-3"><span class="section-number-4">43.2.3</span> <span class="done DONE">DONE</span> See if we can use <code>xrandr</code> to get twin-view with an external HDMI.</h4>
 <div class="outline-text-4" id="text-43-2-3">
 
 <p>     <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-06-15 Fri 06:04</span></span><br/>
@@ -3748,7 +4012,7 @@ xrandr --output HDMI1 --mode 1280x720
 </div>
 
 <div id="outline-container-43-3-2" class="outline-4">
-<h4 id="sec-43-3-2"><span class="section-number-4">43.3.2</span> <span class="todo TODO"> TODO</span> Get a minimal Clojure example up <a href="https://github.com/klutometis/aima-clojure">here</a>.</h4>
+<h4 id="sec-43-3-2"><span class="section-number-4">43.3.2</span> <span class="todo TODO">TODO</span> Get a minimal Clojure example up <a href="https://github.com/klutometis/aima-clojure">here</a>.</h4>
 <div class="outline-text-4" id="text-43-3-2">
 
 </div>
@@ -3756,7 +4020,7 @@ xrandr --output HDMI1 --mode 1280x720
 </div>
 
 <div id="outline-container-43-3-3" class="outline-4">
-<h4 id="sec-43-3-3"><span class="section-number-4">43.3.3</span> <span class="todo TODO"> TODO</span> Set up <code>csrg.org</code> with a mailing list.</h4>
+<h4 id="sec-43-3-3"><span class="section-number-4">43.3.3</span> <span class="todo TODO">TODO</span> Set up <code>csrg.org</code> with a mailing list.</h4>
 <div class="outline-text-4" id="text-43-3-3">
 
 <p>    This is an alternative to e.g. Google groups and whatever
@@ -3910,6 +4174,26 @@ xrandr --output HDMI1 --mode 1280x720
    cherry-pick interesting problems, present them. Optionally
    collaborate.
 </p></div>
+
+</div>
+
+<div id="outline-container-43-10" class="outline-3">
+<h3 id="sec-43-10"><span class="section-number-3">43.10</span> Mon Nov 26 2012</h3>
+<div class="outline-text-3" id="text-43-10">
+
+<ul>
+<li>Come up with pathological cases: different costs from A \(\to\) B
+     vs. B \(\to\) A.
+</li>
+<li>Recombination of paths?
+</li>
+<li>A*, hill-climbing, and GA applied to TSP.
+</li>
+<li><a href="http://webcache.googleusercontent.com/search?q=cache:jhd41bMWVwYJ:ma.ttforbes.com/A*%2520and%2520the%2520Traveling%2520Salesman%2520Problem+&amp;cd=6&amp;hl=en&amp;ct=clnk&amp;gl=us&amp;client=opera">Matt Forbes</a>
+</li>
+</ul>
+
+</div>
 </div>
 
 </div>
@@ -4169,7 +4453,7 @@ xrandr --output HDMI1 --mode 1280x720
 
 </li>
 <li>Rationality: performance measure, agent's prior (i.e. <i>a priori</i>)
-     knowledge, agent's actions, agent's percept sequence.<sup><a class="footref" name="fnr.10" href="#fn.10">10</a></sup>
+     knowledge, agent's actions, agent's percept sequence.<sup><a class="footref" name="fnr-.10" href="#fn-.10">10</a></sup>
 <ul>
 <li>"Percept," it turns out, is the converse of "concept": "A
        Percept or Intuition is a single representation . . . a Concept
@@ -4366,12 +4650,12 @@ xrandr --output HDMI1 --mode 1280x720
 
 
 
-<pre class="src src-org">- table-driven-agent percept
-  - persistent
-    - percepts ()
-    - table
-  - append percept to percepts
-  - lookup percepts table
+<pre class="src src-org">,- table-driven-agent percept
+,  - persistent
+,    - percepts ()
+,    - table
+,  - append percept to percepts
+,  - lookup percepts table
 
 </pre>
 
@@ -4380,13 +4664,13 @@ xrandr --output HDMI1 --mode 1280x720
 
 
 
-<pre class="src src-org">- reflex-vacuum-agent location status
-  - if dirty? status
-    - suck
-    - else if location = A
-      - right
-    - else
-      - left
+<pre class="src src-org">,- reflex-vacuum-agent location status
+,  - if dirty? status
+,    - suck
+,    - else if location = A
+,      - right
+,    - else
+,      - left
 </pre>
 
 </li>
@@ -4399,12 +4683,12 @@ xrandr --output HDMI1 --mode 1280x720
 
 
 
-<pre class="src src-org">- simple-reflex-agent percept
-  - persistent
-    - rules
-  - state = interpret-input(percept)
-  - rule = rule-match(state rules)
-  - rule.action
+<pre class="src src-org">,- simple-reflex-agent percept
+,  - persistent
+,    - rules
+,  - state = interpret-input(percept)
+,  - rule = rule-match(state rules)
+,  - rule.action
 </pre>
 
 </li>
@@ -4440,15 +4724,15 @@ xrandr --output HDMI1 --mode 1280x720
 
 
 
-<pre class="src src-org">- model-based-reflex-agent percept
-  - persistent
-    - state
-    - model
-    - rules
-    - action
-  - state = update-state(state action percept model)
-  - rule = rule-match(state)
-  - (action rule)
+<pre class="src src-org">,- model-based-reflex-agent percept
+,  - persistent
+,    - state
+,    - model
+,    - rules
+,    - action
+,  - state = update-state(state action percept model)
+,  - rule = rule-match(state)
+,  - (action rule)
 </pre>
 
 </li>
@@ -4611,7 +4895,7 @@ xrandr --output HDMI1 --mode 1280x720
 </li>
 <li>Horvitz suggests the use of rationality conceived as the
      maximization of expected utility as the basis for AI.
-     Pearl, 1988.<sup><a class="footref" name="fnr.11" href="#fn.11">11</a></sup>
+     Pearl, 1988.<sup><a class="footref" name="fnr-.11" href="#fn-.11">11</a></sup>
 <ul>
 <li>Horvitz, E., 1988. Reasoning Under Varying and Uncertain
        Resource Constraints, Proc. of the 7th National Conference on
@@ -4720,13 +5004,13 @@ xrandr --output HDMI1 --mode 1280x720
 
 
 
-<pre class="src src-org">- child-node(problem, parent, action) -&gt; node
-  - let
-    - state (problem-result (node-state parent) action)
-    - parent parent
-    - action action
-    - path-cose (+ (path-cost parent) (step-cost problem (node-state
-      parent) action)
+<pre class="src src-org">,- child-node(problem, parent, action) -&gt; node
+,  - let
+,    - state (problem-result (node-state parent) action)
+,    - parent parent
+,    - action action
+,    - path-cose (+ (path-cost parent) (step-cost problem (node-state
+,      parent) action)
 </pre>
 
 </li>
@@ -4866,11 +5150,11 @@ xrandr --output HDMI1 --mode 1280x720
 
 
 
-<pre class="src src-org">- iterative-deepening-search(problem) -&gt; solution or failure
-  - for depth = 0 to infinity do
-    - result = depth-limited-search(problem, depth)
-    - if result != cutoff
-      - return result
+<pre class="src src-org">,- iterative-deepening-search(problem) -&gt; solution or failure
+,  - for depth = 0 to infinity do
+,    - result = depth-limited-search(problem, depth)
+,    - if result != cutoff
+,      - return result
 </pre>
 
 </li>
@@ -5237,12 +5521,12 @@ xrandr --output HDMI1 --mode 1280x720
 
 
 
-<pre class="src src-org">- hill-climbing (problem) -&gt; local maximum state
-  - current &lt;- make-node(problem.initial-state)
-  - loop
-    - neighbor &lt;- max successor of current
-    - if neighbor &lt;= current return current.state
-    - current &lt;- neighbor
+<pre class="src src-org">,- hill-climbing (problem) -&gt; local maximum state
+,  - current &lt;- make-node(problem.initial-state)
+,  - loop
+,    - neighbor &lt;- max successor of current
+,    - if neighbor &lt;= current return current.state
+,    - current &lt;- neighbor
 </pre>
 
 <ul>
@@ -5277,15 +5561,15 @@ xrandr --output HDMI1 --mode 1280x720
 
 
 
-<pre class="src src-org">- simulated-annealing(problem, schedule) -&gt; solution-state
-  - current &lt;- make-node(problem.initial-state)
-  - for i = 1 to inf
-    - T &lt;- schedule(t)
-    - if T = 0 then return current
-    - next &lt;- random successor of current
-    - delta-E &lt;- next.value - current.value
-    - if delte-E &gt; 0 then current &lt;- next
-    - else current &lt;- next only with probability e^{delta-E / T}
+<pre class="src src-org">,- simulated-annealing(problem, schedule) -&gt; solution-state
+,  - current &lt;- make-node(problem.initial-state)
+,  - for i = 1 to inf
+,    - T &lt;- schedule(t)
+,    - if T = 0 then return current
+,    - next &lt;- random successor of current
+,    - delta-E &lt;- next.value - current.value
+,    - if delte-E &gt; 0 then current &lt;- next
+,    - else current &lt;- next only with probability e^{delta-E / T}
 </pre>
 
 <ul>
@@ -5339,21 +5623,21 @@ xrandr --output HDMI1 --mode 1280x720
 
 
 
-<pre class="src src-org">- genetic-algorithm(population, fitness) -&gt; individual
-  - repeat
-    - new-population &lt;- {}
-    - for i = 1 to size(population) do
-      - x &lt;- random-selection(population, fitness)
-      - y &lt;- random-selection(population, fitness)
-      - child &lt;- reproduce(x, y)
-      - if (small-random-possibility) then child &lt;- mutate(child)
-      - add child to new-population
-    - population &lt;- new-population
-  - until some individual is fit enough, or enough time has elapsed
-  - return the best individual in population, according to fitness
-- reproduce(x, y) -&gt; individual
-  - n &lt;- length(x); c &lt;- random(1, n)
-  - return append(substring(x, 1, c), substring,(y, c+1, n))
+<pre class="src src-org">,- genetic-algorithm(population, fitness) -&gt; individual
+,  - repeat
+,    - new-population &lt;- {}
+,    - for i = 1 to size(population) do
+,      - x &lt;- random-selection(population, fitness)
+,      - y &lt;- random-selection(population, fitness)
+,      - child &lt;- reproduce(x, y)
+,      - if (small-random-possibility) then child &lt;- mutate(child)
+,      - add child to new-population
+,    - population &lt;- new-population
+,  - until some individual is fit enough, or enough time has elapsed
+,  - return the best individual in population, according to fitness
+,- reproduce(x, y) -&gt; individual
+,  - n &lt;- length(x); c &lt;- random(1, n)
+,  - return append(substring(x, 1, c), substring,(y, c+1, n))
 </pre>
 
 <ul>
@@ -5563,21 +5847,21 @@ xrandr --output HDMI1 --mode 1280x720
 
 
 
-<pre class="src src-org">- and-or-graph-search(problem) -&gt; conditional plan, failure
-  - or-search(problem.initial-state, problem, [])
-- or-search(state, problem, path) -&gt; conditional plan, failure
-  - if problem.goal-test(state) then return empty plan
-  - if state is on path then retun failure
-  - for each action in problem.actions(state) do
-    - plan &lt;- and-search(results(state, action), problem, [ state |
-      path ])
-    - if plan != failure then return [action | plan]
-  - return failure
-- and-search(states, problem, path) -&gt; conditional plan, failure
-  - for each s in states do
-    - plan &lt;- or-search(s, problem, path)
-    - if plan = failure then return failure
-  - return [if s_1 then plan_1 else . . . if s_n then plan_n]
+<pre class="src src-org">,- and-or-graph-search(problem) -&gt; conditional plan, failure
+,  - or-search(problem.initial-state, problem, [])
+,- or-search(state, problem, path) -&gt; conditional plan, failure
+,  - if problem.goal-test(state) then return empty plan
+,  - if state is on path then retun failure
+,  - for each action in problem.actions(state) do
+,    - plan &lt;- and-search(results(state, action), problem, [ state |
+,      path ])
+,    - if plan != failure then return [action | plan]
+,  - return failure
+,- and-search(states, problem, path) -&gt; conditional plan, failure
+,  - for each s in states do
+,    - plan &lt;- or-search(s, problem, path)
+,    - if plan = failure then return failure
+,  - return [if s_1 then plan_1 else . . . if s_n then plan_n]
 </pre>
 
 </li>
@@ -5855,39 +6139,39 @@ xrandr --output HDMI1 --mode 1280x720
 </li>
 <li>Algorithm keeps a table that lists, for each state, the
       predecessory states to which the agent has not yet
-      backtracked.<sup><a class="footref" name="fnr.12" href="#fn.12">12</a></sup>
+      backtracked.<sup><a class="footref" name="fnr-.12" href="#fn-.12">12</a></sup>
 </li>
 <li>For finding a goal, agent's competitive ratio could be bad if it
       goes off on a long excursion; online variant of iterative
-      deepening solves this problem.<sup><a class="footref" name="fnr.13" href="#fn.13">13</a></sup>
+      deepening solves this problem.<sup><a class="footref" name="fnr-.13" href="#fn-.13">13</a></sup>
 
 
 
-<pre class="src src-org">- online-dfs-agent(state) -&gt; action
-  - let
-    - result, indexed by state and action
-    - untried, state -&gt; untried actions
-    - unbacktracked, state -&gt; backtracks not yet tried
-    - prev-state
-    - prev-action
-    - if goal-test(state) -&gt; stop
-    - if state is not in untried
-      - untried(state) &lt;- actions(state)
-    - if prev-state is not null
-      - begin
-        - result(prev-state, prev-action) &lt;- state
-        - push prev-state unto unbacktracked(state)
-    - if untried(state) is empty
-      - if unbacktracked(state) is empty -&gt; stop
-      - else prev-action &lt;- inverse of prev-action (such that result(state,
-        action) = pop(unbacktracked(state))
-    - else prev-action &lt;- pop(untried(state))
-    - prev-state &lt;- state
-    - return prev-action
+<pre class="src src-org">,- online-dfs-agent(state) -&gt; action
+,  - let
+,    - result, indexed by state and action
+,    - untried, state -&gt; untried actions
+,    - unbacktracked, state -&gt; backtracks not yet tried
+,    - prev-state
+,    - prev-action
+,    - if goal-test(state) -&gt; stop
+,    - if state is not in untried
+,      - untried(state) &lt;- actions(state)
+,    - if prev-state is not null
+,      - begin
+,        - result(prev-state, prev-action) &lt;- state
+,        - push prev-state unto unbacktracked(state)
+,    - if untried(state) is empty
+,      - if unbacktracked(state) is empty -&gt; stop
+,      - else prev-action &lt;- inverse of prev-action (such that result(state,
+,        action) = pop(unbacktracked(state))
+,    - else prev-action &lt;- pop(untried(state))
+,    - prev-state &lt;- state
+,    - return prev-action
 </pre>
 
 </li>
-<li>Only works in state spaces where actions are reversible.<sup><a class="footref" name="fnr.14" href="#fn.14">14</a></sup>
+<li>Only works in state spaces where actions are reversible.<sup><a class="footref" name="fnr-.14" href="#fn-.14">14</a></sup>
 </li>
 </ul>
 
@@ -5908,7 +6192,7 @@ xrandr --output HDMI1 --mode 1280x720
 </li>
 <li>Random restarts cannot be used: can't teleport to new state.
 </li>
-<li>Instead of random restarts: random walk.<sup><a class="footref" name="fnr.15" href="#fn.15">15</a></sup>
+<li>Instead of random restarts: random walk.<sup><a class="footref" name="fnr-.15" href="#fn-.15">15</a></sup>
 </li>
 <li>Random walk will eventually find a goal, given finite state
       space.
@@ -5921,24 +6205,24 @@ xrandr --output HDMI1 --mode 1280x720
 
 
 
-<pre class="src src-org">- LRTA*-agent(s') -&gt; action
-  - let result: indexed by state and action
-    - H: cost-estimated indexed by state
-    - s, a: previous state and action
-    - if goal-test(s') -&gt; stop
-    - if s' is not in H, H(s') &lt;- h(s')
-    - if s is not null:
-      - begin
-        - result(s, a) &lt;- s'
-          # Looks like dynamic programming?
-        - H(s) &lt;- min_{b in actions(s)} LRTA*-cost(s, b, result(s, b), H)
-    - a &lt;- action b in actions(s') that minimizes LRTA*-cost(s', b,
-      result(s', b), H)
-    - s &lt;- s'
-    - a
-- LRTA*-cost(s, a, s', H) -&gt; cost-estimate
-  - if s' is undefined the return h(s)
-  - else return c(s, a, s') + H(s')
+<pre class="src src-org">,- LRTA*-agent(s') -&gt; action
+,  - let result: indexed by state and action
+,    - H: cost-estimated indexed by state
+,    - s, a: previous state and action
+,    - if goal-test(s') -&gt; stop
+,    - if s' is not in H, H(s') &lt;- h(s')
+,    - if s is not null:
+,      - begin
+,        - result(s, a) &lt;- s'
+,          # Looks like dynamic programming?
+,        - H(s) &lt;- min_{b in actions(s)} LRTA*-cost(s, b, result(s, b), H)
+,    - a &lt;- action b in actions(s') that minimizes LRTA*-cost(s', b,
+,      result(s', b), H)
+,    - s &lt;- s'
+,    - a
+,- LRTA*-cost(s, a, s', H) -&gt; cost-estimate
+,  - if s' is undefined the return h(s)
+,  - else return c(s, a, s') + H(s')
 </pre>
 
 </li>
@@ -5984,7 +6268,7 @@ xrandr --output HDMI1 --mode 1280x720
 <li>Genetic programming related to genetic algorithms: programs
       rather than strings; expansion trees: splicing subtrees rather
       than substrings. Guarantees that offspring all well-formed
-      expressions.<sup><a class="footref" name="fnr.16" href="#fn.16">16</a></sup>
+      expressions.<sup><a class="footref" name="fnr-.16" href="#fn-.16">16</a></sup>
 </li>
 </ul>
 
@@ -6314,7 +6598,7 @@ in five minutes of text-based conversation.
 </div>
 
 <div id="outline-container-45-1" class="outline-3">
-<h3 id="sec-45-1"><span class="section-number-3">45.1</span> <span class="done DONE"> DONE</span> 3.22</h3>
+<h3 id="sec-45-1"><span class="section-number-3">45.1</span> <span class="done DONE">DONE</span> 3.22</h3>
 <div class="outline-text-3" id="text-45-1">
 
 <p>   Need a graph of possible moves (initially hard-coded for 3x3?); and
@@ -6931,7 +7215,7 @@ path-cost function.
 </div>
 
 <div id="outline-container-45-2" class="outline-3">
-<h3 id="sec-45-2"><span class="section-number-3">45.2</span> <span class="todo TODO"> TODO</span> Voronoi</h3>
+<h3 id="sec-45-2"><span class="section-number-3">45.2</span> <span class="todo TODO">TODO</span> Voronoi</h3>
 <div class="outline-text-3" id="text-45-2">
 
 <p>   Never got a chance to implement from scratch; <a href="http://www.youtube.com/watch?v=xMhBobFoQbk&amp;feature=related">should have watched</a>?
@@ -6940,7 +7224,7 @@ path-cost function.
 </div>
 
 <div id="outline-container-45-3" class="outline-3">
-<h3 id="sec-45-3"><span class="section-number-3">45.3</span> <span class="done DONE"> DONE</span> 3.7</h3>
+<h3 id="sec-45-3"><span class="section-number-3">45.3</span> <span class="done DONE">DONE</span> 3.7</h3>
 <div class="outline-text-3" id="text-45-3">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-10-01 Mon 03:29</span></span><br/>
@@ -6961,7 +7245,7 @@ path-cost function.
 </div>
 
 <div id="outline-container-45-4" class="outline-3">
-<h3 id="sec-45-4"><span class="section-number-3">45.4</span> <span class="done DONE"> DONE</span> 3.7</h3>
+<h3 id="sec-45-4"><span class="section-number-3">45.4</span> <span class="done DONE">DONE</span> 3.7</h3>
 <div class="outline-text-3" id="text-45-4">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-10-01 Mon 03:29</span></span><br/>
@@ -7360,7 +7644,7 @@ these edges can be attached.
    <a href="https://github.com/gorhill/Javascript-Voronoi/blob/master/rhill-voronoi-core.js">Javascript Voronoi</a>, by the way; 
 </p>
 <ul>
-<li id="sec-45-4-1"><span class="todo TODO"> TODO</span> Implementation<br/>
+<li id="sec-45-4-1"><span class="todo TODO">TODO</span> Implementation<br/>
 <blockquote>
 
 <p>At a site event two new breakpoints appear, which start tracing
@@ -7382,9 +7666,7 @@ breakpoint and p j defines the parabola to the right.
 <p>
      Computing the breakpoint (from <a href="http://www.skynet.ie/~sos/mapviewer/docs/Voronoi_Diagram_Notes_1.pdf">here</a>):
 </p>
-<p>
- # <a name="computing-breakpoint" class="target">computing-breakpoint</a> 
-</p><blockquote>
+<blockquote>
 
 <p>Between each consecutive pair of sites pi and pj , there is a
 breakpoint. Although the breakpoint moves as a function of the
@@ -7500,7 +7782,7 @@ one where it is the right arc.
      Can't we just hard-code the determinant and solve the equations;
      how did Fortune do it?
 </p><ul>
-<li id="sec-45-4-1-1"><span class="todo TODO"> TODO</span> Binary search on breakpoints<br/>
+<li id="sec-45-4-1-1"><span class="todo TODO">TODO</span> Binary search on breakpoints<br/>
       See <a href="#computing-breakpoint">computing-breakpoint</a>.
 
 <p>
@@ -7535,7 +7817,7 @@ these involve determinants, if you know what they are:
 </li>
 </ul>
 <ul>
-<li id="sec-45-4-3"><span class="todo TODO"> TODO</span> Test data<br/>
+<li id="sec-45-4-3"><span class="todo TODO">TODO</span> Test data<br/>
      <code>tripack</code> has an interesting test-case:
 
 
@@ -7703,7 +7985,7 @@ them).
 </li>
 </ul>
 <ul>
-<li id="sec-45-4-8"><span class="todo TODO"> TODO</span> Calculate convergence of breakpoints<br/>
+<li id="sec-45-4-8"><span class="todo TODO">TODO</span> Calculate convergence of breakpoints<br/>
      <a href="http://cgm.cs.mcgill.ca/~mcleish/644/Projects/DerekJohns/Sweep.htm">Good animations</a>; still doesn't elaborate on how to calculate
      whether the breakpoints converge.
 
@@ -7738,7 +8020,7 @@ on the coordinate system and sweepline alignment you have chosen.
 </li>
 </ul>
 <ul>
-<li id="sec-45-4-9"><span class="todo TODO"> TODO</span> Doubly-connect edge list<br/>
+<li id="sec-45-4-9"><span class="todo TODO">TODO</span> Doubly-connect edge list<br/>
      See <a href="http://en.wikipedia.org/wiki/Doubly_connected_edge_list">here</a>:
 
 <blockquote>
@@ -7772,7 +8054,7 @@ reducing the data structure complexity.
 </li>
 </ul>
 <ul>
-<li id="sec-45-4-10"><span class="todo TODO"> TODO</span> \(O(n^2 \log n)\) intersection of all the half-planes<br/>
+<li id="sec-45-4-10"><span class="todo TODO">TODO</span> \(O(n^2 \log n)\) intersection of all the half-planes<br/>
      Bisector between two points: perpendicular; points that are the
      same distance from \(p\) and \(q\).
 
@@ -7804,7 +8086,7 @@ calculation takes O(n log n) time and is done once. Next, we take
 all the open half-planes that contain a site and calculate the
 intersection of these half-planes to obtain the Voronoi cell for
 this site. An optimal algorithm for computing the intersection of
-half-planes is O(n log n) <sup><a class="footref" name="fnr.17" href="#fn.17">17</a></sup>. Repeat for every site. The overall
+half-planes is O(n log n) <sup><a class="footref" name="fnr-.17" href="#fn-.17">17</a></sup>. Repeat for every site. The overall
 complexity then becomes O(n2 log n).
 </p>
 </blockquote>
@@ -7834,7 +8116,7 @@ according to the neighbourhood relations between the triangles.
 </div>
 
 <div id="outline-container-45-4-1" class="outline-4">
-<h4 id="sec-45-4-1"><span class="section-number-4">45.4.1</span> <span class="todo TODO"> TODO</span> Voronoi</h4>
+<h4 id="sec-45-4-1"><span class="section-number-4">45.4.1</span> <span class="todo TODO">TODO</span> Voronoi</h4>
 <div class="outline-text-4" id="text-45-4-1">
 
 <ul>
@@ -7851,7 +8133,7 @@ according to the neighbourhood relations between the triangles.
 </div>
 
 <div id="outline-container-45-4-2" class="outline-4">
-<h4 id="sec-45-4-2"><span class="section-number-4">45.4.2</span> <span class="todo TODO"> TODO</span> Triangulation</h4>
+<h4 id="sec-45-4-2"><span class="section-number-4">45.4.2</span> <span class="todo TODO">TODO</span> Triangulation</h4>
 <div class="outline-text-4" id="text-45-4-2">
 
 <p>    Can't we do some sort of Delaunay triangulation and remove edges to
@@ -7919,7 +8201,7 @@ skinny triangles.
 
 
 <ul>
-<li id="sec-45-4-2-1"><span class="todo TODO"> TODO</span> Matrices<br/>
+<li id="sec-45-4-2-1"><span class="todo TODO">TODO</span> Matrices<br/>
      Not a bad <a href="http://science.kennesaw.edu/~plaval/math3260/det1.pdf">recursive determinant</a> (use only the first row).
 
 
@@ -8019,7 +8301,7 @@ skinny triangles.
 </div>
 
 <div id="outline-container-45-4-3" class="outline-4">
-<h4 id="sec-45-4-3"><span class="section-number-4">45.4.3</span> <span class="todo TODO"> TODO</span> EMST</h4>
+<h4 id="sec-45-4-3"><span class="section-number-4">45.4.3</span> <span class="todo TODO">TODO</span> EMST</h4>
 <div class="outline-text-4" id="text-45-4-3">
 
 <p>    There are even <a href="http://zachjorgensen.com/ictai06.pdf">EMST-based clustering algorithms</a>.
@@ -8028,7 +8310,7 @@ skinny triangles.
 </div>
 
 <div id="outline-container-45-4-4" class="outline-4">
-<h4 id="sec-45-4-4"><span class="section-number-4">45.4.4</span> <span class="todo TODO"> TODO</span> Fortune's algorithm</h4>
+<h4 id="sec-45-4-4"><span class="section-number-4">45.4.4</span> <span class="todo TODO">TODO</span> Fortune's algorithm</h4>
 <div class="outline-text-4" id="text-45-4-4">
 
 <p>    Maybe we can lick this with a combination of
@@ -8052,7 +8334,7 @@ their distance to the other objects.
 </div>
 
 <div id="outline-container-45-4-5" class="outline-4">
-<h4 id="sec-45-4-5"><span class="section-number-4">45.4.5</span> <span class="todo TODO"> TODO</span> Plotting Voronoi</h4>
+<h4 id="sec-45-4-5"><span class="section-number-4">45.4.5</span> <span class="todo TODO">TODO</span> Plotting Voronoi</h4>
 <div class="outline-text-4" id="text-45-4-5">
 
 <p>    See <a href="http://had.co.nz/ggplot2/geom_path.html">path</a> and <a href="http://had.co.nz/ggplot2/geom_segment.html">segment</a>. We might actually build this Scheme-R bridge.
@@ -8327,7 +8609,7 @@ dev.off()
 <p>
     See <a href="http://www.omegahat.org/RSPython/">RSPython</a>, <a href="http://rpy.sourceforge.net/rpy.html">rpy</a>, <a href="http://rpy.sourceforge.net/rpy2.html">rpy2</a>.
 </p><ul>
-<li id="sec-45-4-5-1"><span class="todo TODO"> TODO</span> Embedded R<br/>
+<li id="sec-45-4-5-1"><span class="todo TODO">TODO</span> Embedded R<br/>
      <a href="http://rpy.sourceforge.net/rpy2/doc-2.3/html/introduction.html">rpy2</a> has <code>robjects</code>, which does lookup on <code>.globalEnv</code>. Has a
      callable R-vector type; allows calling of arbitrary R code. The
      ``R singleton.'' There's <code>r_repr</code>: R-representation? Deals with
@@ -9761,11 +10043,11 @@ defined when it is included.
 </div>
 
 <div id="outline-container-45-5" class="outline-3">
-<h3 id="sec-45-5"><span class="section-number-3">45.5</span> <span class="done DONE"> DONE</span> 3.4</h3>
+<h3 id="sec-45-5"><span class="section-number-3">45.5</span> <span class="done DONE">DONE</span> 3.4</h3>
 <div class="outline-text-3" id="text-45-5">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-10-01 Mon 03:29</span></span><br/>
-   Found this note:<sup><a class="footref" name="fnr.18" href="#fn.18">18</a></sup>
+   Found this note:<sup><a class="footref" name="fnr-.18" href="#fn-.18">18</a></sup>
 </p>
 <blockquote>
 
@@ -10044,7 +10326,7 @@ into the natural arrangement, according as its order is odd or even.
 </div>
 
 <div id="outline-container-45-6" class="outline-3">
-<h3 id="sec-45-6"><span class="section-number-3">45.6</span> <span class="done DONE"> DONE</span> Focus on one or two problems for the coming week.</h3>
+<h3 id="sec-45-6"><span class="section-number-3">45.6</span> <span class="done DONE">DONE</span> Focus on one or two problems for the coming week.</h3>
 <div class="outline-text-3" id="text-45-6">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-10-01 Mon 03:29</span></span><br/>
@@ -10054,7 +10336,7 @@ into the natural arrangement, according as its order is odd or even.
 </div>
 
 <div id="outline-container-45-7" class="outline-3">
-<h3 id="sec-45-7"><span class="section-number-3">45.7</span> <span class="done CANCELED"> CANCELED</span> Modify 2.11 to list available actions?</h3>
+<h3 id="sec-45-7"><span class="section-number-3">45.7</span> <span class="done CANCELED">CANCELED</span> Modify 2.11 to list available actions?</h3>
 <div class="outline-text-3" id="text-45-7">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-10-01 Mon 03:30</span></span><br/>
@@ -10064,7 +10346,7 @@ into the natural arrangement, according as its order is odd or even.
 </div>
 
 <div id="outline-container-45-8" class="outline-3">
-<h3 id="sec-45-8"><span class="section-number-3">45.8</span> <span class="todo TODO"> TODO</span> A listing environment</h3>
+<h3 id="sec-45-8"><span class="section-number-3">45.8</span> <span class="todo TODO">TODO</span> A listing environment</h3>
 <div class="outline-text-3" id="text-45-8">
 
 </div>
@@ -10072,7 +10354,7 @@ into the natural arrangement, according as its order is odd or even.
 </div>
 
 <div id="outline-container-45-9" class="outline-3">
-<h3 id="sec-45-9"><span class="section-number-3">45.9</span> <span class="todo TODO"> TODO</span> Blog about barabási-albert vs. depth-first graph-creation.</h3>
+<h3 id="sec-45-9"><span class="section-number-3">45.9</span> <span class="todo TODO">TODO</span> Blog about barabási-albert vs. depth-first graph-creation.</h3>
 <div class="outline-text-3" id="text-45-9">
 
 <p>   The former produces nice hubs and cycles, but the problem of
@@ -10088,7 +10370,7 @@ into the natural arrangement, according as its order is odd or even.
 </div>
 
 <div id="outline-container-45-10" class="outline-3">
-<h3 id="sec-45-10"><span class="section-number-3">45.10</span> <span class="done DONE"> DONE</span> 2.11</h3>
+<h3 id="sec-45-10"><span class="section-number-3">45.10</span> <span class="done DONE">DONE</span> 2.11</h3>
 <div class="outline-text-3" id="text-45-10">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-07-16 Mon 12:57</span></span><br/>
@@ -10096,7 +10378,7 @@ into the natural arrangement, according as its order is odd or even.
 </div>
 
 <div id="outline-container-45-10-1" class="outline-4">
-<h4 id="sec-45-10-1"><span class="section-number-4">45.10.1</span> <span class="done DONE"> DONE</span> Graph world</h4>
+<h4 id="sec-45-10-1"><span class="section-number-4">45.10.1</span> <span class="done DONE">DONE</span> Graph world</h4>
 <div class="outline-text-4" id="text-45-10-1">
 
 <p>     <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-07-16 Mon 12:44</span></span><br/>
@@ -10708,7 +10990,7 @@ connections ("the rich get richer").
 </div>
 
 <div id="outline-container-45-10-2" class="outline-4">
-<h4 id="sec-45-10-2"><span class="section-number-4">45.10.2</span> <span class="done DONE"> DONE</span> Depth-first graph constructor</h4>
+<h4 id="sec-45-10-2"><span class="section-number-4">45.10.2</span> <span class="done DONE">DONE</span> Depth-first graph constructor</h4>
 <div class="outline-text-4" id="text-45-10-2">
 
 <p>     <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-07-16 Mon 12:44</span></span><br/>
@@ -10720,73 +11002,73 @@ connections ("the rich get richer").
 
 
 
-<pre class="src src-org">- make-seed-world
-  - let
-    - world make-hash-table
-    - root make-node
-    - child make-node
-      - biconnect! world root child (random 4)
-      - values world root
-- # Let's recreate location-left{,-set!}, &amp;c.
-- make-preferential-depth-first-world n-nodes
-  - receive world root
-    - make-seed-world
-    - let iter
-      - node root
-      - n-nodes n-nodes
-      - n-degrees 0
-        - if zero? n-nodes
-          - world
-          - hash-table-update
-            - world
-            - node
-            - lambda location
-              - # Wouldn't we make it easier on ourselves by having
-                the children of location be a tetradic vector with
-                left, right, up and down? Yes, a thousand times yes!
-              - # If barab&#225;si dictates add a child, add it; otherwise,
-                take a random path. This random path could backtrack,
-                or it could continue on.
-              - # Keep adding until we have the requisite number of
-                nodes.
-              - let
-                - degrees-from
-                  - vector-fold
-                  - lambda (i degrees passage) if (no-passage? passage)
-                    degrees (+ degrees 1)
-                  - 0
-                  - location-passages location
-                - if
-                  - and
-                    - &lt; degrees-from 4
-                    - &lt; (random-real) (/ degrees-from n-degress)
-                  - let
-                    - directions-from
-                      - vector-fold
-                        - lambda (direction directions-from passage) if
-                          (no-passage? passage) (cons direction
-                          directions-from) directions-from
-                        - '()
-                        - location-passages location
-                    - direction (list-ref directions-from (random
-                      (length directions-from)))
-                      - let new-node (make-node)
-                        - # Maybe biconnect! can take care of adding the
-                          node to the world?
-                        - biconnect! world node new-node direction
-                        - iter new-node (- n-nodes 1) (+ n-degrees 2)
-                  - let
-                    - passages-from
-                      - vector-fold
-                        - lambda (direction passages-from passage) if
-                          (passage? passage) (cons passage
-                          passages-from) passages-from
-                        - '()
-                        - location-passages location
-                    - passage (list-ref
-            - make-location
-              - dirty
-              - #(no-passage no-passage no-passage no-passage)
+<pre class="src src-org">,- make-seed-world
+,  - let
+,    - world make-hash-table
+,    - root make-node
+,    - child make-node
+,      - biconnect! world root child (random 4)
+,      - values world root
+,- # Let's recreate location-left{,-set!}, &amp;c.
+,- make-preferential-depth-first-world n-nodes
+,  - receive world root
+,    - make-seed-world
+,    - let iter
+,      - node root
+,      - n-nodes n-nodes
+,      - n-degrees 0
+,        - if zero? n-nodes
+,          - world
+,          - hash-table-update
+,            - world
+,            - node
+,            - lambda location
+,              - # Wouldn't we make it easier on ourselves by having
+,                the children of location be a tetradic vector with
+,                left, right, up and down? Yes, a thousand times yes!
+,              - # If barab&#225;si dictates add a child, add it; otherwise,
+,                take a random path. This random path could backtrack,
+,                or it could continue on.
+,              - # Keep adding until we have the requisite number of
+,                nodes.
+,              - let
+,                - degrees-from
+,                  - vector-fold
+,                  - lambda (i degrees passage) if (no-passage? passage)
+,                    degrees (+ degrees 1)
+,                  - 0
+,                  - location-passages location
+,                - if
+,                  - and
+,                    - &lt; degrees-from 4
+,                    - &lt; (random-real) (/ degrees-from n-degress)
+,                  - let
+,                    - directions-from
+,                      - vector-fold
+,                        - lambda (direction directions-from passage) if
+,                          (no-passage? passage) (cons direction
+,                          directions-from) directions-from
+,                        - '()
+,                        - location-passages location
+,                    - direction (list-ref directions-from (random
+,                      (length directions-from)))
+,                      - let new-node (make-node)
+,                        - # Maybe biconnect! can take care of adding the
+,                          node to the world?
+,                        - biconnect! world node new-node direction
+,                        - iter new-node (- n-nodes 1) (+ n-degrees 2)
+,                  - let
+,                    - passages-from
+,                      - vector-fold
+,                        - lambda (direction passages-from passage) if
+,                          (passage? passage) (cons passage
+,                          passages-from) passages-from
+,                        - '()
+,                        - location-passages location
+,                    - passage (list-ref
+,            - make-location
+,              - dirty
+,              - #(no-passage no-passage no-passage no-passage)
 </pre>
 
 
@@ -11504,7 +11786,7 @@ connections ("the rich get richer").
 </div>
 
 <div id="outline-container-45-10-3" class="outline-4">
-<h4 id="sec-45-10-3"><span class="section-number-4">45.10.3</span> <span class="done DONE"> DONE</span> Allow specification of random-seeds</h4>
+<h4 id="sec-45-10-3"><span class="section-number-4">45.10.3</span> <span class="done DONE">DONE</span> Allow specification of random-seeds</h4>
 <div class="outline-text-4" id="text-45-10-3">
 
 <p>     <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-07-16 Mon 12:44</span></span><br/>
@@ -11513,7 +11795,7 @@ connections ("the rich get richer").
 </div>
 
 <div id="outline-container-45-10-4" class="outline-4">
-<h4 id="sec-45-10-4"><span class="section-number-4">45.10.4</span> <span class="done DONE"> DONE</span> Stateful graph agent</h4>
+<h4 id="sec-45-10-4"><span class="section-number-4">45.10.4</span> <span class="done DONE">DONE</span> Stateful graph agent</h4>
 <div class="outline-text-4" id="text-45-10-4">
 
 <p>     <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-07-16 Mon 12:44</span></span><br/>
@@ -11525,64 +11807,64 @@ connections ("the rich get richer").
 
 
 
-<pre class="src src-org">- make-stateful-graph-agent start
-  - let
-    - world make-hash-table
-      - # This is going to have to be a stack: we're iterating here,
-        after all. Ah, the problem is that we can't recurse back up the
-        tree because the relative directions are asymmetrical.
-      - # I knew this would bite me in the ass; or is there a more
-        expensive way to backtrack? Can't e.g. try random directions
-        because there's no way back.
-      - # Is it possible, somehow, to progress through the world via
-        random walk; turning away when we encounter a taken path? No, we
-        need to be able to backtrack.
-      - # Fuck it: just wrote a preferential depth-first world-generator
-        that's not quite as good as Barab&#225;si-Albert in the sense that it
-        doesn't generate cycles.
-      - # On the other hand, wouldn't it have been equivalent to store
-        the desirable node and the direction required to get there? I
-        still need the inverse of the current direction to backtrack, I
-        believe.
-      - # It would appear as though we're going to have to push a list
-        of interesting vertices onto the stack as well as the actions
-        required to get here; this notion, therefore, of visit node
-        entails: back-tracking until we find it.
-    - path ()
-    - visitanda (start)
-    - last-action #f
-    - lambda node clean?
-      - if null? visitanda
-        - noop
-        - if dirty?
-          - # This is where pre-/post-order becomes interesting;
-            pre-order it, so we can maximize our score.
-          - clean
-          - begin
-            - hash-table-update!/default
-              - world
-              - node
-              - lambda location
-                - location-set-status (if clean? clean dirty)
-                - let*
-                  - neighbors (location-neighbors location)
-                    - if eq? last-node node
-                      - case last-action
-                        - left vector-set! neighbors left no-passage
-                        - right vector-set! neighbors right no-passage
-                        - up vector-set! neighbors up no-passage
-                        - down vector-set! neighbors down no-passage
-                      - let last-node (car visitandum)
-                        - case last-action
-                          - left vector-set! neighbors right last-node
-                          - right vector-set! neighbors left last-node
-                          - up vector-set! neighbors down last-node
-                          - down vector-set! neighbors up last-node
-                        - set! visitanda (cons node visitanda)
-                - location
-              - # Let's nominate this make-unknown-location (as opposed to:
-                make-dirty-location).
-              - make-location clean? #(unknown unknown unknown unknown)
+<pre class="src src-org">,- make-stateful-graph-agent start
+,  - let
+,    - world make-hash-table
+,      - # This is going to have to be a stack: we're iterating here,
+,        after all. Ah, the problem is that we can't recurse back up the
+,        tree because the relative directions are asymmetrical.
+,      - # I knew this would bite me in the ass; or is there a more
+,        expensive way to backtrack? Can't e.g. try random directions
+,        because there's no way back.
+,      - # Is it possible, somehow, to progress through the world via
+,        random walk; turning away when we encounter a taken path? No, we
+,        need to be able to backtrack.
+,      - # Fuck it: just wrote a preferential depth-first world-generator
+,        that's not quite as good as Barab&#225;si-Albert in the sense that it
+,        doesn't generate cycles.
+,      - # On the other hand, wouldn't it have been equivalent to store
+,        the desirable node and the direction required to get there? I
+,        still need the inverse of the current direction to backtrack, I
+,        believe.
+,      - # It would appear as though we're going to have to push a list
+,        of interesting vertices onto the stack as well as the actions
+,        required to get here; this notion, therefore, of visit node
+,        entails: back-tracking until we find it.
+,    - path ()
+,    - visitanda (start)
+,    - last-action #f
+,    - lambda node clean?
+,      - if null? visitanda
+,        - noop
+,        - if dirty?
+,          - # This is where pre-/post-order becomes interesting;
+,            pre-order it, so we can maximize our score.
+,          - clean
+,          - begin
+,            - hash-table-update!/default
+,              - world
+,              - node
+,              - lambda location
+,                - location-set-status (if clean? clean dirty)
+,                - let*
+,                  - neighbors (location-neighbors location)
+,                    - if eq? last-node node
+,                      - case last-action
+,                        - left vector-set! neighbors left no-passage
+,                        - right vector-set! neighbors right no-passage
+,                        - up vector-set! neighbors up no-passage
+,                        - down vector-set! neighbors down no-passage
+,                      - let last-node (car visitandum)
+,                        - case last-action
+,                          - left vector-set! neighbors right last-node
+,                          - right vector-set! neighbors left last-node
+,                          - up vector-set! neighbors down last-node
+,                          - down vector-set! neighbors up last-node
+,                        - set! visitanda (cons node visitanda)
+,                - location
+,              - # Let's nominate this make-unknown-location (as opposed to:
+,                make-dirty-location).
+,              - make-location clean? #(unknown unknown unknown unknown)
 
 </pre>
 
@@ -11591,7 +11873,7 @@ connections ("the rich get richer").
 </div>
 
 <div id="outline-container-45-10-5" class="outline-4">
-<h4 id="sec-45-10-5"><span class="section-number-4">45.10.5</span> <span class="done CANCELED"> CANCELED</span> <code>make-equilibrium-limited-environment</code></h4>
+<h4 id="sec-45-10-5"><span class="section-number-4">45.10.5</span> <span class="done CANCELED">CANCELED</span> <code>make-equilibrium-limited-environment</code></h4>
 <div class="outline-text-4" id="text-45-10-5">
 
 <p>     <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-07-16 Mon 12:44</span></span><br/>
@@ -11602,7 +11884,7 @@ connections ("the rich get richer").
 </div>
 
 <div id="outline-container-45-10-6" class="outline-4">
-<h4 id="sec-45-10-6"><span class="section-number-4">45.10.6</span> <span class="done DONE"> DONE</span> Compare stateful and randomized reflex agents.</h4>
+<h4 id="sec-45-10-6"><span class="section-number-4">45.10.6</span> <span class="done DONE">DONE</span> Compare stateful and randomized reflex agents.</h4>
 <div class="outline-text-4" id="text-45-10-6">
 
 <p>     <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-07-16 Mon 12:43</span></span><br/>
@@ -11617,7 +11899,7 @@ connections ("the rich get richer").
 </div>
 
 <div id="outline-container-45-10-7" class="outline-4">
-<h4 id="sec-45-10-7"><span class="section-number-4">45.10.7</span> <span class="done DONE"> DONE</span> Figure out the correct aspect ratio for youtube.</h4>
+<h4 id="sec-45-10-7"><span class="section-number-4">45.10.7</span> <span class="done DONE">DONE</span> Figure out the correct aspect ratio for youtube.</h4>
 <div class="outline-text-4" id="text-45-10-7">
 
 <p>     <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-07-08 Sun 05:42</span></span><br/>
@@ -11634,7 +11916,7 @@ connections ("the rich get richer").
 </div>
 
 <div id="outline-container-45-11" class="outline-3">
-<h3 id="sec-45-11"><span class="section-number-3">45.11</span> <span class="todo TODO"> TODO</span> Should we structure this somehow as a blog instead of an org-doc?</h3>
+<h3 id="sec-45-11"><span class="section-number-3">45.11</span> <span class="todo TODO">TODO</span> Should we structure this somehow as a blog instead of an org-doc?</h3>
 <div class="outline-text-3" id="text-45-11">
 
 <p>   Can we create a jekyll-based blog from this org-doc and push it to
@@ -11649,7 +11931,7 @@ connections ("the rich get richer").
 </div>
 
 <div id="outline-container-45-12" class="outline-3">
-<h3 id="sec-45-12"><span class="section-number-3">45.12</span> <span class="todo TODO"> TODO</span> Some sort of blog post or other publicity?</h3>
+<h3 id="sec-45-12"><span class="section-number-3">45.12</span> <span class="todo TODO">TODO</span> Some sort of blog post or other publicity?</h3>
 <div class="outline-text-3" id="text-45-12">
 
 </div>
@@ -11657,7 +11939,7 @@ connections ("the rich get richer").
 </div>
 
 <div id="outline-container-45-13" class="outline-3">
-<h3 id="sec-45-13"><span class="section-number-3">45.13</span> <span class="todo TODO"> TODO</span> Find a reasonable pseudocode package in \LaTeX.</h3>
+<h3 id="sec-45-13"><span class="section-number-3">45.13</span> <span class="todo TODO">TODO</span> Find a reasonable pseudocode package in \LaTeX.</h3>
 <div class="outline-text-3" id="text-45-13">
 
 <p>   See <a href="http://www.tex.ac.uk/cgi-bin/texfaq2htmllabel=algorithms">this survey</a>. Algorithm2e isn't bad; doesn't seem to have a
@@ -11676,7 +11958,7 @@ connections ("the rich get richer").
 </div>
 
 <div id="outline-container-45-14" class="outline-3">
-<h3 id="sec-45-14"><span class="section-number-3">45.14</span> <span class="done CANCELED"> CANCELED</span> Should we tangle to a bunch of text files?</h3>
+<h3 id="sec-45-14"><span class="section-number-3">45.14</span> <span class="done CANCELED">CANCELED</span> Should we tangle to a bunch of text files?</h3>
 <div class="outline-text-3" id="text-45-14">
 
 <p>    <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-10-01 Mon 03:30</span></span><br/>
@@ -11686,7 +11968,7 @@ connections ("the rich get richer").
 </div>
 
 <div id="outline-container-45-15" class="outline-3">
-<h3 id="sec-45-15"><span class="section-number-3">45.15</span> <span class="done DONE"> DONE</span> Reimplement the Lisp environment in Scheme.</h3>
+<h3 id="sec-45-15"><span class="section-number-3">45.15</span> <span class="done DONE">DONE</span> Reimplement the Lisp environment in Scheme.</h3>
 <div class="outline-text-3" id="text-45-15">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-06-01 Fri 03:09</span></span><br/>
@@ -11697,7 +11979,7 @@ connections ("the rich get richer").
 </div>
 
 <div id="outline-container-45-16" class="outline-3">
-<h3 id="sec-45-16"><span class="section-number-3">45.16</span> <span class="done DONE"> DONE</span> Personal notes as footnotes.</h3>
+<h3 id="sec-45-16"><span class="section-number-3">45.16</span> <span class="done DONE">DONE</span> Personal notes as footnotes.</h3>
 <div class="outline-text-3" id="text-45-16">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-06-01 Fri 03:09</span></span><br/>
@@ -11706,7 +11988,7 @@ connections ("the rich get richer").
 </div>
 
 <div id="outline-container-45-17" class="outline-3">
-<h3 id="sec-45-17"><span class="section-number-3">45.17</span> <span class="done CANCELED"> CANCELED</span> Should we try to release an e.g. Wumpus World egg?</h3>
+<h3 id="sec-45-17"><span class="section-number-3">45.17</span> <span class="done CANCELED">CANCELED</span> Should we try to release an e.g. Wumpus World egg?</h3>
 <div class="outline-text-3" id="text-45-17">
 
 <p>   <span class="timestamp-wrapper"><span class="timestamp-kwd">CLOSED: </span> <span class="timestamp">2012-06-01 Fri 03:08</span></span><br/>
@@ -11720,84 +12002,102 @@ connections ("the rich get richer").
 <p>  I wonder if it would be worthwhile to study the canonical Lisp
   examples.
 </p>
-
 <div id="footnotes">
 <h2 class="footnotes">Footnotes: </h2>
 <div id="text-footnotes">
-<p class="footnote"><sup><a class="footnum" name="fn.1" href="#fnr.1">1</a></sup> See this <a href="http://linux.about.com/b/2007/05/16/google-machine-translation-system-beats-competition.htm">article from 2007</a> on Google's machine translation
+<p class="footnote"><sup><a class="footnum" name="fn-.1" href="#fnr-.1">1</a></sup> See this <a href="http://linux.about.com/b/2007/05/16/google-machine-translation-system-beats-competition.htm">article from 2007</a> on Google's machine translation
   system: "Using a brute-force statistical approach, the Google
   machine translation team has developed top performing translation
   software to and from languages that not even one of the teams
   members understands, such as Arabic and Chinese."
 </p>
 
-<p class="footnote"><sup><a class="footnum" name="fn.2" href="#fnr.2">2</a></sup> "Let \(T\) be the lifetime of the agent (the total number of
+
+<p class="footnote"><sup><a class="footnum" name="fn-.2" href="#fnr-.2">2</a></sup> "Let \(T\) be the lifetime of the agent (the total number of
   percepts it will receive)" (p. 47). Percepts are the granularity of
   time.
 </p>
 
-<p class="footnote"><sup><a class="footnum" name="fn.3" href="#fnr.3">3</a></sup> The current state of the environment is the same as the current
+
+<p class="footnote"><sup><a class="footnum" name="fn-.3" href="#fnr-.3">3</a></sup> The current state of the environment is the same as the current
   percept, incidentally, if the environment is fully observable.
 </p>
 
-<p class="footnote"><sup><a class="footnum" name="fn.4" href="#fnr.4">4</a></sup> The agent's minds are unobservable: we have to operate in
+
+<p class="footnote"><sup><a class="footnum" name="fn-.4" href="#fnr-.4">4</a></sup> The agent's minds are unobservable: we have to operate in
   belief space.
 </p>
 
-<p class="footnote"><sup><a class="footnum" name="fn.5" href="#fnr.5">5</a></sup> From page 67: "The state space . . . is the set of all states
+
+<p class="footnote"><sup><a class="footnum" name="fn-.5" href="#fnr-.5">5</a></sup> From page 67: "The state space . . . is the set of all states
   reachable from the initial state by any sequence of actions."
 </p>
 
-<p class="footnote"><sup><a class="footnum" name="fn.6" href="#fnr.6">6</a></sup> Noöp, where one friend stays put; is apparently not an option.
+
+<p class="footnote"><sup><a class="footnum" name="fn-.6" href="#fnr-.6">6</a></sup> Noöp, where one friend stays put; is apparently not an option.
   If it were, there wouldn't be cases where vacillation is required to
   convene.
 </p>
 
-<p class="footnote"><sup><a class="footnum" name="fn.7" href="#fnr.7">7</a></sup> Thanks, <a href="http://mathoverflow.net/questions/61225/how-many-different-colorings-excluding-exchanges-exist-for-a-given-map-graph/68737#68737">Emil Jeřábek</a>.
+
+<p class="footnote"><sup><a class="footnum" name="fn-.7" href="#fnr-.7">7</a></sup> Thanks,
+<a href="http://mathoverflow.net/questions/61225/how-many-different-colorings-excluding-exchanges-exist-for-a-given-map-graph/68737#68737">Emil Jeřábek</a>.
 </p>
 
-<p class="footnote"><sup><a class="footnum" name="fn.8" href="#fnr.8">8</a></sup> One based on <a href="http://demonstrations.wolfram.com/FourColoringPlanarGraphs/">Kempe's method</a>, for instance; or <a href="http://www.sciencedirect.com/science/article/pii/S0167637704000409">Byskov's</a> (which
+
+<p class="footnote"><sup><a class="footnum" name="fn-.8" href="#fnr-.8">8</a></sup> One based on <a href="http://demonstrations.wolfram.com/FourColoringPlanarGraphs/">Kempe's method</a>, for instance; or <a href="http://www.sciencedirect.com/science/article/pii/S0167637704000409">Byskov's</a> (which
   is \(O(1.7504^n))\).
 </p>
 
-<p class="footnote"><sup><a class="footnum" name="fn.9" href="#fnr.9">9</a></sup> From <a href="http://en.wikipedia.org/wiki/Heuristic_function">heuristic function</a>: "if, for any given state, \(h2\) will
+
+<p class="footnote"><sup><a class="footnum" name="fn-.9" href="#fnr-.9">9</a></sup> From <a href="http://en.wikipedia.org/wiki/Heuristic_function">heuristic function</a>: "if, for any given state, \(h2\) will
   always be greater than or equal to \(h1\); we can say that \(h2\)
   dominates \(h1\)."
 </p>
 
-<p class="footnote"><sup><a class="footnum" name="fn.10" href="#fnr.10">10</a></sup> Bizarre to me that a programmer is responsible for the <i>a   priori</i>; playing god, anyone?
+
+<p class="footnote"><sup><a class="footnum" name="fn-.10" href="#fnr-.10">10</a></sup> Bizarre to me that a programmer is responsible for the <i>a   priori</i>; playing god, anyone?
 </p>
 
-<p class="footnote"><sup><a class="footnum" name="fn.11" href="#fnr.11">11</a></sup> Which of these following papers do you think he's talking
+
+<p class="footnote"><sup><a class="footnum" name="fn-.11" href="#fnr-.11">11</a></sup> Which of these following papers do you think he's talking
   about? Probably the latter: it carries an <i>et al.</i>
 </p>
 
-<p class="footnote"><sup><a class="footnum" name="fn.12" href="#fnr.12">12</a></sup> Don't forget that we have to have knowledge of which actions
+
+<p class="footnote"><sup><a class="footnum" name="fn-.12" href="#fnr-.12">12</a></sup> Don't forget that we have to have knowledge of which actions
   are inverses of one another.
 </p>
 
-<p class="footnote"><sup><a class="footnum" name="fn.13" href="#fnr.13">13</a></sup> We really need to go back and finish up ch. 3: fundamental;
+
+<p class="footnote"><sup><a class="footnum" name="fn-.13" href="#fnr-.13">13</a></sup> We really need to go back and finish up ch. 3: fundamental;
   things build upon it.
 </p>
 
-<p class="footnote"><sup><a class="footnum" name="fn.14" href="#fnr.14">14</a></sup> We inadvertently dealt with an irreversible scenario in ch. 2,
+
+<p class="footnote"><sup><a class="footnum" name="fn-.14" href="#fnr-.14">14</a></sup> We inadvertently dealt with an irreversible scenario in ch. 2,
   where we linked up random graphs with asymmetrical connections
   (going e.g. right was not necesarrily the inverse of going left).
 </p>
 
-<p class="footnote"><sup><a class="footnum" name="fn.15" href="#fnr.15">15</a></sup> Underscores that hill-climbing is an optimization algorithm
+
+<p class="footnote"><sup><a class="footnum" name="fn-.15" href="#fnr-.15">15</a></sup> Underscores that hill-climbing is an optimization algorithm
   unconcerned with path; thus, random restarts.
 </p>
 
-<p class="footnote"><sup><a class="footnum" name="fn.16" href="#fnr.16">16</a></sup> Be nice to take a look at some of the literature.
+
+<p class="footnote"><sup><a class="footnum" name="fn-.16" href="#fnr-.16">16</a></sup> Be nice to take a look at some of the literature.
 </p>
 
-<p class="footnote"><sup><a class="footnum" name="fn.17" href="#fnr.17">17</a></sup> DEFINITION NOT FOUND: 1
+
+<p class="footnote"><sup><a class="footnum" name="fn-.17" href="#fnr-.17">17</a></sup> DEFINITION NOT FOUND: 1
 </p>
 
-<p class="footnote"><sup><a class="footnum" name="fn.18" href="#fnr.18">18</a></sup> Berlekamp, Elwyn, et al. Winning Ways for Pour Mathematical
+<p class="footnote"><sup><a class="footnum" name="fn-.18" href="#fnr-.18">18</a></sup> Berlekamp, Elwyn, et al. Winning Ways for Pour Mathematical
   Plays. 2004. p. 867.
 </p>
+
+
 </div>
 </div>
 </div>
@@ -11807,9 +12107,9 @@ connections ("the rich get richer").
 </div>
 
 <div id="postamble">
-<p class="date">Date: 2012-11-26 15:35:26 PST</p>
+<p class="date">Date: 2012-11-30T03:27-0800</p>
 <p class="author">Author: Peter Danenberg</p>
-<p class="creator">Org version 7.8.03 with Emacs version 24</p>
+<p class="creator"><a href="http://orgmode.org">Org</a> version 7.9.2 with <a href="http://www.gnu.org/software/emacs/">Emacs</a> version 24</p>
 <a href="http://validator.w3.org/check?uri=referer">Validate XHTML 1.0</a>
 
 </div>
