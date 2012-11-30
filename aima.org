@@ -2306,7 +2306,7 @@
                                   visited-points
                                   unvisited-tree)
                                  (when (goal? node)
-                                   (let ((fps 25))
+                                   (let ((fps 4))
                                      ;; Make the animation pause at the
                                      ;; finished frame for a couple seconds.
                                      (let ((tour
