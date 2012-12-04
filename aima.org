@@ -2454,6 +2454,14 @@
      
      (include "tsp.scm")
      
+     (define (shuffle! v p r)
+       (let* ((n (vector-length v))
+              (r (if (> p r) r (+ n r)))) (do ((n (vector-length v) (- n 1)))
+            ((zero? n) v)
+          (let* ((r (random n)) (t (vector-ref v r)))
+            (vector-set! v r (vector-ref v (- n 1)))
+            (vector-set! v (- n 1) t)))))
+     
      (define (crossover-alternating-positions p1 p2)
        (let ((n (vector-length p1)))
          (let ((child (make-vector n))
