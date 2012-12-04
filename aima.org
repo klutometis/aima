@@ -3975,6 +3975,7 @@
      - Partially mapped crossover (PMX): selects two random cut points
        . . .
 * TODOs
+** TODO What the hell: let's add some Bach or Liszt to the animations.
 ** DONE 3.22
    Need a graph of possible moves (initially hard-coded for 3x3?); and
    a Manhattan distance calculator. Can we have an abstract game-graph?
