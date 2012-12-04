@@ -2324,128 +2324,173 @@
 
   Initial state is complete and random.
 * TODO 4.3
-  Thanks, John Montgomery, for the suggestion to [[http://www.psychicorigami.com/2007/04/17/tackling-the-travelling-salesman-problem-part-one/][reverse]] pairs of
-  cities or the cities intervening pairs.
+** TODO a
+   Thanks, John Montgomery, for the suggestion to [[http://www.psychicorigami.com/2007/04/17/tackling-the-travelling-salesman-problem-part-one/][reverse]] pairs of
+   cities or the cities intervening pairs.
 
-  [[http://osdir.com/ml/plt-scheme/2009-08/msg00134.html][Shuffling a list]]; [[http://mumble.net/~campbell/scheme/shuffle.scm][Riastradh's]]; [[http://codeimmersion.i3ci.hampshire.edu/2009/09/20/a-simple-scheme-shuffle/][O(n log n)]], I believe.
+   [[http://osdir.com/ml/plt-scheme/2009-08/msg00134.html][Shuffling a list]]; [[http://mumble.net/~campbell/scheme/shuffle.scm][Riastradh's]]; [[http://codeimmersion.i3ci.hampshire.edu/2009/09/20/a-simple-scheme-shuffle/][O(n log n)]], I believe.
 
-  #+BEGIN_SRC scheme :tangle 4.3.scm :shebang #!/usr/bin/env chicken-scheme
-    (use format)
-    
-    (include "tsp.scm")
-    
-    (use aima-search
-         data-structures
-         debug
-         heap
-         srfi-1
-         statistics
-         vector-lib)
-    
-    (define (shuffle! v)
-      (do ((n (vector-length v) (- n 1)))
-          ((zero? n) v)
-        (let* ((r (random n)) (t (vector-ref v r)))
-          (vector-set! v r (vector-ref v (- n 1)))
-                (vector-set! v (- n 1) t))))
-    
-    (define (shuffle v)
-      (let ((v (vector-copy v)))
-        (shuffle! v)
-        v))
-    
-    (define (tour-distance tour)
-      (do ((i 0 (+ i 1))
-           (j 1 (modulo (+ j 1) (vector-length tour)))
-           (distance 0 (+ distance (point-distance (vector-ref tour i)
-                                                   (vector-ref tour j)))))
-          ((= i (vector-length tour)) distance)))
-    
-    (define (successors tour)
-      (do ((i 0 (+ i 1))
-           (successors
-            '()
-            (append
-             (do ((j i (+ j 1))
-                  (successors '() (cons (let ((tour (vector-copy tour)))
-                                          (vector-swap! tour i j)
-                                          tour)
-                                        successors)))
-                 ((= j (vector-length tour)) successors))
-             successors)
-            ))
-          ((= i (- (vector-length tour) 1)) successors)))
-    
-    (define (min-successor successors)
-      (let ((tours (make-min-heap)))
-        (for-each (lambda (successor)
-                    (heap-insert! tours (tour-distance successor) successor))
-          successors)
-        (heap-extract-extremum! tours)))
-    
-    (define (hill-climbing points)
-      (let iter ((tour (shuffle (list->vector points))))
-        (let ((next-tour (min-successor (successors tour))))
-          (if (>= (tour-distance next-tour)
-                  (tour-distance tour))
-              (cons (vector-ref tour (- (vector-length tour) 1))
-                    (vector->list tour))
-              (iter next-tour)))))
-    
-    ;; (let ((points (make-random-points 10)))
-    ;;   (let ((hill-climbing-tour (hill-climbing points))
-    ;;         (A*-tour (A*-tour (car points) (complete-graph points) points)))
-    ;;     (debug (tour-length (make-tour hill-climbing-tour))
-    ;;            (tour-length (make-tour A*-tour)))
-    ;;     ;; (graph-tour (make-tour (cons (vector-ref tour (- (vector-length tour) 1))
-    ;;     ;;                              (vector->list tour)))
-    ;;     ;;             "Hill-climbing"
-    ;;     ;;             "img/4-3.png")
-    ;;     ))
-    
-    ;; (map (lambda (i)
-    ;;        (let ((points (make-random-points 10)))
-    ;;          (debug i)
-    ;;          (let ((hill-climbing-tour (hill-climbing points))
-    ;;                (A*-tour (A*-tour (car points)
-    ;;                                  (complete-graph points)
-    ;;                                  points
-    ;;                                  #f)))
-    ;;            (cons (tour-length (make-tour hill-climbing-tour))
-    ;;                  (tour-length (make-tour A*-tour))))))
-    ;;      (iota 100))
-    
-    (debug
-     (let iter ((n 100)
-                (hill-climbing-tours '())
-                (A*-tours '()))
-       (debug n)
-       (if (zero? n)
-           (cons (mean hill-climbing-tours)
-                 (mean A*-tours))
-           (let ((points (make-random-points 10)))
-             (let ((hill-climbing-tour (hill-climbing points))
-                   (A*-tour (A*-tour (car points)
-                                     (complete-graph points)
-                                     points
-                                     #f)))
-               ;; (debug hill-climbing-tour
-               ;;        (tour-length (make-tour hill-climbing-tour))
-               ;;        A*-tour
-               ;;        (tour-length (make-tour A*-tour)))
-               ;; (graph-tour (make-tour hill-climbing-tour)
-               ;;             "Hill climbing"
-               ;;             "hill-climbing.png")
-               ;; (graph-tour (make-tour A*-tour)
-               ;;             "A*"
-               ;;             "a-star.png")
-               (iter (- n 1)
-                     (cons (tour-length (make-tour hill-climbing-tour))
-                           hill-climbing-tours)
-                     (cons (tour-length (make-tour A*-tour))
-                           A*-tours)))))))
-    
-  #+END_SRC
+   #+BEGIN_SRC scheme :tangle 4.3.scm :shebang #!/usr/bin/env chicken-scheme
+     (use format)
+
+     (include "tsp.scm")
+
+     (use aima-search
+          data-structures
+          debug
+          heap
+          srfi-1
+          statistics
+          vector-lib)
+
+     (define (shuffle! v)
+       (do ((n (vector-length v) (- n 1)))
+           ((zero? n) v)
+         (let* ((r (random n)) (t (vector-ref v r)))
+           (vector-set! v r (vector-ref v (- n 1)))
+                 (vector-set! v (- n 1) t))))
+
+     (define (shuffle v)
+       (let ((v (vector-copy v)))
+         (shuffle! v)
+         v))
+
+     (define (tour-distance tour)
+       (do ((i 0 (+ i 1))
+            (j 1 (modulo (+ j 1) (vector-length tour)))
+            (distance 0 (+ distance (point-distance (vector-ref tour i)
+                                                    (vector-ref tour j)))))
+           ((= i (vector-length tour)) distance)))
+
+     (define (successors tour)
+       (do ((i 0 (+ i 1))
+            (successors
+             '()
+             (append
+              (do ((j i (+ j 1))
+                   (successors '() (cons (let ((tour (vector-copy tour)))
+                                           (vector-swap! tour i j)
+                                           tour)
+                                         successors)))
+                  ((= j (vector-length tour)) successors))
+              successors)
+             ))
+           ((= i (- (vector-length tour) 1)) successors)))
+
+     (define (min-successor successors)
+       (let ((tours (make-min-heap)))
+         (for-each (lambda (successor)
+                     (heap-insert! tours (tour-distance successor) successor))
+           successors)
+         (heap-extract-extremum! tours)))
+
+     (define (hill-climbing points)
+       (let iter ((tour (shuffle (list->vector points))))
+         (let ((next-tour (min-successor (successors tour))))
+           (if (>= (tour-distance next-tour)
+                   (tour-distance tour))
+               (cons (vector-ref tour (- (vector-length tour) 1))
+                     (vector->list tour))
+               (iter next-tour)))))
+
+     ;; (let ((points (make-random-points 10)))
+     ;;   (let ((hill-climbing-tour (hill-climbing points))
+     ;;         (A*-tour (A*-tour (car points) (complete-graph points) points)))
+     ;;     (debug (tour-length (make-tour hill-climbing-tour))
+     ;;            (tour-length (make-tour A*-tour)))
+     ;;     ;; (graph-tour (make-tour (cons (vector-ref tour (- (vector-length tour) 1))
+     ;;     ;;                              (vector->list tour)))
+     ;;     ;;             "Hill-climbing"
+     ;;     ;;             "img/4-3.png")
+     ;;     ))
+
+     ;; (map (lambda (i)
+     ;;        (let ((points (make-random-points 10)))
+     ;;          (debug i)
+     ;;          (let ((hill-climbing-tour (hill-climbing points))
+     ;;                (A*-tour (A*-tour (car points)
+     ;;                                  (complete-graph points)
+     ;;                                  points
+     ;;                                  #f)))
+     ;;            (cons (tour-length (make-tour hill-climbing-tour))
+     ;;                  (tour-length (make-tour A*-tour))))))
+     ;;      (iota 100))
+
+     (debug
+      (let iter ((n 100)
+                 (hill-climbing-tours '())
+                 (A*-tours '()))
+        (debug n)
+        (if (zero? n)
+            (cons (mean hill-climbing-tours)
+                  (mean A*-tours))
+            (let ((points (make-random-points 10)))
+              (let ((hill-climbing-tour (hill-climbing points))
+                    (A*-tour (A*-tour (car points)
+                                      (complete-graph points)
+                                      points
+                                      #f)))
+                ;; (debug hill-climbing-tour
+                ;;        (tour-length (make-tour hill-climbing-tour))
+                ;;        A*-tour
+                ;;        (tour-length (make-tour A*-tour)))
+                ;; (graph-tour (make-tour hill-climbing-tour)
+                ;;             "Hill climbing"
+                ;;             "hill-climbing.png")
+                ;; (graph-tour (make-tour A*-tour)
+                ;;             "A*"
+                ;;             "a-star.png")
+                (iter (- n 1)
+                      (cons (tour-length (make-tour hill-climbing-tour))
+                            hill-climbing-tours)
+                      (cons (tour-length (make-tour A*-tour))
+                            A*-tours)))))))
+
+   #+END_SRC
+** TODO b
+   #+BEGIN_SRC scheme
+     (use format
+          test)
+     
+     (include "tsp.scm")
+     
+     (define (crossover-alternating-positions p1 p2)
+       (let ((n (vector-length p1)))
+         (let ((child (make-vector n))
+               (present? (make-hash-table)))
+           (let iter ((p1 (vector->list p1))
+                      (p2 (vector->list p2))
+                      (p1? #f)
+                      (i 0))
+             (if (= i n)
+                 child
+                 (let ((element (if p1? (car p1) (car p2))))
+                   (if (hash-table-ref/default present? element #f)
+                       (iter (if p1? (cdr p1) p1)
+                             (if p1? p2 (cdr p2))
+                             (not p1?)
+                             i)
+                       (begin (vector-set! child i element)
+                              (hash-table-set! present? element #t)
+                              (iter (if p1? (cdr p1) p1)
+                                    (if p1? p2 (cdr p2))
+                                    (not p1?)
+                                    (+ i 1))))))))))
+     
+     #;
+     (let ((points (make-random-points 10)))
+       points)
+     
+     (let ((p1 '#(1 2 3 4 5 6 7 8))
+           (p2 '#(3 7 5 1 6 8 2 4)))
+       (test
+        '#(3 1 7 2 5 4 6 8)
+        (crossover-alternating-positions p1 p2))
+       (test
+        '#(1 3 2 7 5 4 6 8)
+        (crossover-alternating-positions p2 p1)))
+     
+   #+END_SRC
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
@@ -3888,6 +3933,39 @@
    - We can only see a short distance ahead, but we can see plenty
      there that needs to be done.
 
+** Larrañaga, Genetic algorithms
+   - Crossover and mutation
+   - Mutation: helps avoid local optima
+   - Stopping criteria: uniformity of population; average object
+     function, average individual.
+   - Brady, Grefenstette, Goldberg and Lingle, Oliver, et al.: GA to
+     TSP.
+   - Binary representation, matrix representation: binary alphabets.
+   - In the TSP, crossover and mutation operators don't constitute
+     closed operations: the results obtained using the above mentioned
+     operators are not valid tours.
+   - Path representation: great number of crossover and mutation
+     operators have been developed.
+   - Schemata analysis: chain formed by any characters, amplified by
+     =*=: lack of information: hyperplane in search space.
+   - Provides lower bound of expected number of individuals that in
+     the following generation will be associated with the determined
+     schema.
+   - Adjacency representation allows schemata analysis; ordinal
+     representation: crossover and mutation can be used without
+     designing new operators. Experimental results, poor.
+   - Binary representation: city encoded as a string of $\log{n}_2$
+     bits.
+     - Classical crossover: random crossover; do not represent legal
+       tours. Change created offspring, legal tours: repair algorithm:
+       transfers individuals that do not belong to the search space into
+       individual of that search space.
+     - Classal mutation: alters one or more bits with a probability
+       equal to the mutation rate: close to zero.
+   - Path representation: list of $n$ cities; classical operators also
+     not suitable.
+     - Partially mapped crossover (PMX): selects two random cut points
+       . . .
 * TODOs
 ** DONE 3.22
    Need a graph of possible moves (initially hard-coded for 3x3?); and
