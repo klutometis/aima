@@ -2519,12 +2519,14 @@
        (let* ((n (length population))
               (x (logarithmically-biased-random n)))
          (do ((y (logarithmically-biased-random n)
-                 (logarithmically-biased-random n)))
+                 (begin
+                   ;; (debug x y)
+                   (logarithmically-biased-random n))))
              ((not (= x y)) (values (list-ref population x)
                                     (list-ref population y))))))
      
      (define (sort-population population fitness)
-       (sort population < fitness))
+       (sort population > fitness))
      
      (define max-time (make-parameter 100))
      
@@ -2539,6 +2541,14 @@
            ;; (debug (map fitness population))
            (if (negative? i)
                (begin
+                 (let ((outfile (make-pathname directory (format "~4,48d" (+ (- (max-time) i) 1)) ".png"))
+                       (grapheon (vector->list (car population))))
+                   (debug outfile)
+                   (graph-tour outfile
+                               (format "TSP with GA (~a)" (- (max-time) i))
+                               grapheon
+                               (cons (last grapheon)
+                                     grapheon)))
                  (run (cd ,directory &&
                           mencoder mf://*.png
                           -mf ,(format "type=png:fps=~a" 6)
@@ -2550,10 +2560,17 @@
                        (grapheon (vector->list (car population))))
                    (debug outfile)
                    (graph-tour outfile
-                               "TSP with GA"
+                               (format "TSP with GA (~a)" (- (max-time) i))
                                grapheon
                                (cons (last grapheon)
                                      grapheon)))
+                 ;; (debug (sort
+                 ;;         (map (lambda (offspring) (cons (fitness offspring)
+                 ;;                                   offspring))
+                 ;;              population)
+                 ;;         <
+                 ;;         car))
+                 (mutation-probability (* (mutation-probability) 0.8))
                  (let ((new-population
                         (do ((new-population
                               '()
@@ -2569,6 +2586,9 @@
                             ((= (length new-population)
                                 (length population))
                              new-population))))
+                   ;; (debug (abs
+                   ;;         (- (mean (map fitness population))
+                   ;;            (mean (map fitness new-population)))))
                    (iter (sort-population new-population fitness)
                          (if (< (abs
                                  (- (mean (map fitness population))
@@ -2599,12 +2619,12 @@
                             crossover-alternating-positions
                             scramble-mutate!)))
      
-     (let ((points (make-random-points 10)))
+     (let ((points (make-random-points 25)))
        (let ((genetic-tour
-              (parameterize ((max-time 100)
-                             (population-n 100)
-                             (mutation-probability 0.01)
-                             (mean-threshold 0.00000))
+              (parameterize ((max-time 300)
+                             (population-n 500)
+                             (mutation-probability 0.5)
+                             (mean-threshold 0.0000))
                 (genetic-tsp points)))
              (hill-climbing-tour (hill-climbing-tsp points)))
          ;; (graph-tour "harro.png" "harro" points (cons (vector-ref genetic-tour
