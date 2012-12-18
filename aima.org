@@ -2242,7 +2242,8 @@
                                               -mf ,(format "type=png:fps=~a" fps)
                                               -ovc lavc
                                               -o ,(make-pathname (current-directory) animation))))))
-                               (* (tree-cost unvisited-tree) 2)))))))))))
+                               (tree-cost unvisited-tree)))))))))))
+     
    #+END_SRC
 
    #+BEGIN_SRC scheme :tangle 3.30.scm :shebang #!/usr/bin/env chicken-scheme
@@ -2330,11 +2331,7 @@
 
    [[http://osdir.com/ml/plt-scheme/2009-08/msg00134.html][Shuffling a list]]; [[http://mumble.net/~campbell/scheme/shuffle.scm][Riastradh's]]; [[http://codeimmersion.i3ci.hampshire.edu/2009/09/20/a-simple-scheme-shuffle/][O(n log n)]], I believe.
 
-   #+BEGIN_SRC scheme :tangle 4.3.scm :shebang #!/usr/bin/env chicken-scheme
-     (use format)
-
-     (include "tsp.scm")
-
+   #+BEGIN_SRC scheme :tangle tsp-local.scm
      (use aima-search
           data-structures
           debug
@@ -2342,26 +2339,26 @@
           srfi-1
           statistics
           vector-lib)
-
+     
      (define (shuffle! v)
        (do ((n (vector-length v) (- n 1)))
            ((zero? n) v)
          (let* ((r (random n)) (t (vector-ref v r)))
            (vector-set! v r (vector-ref v (- n 1)))
                  (vector-set! v (- n 1) t))))
-
+     
      (define (shuffle v)
        (let ((v (vector-copy v)))
          (shuffle! v)
          v))
-
+     
      (define (tour-distance tour)
        (do ((i 0 (+ i 1))
             (j 1 (modulo (+ j 1) (vector-length tour)))
             (distance 0 (+ distance (point-distance (vector-ref tour i)
                                                     (vector-ref tour j)))))
            ((= i (vector-length tour)) distance)))
-
+     
      (define (successors tour)
        (do ((i 0 (+ i 1))
             (successors
@@ -2376,23 +2373,25 @@
               successors)
              ))
            ((= i (- (vector-length tour) 1)) successors)))
-
+     
      (define (min-successor successors)
        (let ((tours (make-min-heap)))
          (for-each (lambda (successor)
                      (heap-insert! tours (tour-distance successor) successor))
            successors)
          (heap-extract-extremum! tours)))
-
-     (define (hill-climbing points)
+     
+     (define (hill-climbing-tsp points)
        (let iter ((tour (shuffle (list->vector points))))
          (let ((next-tour (min-successor (successors tour))))
            (if (>= (tour-distance next-tour)
                    (tour-distance tour))
-               (cons (vector-ref tour (- (vector-length tour) 1))
-                     (vector->list tour))
+               ;; No, don't cons it; tour-distance takes this into account.
+               ;; (cons (vector-ref tour (- (vector-length tour) 1))
+               ;;       (vector->list tour))
+               tour
                (iter next-tour)))))
-
+     
      ;; (let ((points (make-random-points 10)))
      ;;   (let ((hill-climbing-tour (hill-climbing points))
      ;;         (A*-tour (A*-tour (car points) (complete-graph points) points)))
@@ -2403,7 +2402,7 @@
      ;;     ;;             "Hill-climbing"
      ;;     ;;             "img/4-3.png")
      ;;     ))
-
+     
      ;; (map (lambda (i)
      ;;        (let ((points (make-random-points 10)))
      ;;          (debug i)
@@ -2415,7 +2414,17 @@
      ;;            (cons (tour-length (make-tour hill-climbing-tour))
      ;;                  (tour-length (make-tour A*-tour))))))
      ;;      (iota 100))
+     
+        
+     
+   #+END_SRC
 
+   #+BEGIN_SRC scheme :tangle 4.3.scm :shebang #!/usr/bin/env chicken-scheme
+     (use format)
+     
+     (include "tsp.scm")
+     (include "tsp-local.scm")
+     
      (debug
       (let iter ((n 100)
                  (hill-climbing-tours '())
@@ -2425,7 +2434,7 @@
             (cons (mean hill-climbing-tours)
                   (mean A*-tours))
             (let ((points (make-random-points 10)))
-              (let ((hill-climbing-tour (hill-climbing points))
+              (let ((hill-climbing-tour (hill-climbing-tsp points))
                     (A*-tour (A*-tour (car points)
                                       (complete-graph points)
                                       points
@@ -2445,17 +2454,22 @@
                             hill-climbing-tours)
                       (cons (tour-length (make-tour A*-tour))
                             A*-tours)))))))
-
    #+END_SRC
 ** TODO b
-   #+BEGIN_SRC scheme
+   #+BEGIN_SRC scheme :tangle 4.3b.scm :shebang #!/usr/bin/env chicken-scheme
      (use debug
           format
+          miscmacros
+          ;; numbers
+          random-bsd
+          srfi-1
+          srfi-95
           test)
      
      (include "tsp.scm")
+     (include "tsp-local.scm")
      
-     (define (shuffle! v p r)
+     (define (shuffle-bounded! v p r)
        (let* ((n (vector-length v))
               (r (if (> r p) r (+ n r))))
          (do ((i r (- i 1)))
@@ -2467,7 +2481,11 @@
                (vector-set! v j (vector-ref v i))
                (vector-set! v i t))))))
      
-     (define scramble-mutate! shuffle!)
+     (define (scramble-mutate! offspring)
+       (let ((n (vector-length offspring)))
+         (shuffle-bounded! offspring
+                           (random n)
+                           (random n))))
      
      (define (crossover-alternating-positions p1 p2)
        (let ((n (vector-length p1)))
@@ -2492,9 +2510,98 @@
                                     (not p1?)
                                     (+ i 1))))))))))
      
-     (let ((p1 '#(1 2 3 4 5 6 7 8)))
-       (shuffle! p1 6 2)
-       (debug p1))
+     
+     
+     (define (logarithmically-biased-random-real)
+       (log (+ (* (- (exp 1) 1) (random-real)) 1)))
+     
+     (define logarithmic-bias (make-parameter 5))
+     
+     (define logarithmically-biased-random-real
+       (case-lambda
+        (() (logarithmically-biased-random-real (logarithmic-bias)))
+        ((bias)
+         (let ((r
+                (/ 1 (log (+ (* (- (exp bias) (exp 1)) (random-real)) (exp 1))))))
+           (debug r
+                  (+ (* (- (exp bias) (exp 1)) (random-real)) (exp 1))
+                  (log (+ (* (- (exp bias) (exp 1)) (random-real)) (exp 1)))
+                  (/ 1 (log (+ (* (- (exp bias) (exp 1)) (random-real)) (exp 1)))))
+           r))))
+     
+     (define (logarithmically-biased-random n)
+       (inexact->exact (floor (* n (logarithmically-biased-random-real)))))
+     
+     (define (logarithmically-biased-random n)
+       (inexact->exact (floor (log (+ (* (random-real) (- (exp n) 1)) 1)))))
+     
+     ;; (define (linearly-biased-random n)
+     ;;   (inexact->exact (floor (log (+ (* (random-real) (- (exp n) 1)) 1)))))
+     
+     (define (logarithmically-biased-random-pair population)
+       (let* ((n (length population))
+              (x (logarithmically-biased-random n)))
+         (do ((y (logarithmically-biased-random n)
+                 (logarithmically-biased-random n)))
+             ((not (= x y)) (values (list-ref population x)
+                                    (list-ref population y))))))
+     
+     (define (sort-population population fitness)
+       (sort population < fitness))
+     
+     (define (genetic-algorithm population fitness reproduce mutate!)
+       (let iter ((population population)
+                  (i 1000))
+         ;; (debug (map fitness population))
+         (if (negative? i)
+             (car (sort-population population fitness))
+             (let ((new-population
+                    (do ((new-population
+                          '()
+                          (cons
+                           (let ((offspring
+                                  (receive (x y)
+                                    (logarithmically-biased-random-pair population)
+                                    (reproduce x y))))
+                             (if (< (random-real) 0.05) (mutate! offspring))
+                             offspring)
+                           new-population)))
+                        ((= (length new-population)
+                            (length population))
+                         new-population))))
+               (debug (abs
+                       (- (fitness (car population))
+                          (fitness (car new-population)))))
+               (iter (sort-population new-population fitness)
+                     (- i 1))))))
+     
+     ;; (let ((p1 '#(1 2 3 4 5 6 7 8)))
+     ;;   (shuffle! p1 6 2)
+     ;;   (debug p1))
+     
+     ;; (let ((sample (list-tabulate 100 (lambda (i) (logarithmically-biased-random 100)))))
+     ;;   (debug (sort sample >)
+     ;;          (exact->inexact (mean sample))
+     ;;          (exact->inexact (median sample))))
+     
+     (define (populate-tour n points)
+       (let ((path (list->vector points)))
+         (list-tabulate n (lambda (i) (shuffle path)))))
+     
+     (define (genetic-tsp points)
+       (let ((population (populate-tour 100 points)))
+         (genetic-algorithm population
+                            tour-distance
+                            crossover-alternating-positions
+                            scramble-mutate!)))
+     
+     (let ((points (make-random-points 10)))
+       (let ((genetic-tour (genetic-tsp points))
+             (hill-climbing-tour (hill-climbing-tsp points)))
+         (debug genetic-tour
+                hill-climbing-tour
+                (tour-distance genetic-tour)
+                (tour-distance hill-climbing-tour))))
      
    #+END_SRC
 
