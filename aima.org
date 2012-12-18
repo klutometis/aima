@@ -2512,31 +2512,8 @@
      
      
      
-     (define (logarithmically-biased-random-real)
-       (log (+ (* (- (exp 1) 1) (random-real)) 1)))
-     
-     (define logarithmic-bias (make-parameter 5))
-     
-     (define logarithmically-biased-random-real
-       (case-lambda
-        (() (logarithmically-biased-random-real (logarithmic-bias)))
-        ((bias)
-         (let ((r
-                (/ 1 (log (+ (* (- (exp bias) (exp 1)) (random-real)) (exp 1))))))
-           (debug r
-                  (+ (* (- (exp bias) (exp 1)) (random-real)) (exp 1))
-                  (log (+ (* (- (exp bias) (exp 1)) (random-real)) (exp 1)))
-                  (/ 1 (log (+ (* (- (exp bias) (exp 1)) (random-real)) (exp 1)))))
-           r))))
-     
-     (define (logarithmically-biased-random n)
-       (inexact->exact (floor (* n (logarithmically-biased-random-real)))))
-     
      (define (logarithmically-biased-random n)
        (inexact->exact (floor (log (+ (* (random-real) (- (exp n) 1)) 1)))))
-     
-     ;; (define (linearly-biased-random n)
-     ;;   (inexact->exact (floor (log (+ (* (random-real) (- (exp n) 1)) 1)))))
      
      (define (logarithmically-biased-random-pair population)
        (let* ((n (length population))
@@ -2549,31 +2526,56 @@
      (define (sort-population population fitness)
        (sort population < fitness))
      
+     (define max-time (make-parameter 100))
+     
+     (define mutation-probability (make-parameter 0.01))
+     
+     (define mean-threshold (make-parameter 0.0005))
+     
      (define (genetic-algorithm population fitness reproduce mutate!)
-       (let iter ((population population)
-                  (i 1000))
-         ;; (debug (map fitness population))
-         (if (negative? i)
-             (car (sort-population population fitness))
-             (let ((new-population
-                    (do ((new-population
-                          '()
-                          (cons
-                           (let ((offspring
-                                  (receive (x y)
-                                    (logarithmically-biased-random-pair population)
-                                    (reproduce x y))))
-                             (if (< (random-real) 0.05) (mutate! offspring))
-                             offspring)
-                           new-population)))
-                        ((= (length new-population)
-                            (length population))
-                         new-population))))
-               (debug (abs
-                       (- (fitness (car population))
-                          (fitness (car new-population)))))
-               (iter (sort-population new-population fitness)
-                     (- i 1))))))
+       (let ((directory (create-temporary-directory)))
+         (let iter ((population (sort-population population fitness))
+                    (i (max-time)))
+           ;; (debug (map fitness population))
+           (if (negative? i)
+               (begin
+                 (run (cd ,directory &&
+                          mencoder mf://*.png
+                          -mf ,(format "type=png:fps=~a" 6)
+                          -ovc lavc
+                          -o ,(make-pathname (current-directory) "ga.avi")))
+                 (car population))
+               (begin
+                 (let ((outfile (make-pathname directory (format "~4,48d" (- (max-time) i)) ".png"))
+                       (grapheon (vector->list (car population))))
+                   (debug outfile)
+                   (graph-tour outfile
+                               "TSP with GA"
+                               grapheon
+                               (cons (last grapheon)
+                                     grapheon)))
+                 (let ((new-population
+                        (do ((new-population
+                              '()
+                              (cons
+                               (let ((offspring
+                                      (receive (x y)
+                                        (logarithmically-biased-random-pair population)
+                                        (reproduce x y))))
+                                 (if (< (random-real) (mutation-probability))
+                                     (mutate! offspring))
+                                 offspring)
+                               new-population)))
+                            ((= (length new-population)
+                                (length population))
+                             new-population))))
+                   (iter (sort-population new-population fitness)
+                         (if (< (abs
+                                 (- (mean (map fitness population))
+                                    (mean (map fitness new-population))))
+                                (mean-threshold))
+                             -1
+                             (- i 1)))))))))
      
      ;; (let ((p1 '#(1 2 3 4 5 6 7 8)))
      ;;   (shuffle! p1 6 2)
@@ -2588,18 +2590,27 @@
        (let ((path (list->vector points)))
          (list-tabulate n (lambda (i) (shuffle path)))))
      
+     (define population-n (make-parameter 100))
+     
      (define (genetic-tsp points)
-       (let ((population (populate-tour 100 points)))
+       (let ((population (populate-tour (population-n) points)))
          (genetic-algorithm population
                             tour-distance
                             crossover-alternating-positions
                             scramble-mutate!)))
      
      (let ((points (make-random-points 10)))
-       (let ((genetic-tour (genetic-tsp points))
+       (let ((genetic-tour
+              (parameterize ((max-time 100)
+                             (population-n 100)
+                             (mutation-probability 0.01)
+                             (mean-threshold 0.00000))
+                (genetic-tsp points)))
              (hill-climbing-tour (hill-climbing-tsp points)))
+         ;; (graph-tour "harro.png" "harro" points (cons (vector-ref genetic-tour
+         ;;                                                          (- (vector-length genetic-tour) 1))
+         ;;                                              (vector->list genetic-tour)))
          (debug genetic-tour
-                hill-climbing-tour
                 (tour-distance genetic-tour)
                 (tour-distance hill-climbing-tour))))
      
