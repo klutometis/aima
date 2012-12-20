@@ -2324,8 +2324,10 @@
   only $14\%$ of problem instances."
 
   Initial state is complete and random.
-* TODO 4.3
-** TODO a
+* DONE 4.3
+  CLOSED: [2012-12-20 Thu 15:19]
+** DONE a
+   CLOSED: [2012-12-20 Thu 15:19]
    Thanks, John Montgomery, for the suggestion to [[http://www.psychicorigami.com/2007/04/17/tackling-the-travelling-salesman-problem-part-one/][reverse]] pairs of
    cities or the cities intervening pairs.
 
@@ -2455,7 +2457,10 @@
                       (cons (tour-length (make-tour A*-tour))
                             A*-tours)))))))
    #+END_SRC
-** TODO b
+** DONE b
+   CLOSED: [2012-12-20 Thu 15:19]
+   See [[http://youtu.be/KHG3AnTp1bg][the movie]].
+
    #+BEGIN_SRC scheme :tangle 4.3b.scm :shebang #!/usr/bin/env chicken-scheme
      (use debug
           format
