@@ -2534,6 +2534,8 @@
      
      (define mean-threshold (make-parameter 0.0005))
      
+     (define mutation-decay (make-parameter 0.8))
+     
      (define (genetic-algorithm population fitness reproduce mutate!)
        (let ((directory (create-temporary-directory)))
          (let iter ((population (sort-population population fitness))
@@ -2570,7 +2572,7 @@
                  ;;              population)
                  ;;         <
                  ;;         car))
-                 (mutation-probability (* (mutation-probability) 0.8))
+                 (mutation-probability (* (mutation-probability) (mutation-decay)))
                  (let ((new-population
                         (do ((new-population
                               '()
@@ -2619,11 +2621,12 @@
                             crossover-alternating-positions
                             scramble-mutate!)))
      
-     (let ((points (make-random-points 25)))
+     (let ((points (make-random-points 10)))
        (let ((genetic-tour
-              (parameterize ((max-time 300)
+              (parameterize ((max-time 50)
                              (population-n 500)
                              (mutation-probability 0.5)
+                             (mutation-decay 0.8)
                              (mean-threshold 0.0000))
                 (genetic-tsp points)))
              (hill-climbing-tour (hill-climbing-tsp points)))
@@ -4114,6 +4117,8 @@
      - Partially mapped crossover (PMX): selects two random cut points
        . . .
 * TODOs
+** TODO Maybe search should be in its own package; it's useful.
+** TODO Need a generic animation facility.
 ** TODO What the hell: let's add some Bach or Liszt to the animations.
 ** DONE 3.22
    Need a graph of possible moves (initially hard-coded for 3x3?); and
