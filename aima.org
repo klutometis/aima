@@ -2646,6 +2646,152 @@
 
    Can we construct a suitable data-frame to visualize the top
    n-offspring with path-lengths?
+* TODO 4.6
+  Problem has: =actions(state)=, =results(state, action)=,
+  =goal-test(state)=. We'll keep track of the states and label them.
+  First: acyclic.
+
+  #+BEGIN_SRC scheme :comments link :tangle and-or-search.scm :shebang #!/usr/local/bin/chicken-scheme
+  (use debug
+       define-record-and-printer
+       fmt
+       srfi-1)
+
+  (define-record-and-printer problem
+    initial-state
+    goal?
+    actions
+    results)
+
+  (define-record clean)
+  (define clean (make-clean))
+
+  (define-record dirty)
+  (define dirty (make-dirty))
+
+  (define-record left)
+  (define left (make-left))
+
+  (define-record right)
+  (define right (make-right))
+
+  (define-record suck)
+  (define suck (make-suck))
+
+  (define-record failure)
+  (define failure (make-failure))
+
+  (define-record success)
+  (define success (make-success))
+
+  (define-record-and-printer vacuum-world
+    left
+    right
+    robot)
+
+  (define (make-erratic-vacuum-problem)
+    (make-problem
+     (make-vacuum-world dirty dirty left)
+     (lambda (vacuum-world)
+       (and (clean? (vacuum-world-right vacuum-world))
+            (clean? (vacuum-world-left vacuum-world))))
+     (lambda (vacuum-world)
+       (cons (if (left? (vacuum-world-robot vacuum-world))
+                 right
+                 left)
+             (list suck)))
+     (lambda (vacuum-world action)
+       (if (suck? action)
+           (if (left? (vacuum-world-robot vacuum-world))
+               (if (dirty? (vacuum-world-left vacuum-world))
+                   (if (dirty? (vacuum-world-right vacuum-world))
+                       (list (make-vacuum-world clean dirty left)
+                             (make-vacuum-world clean clean left))
+                       (list (make-vacuum-world clean clean left)))
+                   (list (make-vacuum-world clean (vacuum-world-right vacuum-world) left)
+                         (make-vacuum-world dirty (vacuum-world-right vacuum-world) left)))
+               (if (dirty? (vacuum-world-right vacuum-world))
+                   (if (dirty? (vacuum-world-left vacuum-world))
+                       (list (make-vacuum-world dirty clean right)
+                             (make-vacuum-world clean clean right))
+                       (list (make-vacuum-world clean clean right)))
+                   (list (make-vacuum-world (vacuum-world-left vacuum-world) clean right)
+                         (make-vacuum-world (vacuum-world-left vacuum-world) dirty right))))
+           (if (left? action)
+               (list (make-vacuum-world (vacuum-world-left vacuum-world)
+                                        (vacuum-world-right vacuum-world)
+                                        left))
+               (list (make-vacuum-world (vacuum-world-left vacuum-world)
+                                        (vacuum-world-right vacuum-world)
+                                        right)))))))
+
+  (define (make-slippery-vacuum-problem)
+    (make-problem
+     (make-vacuum-world dirty dirty left)
+     (lambda (vacuum-world)
+       (and (clean? (vacuum-world-right vacuum-world))
+            (clean? (vacuum-world-left vacuum-world))))
+     (lambda (vacuum-world)
+       (cons (if (left? (vacuum-world-robot vacuum-world))
+                 right
+                 left)
+             (list suck)))
+     (lambda (vacuum-world action)
+       (if (suck? action)
+           (if (left? (vacuum-world-robot vacuum-world))
+               (list (make-vacuum-world clean
+                                        (vacuum-world-right vacuum-world)
+                                        left))
+               (list (make-vacuum-world (vacuum-world-left vacuum-world)
+                                        clean
+                                        right)))
+           (list (make-vacuum-world (vacuum-world-left vacuum-world)
+                                    (vacuum-world-right vacuum-world)
+                                    left)
+                 (make-vacuum-world (vacuum-world-left vacuum-world)
+                                    (vacuum-world-right vacuum-world)
+                                    right))))))
+
+  (define-record-and-printer plan
+    action
+    contingencies)
+
+  (define (and-or-graph-search problem)
+    (define (or-search state path)
+      (debug state path)
+      (if (member state path equal?)
+          failure
+          (if ((problem-goal? problem) state)
+              success
+              (let iter ((actions ((problem-actions problem) state)))
+                (if (null? actions)
+                    failure
+                    (let* ((action (car actions))
+                           (plan (and-search ((problem-results problem) state action)
+                                             (cons state path))))
+                      (debug action plan)
+                      (if (failure? plan)
+                          (iter (cdr actions))
+                          (make-plan action plan))))))))
+    (define (and-search states path)
+      (let ((plans (make-hash-table)))
+        (let iter ((states states))
+          (if (null? states)
+              ;; (lambda (state)
+              ;;   (hash-table-ref plans state))
+              (hash-table->alist plans)
+              (let* ((state (car states))
+                     (plan (or-search state path)))
+                (if (failure? plan)
+                    failure
+                    (begin
+                      (hash-table-set! plans state plan)
+                      (iter (cdr states)))))))))
+    (or-search (problem-initial-state problem) '()))
+
+  (debug (and-or-graph-search (make-erratic-vacuum-problem)))
+  (debug (and-or-graph-search (make-slippery-vacuum-problem)))
+  #+END_SRC
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
