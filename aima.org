@@ -2712,10 +2712,10 @@
                     (make-vacuum-world clean clean left)))
              (((? dirty?) (? clean?) (? left?))
               (list (make-vacuum-world clean clean left)))
-             (((? clean?) (? dirty?) left)
+             (((? clean?) (? dirty?) (? left?))
               (list (make-vacuum-world dirty dirty left)
                     (make-vacuum-world clean dirty left)))
-             (((? clean?) (? clean?) left)
+             (((? clean?) (? clean?) (? left?))
               (list (make-vacuum-world dirty clean left)
                     (make-vacuum-world clean clean left)))
              (((? dirty?) (? dirty?) (? right?))
@@ -2802,6 +2802,64 @@
                       (hash-table-set! plans state plan)
                       (iter (cdr states)))))))))
     (or-search (problem-initial-state problem) '()))
+
+  (define-record-and-printer node
+    state
+    parent
+    plan
+    ;; cost
+    )
+
+  (define (and-or-graph-search problem)
+    (let ((frontier (make-queue))
+          (almost-explored (make-queue))
+          (explored (make-hash-table)))
+      (define (or-search)
+        (let search ()
+          (if (queue-empty? frontier)
+              failure
+              (let* ((parent (queue-remove! frontier))
+                     (state (node-state parent)))
+                (hash-table-delete! almost-explored state)
+                (hash-table-set! explored state #t)
+                (for-each
+                    (lambda (action)
+                      (let* ((plan (and-search ((problem-results problem) state action)))
+                             (child (make-node state parent plan)))
+                        ))
+                  ((problem-actions problem) state))
+                (if ((problem-goal? problem) state)
+                    success
+                    (unless (or (hash-table-ref/default explored state #f)
+                                (hash-table-ref/default almost-explored state #f))
+                      (let ((child (make-node state parent)))
+                        (for-each (lambda (action)
+                                    (let ((plan (and-search ((problem-results problem) state action))))
+                                      (make-plan action plan)))
+                          ((problem-actions problem) state)))))))))
+      (define (and-search states)
+        (let ((plans (make-hash-table)))
+          (let iter ((states states))
+            (if (null? states)
+                (hash-table->alist plans)
+                (let* ((state (car states))
+                       (plan (or-search)))
+                  (if (failure? plan)
+                      failure
+                      (begin
+                        (hash-table-set! plans state plan)
+                        (iter (cdr states)))))))))
+      (let* ((state (problem-initial-state problem))
+             (root (make-node state #f #f)))
+        (if ((problem-goal? problem) state)
+            success
+            (begin
+              (queue-add! frontier root)
+              (hash-table-set! almost-explored state #t)
+              (or-search))))))
+
+  (define (and-or-graph-search problem)
+    )
 
   (debug (and-or-graph-search (make-erratic-vacuum-problem)))
   ;; (debug (and-or-graph-search (make-slippery-vacuum-problem)))
