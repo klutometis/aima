@@ -2885,6 +2885,10 @@
      d$dirsgs <- subset(d$dirsgs, !(bp1 | bp2))
      plot(d)
    #+END_SRC
+
+   On the other hand, calculate a convex hull around every Dirichlet
+   tile (redundantly, in some cases): use this as the basis for a
+   subpolygon.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
