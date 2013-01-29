@@ -2867,28 +2867,28 @@
 
   Conduct BF and AND/OR: relax the unsolvable procedure; label the
   intermediate nodes (and)?
-** TODO 4.12
-   - Take a Voronoi tessellation; throw away the edges that cross the
-     bounding box and their corresponding points.
-   - Take every edge involving a centroid: pick random points on
-     those edges
-   - Take the convex hull of those edges
-     
-   #+BEGIN_SRC R
-     library(deldir)
-     n.nodes <- 30
-     d <- deldir(rnorm(n.nodes), rnorm(n.nodes))
-     outers <- subset(d$dirsgs, bp1 | bp2)
-     outers <- unique(c(outers$ind1, outers$ind2))
-     outers
-     d$delsgs <- subset(d$delsgs, !(ind1 %in% outers | ind2 %in% outers))
-     d$dirsgs <- subset(d$dirsgs, !(bp1 | bp2))
-     plot(d)
-   #+END_SRC
+* TODO 4.12
+  - Take a Voronoi tessellation; throw away the edges that cross the
+    bounding box and their corresponding points.
+  - Take every edge involving a centroid: pick random points on
+    those edges
+  - Take the convex hull of those edges
 
-   On the other hand, calculate a convex hull around every Dirichlet
-   tile (redundantly, in some cases): use this as the basis for a
-   subpolygon.
+  #+BEGIN_SRC R
+    library(deldir)
+    n.nodes <- 30
+    d <- deldir(rnorm(n.nodes), rnorm(n.nodes))
+    outers <- subset(d$dirsgs, bp1 | bp2)
+    outers <- unique(c(outers$ind1, outers$ind2))
+    outers
+    d$delsgs <- subset(d$delsgs, !(ind1 %in% outers | ind2 %in% outers))
+    d$dirsgs <- subset(d$dirsgs, !(bp1 | bp2))
+    plot(d)
+  #+END_SRC
+
+  On the other hand, calculate a convex hull around every Dirichlet
+  tile (redundantly, in some cases): use this as the basis for a
+  subpolygon.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
