@@ -3094,6 +3094,9 @@
    - Recombination of paths?
    - A*, hill-climbing, and GA applied to TSP.
    - [[http://webcache.googleusercontent.com/search?q%3Dcache:jhd41bMWVwYJ:ma.ttforbes.com/A*%252520and%252520the%252520Traveling%252520Salesman%252520Problem%2B&cd%3D6&hl%3Den&ct%3Dclnk&gl%3Dus&client%3Dopera][Matt Forbes]]
+** Mon Jan 28 2013
+   - Absolute position of goal vs. relative position of goal every
+     turn.
 * Notes
 ** 1
    - Two dimensions: thought vs. action, humanity vs. rationality.
