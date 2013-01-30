@@ -2942,8 +2942,8 @@
     ## polygon <- subset(d$dirsgs, ind1 == 1 | ind2 == 1)
     ## ## plot(ggplot(d$summary, aes(x=x, y=y)) + geom_polygon(aes(group=n.tri, fill=n.tri)))
     ## polygon <- polygon[chull(polygon$x1, polygon$y1),]
-    plot(d)
-    Sys.sleep(2)
+    ## plot(d)
+    ## Sys.sleep(2)
     plot(ggplot(polygons, aes(x=x1, y=y1)) + geom_polygon(aes(group=index, fill=index)))
     
   #+END_SRC
