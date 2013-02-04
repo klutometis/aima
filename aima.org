@@ -2927,18 +2927,33 @@
     library(debug)
     library(lisp)
     
-    source('multiplot.R')
-    
-    n.nodes <- 10
+    n.nodes <- 30
     d <- deldir(rnorm(n.nodes), rnorm(n.nodes))
-    d$dirsgs
+    
+    random.points <- function(x, y) {
+      x <- c(x, car(x))
+      y <- c(y, car(y))
+      Map(function(x1, y1, x2, y2) {
+        t <- runif(1)
+        list(x1 + t * (x2 - x1),
+             y1 + t * (y2 - y1))
+      },
+          x[1:length(x) - 1],
+          y[1:length(y) - 1],
+          x[-1],
+          y[-1])
+    }
+    
     polygons <- Reduce(function(polygons, index) {
       polygon <- subset(d$dirsgs, ind1 == index | ind2 == index)
       points <- unique(zip.c(c(polygon$x1, polygon$x2), c(polygon$y1, polygon$y2)))
       x <- unlist(Map(car, points))
       y <- unlist(Map(cdr, points))
       hull <- chull(x, y)
-      polygon <- data.frame(x=x[hull], y=y[hull])
+      points <- random.points(x[hull], y[hull])
+      x <- unlist(Map(car, points))
+      y <- unlist(Map(cdr, points))
+      polygon <- data.frame(x=x, y=y)
       polygon <- cbind(polygon, data.frame(index=rep(index, nrow(polygon))))
       rbind(polygons, polygon)
     },
