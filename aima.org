@@ -2927,13 +2927,46 @@
     library(debug)
     library(lisp)
     
-    n.nodes <- 30
+    source('multiplot.R')
+    
+    n.nodes <- 10
     d <- deldir(rnorm(n.nodes), rnorm(n.nodes))
+    d$dirsgs
     polygons <- Reduce(function(polygons, index) {
+      debug(index)
+      debug(subset(d$dirsgs, ind1 == index | ind2 == index))
       polygon <- subset(d$dirsgs, ind1 == index | ind2 == index)
-      polygon <- polygon[chull(polygon$x1, polygon$y1), ]
-      polygon <- rbind(polygon, polygon[1, ])
+      ## polygon <- polygon[chull(c(polygon$x1, polygon$x2),
+      ##                          c(polygon$y1, polygon$y2)), ]
+      ## debug(polygon, c(polygon$x1, polygon$x2))
+      points <- unique(zip.c(c(polygon$x1, polygon$x2), c(polygon$y1, polygon$y2)))
+      x <- Map(car, points)
+      y <- Map(cdr, points)
+      ## debug(## zip.list(c(polygon$x1, polygon$x2), c(polygon$y1, polygon$y2)),
+      ##       ## unique(zip.list(c(polygon$x1, polygon$x2), c(polygon$y1, polygon$y2)))
+      ##       ## ,
+      ##       Map(function(list) structure(list, names=c("x", "y")),
+      ##           unique(zip.list(c(polygon$x1, polygon$x2), c(polygon$y1, polygon$y2))))## ,
+      ##       ## chull(Map(function(list) structure(list, names=c("x", "y")),
+      ##       ##           unique(zip.list(c(polygon$x1, polygon$x2), c(polygon$y1, polygon$y2)))))
+      ##       )
+      ## debug(points, Map(car, points), Map(cdr, points))
+      hull <- chull(x, y)
+      ## polygon <- polygon[chull(polygon$x1, polygon$y1), ]
+      ## debug(hull)
+      ## debug(points, points[hull])
+      polygon <- points[hull]
+      x <- Map(car, polygon)
+      y <- Map(cdr, polygon)
+      ## polygon <- rbind(polygon, polygon[1, ])
+      ## debug(polygon)
+      ## polygon <- cbind(polygon, data.frame(index=rep(index, nrow(polygon))))
+      debug(x, y)
+      polygon <- data.frame(x=unlist(x), y=unlist(y))
+      debug(polygon)
+      print(polygon)
       polygon <- cbind(polygon, data.frame(index=rep(index, nrow(polygon))))
+      debug(polygon)
       rbind(polygons, polygon)
     },
                        1:nrow(d$summary),
@@ -2942,9 +2975,13 @@
     ## polygon <- subset(d$dirsgs, ind1 == 1 | ind2 == 1)
     ## ## plot(ggplot(d$summary, aes(x=x, y=y)) + geom_polygon(aes(group=n.tri, fill=n.tri)))
     ## polygon <- polygon[chull(polygon$x1, polygon$y1),]
+    ## par(mfrow=c(2, 1))
+    ## layout(matrix(c(1,1,0,2), 2, 2, byrow = TRUE))
     ## plot(d)
-    ## Sys.sleep(2)
-    plot(ggplot(polygons, aes(x=x1, y=y1)) + geom_polygon(aes(group=index, fill=index)))
+    debug(polygons)
+    ggplot(polygons, aes(x=x, y=y)) + geom_polygon(aes(group=index, fill=index))
+    ## par(new=T)
+    ## plot(d)
     
   #+END_SRC
 
