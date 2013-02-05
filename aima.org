@@ -3145,6 +3145,13 @@
 ** Mon Jan 28 2013
    - Absolute position of goal vs. relative position of goal every
      turn.
+** Mon Feb  4 2013
+   - Teleported to free-space or vertex?
+   - Identify nodes as percepts
+   - Hash points
+   - Polar vs. cartesian relativism
+   - Similarity to simulated annealing
+   - Expanding frontier
 * Notes
 ** 1
    - Two dimensions: thought vs. action, humanity vs. rationality.
