@@ -2926,6 +2926,7 @@
     library(ggplot2)
     library(debug)
     library(lisp)
+    library(sp)
     
     n.nodes <- 30
     d <- deldir(rnorm(n.nodes), rnorm(n.nodes))
@@ -2959,7 +2960,39 @@
     },
                        1:nrow(d$summary),
                        data.frame())
-    ggplot(polygons, aes(x=x, y=y)) + geom_polygon(aes(group=index, fill=index))
+    
+    indexed.polygons <- Map(function(i) {
+      polygon <- new.env(parent=emptyenv())
+      polygon$x <- subset(polygons, index == i)$x
+      polygon$y <- subset(polygons, index == i)$y
+      polygon
+    },
+                            unique(polygons$index))
+    range <- list(x.min=min(polygons$x),
+                  x.max=max(polygons$x),
+                  y.min=min(polygons$y),
+                  y.max=max(polygons$y))
+    point <- NULL
+    while(TRUE) {
+      point <<- list(x=runif(1, range$x.min, range$x.max),
+                    y=runif(1, range$y.min, range$y.max))
+      debug(point)
+      if (Reduce(function(is.free, polygon) {
+        is.free && point.in.polygon(point$x,
+                                    point$y,
+                                    polygon$x,
+                                    polygon$y) == 0
+      },
+                 indexed.polygons,
+                 TRUE))
+        break
+    }
+    
+    ggplot(polygons, aes(x=x, y=y)) +
+      geom_polygon(aes(group=index, fill=index)) +
+      geom_point(data=data.frame(x=1, y=2),
+                 aes(x=point$x, y=point$y, color='robot'),
+                 size=4)
     
   #+END_SRC
 
