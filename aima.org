@@ -2997,6 +2997,63 @@
   #+END_SRC
 
   See [[http://stackoverflow.com/questions/1299871/how-to-join-data-frames-in-r-inner-outer-left-right][joining dataframes]].
+
+  #+BEGIN_SRC scheme
+    (use aima-tessellation
+         define-record-and-printer
+         debug
+         miscmacros
+         srfi-95)
+    
+    (define-record-and-printer agent
+      point
+      score
+      program)
+    
+    (define zero-motion (make-point 0 0))
+    
+    (define (zero-motion? move) (equal? move zero-motion))
+    
+    (let ((world (tessellate 250)))
+      (let ((points (tessellation-points world))
+            (neighbors (tessellation-neighbors world))
+            (goal (tessellation-end world)))
+        (let* ((start (list-ref points (random (length points))))
+               (agent (make-agent
+                       start
+                       0
+                       (lambda (points goal?)
+                         (if goal?
+                             zero-motion
+                             (list-ref points (random (length points))))))))
+          (dotimes (step 10000 agent)
+            (let* ((agent-point (agent-point agent))
+                   (visible-points (hash-table-ref neighbors agent-point))
+                   (relative-points
+                    (map (lambda (point)
+                           (make-point (- (point-x point) (point-x agent-point))
+                                       (- (point-y point) (point-y agent-point))))
+                         visible-points)))
+              (let* ((goal? (equal? agent-point goal))
+                     (move ((agent-program agent) relative-points goal?)))
+                (let* ((relative->visible-points
+                        (alist->hash-table (zip relative-points visible-points)))
+                       (new-point
+                        (if (and (zero-motion? move) goal?)
+                            (begin
+                              (agent-score-set! agent (+ (agent-score agent) 1000))
+                              (list-ref points (random (length points))))
+                            (begin
+                              (agent-score-set! agent (- (agent-score agent)
+                                                         (point-distance zero-motion move)))
+                              (make-point (+ (point-x move) (point-x agent-point))
+                                          (+ (point-y move) (point-y agent-point)))
+                              (car (hash-table-ref relative->visible-points move))))))
+                  ;; (debug agent-point move new-point goal?)
+                  (if goal? (debug (agent-score agent)))
+                  (agent-point-set! agent new-point))))))))
+    
+  #+END_SRC
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
