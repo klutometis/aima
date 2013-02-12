@@ -3018,6 +3018,7 @@
       (let ((points (tessellation-points world))
             (neighbors (tessellation-neighbors world))
             (goal (tessellation-end world)))
+        (debug (length points))
         (let* ((start (list-ref points (random (length points))))
                (agent (make-agent
                        start
