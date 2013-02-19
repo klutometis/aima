@@ -3055,6 +3055,59 @@
                   (agent-point-set! agent new-point))))))))
     
   #+END_SRC
+
+  - “The preceding definitions enable the automatic construction of
+    the belief-state problem formulation from the definiton of the
+    underlying physical problem. Once this is done, we can apply any
+    of the search algorithms of Chapter 3.”
+  - Incremental belief-state search
+  - The difference is that AND-OR search can find a different solution
+    for each branch, whereas an incremental belief-state search has to
+    find /one/ solution that works for /all/ the states.
+  - Prediction: given an action in belief state $b$, predicted belief
+    state is $\hat{b} = predict(b, a)$.
+  - Observation-prediction stage: set of percepts $o$ that could be
+    observed in the predicted belief state:
+    $\text{possible-percepts}(\hat{b}) = \{o: o = \text{percept}(s)
+    \wedge s \in \hat{b}\}$
+  - Update stage: for each possible percept, the belief state that
+    would result from the percept. The new belief state $b_o$ is just
+    the set of states in $\hat{b}$ that could have produced the
+    percept: $b_o = \text{update}(\hat{b}, o) = \{s: o =
+    \text{percept}(s) \wedge s \in \hat{b}\}$
+
+    \[\text{results}(b, a) = \{b_o: b_o =
+    \text{update}(\text{predict}(b, a), o) \wedge o \in
+    \text{possible-percepts}(\text{predict}(b, a))\}\]
+  - Localization: finding out where it is.
+  - Initial belief state $b$ consists of the set of all locations.
+  - Receives the percept, does an update using $b_o =
+    \text{update}(b)$.
+  - Predict state grows the belief state, update step shrinks it back
+    down.
+    - Difference between this problem and the one with multiple views:
+      belief state will be an atom or a list.
+  - [We’re doing online search, incidentally: we’ve got to augment the
+    map.]
+  - A* has to travel across the tree; depth-first expands locally.
+  - In offline search, the state is simply dropped from the queue; in
+    online search, the agent has to backtrack physically.
+  - Going back to some state from which the agent most recently
+    entered the current state.
+  - Keeps a predecessor table.
+  - Run out of backtracking states? Complete.
+  - Competitive ratio: cost of the path with the cost the agent would
+    follow if it know the search space in advance.
+  - Online local search: instead of random restarts, consider using
+    random walk to explore the environment.
+  - Augmenting hill-climbing with memory: store a current best
+    estimate H(s) of the cost to reach the goal from each state that
+    has been visited; updated as the agent gains experience in the
+    state space.
+  - Learning real-time A* (LTRA*).
+  - Actions that have not yet been tried in a state $s$ are always
+    assumed to lead immediately to the goal with the least possible
+    cost, namely $h(s)$: _optimism under uncertainty_.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
