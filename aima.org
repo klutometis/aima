@@ -3003,7 +3003,8 @@
          define-record-and-printer
          debug
          miscmacros
-         srfi-95)
+         srfi-95
+         stack)
     
     (define-record-and-printer agent
       point
@@ -3011,22 +3012,74 @@
       program)
     
     (define zero-motion (make-point 0 0))
-    
     (define (zero-motion? move) (equal? move zero-motion))
     
-    (let ((world (tessellate 250)))
+    (define-record-and-printer stop)
+    (define stop (make-stop))
+    
+    (define (make-agent-random-walk start)
+      (make-agent
+       start
+       0
+       (lambda (points goal?)
+         (if goal?
+             zero-motion
+             (list-ref points (random (length points)))))))
+    
+    (define (make-agent-online-dfs start)
+      (make-agent
+       start
+       0
+       (let ((result (make-hash-table))
+             (untried (make-hash-table))
+             (unbacktracked (make-hash-table))
+             (previous-state #f)
+             (previous-action #f))
+         (lambda (points goal?)
+           (if goal?
+               zero-motion
+               (begin
+                 (hash-table-update!
+                  untried
+                  points
+                  identity
+                  (lambda ()
+                    (let ((stack (make-stack)))
+                      (stack-push! stack points)
+                      stack)))
+                 (unless previous-state
+                   (hash-table-set!
+                    result
+                    (cons previous-state previous-action)
+                    points)
+                   (hash-table-update!/default
+                    unbacktracked
+                    points
+                    (lambda (backtracks)
+                      (stack-push! backtracks previous-state)
+                      backtracks)
+                    (make-stack)))
+                 (if (stack-empty? (hash-table-ref/default untried points (make-stack)))
+                     (if (stack-empty? (hash-table-ref/default unbacktracked points (make-stack)))
+                         (begin
+                           (debug 'not-found!)
+                           (set! previous-action stop))
+                         (let ((backtrack (hash-table-ref unbacktracked points)))
+                           (debug 'harro)
+                           (set! previous-action (car points))))
+                     (begin
+                       (debug 'warro)
+                       (set! previous-action (car (stack-pop! (hash-table-ref untried points))))))
+                 (set! previous-state points)
+                 previous-action))))))
+    
+    (let ((world (tessellate 100)))
       (let ((points (tessellation-points world))
             (neighbors (tessellation-neighbors world))
             (goal (tessellation-end world)))
         (debug (length points))
         (let* ((start (list-ref points (random (length points))))
-               (agent (make-agent
-                       start
-                       0
-                       (lambda (points goal?)
-                         (if goal?
-                             zero-motion
-                             (list-ref points (random (length points))))))))
+               (agent (make-agent-online-dfs start)))
           (dotimes (step 10000 agent)
             (let* ((agent-point (agent-point agent))
                    (visible-points (hash-table-ref neighbors agent-point))
@@ -3044,11 +3097,12 @@
                             (begin
                               (agent-score-set! agent (+ (agent-score agent) 1000))
                               (list-ref points (random (length points))))
-                            (begin
+                            (unless (stop? move)
                               (agent-score-set! agent (- (agent-score agent)
                                                          (point-distance zero-motion move)))
                               (make-point (+ (point-x move) (point-x agent-point))
                                           (+ (point-y move) (point-y agent-point)))
+                              (debug (hash-table->alist relative->visible-points))
                               (car (hash-table-ref relative->visible-points move))))))
                   ;; (debug agent-point move new-point goal?)
                   (if goal? (debug (agent-score agent)))
