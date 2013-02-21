@@ -3043,15 +3043,19 @@
                   untried
                   points
                   identity
-                  (lambda ()
-                    (let ((stack (make-stack)))
-                      (stack-push! stack points)
-                      stack)))
-                 (unless previous-state
-                   (hash-table-set!
+                  (lambda () (list->stack points)))
+                 (when previous-state
+                   ;; (hash-table-set!
+                   ;;  result
+                   ;;  (cons previous-state previous-action)
+                   ;;  points)
+                   (hash-table-update!
                     result
-                    (cons previous-state previous-action)
-                    points)
+                    previous-state
+                    (lambda (state->action)
+                      (hash-table-set! state->action points previous-action)
+                      state->action)
+                    (lambda () (make-hash-table)))
                    (hash-table-update!/default
                     unbacktracked
                     points
@@ -3064,12 +3068,19 @@
                          (begin
                            (debug 'not-found!)
                            (set! previous-action stop))
-                         (let ((backtrack (hash-table-ref unbacktracked points)))
-                           (debug 'harro)
-                           (set! previous-action (car points))))
+                          (let* ((backtrack (stack-pop! (hash-table-ref unbacktracked points)))
+                                 (backtrack-action
+                                  (hash-table-ref (hash-table-ref result points) backtrack)))
+                            (debug 'harro)
+                           ;; (debug backtrack
+                           ;;        (hash-table->alist (hash-table-ref result points))
+                           ;;        points)
+                           (set! previous-action (make-point (- (point-x backtrack-action))
+                                                             (- (point-y backtrack-action))))
+                           (set! previous-action backtrack-action)))
                      (begin
                        (debug 'warro)
-                       (set! previous-action (car (stack-pop! (hash-table-ref untried points))))))
+                       (set! previous-action (stack-pop! (hash-table-ref untried points)))))
                  (set! previous-state points)
                  previous-action))))))
     
@@ -3090,6 +3101,7 @@
                          visible-points)))
               (let* ((goal? (equal? agent-point goal))
                      (move ((agent-program agent) relative-points goal?)))
+                (debug move)
                 (let* ((relative->visible-points
                         (alist->hash-table (zip relative-points visible-points)))
                        (new-point
@@ -3102,7 +3114,7 @@
                                                          (point-distance zero-motion move)))
                               (make-point (+ (point-x move) (point-x agent-point))
                                           (+ (point-y move) (point-y agent-point)))
-                              (debug (hash-table->alist relative->visible-points))
+                              ;; (debug (hash-table->alist relative->visible-points))
                               (car (hash-table-ref relative->visible-points move))))))
                   ;; (debug agent-point move new-point goal?)
                   (if goal? (debug (agent-score agent)))
