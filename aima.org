@@ -3231,16 +3231,15 @@
                         coordinates
                         state
                         origin)))
-                 (debug state
-                        (hash-table-ref/default untried state (make-stack))
-                        (hash-table-ref/default unbacktracked state (make-stack)))
+                 ;; (debug state
+                 ;;        (hash-table-ref/default untried state (make-stack))
+                 ;;        (hash-table-ref/default unbacktracked state (make-stack)))
                  (if (stack-empty? (hash-table-ref/default untried state (make-stack)))
                      (if (stack-empty? (hash-table-ref/default unbacktracked state (make-stack)))
                          (begin
                            ;; (debug 'not-found!)
                            (set! previous-action stop)
-                           (debug "Goal not found -- AGENT-ONLINE-DFS")
-                           (set! previous-action stop))
+                           (error "Goal not found -- AGENT-ONLINE-DFS"))
                          (let* ((backtrack (stack-pop! (hash-table-ref unbacktracked state)))
                                 (backtrack-action
                                  (hash-table-ref (hash-table-ref result state) backtrack)))
@@ -3259,7 +3258,7 @@
                  (set! previous-state state)
                  previous-action))))))
     
-    (let ((world (tessellate 10)))
+    (let ((world (tessellate 100)))
       (let ((points (tessellation-points world))
             (neighbors (tessellation-neighbors world))
             (goal (tessellation-end world)))
