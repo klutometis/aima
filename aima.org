@@ -3071,8 +3071,9 @@
                                 previous-state
                                 previous-action
                                 start
-                                goal)
-      (write-dot-preamble 1600 900)
+                                goal
+                                score)
+      (write-dot-preamble 1600 900 "Online DFS" score)
       ;; (display "digraph G { graph [size=\"\"]; node[shape=point];")
       (let ((displayed (make-hash-table))
             (linear-scale (* 5 72)))
@@ -3148,7 +3149,8 @@
                                 previous-state
                                 previous-action
                                 start
-                                goal)
+                                goal
+                                score)
       (let ((dot (create-temporary-file ".dot")))
         (with-output-to-file dot
           (lambda () (write-agent-as-dot points
@@ -3160,7 +3162,8 @@
                                     previous-state
                                     previous-action
                                     start
-                                    goal)))
+                                    goal
+                                    score)))
         (run (neato -n1 -Tpng -o ,png < ,dot))))
     
     (define-record-and-printer coordinate
@@ -3183,7 +3186,7 @@
              (time 0)
              (start #f)
              (goal #f))
-         (lambda (state goal?)
+         (lambda (state goal? score)
            ;; (debug (hash-table->alist result)
            ;;        (hash-table->alist untried)
            ;;        (hash-table->alist unbacktracked)
@@ -3204,7 +3207,8 @@
                                  previous-state
                                  previous-action
                                  start
-                                 goal))
+                                 goal
+                                 score))
            ;; (debug untried
            ;;        unbacktracked
            ;;        previous-state
@@ -3355,7 +3359,7 @@
                                          (- (point-y point) (point-y agent-point))))
                            visible-points)))
                 (let* ((goal? (equal? agent-point goal))
-                       (move ((agent-program agent) relative-points goal?)))
+                       (move ((agent-program agent) relative-points goal? (agent-score agent))))
                   (debug move)
                   (let* ((relative->visible-points
                           (alist->hash-table (zip relative-points visible-points)))
