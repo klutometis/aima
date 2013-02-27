@@ -3098,9 +3098,9 @@
                        (* (point-x coordinate) linear-scale)
                        (* (point-y coordinate) linear-scale)
                        (cond ((equal? state start)
-                              ", shape=circle, label=S, fontsize=64")
+                              ", shape=circle, label=S")
                              ((equal? state goal)
-                              ", shape=circle, label=G, fontsize=64")
+                              ", shape=circle, label=G")
                              (else ""))))
              #t)))
         (hash-table-walk result
