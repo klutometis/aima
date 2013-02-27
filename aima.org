@@ -3024,11 +3024,11 @@
     (define-record-and-printer stop)
     (define stop (make-stop))
     
-    (define (make-agent-random-walk start)
+    (define (make-agent-random-walk start next-frame)
       (make-agent
        start
        0
-       (lambda (points goal?)
+       (lambda (points goal? score)
          (if goal?
              zero-motion
              (list-ref points (random (length points)))))))
@@ -3196,19 +3196,19 @@
            ;;   (lambda () (write-agent-as-dot result coordinates labels)))
            (unless start
              (set! start state))
-           (unless (zero? (hash-table-size result))
-             (write-agent-as-png (next-frame)
-                                 state
-                                 coordinates
-                                 labels
-                                 result
-                                 untried
-                                 unbacktracked
-                                 previous-state
-                                 previous-action
-                                 start
-                                 goal
-                                 score))
+           ;; (unless (zero? (hash-table-size result))
+           ;;   (write-agent-as-png (next-frame)
+           ;;                       state
+           ;;                       coordinates
+           ;;                       labels
+           ;;                       result
+           ;;                       untried
+           ;;                       unbacktracked
+           ;;                       previous-state
+           ;;                       previous-action
+           ;;                       start
+           ;;                       goal
+           ;;                       score))
            ;; (debug untried
            ;;        unbacktracked
            ;;        previous-state
@@ -3349,7 +3349,9 @@
           ;; (make-animator frames-per-second: 1 height: 900 width: 1600)
           (make-animator)
           (let* ((start (list-ref points (random (length points))))
-                 (agent (make-agent-online-dfs start next-frame)))
+                 (agent (make-agent-online-dfs start next-frame))
+                 ;; (agent (make-agent-random-walk start next-frame))
+                 )
             (dotimes (step 1000 agent)
               (let* ((agent-point (agent-point agent))
                      (visible-points (hash-table-ref neighbors agent-point))
@@ -3380,6 +3382,7 @@
                     ;; (debug agent-point move new-point goal?)
                     (if goal? (debug (agent-score agent)))
                     (agent-point-set! agent new-point)))))
+            (debug (agent-score agent))
             (finalize! "online-dfs.avi")
             (run (mplayer -loop 0 online-dfs.avi)))))) 
     
