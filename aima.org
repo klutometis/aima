@@ -3091,19 +3091,14 @@
              (let ((coordinate
                     (coordinate-point
                      (hash-table-ref coordinates state))))
-               (format #t "~a [pos=\"~a,~a\"~a~a];"
+               (format #t "~a [pos=\"~a,~a\"~a];"
                        label
                        (* (point-x coordinate) linear-scale)
                        (* (point-y coordinate) linear-scale)
-                       (if (or
-                            (equal? start state)
-                            (equal? start goal))
-                           ", shape=circle"
-                           "")
-                       (cond ((equal? start state)
-                              ", label=S")
-                             ((equal? goal state)
-                              ", label=G")
+                       (cond ((equal? state start)
+                              ", shape=circle, label=S, fontsize=64")
+                             ((equal? state goal)
+                              ", shape=circle, label=G, fontsize=64")
                              (else ""))))
              #t)))
         (hash-table-walk result
