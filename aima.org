@@ -3333,7 +3333,7 @@
                  (set! previous-state state)
                  previous-action))))))
     
-    (let ((world (tessellate 3)))
+    (let ((world (tessellate 50)))
       (let ((points (tessellation-points world))
             (neighbors (tessellation-neighbors world))
             (goal (tessellation-end world)))
