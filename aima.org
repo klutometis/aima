@@ -3033,13 +3033,15 @@
              (list-ref points (random (length points)))))))
     
     ;; (write-dot-preamble agent step width height font-size title)
-    (define (write-dot-preamble width height)
+    (define (write-dot-preamble width height title score)
      (display "digraph G {")
      ;; (display "node [shape=point, width=0.25];")
      (display "node [shape=point];")
      (let ((width-in-inches (/ width 96))
            (height-in-inches (/ height 96)))
-       (format #t "graph [ratio=fill, viewport=\"~a,~a\", size=\"~a,~a!\"];"
+       (format #t "graph [fontsize=36, label=\"~a (Score: ~,2f)\", ratio=fill, viewport=\"~a,~a\", size=\"~a,~a!\", labelloc=t];"
+               title
+               score
                (* width-in-inches 72)
                (* height-in-inches 72)
                width-in-inches
