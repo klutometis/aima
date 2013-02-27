@@ -3208,6 +3208,86 @@
            ;;        previous-action
            ;;        (hash-table-ref/default untried state #f)
            ;;        (hash-table-ref/default unbacktracked state #f))
+           (unless (hash-table-exists? untried state)
+             (hash-table-set!
+              untried
+              state
+              (list->stack state)))
+           (unless (hash-table-exists? labels state)
+             (hash-table-set!
+              labels
+              state
+              (gensym))) 
+           (if previous-state
+               ;; (hash-table-set!
+               ;;  result
+               ;;  (cons previous-state previous-action)
+               ;;  state)
+               (begin
+                 (hash-table-update!
+                  result
+                  previous-state
+                  (lambda (state->action)
+                    (hash-table-set! state->action state previous-action)
+                    state->action)
+                  (lambda () (make-hash-table)))
+                 (unless backtrack?
+                   (hash-table-update!
+                    unbacktracked
+                    state
+                    (lambda (backtracks)
+                      (stack-push! backtracks previous-state)
+                      backtracks)
+                    (lambda () (make-stack))))
+                 ;; We could probably set this as a state variable
+                 ;; and avoid the lookup.
+                 (let* ((previous-coordinate
+                         (hash-table-ref coordinates previous-state))
+                        (previous-point (coordinate-point previous-coordinate)))
+                   (if (hash-table-exists? coordinates state)
+                       (let* ((coordinate (hash-table-ref coordinates state))
+                              (point (coordinate-point coordinate)))
+                         (when (< (coordinate-time coordinate) time)
+                           (let ((delta-x
+                                  (- (point-x point)
+                                     (+ (point-x previous-point)
+                                        (point-x previous-action))))
+                                 (delta-y
+                                  (- (point-y point)
+                                     (+ (point-y previous-point)
+                                        (point-y previous-action)))))
+                             (hash-table-walk coordinates
+                               (lambda (state old-coordinate)
+                                 (when (< (coordinate-time old-coordinate) time)
+                                   (debug ;; (coordinate-time old-coordinate)
+                                    ;; time
+                                    delta-x
+                                    delta-y)
+                                   (coordinate-time-set! old-coordinate time)
+                                   (let ((old-point (coordinate-point old-coordinate)))
+                                     (coordinate-point-set!
+                                      old-coordinate
+                                      (make-point (- (point-x old-point) delta-x)
+                                                  (- (point-y old-point) delta-y))))))))))
+                       (hash-table-set!
+                        coordinates
+                        state
+                        (make-coordinate
+                         (make-point (+ (point-x previous-point)
+                                        (point-x previous-action))
+                                     (+ (point-y previous-point)
+                                        (point-y previous-action)))
+                         time)))))
+               ;; We've been teleported to some previously unknow
+               ;; location; let's designate it as the origin.
+               (unless (hash-table-exists? coordinates state)
+                 (hash-table-set!
+                  coordinates
+                  state
+                  (make-coordinate origin time))))
+           ;; (debug state
+           ;;        (hash-table-ref/default untried state (make-stack))
+           ;;        (hash-table-ref/default unbacktracked state (make-stack)))
            (if goal?
                (begin
                  (debug "Goal found -- ONLINE-DFS-AGENT")
@@ -3229,86 +3309,6 @@
                  ;;      (lambda () (make-hash-table))))
                  zero-motion)
                (begin
-                 (unless (hash-table-exists? untried state)
-                   (hash-table-set!
-                    untried
-                    state
-                    (list->stack state)))
-                 (unless (hash-table-exists? labels state)
-                   (hash-table-set!
-                    labels
-                    state
-                    (gensym))) 
-                 (if previous-state
-                   ;; (hash-table-set!
-                   ;;  result
-                   ;;  (cons previous-state previous-action)
-                   ;;  state)
-                     (begin
-                       (hash-table-update!
-                        result
-                        previous-state
-                        (lambda (state->action)
-                          (hash-table-set! state->action state previous-action)
-                          state->action)
-                        (lambda () (make-hash-table)))
-                       (unless backtrack?
-                         (hash-table-update!
-                          unbacktracked
-                          state
-                          (lambda (backtracks)
-                            (stack-push! backtracks previous-state)
-                            backtracks)
-                          (lambda () (make-stack))))
-                       ;; We could probably set this as a state variable
-                       ;; and avoid the lookup.
-                       (let* ((previous-coordinate
-                               (hash-table-ref coordinates previous-state))
-                              (previous-point (coordinate-point previous-coordinate)))
-                         (if (hash-table-exists? coordinates state)
-                             (let* ((coordinate (hash-table-ref coordinates state))
-                                    (point (coordinate-point coordinate)))
-                               (when (< (coordinate-time coordinate) time)
-                                 (let ((delta-x
-                                        (- (point-x point)
-                                           (+ (point-x previous-point)
-                                              (point-x previous-action))))
-                                       (delta-y
-                                        (- (point-y point)
-                                           (+ (point-y previous-point)
-                                              (point-y previous-action)))))
-                                   (hash-table-walk coordinates
-                                     (lambda (state old-coordinate)
-                                       (when (< (coordinate-time old-coordinate) time)
-                                         (debug ;; (coordinate-time old-coordinate)
-                                                ;; time
-                                                delta-x
-                                                delta-y)
-                                         (coordinate-time-set! old-coordinate time)
-                                         (let ((old-point (coordinate-point old-coordinate)))
-                                           (coordinate-point-set!
-                                            old-coordinate
-                                            (make-point (- (point-x old-point) delta-x)
-                                                        (- (point-y old-point) delta-y))))))))))
-                             (hash-table-set!
-                              coordinates
-                              state
-                              (make-coordinate
-                               (make-point (+ (point-x previous-point)
-                                              (point-x previous-action))
-                                           (+ (point-y previous-point)
-                                              (point-y previous-action)))
-                               time)))))
-                     ;; We've been teleported to some previously unknow
-                     ;; location; let's designate it as the origin.
-                     (unless (hash-table-exists? coordinates state)
-                         (hash-table-set!
-                          coordinates
-                          state
-                          (make-coordinate origin time))))
-                 ;; (debug state
-                 ;;        (hash-table-ref/default untried state (make-stack))
-                 ;;        (hash-table-ref/default unbacktracked state (make-stack)))
                  (if (stack-empty? (hash-table-ref/default untried state (make-stack)))
                      (if (stack-empty? (hash-table-ref/default unbacktracked state (make-stack)))
                          (begin
