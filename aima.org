@@ -3322,8 +3322,8 @@
                            ;; (debug backtrack
                            ;;        (hash-table->alist (hash-table-ref result state))
                            ;;        state)
-                           (set! previous-action (make-point (- (point-x backtrack-action))
-                                                             (- (point-y backtrack-action))))
+                           ;; (set! previous-action (make-point (- (point-x backtrack-action))
+                           ;;                                   (- (point-y backtrack-action))))
                            (set! backtrack? #t)
                            (set! previous-action backtrack-action)))
                      (begin
