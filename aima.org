@@ -3066,22 +3066,42 @@
                                 untried
                                 unbacktracked
                                 previous-state
-                                previous-action)
+                                previous-action
+                                start
+                                goal)
       (write-dot-preamble 1600 900)
       ;; (display "digraph G { graph [size=\"\"]; node[shape=point];")
       (let ((displayed (make-hash-table))
             (linear-scale (* 5 72)))
-        (define (node-maybe-display node label)
+        (define (node-maybe-display state label)
+          ;; (debug start goal state)
+          (let ((harro '********************************************))
+            (debug state
+                   goal
+                   (when (equal? goal state)
+                     harro)))
           (hash-table-update!
            displayed
-           node
+           state
            identity
            (lambda ()
-             (let ((coordinate (hash-table-ref coordinates node)))
-               (format #t "~a [pos=\"~a,~a\"];"
+             (let ((coordinate
+                    (coordinate-point
+                     (hash-table-ref coordinates state))))
+               (format #t "~a [pos=\"~a,~a\"~a~a];"
                        label
                        (* (point-x coordinate) linear-scale)
-                       (* (point-y coordinate) linear-scale)))
+                       (* (point-y coordinate) linear-scale)
+                       (if (or
+                            (equal? start state)
+                            (equal? start goal))
+                           ", shape=circle"
+                           "")
+                       (cond ((equal? start state)
+                              ", label=S")
+                             ((equal? goal state)
+                              ", label=G")
+                             (else ""))))
              #t)))
         (hash-table-walk result
           (lambda (whence whither->action)
@@ -3103,8 +3123,8 @@
                           whence-label
                           whither-label
                           (if (equal? whence previous-state)
-                              "red"
-                              "black")
+                              "orange"
+                              "blue")
                           (if (equal? whence previous-state)
                               2
                               1))
@@ -3125,7 +3145,9 @@
                                 untried
                                 unbacktracked
                                 previous-state
-                                previous-action)
+                                previous-action
+                                start
+                                goal)
       (let ((dot (create-temporary-file ".dot")))
         (with-output-to-file dot
           (lambda () (write-agent-as-dot points
@@ -3135,8 +3157,14 @@
                                     untried
                                     unbacktracked
                                     previous-state
-                                    previous-action)))
+                                    previous-action
+                                    start
+                                    goal)))
         (run (neato -n1 -Tpng -o ,png < ,dot))))
+    
+    (define-record-and-printer coordinate
+      point
+      time)
     
     (define (make-agent-online-dfs start next-frame)
       (make-agent
@@ -3150,7 +3178,10 @@
              (unbacktracked (make-hash-table))
              (previous-state #f)
              (previous-action #f)
-             (backtrack? #f))
+             (backtrack? #f)
+             (time 0)
+             (start #f)
+             (goal #f))
          (lambda (state goal?)
            ;; (debug (hash-table->alist result)
            ;;        (hash-table->alist untried)
@@ -3159,6 +3190,8 @@
            ;;        previous-action)
            ;; (with-output-to-file (create-temporary-file)
            ;;   (lambda () (write-agent-as-dot result coordinates labels)))
+           (unless start
+             (set! start state))
            (unless (zero? (hash-table-size result))
              (write-agent-as-png (next-frame)
                                  state
@@ -3168,7 +3201,9 @@
                                  untried
                                  unbacktracked
                                  previous-state
-                                 previous-action))
+                                 previous-action
+                                 start
+                                 goal))
            ;; (debug untried
            ;;        unbacktracked
            ;;        previous-state
@@ -3178,11 +3213,22 @@
            (if goal?
                (begin
                  (debug "Goal found -- ONLINE-DFS-AGENT")
+                 (set! goal state)
+                 (set! start #f)
                  (set! previous-state #f)
                  (set! previous-action #f)
                  (set! backtrack? #f)
                  (set! untried (make-hash-table))
                  (set! unbacktracked (make-hash-table))
+                 (inc! time)
+                 ;; (if previous-state
+                 ;;     (hash-table-update!
+                 ;;      result
+                 ;;      previous-state
+                 ;;      (lambda (state->action)
+                 ;;        (hash-table-set! state->action state previous-action)
+                 ;;        state->action)
+                 ;;      (lambda () (make-hash-table))))
                  zero-motion)
                (begin
                  (unless (hash-table-exists? untried state)
@@ -3216,21 +3262,52 @@
                             (stack-push! backtracks previous-state)
                             backtracks)
                           (lambda () (make-stack))))
-                       (unless (hash-table-exists? coordinates state)
+                       ;; We could probably set this as a state variable
+                       ;; and avoid the lookup.
+                       (let* ((previous-coordinate
+                               (hash-table-ref coordinates previous-state))
+                              (previous-point (coordinate-point previous-coordinate)))
+                         (if (hash-table-exists? coordinates state)
+                             (let* ((coordinate (hash-table-ref coordinates state))
+                                    (point (coordinate-point coordinate)))
+                               (when (< (coordinate-time coordinate) time)
+                                 (let ((delta-x
+                                        (- (point-x point)
+                                           (+ (point-x previous-point)
+                                              (point-x previous-action))))
+                                       (delta-y
+                                        (- (point-y point)
+                                           (+ (point-y previous-point)
+                                              (point-y previous-action)))))
+                                   (hash-table-walk coordinates
+                                     (lambda (state old-coordinate)
+                                       (when (< (coordinate-time old-coordinate) time)
+                                         (debug ;; (coordinate-time old-coordinate)
+                                                ;; time
+                                                delta-x
+                                                delta-y)
+                                         (coordinate-time-set! old-coordinate time)
+                                         (let ((old-point (coordinate-point old-coordinate)))
+                                           (coordinate-point-set!
+                                            old-coordinate
+                                            (make-point (- (point-x old-point) delta-x)
+                                                        (- (point-y old-point) delta-y))))))))))
+                             (hash-table-set!
+                              coordinates
+                              state
+                              (make-coordinate
+                               (make-point (+ (point-x previous-point)
+                                              (point-x previous-action))
+                                           (+ (point-y previous-point)
+                                              (point-y previous-action)))
+                               time)))))
+                     ;; We've been teleported to some previously unknow
+                     ;; location; let's designate it as the origin.
+                     (unless (hash-table-exists? coordinates state)
                          (hash-table-set!
                           coordinates
                           state
-                          (let ((previous-coordinates
-                                 (hash-table-ref coordinates previous-state)))
-                            (make-point (+ (point-x previous-coordinates)
-                                           (point-x previous-action))
-                                        (+ (point-y previous-coordinates)
-                                           (point-y previous-action)))))))
-                     (unless (hash-table-exists? coordinates state)
-                       (hash-table-set!
-                        coordinates
-                        state
-                        origin)))
+                          (make-coordinate origin time))))
                  ;; (debug state
                  ;;        (hash-table-ref/default untried state (make-stack))
                  ;;        (hash-table-ref/default unbacktracked state (make-stack)))
@@ -3258,7 +3335,7 @@
                  (set! previous-state state)
                  previous-action))))))
     
-    (let ((world (tessellate 100)))
+    (let ((world (tessellate 3)))
       (let ((points (tessellation-points world))
             (neighbors (tessellation-neighbors world))
             (goal (tessellation-end world)))
@@ -3268,7 +3345,7 @@
           (make-animator)
           (let* ((start (list-ref points (random (length points))))
                  (agent (make-agent-online-dfs start next-frame)))
-            (dotimes (step 500 agent)
+            (dotimes (step 100 agent)
               (let* ((agent-point (agent-point agent))
                      (visible-points (hash-table-ref neighbors agent-point))
                      (relative-points
