@@ -3343,7 +3343,7 @@
           (make-animator)
           (let* ((start (list-ref points (random (length points))))
                  (agent (make-agent-online-dfs start next-frame)))
-            (dotimes (step 100 agent)
+            (dotimes (step 500 agent)
               (let* ((agent-point (agent-point agent))
                      (visible-points (hash-table-ref neighbors agent-point))
                      (relative-points
