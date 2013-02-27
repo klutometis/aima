@@ -3075,11 +3075,14 @@
             (linear-scale (* 5 72)))
         (define (node-maybe-display state label)
           ;; (debug start goal state)
-          (let ((harro '********************************************))
-            (debug state
-                   goal
-                   (when (equal? goal state)
-                     harro)))
+          ;; (let ((harro '********************************************))
+          ;;   (debug state
+          ;;          goal
+          ;;          (when (equal? goal state)
+          ;;            harro)))
+          ;; (when (equal? state goal)
+          ;;   (debug goal state)
+          ;;   (error "Fuck you"))
           (hash-table-update!
            displayed
            state
