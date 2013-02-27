@@ -3040,7 +3040,7 @@
      (display "node [shape=point];")
      (let ((width-in-inches (/ width 96))
            (height-in-inches (/ height 96)))
-       (format #t "graph [fontsize=36, label=\"~a (Score: ~,2f)\", ratio=fill, viewport=\"~a,~a\", size=\"~a,~a!\", labelloc=t];"
+       (format #t "graph [fontsize=48, label=\"~a (Score: ~,2f)\", ratio=fill, viewport=\"~a,~a\", size=\"~a,~a!\", labelloc=t];"
                title
                score
                (* width-in-inches 72)
