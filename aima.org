@@ -3004,6 +3004,7 @@
          define-record-and-printer
          debug
          files
+         format
          miscmacros
          shell
          srfi-95
