@@ -3946,6 +3946,14 @@
                           animation-file: "slippage.avi")
      
    #+END_SRC
+** Notes
+   - Might accidentally encounter a node somewhere in the
+     error-correction stack
+   - Heap? Hash-table-backed stack? Indexed heap?
+   - Keep statistics during the excursion.
+   - Diverge? Depth-first back.
+   - Stastistical model of “next” node.
+   - Random distribution of probabilities, some asymmetrical.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
