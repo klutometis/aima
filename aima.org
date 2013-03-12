@@ -3385,13 +3385,116 @@
    #+BEGIN_SRC scheme :comments link :tangle online-dfs.scm :shebang #!/usr/bin/env chicken-scheme
   (include "online-navigation.scm")
 
+  (define (maybe-write-agent-as-png png
+                                    points
+                                    coordinates
+                                    labels
+                                    result
+                                    untried
+                                    unbacktracked
+                                    previous-state
+                                    previous-action 
+                                    start
+                                    goal
+                                    score
+                                    state)
+    (unless (zero? (hash-table-size result))
+      (write-agent-as-png png
+                          state
+                          coordinates
+                          labels
+                          result
+                          untried
+                          unbacktracked
+                          previous-state
+                          previous-action
+                          start
+                          goal
+                          score)))
+
+  (define (maybe-update-untried! untried state)
+    (unless (hash-table-exists? untried state)
+      (hash-table-set!
+       untried
+       state
+       (list->stack state))))
+
+  (define (maybe-update-labels! labels state)
+    (unless (hash-table-exists? labels state)
+      (hash-table-set!
+       labels
+       state
+       (gensym))))
+
+  (define (maybe-update-result! result previous-state previous-action state)
+    (hash-table-update!
+     result
+     previous-state
+     (lambda (state->action)
+       (hash-table-set! state->action state previous-action)
+       state->action)
+     (lambda () (make-hash-table))))
+
+  (define (maybe-update-unbacktracked! unbacktracked backtrack? previous-state state)
+    (unless backtrack?
+      (hash-table-update!
+       unbacktracked
+       state
+       (lambda (backtracks)
+         (stack-push! backtracks previous-state)
+         backtracks)
+       (lambda () (make-stack)))))
+
+  (define (maybe-update-coordinates! coordinates previous-state previous-action state time)
+    ;; We could probably set this as a state variable
+    ;; and avoid the lookup.
+    (let* ((previous-coordinate
+            (hash-table-ref coordinates previous-state))
+           (previous-point (coordinate-point previous-coordinate)))
+      (if (hash-table-exists? coordinates state)
+          (let* ((coordinate (hash-table-ref coordinates state))
+                 (point (coordinate-point coordinate)))
+            (when (< (coordinate-time coordinate) time)
+              (let ((delta-x
+                     (- (point-x point)
+                        (+ (point-x previous-point)
+                           (point-x previous-action))))
+                    (delta-y
+                     (- (point-y point)
+                        (+ (point-y previous-point)
+                           (point-y previous-action)))))
+                (hash-table-walk coordinates
+                  (lambda (state old-coordinate)
+                    (when (< (coordinate-time old-coordinate) time)
+                      ;; (debug ;; (coordinate-time old-coordinate)
+                      ;;  ;; time
+                      ;;  delta-x
+                      ;;  delta-y)
+                      (coordinate-time-set! old-coordinate time)
+                      (let ((old-point (coordinate-point old-coordinate)))
+                        (coordinate-point-set!
+                         old-coordinate
+                         (make-point (- (point-x old-point) delta-x)
+                                     (- (point-y old-point) delta-y))))))))))
+          (hash-table-set!
+           coordinates
+           state
+           (make-coordinate
+            (make-point (+ (point-x previous-point)
+                           (point-x previous-action))
+                        (+ (point-y previous-point)
+                           (point-y previous-action)))
+            time)))))
+
   (define (make-agent-online-dfs start next-frame)
     (make-agent
      start
      0
      (let ((coordinates (make-hash-table))
            (labels (make-hash-table))
+           ;; state->state->action
            (result (make-hash-table))
+           (state->action->state (make-hash-table))
            (untried (make-hash-table))
            (unbacktracked (make-hash-table))
            (previous-state #f)
@@ -3399,89 +3502,52 @@
            (backtrack? #f)
            (time 0)
            (start #f)
-           (goal #f))
+           (goal #f)
+           )
        (lambda (state goal? score)
          (unless start
            (set! start state))
-         (unless (zero? (hash-table-size result))
-           (write-agent-as-png (next-frame)
-                               state
-                               coordinates
-                               labels
-                               result
-                               untried
-                               unbacktracked
-                               previous-state
-                               previous-action
-                               start
-                               goal
-                               score))
-         (unless (hash-table-exists? untried state)
-           (hash-table-set!
-            untried
-            state
-            (list->stack state)))
-         (unless (hash-table-exists? labels state)
-           (hash-table-set!
-            labels
-            state
-            (gensym))) 
+         (maybe-write-agent-as-png (next-frame)
+                                   state
+                                   coordinates
+                                   labels
+                                   result
+                                   untried
+                                   unbacktracked
+                                   previous-state
+                                   previous-action
+                                   start
+                                   goal
+                                   score
+                                   state)
+         (maybe-update-untried! untried state)
+         (maybe-update-labels! labels state)
          (if previous-state
              (begin
                (hash-table-update!
-                result
+                state->action->state
                 previous-state
-                (lambda (state->action)
-                  (hash-table-set! state->action state previous-action)
-                  state->action)
+                (lambda (action->state)
+                  (let* ((expected-state
+                          (hash-table-ref/default
+                           action->state
+                           previous-action
+                           #f))
+                         (navigation-error?
+                          (and expected-state
+                               (equal? expected-state state))))
+                    (if expected-state
+                        (when navigation-error?
+                          (debug 'navigation-error))
+                        (hash-table-set!
+                         action->state
+                         previous-action
+                         state)))
+                  action->state)
                 (lambda () (make-hash-table)))
-               (unless backtrack?
-                 (hash-table-update!
-                  unbacktracked
-                  state
-                  (lambda (backtracks)
-                    (stack-push! backtracks previous-state)
-                    backtracks)
-                  (lambda () (make-stack))))
-               ;; We could probably set this as a state variable
-               ;; and avoid the lookup.
-               (let* ((previous-coordinate
-                       (hash-table-ref coordinates previous-state))
-                      (previous-point (coordinate-point previous-coordinate)))
-                 (if (hash-table-exists? coordinates state)
-                     (let* ((coordinate (hash-table-ref coordinates state))
-                            (point (coordinate-point coordinate)))
-                       (when (< (coordinate-time coordinate) time)
-                         (let ((delta-x
-                                (- (point-x point)
-                                   (+ (point-x previous-point)
-                                      (point-x previous-action))))
-                               (delta-y
-                                (- (point-y point)
-                                   (+ (point-y previous-point)
-                                      (point-y previous-action)))))
-                           (hash-table-walk coordinates
-                             (lambda (state old-coordinate)
-                               (when (< (coordinate-time old-coordinate) time)
-                                 (debug ;; (coordinate-time old-coordinate)
-                                  ;; time
-                                  delta-x
-                                  delta-y)
-                                 (coordinate-time-set! old-coordinate time)
-                                 (let ((old-point (coordinate-point old-coordinate)))
-                                   (coordinate-point-set!
-                                    old-coordinate
-                                    (make-point (- (point-x old-point) delta-x)
-                                                (- (point-y old-point) delta-y))))))))))
-                     (hash-table-set!
-                      coordinates
-                      state
-                      (make-coordinate
-                       (make-point (+ (point-x previous-point)
-                                      (point-x previous-action))
-                                   (+ (point-y previous-point)
-                                      (point-y previous-action)))
-                       time)))))
+               (maybe-update-result! result previous-state previous-action state)
+               (maybe-update-unbacktracked! unbacktracked backtrack? previous-state state)
+               (maybe-update-coordinates! coordinates previous-state previous-action state time))
              ;; We've been teleported to some previously unknow
              ;; location; let's designate it as the origin.
              (unless (hash-table-exists? coordinates state)
@@ -3518,15 +3584,19 @@
                        (let* ((backtrack (stack-pop! (hash-table-ref unbacktracked state)))
                               (backtrack-action
                                (hash-table-ref (hash-table-ref result state) backtrack)))
+                         (debug 'backtrack)
                          (set! backtrack? #t)
-                         (set! previous-action backtrack-action)))
+                         (set! previous-action backtrack-action)
+                         (set! previous-action (list-ref state (random (length state))))))
                    (begin
                      (set! backtrack? #f)
                      (set! previous-action (stack-pop! (hash-table-ref untried state)))))
                (set! previous-state state)
                previous-action))))))
 
-  (simulate-navigation 50 100 "online-dfs.avi" make-agent-online-dfs)
+  (simulate-navigation make-agent-online-dfs
+                       n-points: 10
+                       n-steps: 1000)
    #+END_SRC
 ** TODO Random walk
    #+BEGIN_SRC scheme
@@ -3681,12 +3751,16 @@
     point
     time)
 
-  (define (simulate-navigation n-points n-steps animation-file make-agent)
+  (define (simulate-navigation make-agent
+                               #!key
+                               (n-points 50)
+                               (n-steps 1000)
+                               (animation-file #f))
     (let ((world (tessellate n-points)))
       (let ((points (tessellation-points world))
             (neighbors (tessellation-neighbors world))
             (goal (tessellation-end world)))
-        (debug (length points))
+        ;; (debug (length points))
         (receive (next-frame finalize!)
           (make-animator)
           (let* ((start (list-ref points (random (length points))))
@@ -3703,7 +3777,7 @@
                        (move (if (< (random-real) 0.3)
                                  (list-ref relative-points (random (length relative-points)))
                                  ((agent-program agent) relative-points goal? (agent-score agent)))))
-                  (debug move)
+                  ;; (debug move)
                   (let* ((relative->visible-points
                           (alist->hash-table (zip relative-points visible-points)))
                          (new-point
@@ -3722,8 +3796,9 @@
                     (if goal? (debug (agent-score agent)))
                     (agent-point-set! agent new-point)))))
             (debug (agent-score agent))
-            (finalize! animation-file)
-            (run (mplayer -loop 0 ,animation-file)))))))
+            (when animation-file
+              (finalize! animation-file)
+              (run (mplayer -loop 0 ,animation-file))))))))
    #+END_SRC
 ** TODO 4.11c
    #+BEGIN_SRC scheme :comments link :tangle online-dfs-non-deterministic.scm :shebang #!/usr/bin/env chicken-scheme
