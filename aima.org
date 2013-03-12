@@ -3738,6 +3738,10 @@
               (run (mplayer -loop 0 ,animation-file))))))))
    #+END_SRC
 ** TODO 4.11c
+   During the non-deterministic walk, we should update the statistics
+   during each run; and show e.g. the most probably route when drawing
+   the map.
+
    #+BEGIN_SRC scheme :comments link :tangle online-dfs-non-deterministic.scm :shebang #!/usr/bin/env chicken-scheme
      (include "online-navigation.scm")
      
