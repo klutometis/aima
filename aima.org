@@ -4078,6 +4078,22 @@
    #+BEGIN_SRC scheme
      (((exact->inexact (/ met-expectations expectations)) 0.811181118111811))
    #+END_SRC
+
+   =defies-expectation?= is either because we have a plan that failed
+   (i.e. tried to backtrack to some known square), or we have a
+   statistical anomaly; in that case: need an expectation-stack. Do
+   the reduce to the same case?
+
+   Backtrack preemptively pushes to expectation-square; this for
+   LRTA*, or any goal-directed plan, for that matter.
+
+   With the latest code, by the way, the ratio is even higher:
+
+   #+BEGIN_SRC scheme
+     (((/ met-expectations expectations) 0.900673569920579))
+   #+END_SRC
+
+   Have to think about why this is the case.
 ** Notes
    - Might accidentally encounter a node somewhere in the
      error-correction stack
