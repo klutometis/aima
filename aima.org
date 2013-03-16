@@ -3967,6 +3967,66 @@
    online depth-first-search later.
 
    God, it would be great to integrate it with a LRTA*, too.
+** TODO Non-determinism and random-walk
+   Let’s see if we can try it out on the random-walk, to avoid the
+   depth-first overhead?
+
+   #+BEGIN_SRC scheme
+     (include "online-navigation.scm")
+     
+     (use heap)
+     
+     (define (make-agent-random-walk start next-frame)
+       (make-agent
+        start
+        0
+        (let ((state->action->states (make-hash-table))
+              (previous-state #f)
+              (previous-action #f))
+          (lambda (state goal? score)
+            (when (and previous-action previous-state)
+              (hash-table-update!
+               state->action->states
+               previous-state
+               (lambda (action->states)
+                 (hash-table-update!
+                  action->states
+                  previous-action
+                  (lambda (states)
+                    (if (heap-member? states previous-state)
+                        (heap-change-key! states
+                                          previous-state
+                                          (add1 (heap-key states previous-state)))
+                        (heap-insert! states
+                                      1
+                                      previous-state))
+                    states)
+                  (lambda () (make-max-heap)))
+                 action->states)
+               ;; Too bad we don't have multi-dimensional hash-tables.
+               (lambda () (make-hash-table))))
+            (let ((action
+                   (if goal?
+                       (begin
+                         (set! previous-state #f)
+                         (set! previous-action #f)
+                         (hash-table-walk state->action->states
+                           (lambda (state action->states)
+                             (hash-table-walk action->states
+                               (lambda (action states)
+                                 (debug state action (heap-extremum states))))))
+                         zero-motion)
+                       (list-ref state (random (length state))))))
+              (set! previous-state state)
+              (set! previous-action action)
+              action)))))
+     
+     (simulate-navigation make-agent-random-walk
+                          n-points: 10
+                          n-steps: 100
+                          p-slippage: 0.3
+                          animation-file: #f)
+   #+END_SRC
 ** Notes
    - Might accidentally encounter a node somewhere in the
      error-correction stack
