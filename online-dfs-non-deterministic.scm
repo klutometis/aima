@@ -97,8 +97,9 @@
    0
    (let ((coordinates (make-hash-table))
          (labels (make-hash-table))
-         ;; state->state->action
+         ;; state->state->[[action_0, p_0], ..., [action_n, p_n]]
          (result (make-hash-table))
+         ;; state->action->[[state_0, p_0], ..., [state_n, p_n]]
          (state->action->state (make-hash-table))
          (untried (make-hash-table))
          (unbacktracked (make-hash-table))
@@ -187,8 +188,7 @@
                        ;; (set! previous-action stop)
                        ;; (error "Goal not found -- AGENT-ONLINE-DFS")
                        (set! previous-action (list-ref state (random (length state))))
-                       (debug "Goal not found -- AGENT-ONLINE-DFS")
-                       )
+                       (debug "Goal not found -- AGENT-ONLINE-DFS"))
                      (let* ((backtrack (stack-pop! (hash-table-ref unbacktracked state)))
                             (backtrack-action
                              (hash-table-ref (hash-table-ref result state) backtrack)))
