@@ -163,9 +163,12 @@
                                        (- (point-y point) (point-y agent-point))))
                          visible-points)))
               (let* ((goal? (equal? agent-point goal))
+                     ;; Initial hypothesis: agent dictates a move.
+                     (move ((agent-program agent) relative-points goal? (agent-score agent)))
+                     ;; We may revise this to wind up somewhere else.
                      (move (if (< (random-real) p-slippage)
                                (list-ref relative-points (random (length relative-points)))
-                               ((agent-program agent) relative-points goal? (agent-score agent)))))
+                               move)))
                 (debug move)
                 (let* ((relative->visible-points
                         (alist->hash-table (zip relative-points visible-points)))
