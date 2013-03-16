@@ -25,31 +25,36 @@
              action->states
              previous-action
              (lambda (states)
-               (if (heap-member? states previous-state)
+               (if (heap-member? states state)
                    (heap-change-key! states
-                                     previous-state
-                                     (add1 (heap-key states previous-state)))
+                                     state
+                                     (add1 (heap-key states state)))
                    (heap-insert! states
                                  1
-                                 previous-state))
+                                 state))
                states)
              (lambda () (make-max-heap)))
             action->states)
           ;; Too bad we don't have multi-dimensional hash-tables.
           (lambda () (make-hash-table)))
          (inc! expectations)
-         (let* ((heap
+         ;; Given that we just added a key corresponding to
+         ;; state, previous-state and previous-action; this should
+         ;; always return at least something.
+         ;;
+         ;; The question is whether it defies our expectations.
+         (let ((expected-state
+                (heap-extremum
                  (hash-table-ref/default
                   (hash-table-ref/default
                    state->action->states
                    previous-state
                    (make-hash-table))
                   previous-action
-                  (make-max-heap)))
-                (expected-state
-                 (heap-extremum
-                  heap)))
-           (debug '**************** heap expected-state)
+                  (make-max-heap)))))
+           ;; (debug state
+           ;;        expected-state
+           ;;        (equal? state expected-state))
            (when (equal? state expected-state)
              (inc! met-expectations)))
          (debug (exact->inexact (/ met-expectations expectations))))
@@ -72,7 +77,7 @@
 
 (simulate-navigation make-agent-random-walk
                      n-points: 10
-                     n-steps: 100
+                     n-steps: 10000
                      p-slippage: 0.3
                      animation-file: #f)
 
