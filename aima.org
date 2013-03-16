@@ -4007,7 +4007,9 @@
         0
         (let ((state->action->states (make-hash-table))
               (previous-state #f)
-              (previous-action #f))
+              (previous-action #f)
+              (expectations 0)
+              (met-expectations 0))
           (lambda (state goal? score)
             (when (and previous-action previous-state)
               (hash-table-update!
@@ -4029,7 +4031,23 @@
                   (lambda () (make-max-heap)))
                  action->states)
                ;; Too bad we don't have multi-dimensional hash-tables.
-               (lambda () (make-hash-table))))
+               (lambda () (make-hash-table)))
+              (inc! expectations)
+              (let* ((heap
+                      (hash-table-ref/default
+                       (hash-table-ref/default
+                        state->action->states
+                        previous-state
+                        (make-hash-table))
+                       previous-action
+                       (make-max-heap)))
+                     (expected-state
+                      (heap-extremum
+                       heap)))
+                (debug '**************** heap expected-state)
+                (when (equal? state expected-state)
+                  (inc! met-expectations)))
+              (debug (exact->inexact (/ met-expectations expectations))))
             (let ((action
                    (if goal?
                        (begin
@@ -4039,7 +4057,8 @@
                            (lambda (state action->states)
                              (hash-table-walk action->states
                                (lambda (action states)
-                                 (debug state action (heap-extremum states))))))
+                                 ;; (debug state action (heap-extremum states))
+                                 2))))
                          zero-motion)
                        (list-ref state (random (length state))))))
               (set! previous-state state)
