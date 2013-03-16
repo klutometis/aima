@@ -167,7 +167,9 @@
                      (move ((agent-program agent) relative-points goal? (agent-score agent)))
                      ;; We may revise this to wind up somewhere else.
                      (move (if (< (random-real) p-slippage)
-                               (list-ref relative-points (random (length relative-points)))
+                               ;; Add the zero-motion case.
+                               (list-ref (cons zero-motion relative-points)
+                                         (random (add1 (length relative-points))))
                                move)))
                 (debug move)
                 (let* ((relative->visible-points
@@ -179,12 +181,15 @@
                               (list-ref points (random (length points))))
                             (if (stop? move)
                                 (error "Stop!")
-                                (begin
-                                  (agent-score-set! agent (- (agent-score agent)
-                                                             (point-distance zero-motion move)))
-                                  (make-point (+ (point-x move) (point-x agent-point))
-                                              (+ (point-y move) (point-y agent-point)))
-                                  (car (hash-table-ref relative->visible-points move)))))))
+                                (if (zero-motion? move)
+                                    agent-point
+                                    (begin
+                                      (agent-score-set! agent
+                                                        (- (agent-score agent)
+                                                           (point-distance zero-motion move)))
+                                      (make-point (+ (point-x move) (point-x agent-point))
+                                                  (+ (point-y move) (point-y agent-point)))
+                                      (car (hash-table-ref relative->visible-points move))))))))
                   (if goal? (debug (agent-score agent)))
                   (agent-point-set! agent new-point)))))
           (debug (agent-score agent))
