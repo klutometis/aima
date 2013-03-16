@@ -3996,7 +3996,7 @@
    Let’s see if we can try it out on the random-walk, to avoid the
    depth-first overhead?
 
-   #+BEGIN_SRC scheme
+   #+BEGIN_SRC scheme :comments link :tangle online-dfs-random-statistics.scm :shebang #!/usr/bin/env chicken-scheme
      (include "online-navigation.scm")
      
      (use heap)
@@ -4070,6 +4070,13 @@
                           n-steps: 100
                           p-slippage: 0.3
                           animation-file: #f)
+   #+END_SRC
+
+   After about $10,000$ trials, converges on an expected-location /
+   movement ratio of about $0.81$:
+
+   #+BEGIN_SRC scheme
+     (((exact->inexact (/ met-expectations expectations)) 0.811181118111811))
    #+END_SRC
 ** Notes
    - Might accidentally encounter a node somewhere in the
