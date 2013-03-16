@@ -3950,6 +3950,23 @@
                           animation-file: "slippage.avi")
      
    #+END_SRC
+
+   On the other hand, untried and unbacktraced are deterministic;
+   movement and error correction are non-deterministic.
+
+   =state->action->state= can be statistical; =state->state->action=
+   deterministic, based on best-guess?
+
+   That’s still going to have implications for backtracking, though;
+   we’re going to have to implement error correction into
+   backtracking. Can we do that by integrating it with the error
+   stack? The error stack is more generally the planning stack?
+   
+   I want to implement the error correction planner with the random
+   walker, because it’s simpler; worry about integration with the
+   online depth-first-search later.
+
+   God, it would be great to integrate it with a LRTA*, too.
 ** Notes
    - Might accidentally encounter a node somewhere in the
      error-correction stack
