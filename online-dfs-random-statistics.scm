@@ -94,24 +94,33 @@
                      ;; This is also false if we haven't seen it
                      ;; before, right? Need to distinguish between the
                      ;; two.
+                     (debug state)
                      (if expected-state?
                          (begin
+                           ;; We should check this before we update
+                           ;; the stats, shouldn't we?
+                           (debug "Statistically speaking, I'm not at an unexpected state.")
                            (inc! met-expectations))
                          (begin
+                           (debug "This state contradicts my expectations based on stats.")
                            (stack-push! expected-states expected-state)
                            ;; Handle the non no-op case.
                            (unless (equal? state previous-state)
+                             (debug "Handling the non no-op case.")
                              (stack-push! expected-states previous-state))))
                      ;; (debug (/ met-expectations expectations))
                      )
                    (while (and (not (stack-empty? expected-states))
                                (equal? (stack-peek expected-states)
                                        state))
+                     (debug "Popping from expected states")
                      (stack-pop! expected-states))
                    ;; Handle expectations.
                    (if (stack-empty? expected-states)
                        (let ((action
                               (list-ref state (random (length state)))))
+                         (debug "There aren't any expected states on the stack, moving randomly.")
+                         (debug action)
                          (set! previous-state state)
                          (set! previous-action action)
                          action)
@@ -119,6 +128,7 @@
                          ;; (debug expected-state
                          ;;        state
                          ;;        (stack-count expected-states))
+                         (debug "Here's the first expected state on the stack:" expected-state)
                          (debug
                           ;; expected-state
                           (stack-count expected-states))
@@ -140,10 +150,16 @@
                            (let ((action (if return
                                              return
                                              (list-ref state (random (length state))))))
+                             (if return
+                                 (debug "There's a candidate action: trying to return.")
+                                 (debug "Can't return: moving randomly."))
+                             (debug action)
                              (set! previous-action action)
                              action)))))))
            (let ((action
                   (list-ref state (random (length state)))))
+             (debug "No previous action or state: moving randomly.")
+             (debug action)
              (set! previous-state state)
              (set! previous-action action)
              action))))))
