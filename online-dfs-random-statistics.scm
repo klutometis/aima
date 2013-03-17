@@ -149,7 +149,7 @@
              action))))))
 
 (simulate-navigation make-agent-random-walk
-                     n-points: 10
+                     n-points: 100
                      n-steps: 1000
                      p-slippage: 0.3
                      animation-file: #f)
