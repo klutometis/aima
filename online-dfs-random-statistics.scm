@@ -57,20 +57,19 @@
            (lambda () (make-max-heap)))
           state->actions)
         (lambda () (make-hash-table))))
-     (define (not-unexpected-state? state)
-       (let* ((possible-states
-               (hash-table-ref/default
-                (hash-table-ref/default
-                 state->action->states
-                 previous-state
-                 (make-hash-table))
-                previous-action
-                (make-max-heap)))
-              (expected-state
-               (and (not (heap-empty? possible-states))
-                    (heap-extremum possible-states))))
-         (or (not expected-state)
-             (equal? state expected-state))))
+     (define (maybe-update-goals! expected-state state)
+       (if (not-unexpected-state? expected-state state)
+           (begin
+             (debug "This state is not unexpected."))
+           (begin
+             (debug "This state is statistically anomolous.")
+             (debug "Pushing the expected-state unto expected-states.")
+             (debug expected-state)
+             (stack-push! expected-states expected-state)
+             (unless (equal? previous-state state)
+               (debug "Pushing the previous-state unto expected-states.")
+               (debug previous-state)
+               (stack-push! expected-states previous-state)))))
      (define (expected-state)
        (let* ((possible-states
                (hash-table-ref/default
@@ -89,21 +88,22 @@
        (set! previous-state #f)
        (set! previous-action #f)
        (set! expected-states (make-stack)))
+     (define (move state action)
+       (set! previous-state state)
+       (set! previous-action action)
+       (debug action)
+       action)
      (define (move-randomly state)
        (debug "Moving randomly.")
-       (let ((action (list-ref state (random (length state)))))
-         (set! previous-state state)
-         (set! previous-action action)
-         (debug action)
-         action))
-     (define (move-backwards-or-randomly state)
+       (move state (list-ref state (random (length state)))))
+     (define (move-backwards-or-randomly expected-state state)
        (let* ((return
                (hash-table-ref/default
                 (hash-table-ref/default
                  state->state->actions
                  state
                  (make-hash-table))
-                previous-state
+                expected-state
                 (make-max-heap)))
               (return
                (and (not (heap-empty? return))
@@ -111,40 +111,15 @@
          (if return
              (begin
                (debug "Attempting to return.")
-               (debug return)
-               (set! previous-state state)
-               (set! previous-action return)
-               return)
+               (move state return))
              (begin
                (debug "Can't return.")
                (move-randomly state)))))
-     (define (try-to-backtrack expected-state state)
-       (move-backwards-or-randomly state))
-     (define (iterate-over-goals goal? state)
-       (debug state)
+     (define (iterate-over-goals state)
        (if (stack-empty? expected-states)
            (begin
              (debug "There are no expected states.")
-             (if goal?
-                 (begin
-                   (debug "Found goal.")
-                   (reset!)
-                   zero-motion)
-                 (let ((expected-state (expected-state)))
-                   (if (not-unexpected-state? expected-state state)
-                       (begin
-                         (debug "This state is not unexpected.")
-                         (move-randomly state))
-                       (begin
-                         (debug "This state is statistically anomolous.")
-                         (debug "Pushing the expected-state unto expected-states.")
-                         (debug expected-state)
-                         (stack-push! expected-states expected-state)
-                         (unless (equal? previous-state state)
-                           (debug "Pushing the previous-state unto expected-states.")
-                           (debug previous-state)
-                           (stack-push! expected-states previous-state))
-                         (try-to-backtrack expected-state state))))))
+             (move-randomly state))
            (begin
              (debug (stack->list expected-states))
              (let ((expected-state (stack-peek expected-states)))
@@ -152,16 +127,24 @@
                    (begin
                      (debug "We're at the expected state; popping expected states.")
                      (stack-pop! expected-states)
-                     (iterate-over-goals goal? state))
+                     (iterate-over-goals state))
                    (begin
                      (debug "We're not at the expected state; trying to backtrack.")
-                     (try-to-backtrack expected-state state)))))))
+                     (move-backwards-or-randomly expected-state state)))))))
      (lambda (state goal? score)
-       (if previous-action             ; Implied: previous-state, too.
+       (debug state goal?)
+       (if goal?
            (begin
-             (update-statistics! state)
-             (iterate-over-goals goal? state))
-           (move-randomly state))))))
+             (debug "Found goal.")
+             (reset!)
+             zero-motion)
+           (if previous-action         ; Implied: previous-state, too.
+               (begin
+                 (update-statistics! state)
+                 (let ((expected-state (expected-state)))
+                   (maybe-update-goals! expected-state state)
+                   (iterate-over-goals state)))
+               (move-randomly state)))))))
 
 (simulate-navigation make-agent-random-walk
                      n-points: 100
