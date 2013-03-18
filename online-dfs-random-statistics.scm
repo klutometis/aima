@@ -16,6 +16,7 @@
          (previous-action #f)
          (expectations 0)
          (met-expectations 0)
+         ;; Call this: contingency-plans.
          (expected-states (make-stack)))
      (define (update-statistics! state)
        (hash-table-update!
@@ -57,7 +58,7 @@
            (lambda () (make-max-heap)))
           state->actions)
         (lambda () (make-hash-table))))
-     (define (maybe-update-goals! expected-state state)
+     (define (maybe-update-goals! previous-state expected-state state)
        (if (not-unexpected-state? expected-state state)
            (begin
              (debug "This state is not unexpected."))
@@ -65,11 +66,12 @@
              (debug "This state is statistically anomolous.")
              (debug "Pushing the expected-state unto expected-states.")
              (debug expected-state)
-             (stack-push! expected-states expected-state)
+             ;; (stack-push! expected-states expected-state)
+             (stack-push! expected-states (lambda (state) expected-state))
              (unless (equal? previous-state state)
                (debug "Pushing the previous-state unto expected-states.")
                (debug previous-state)
-               (stack-push! expected-states previous-state)))))
+               (stack-push! expected-states (lambda (state) previous-state))))))
      (define (expected-state)
        (let* ((possible-states
                (hash-table-ref/default
@@ -114,6 +116,12 @@
                (move state return))
              (begin
                (debug "Can't return.")
+               (debug "Pushing a contingency unto expected states.")
+               (stack-push! expected-states
+                            (lambda (state)
+                              (if (equal? state expected-state)
+                                  expected-state
+                                  state)))
                (move-randomly state)))))
      (define (iterate-over-goals state)
        (if (stack-empty? expected-states)
@@ -121,8 +129,11 @@
              (debug "There are no expected states.")
              (move-randomly state))
            (begin
-             (debug (stack->list expected-states))
-             (let ((expected-state (stack-peek expected-states)))
+             ;; (debug (map (lambda (plan) (plan state))
+             ;;             (stack->list expected-states)))
+             (debug (stack-count expected-states))
+             (let ((expected-state ((stack-peek expected-states) state)))
+               (debug expected-state state)
                (if (equal? state expected-state)
                    (begin
                      (debug "We're at the expected state; popping expected states.")
@@ -142,13 +153,13 @@
                (begin
                  (update-statistics! state)
                  (let ((expected-state (expected-state)))
-                   (maybe-update-goals! expected-state state)
+                   (maybe-update-goals! previous-state expected-state state)
                    (iterate-over-goals state)))
                (move-randomly state)))))))
 
 (simulate-navigation make-agent-random-walk
                      n-points: 100
-                     n-steps: 200
+                     n-steps: 1000
                      p-slippage: 0.3
                      animation-file: #f)
 
