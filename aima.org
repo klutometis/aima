@@ -4094,6 +4094,149 @@
    #+END_SRC
 
    Have to think about why this is the case.
+
+   Don’t we have to distinguish somehow between: I’m not at an
+   unexpected state (statistically speaking or de novo) vs. I’ve
+   achieved this error-correction goal?
+
+   Maybe we should call it the error-correction stack instead of the
+   expected-states stack.
+
+   Here’s an interesting case:
+
+   #+BEGIN_SRC scheme
+     ((move #(point 0 0)))
+     ((state (#(point 0.232025 -0.019276)
+              #(point -0.024151 -0.03691)
+              #(point -0.065342 0.178348))))
+     (("This state contradicts my expectations based on stats."
+       "This state contradicts my expectations based on stats."))
+     (("Here's the first expected state on the stack:"
+       "Here's the first expected state on the stack:")
+      (expected-state
+        (#(point 0.037821 -0.306753)
+         #(point 0.024151 0.03691)
+         #(point -0.303238 -0.132122))))
+     (((stack-count expected-states) 1))
+     (("Trying to return" "Trying to return"))
+     ((action #(point -0.024151 -0.03691)))
+     ((move #(point 0 0)))
+     ((state (#(point 0.232025 -0.019276)
+              #(point -0.024151 -0.03691)
+              #(point -0.065342 0.178348))))
+     (("This state contradicts my expectations based on stats."
+       "This state contradicts my expectations based on stats."))
+     (("Here's the first expected state on the stack:"
+       "Here's the first expected state on the stack:")
+      (expected-state
+        (#(point 0.037821 -0.306753)
+         #(point 0.024151 0.03691)
+         #(point -0.303238 -0.132122))))
+     (((stack-count expected-states) 2))
+     (("Trying to return" "Trying to return"))
+     ((action #(point -0.024151 -0.03691)))
+     ((move #(point -0.024151 -0.03691)))
+     ((state (#(point 0.037821 -0.306753)
+              #(point 0.024151 0.03691)
+              #(point -0.303238 -0.132122))))
+     (("I'm not at an unexpected state." "I'm not at an unexpected state."))
+     (("Popping from expected states" "Popping from expected states"))
+     (("Popping from expected states" "Popping from expected states"))
+     (("There aren't any expected states on the stack."
+       "There aren't any expected states on the stack."))
+     ((move #(point -0.303238 -0.132122)))
+   #+END_SRC
+
+   It tries to move and sticks, then tries to recover and sticks; two
+   of the same state are on the expected-states stack. It recovers and
+   removes them successively.
+
+   Should we watch out for this case somehow?
+
+   This looks like trouble:
+
+   #+BEGIN_SRC scheme
+     ((move #(point 0 0)))
+     ((state (#(point -0.27045 0.081585)
+              #(point 0.128703 -0.166269)
+              #(point 0.268297 0.066291))))
+     (("This state contradicts my expectations based on stats."
+       "This state contradicts my expectations based on stats."))
+     (("Here's the first expected state on the stack:"
+       "Here's the first expected state on the stack:")
+      (expected-state
+        (#(point 0.065893 0.021618)
+         #(point 0.570076 -0.385706)
+         #(point -0.268297 -0.066291))))
+     (((stack-count expected-states) 1))
+     (("Trying to return" "Trying to return"))
+     ((action #(point 0.268297 0.066291)))
+     ((move #(point -0.27045 0.081585)))
+     ((state (#(point 0.27045 -0.081585)
+              #(point -0.124748 -1.105556)
+              #(point -0.0990089999999999 0.105484))))
+     (("I'm not at an unexpected state." "I'm not at an unexpected state."))
+     (("Here's the first expected state on the stack:"
+       "Here's the first expected state on the stack:")
+      (expected-state
+        (#(point 0.065893 0.021618)
+         #(point 0.570076 -0.385706)
+         #(point -0.268297 -0.066291))))
+     (((stack-count expected-states) 1))
+     (("Trying to return" "Trying to return"))
+     ((action #(point -0.124748 -1.105556)))
+     ((move #(point -0.124748 -1.105556)))
+     ((state (#(point 0.124748 1.105556)
+              #(point 0.214512 -0.149823)
+              #(point -0.885656 -0.313053))))
+     (("I'm not at an unexpected state." "I'm not at an unexpected state."))
+     (("Here's the first expected state on the stack:"
+       "Here's the first expected state on the stack:")
+      (expected-state
+        (#(point 0.065893 0.021618)
+         #(point 0.570076 -0.385706)
+         #(point -0.268297 -0.066291))))
+     (((stack-count expected-states) 1))
+     (("Trying to return" "Trying to return"))
+     ((action #(point 0.124748 1.105556)))
+     ((move #(point -0.885656 -0.313053)))
+   #+END_SRC
+
+   Attempts to return; fails; but doesn’t put failure on the expected
+   stack. Makes me believe that we’re not distinguishing the proper
+   cases.
+
+   Cases for popping something on expectation stack: 1. statistical
+   anomaly (based on current data); 2. we didn’t achieve the last
+   expected goal.
+
+   The cases are not mutually exclusive; given 2., 1. is not
+   sufficient to push unto the expected-values stack. (2. should be
+   generalized to include any goal on the stack, no matter how deep;
+   that leads to some kind of stack data-structure with O(1)
+   membership testing and random access.)
+
+   #+BEGIN_SRC org
+     ,- Update statistics
+     ,- A: Are there goals to be achieved?
+     ,  - Did we achieve the latest goal?
+     ,    - Begin
+     ,      - Pop off the goal-stack
+     ,      - Goto A
+     ,    - Begin
+     ,      - B: Push previous-state unto goals
+     ,      - Do we have a hypothesis as to how to get back to the latest
+     ,        goal?
+     ,        - Try it
+     ,        - Move randomly
+     ,  - Did we reach terminal goal?
+     ,    - Begin
+     ,      - Reset!
+     ,      - Null-move
+     ,    - Is this state statistically anomolous?
+     ,      - Goto B
+     ,      - Move randomly
+   #+END_SRC
 ** Notes
    - Might accidentally encounter a node somewhere in the
      error-correction stack
