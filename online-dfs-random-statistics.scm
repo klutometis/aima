@@ -17,156 +17,155 @@
          (expectations 0)
          (met-expectations 0)
          (expected-states (make-stack)))
-     (lambda (state goal? score)
-       (if (and previous-action previous-state)
-           (begin
-             (hash-table-update!
-              state->action->states
-              previous-state
-              (lambda (action->states)
-                (hash-table-update!
-                 action->states
-                 previous-action
-                 (lambda (states)
-                   (if (heap-member? states state)
-                       (heap-change-key! states
-                                         state
-                                         (add1 (heap-key states state)))
-                       (heap-insert! states
-                                     1
-                                     state))
-                   states)
-                 (lambda () (make-max-heap)))
-                action->states)
-              ;; Too bad we don't have multi-dimensional hash-tables.
-              (lambda () (make-hash-table)))
-             (hash-table-update!
-              state->state->actions
-              previous-state
-              (lambda (state->actions)
-                (hash-table-update!
-                 state->actions
+     (define (update-statistics! state)
+       (hash-table-update!
+        state->action->states
+        previous-state
+        (lambda (action->states)
+          (hash-table-update!
+           action->states
+           previous-action
+           (lambda (states)
+             (if (heap-member? states state)
+                 (heap-change-key! states
+                                   state
+                                   (add1 (heap-key states state)))
+                 (heap-insert! states
+                               1
+                               state))
+             states)
+           (lambda () (make-max-heap)))
+          action->states)
+        ;; Too bad we don't have multi-dimensional hash-tables.
+        (lambda () (make-hash-table)))
+       (hash-table-update!
+        state->state->actions
+        previous-state
+        (lambda (state->actions)
+          (hash-table-update!
+           state->actions
+           state
+           (lambda (actions)
+             (if (heap-member? actions previous-action)
+                 (heap-change-key! actions
+                                   previous-action
+                                   (add1 (heap-key actions previous-action)))
+                 (heap-insert! actions
+                               1
+                               previous-action))
+             actions)
+           (lambda () (make-max-heap)))
+          state->actions)
+        (lambda () (make-hash-table))))
+     (define (not-unexpected-state? state)
+       (let* ((possible-states
+               (hash-table-ref/default
+                (hash-table-ref/default
+                 state->action->states
+                 previous-state
+                 (make-hash-table))
+                previous-action
+                (make-max-heap)))
+              (expected-state
+               (and (not (heap-empty? possible-states))
+                    (heap-extremum possible-states))))
+         (or (not expected-state)
+             (equal? state expected-state))))
+     (define (expected-state)
+       (let* ((possible-states
+               (hash-table-ref/default
+                (hash-table-ref/default
+                 state->action->states
+                 previous-state
+                 (make-hash-table))
+                previous-action
+                (make-max-heap))))
+         (and (not (heap-empty? possible-states))
+              (heap-extremum possible-states))))
+     (define (not-unexpected-state? expected-state state)
+       (or (not expected-state)
+           (equal? state expected-state)))
+     (define (reset!)
+       (set! previous-state #f)
+       (set! previous-action #f)
+       (set! expected-states (make-stack)))
+     (define (move-randomly state)
+       (debug "Moving randomly.")
+       (let ((action (list-ref state (random (length state)))))
+         (set! previous-state state)
+         (set! previous-action action)
+         (debug action)
+         action))
+     (define (move-backwards-or-randomly state)
+       (let* ((return
+               (hash-table-ref/default
+                (hash-table-ref/default
+                 state->state->actions
                  state
-                 (lambda (actions)
-                   (if (heap-member? actions previous-action)
-                       (heap-change-key! actions
-                                         previous-action
-                                         (add1 (heap-key actions previous-action)))
-                       (heap-insert! actions
-                                     1
-                                     previous-action))
-                   actions)
-                 (lambda () (make-max-heap)))
-                state->actions)
-              (lambda () (make-hash-table)))
-             ;; Should we short-circuit error-correction for the sake of
-             ;; the goal?
+                 (make-hash-table))
+                previous-state
+                (make-max-heap)))
+              (return
+               (and (not (heap-empty? return))
+                    (heap-extremum return))))
+         (if return
+             (begin
+               (debug "Attempting to return.")
+               (debug return)
+               (set! previous-state state)
+               (set! previous-action return)
+               return)
+             (begin
+               (debug "Can't return.")
+               (move-randomly state)))))
+     (define (try-to-backtrack expected-state state)
+       (move-backwards-or-randomly state))
+     (define (iterate-over-goals goal? state)
+       (debug state)
+       (if (stack-empty? expected-states)
+           (begin
+             (debug "There are no expected states.")
              (if goal?
                  (begin
-                   (set! previous-state #f)
-                   (set! previous-action #f)
-                   (set! expected-states (make-stack))
+                   (debug "Found goal.")
+                   (reset!)
                    zero-motion)
-                 ;; Given that we just added a key corresponding to
-                 ;; state, previous-state and previous-action; this should
-                 ;; always return at least something.
-                 ;;
-                 ;; The question is whether it defies our expectations.
-                 (begin
-                   (inc! expectations)
-                   (set! previous-state state)
-                   (let* ((possible-states
-                           (hash-table-ref/default
-                            (hash-table-ref/default
-                             state->action->states
-                             previous-state
-                             (make-hash-table))
-                            previous-action
-                            (make-max-heap)))
-                          (expected-state
-                           (and (not (heap-empty? possible-states))
-                                (heap-extremum possible-states)))
-                          (expected-state?
-                           (or (heap-empty? possible-states)
-                               (equal? expected-state state))))
-                     ;; (debug expected-state)
-                     ;; (debug expected-state?)
-                     ;; This is also false if we haven't seen it
-                     ;; before, right? Need to distinguish between the
-                     ;; two.
-                     (debug state)
-                     (if expected-state?
-                         (begin
-                           ;; We should check this before we update
-                           ;; the stats, shouldn't we?
-                           (debug "Statistically speaking, I'm not at an unexpected state.")
-                           (inc! met-expectations))
-                         (begin
-                           (debug "This state contradicts my expectations based on stats.")
-                           (stack-push! expected-states expected-state)
-                           ;; Handle the non no-op case.
-                           (unless (equal? state previous-state)
-                             (debug "Handling the non no-op case.")
-                             (stack-push! expected-states previous-state))))
-                     ;; (debug (/ met-expectations expectations))
-                     )
-                   (while (and (not (stack-empty? expected-states))
-                               (equal? (stack-peek expected-states)
-                                       state))
-                     (debug "Popping from expected states")
-                     (stack-pop! expected-states))
-                   ;; Handle expectations.
-                   (if (stack-empty? expected-states)
-                       (let ((action
-                              (list-ref state (random (length state)))))
-                         (debug "There aren't any expected states on the stack, moving randomly.")
-                         (debug action)
-                         (set! previous-state state)
-                         (set! previous-action action)
-                         action)
-                       (let ((expected-state (stack-peek expected-states)))
-                         ;; (debug expected-state
-                         ;;        state
-                         ;;        (stack-count expected-states))
-                         (debug "Here's the first expected state on the stack:" expected-state)
-                         (debug
-                          ;; expected-state
-                          (stack-count expected-states))
-                             ;; Figure out if there's a A, x -> B: where A
-                             ;; is state, B is expected-state; otherwise,
-                             ;; random. (In which case: push state unto
-                             ;; expected-states.)
-                         (let* ((return
-                                 (hash-table-ref/default
-                                  (hash-table-ref/default
-                                   state->state->actions
-                                   state
-                                   (make-hash-table))
-                                  previous-state
-                                  (make-max-heap)))
-                                (return
-                                 (and (not (heap-empty? return))
-                                      (heap-extremum return))))
-                           (let ((action (if return
-                                             return
-                                             (list-ref state (random (length state))))))
-                             (if return
-                                 (debug "There's a candidate action: trying to return.")
-                                 (debug "Can't return: moving randomly."))
-                             (debug action)
-                             (set! previous-action action)
-                             action)))))))
-           (let ((action
-                  (list-ref state (random (length state)))))
-             (debug "No previous action or state: moving randomly.")
-             (debug action)
-             (set! previous-state state)
-             (set! previous-action action)
-             action))))))
+                 (let ((expected-state (expected-state)))
+                   (if (not-unexpected-state? expected-state state)
+                       (begin
+                         (debug "This state is not unexpected.")
+                         (move-randomly state))
+                       (begin
+                         (debug "This state is statistically anomolous.")
+                         (debug "Pushing the expected-state unto expected-states.")
+                         (debug expected-state)
+                         (stack-push! expected-states expected-state)
+                         (unless (equal? previous-state state)
+                           (debug "Pushing the previous-state unto expected-states.")
+                           (debug previous-state)
+                           (stack-push! expected-states previous-state))
+                         (try-to-backtrack expected-state state))))))
+           (begin
+             (debug (stack->list expected-states))
+             (let ((expected-state (stack-peek expected-states)))
+               (if (equal? state expected-state)
+                   (begin
+                     (debug "We're at the expected state; popping expected states.")
+                     (stack-pop! expected-states)
+                     (iterate-over-goals goal? state))
+                   (begin
+                     (debug "We're not at the expected state; trying to backtrack.")
+                     (try-to-backtrack expected-state state)))))))
+     (lambda (state goal? score)
+       (if previous-action             ; Implied: previous-state, too.
+           (begin
+             (update-statistics! state)
+             (iterate-over-goals goal? state))
+           (move-randomly state))))))
 
 (simulate-navigation make-agent-random-walk
                      n-points: 100
-                     n-steps: 1000
+                     n-steps: 200
                      p-slippage: 0.3
                      animation-file: #f)
 
