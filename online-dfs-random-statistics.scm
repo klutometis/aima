@@ -75,13 +75,14 @@
                              (+ (point-y previous-point)
                                 (point-y previous-action)))))
                      (hash-table-walk coordinates
-                       (when (< (coordinate-time old-coordinate) time)
-                         (coordinate-time-set! old-coordinate time)
-                         (let ((old-point (coordinate-point old-coordinate)))
-                           (coordinate-point-set!
-                            old-coordinate
-                            (make-point (- (point-x old-point) delta-x)
-                                        (- (point-y old-point) delta-y)))))))))
+                       (lambda (state old-coordinate)
+                         (when (< (coordinate-time old-coordinate) time)
+                           (coordinate-time-set! old-coordinate time)
+                           (let ((old-point (coordinate-point old-coordinate)))
+                             (coordinate-point-set!
+                              old-coordinate
+                              (make-point (- (point-x old-point) delta-x)
+                                          (- (point-y old-point) delta-y))))))))))
                (hash-table-set!
                 coordinates
                 state
@@ -248,7 +249,8 @@
                            ", shape=circle, label=E, color=red"
                            "")))))
 
-         (write-dot-preamble 1600 900 "Random walk with error correction")
+         (write-dot-preamble 800 450 "Random walk with error correction")
+         ;; (write-dot-preamble 1600 900 "Random walk with error correction")
          ;; Let's just take the top one for now?
          (hash-table-walk state->state->actions
            (lambda (whence state->actions)
@@ -297,7 +299,7 @@
 
 (parameterize ((debug? #f))
   (simulate-navigation make-agent-random-walk
-                       n-points: 100
+                       n-points: 10
                        n-steps: 100
                        p-slippage: 0.3
                        animation-file: "online-dfs-random-statistics.avi"))

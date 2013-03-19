@@ -195,6 +195,10 @@
           (debug (agent-score agent))
           (when animation-file
             (finalize! animation-file)
-            (run (vt mplayer -really-quiet -vo fbdev2 -loop 0 ,animation-file))))))))
+            (run (sudo -E vt mplayer -really-quiet -vo fbdev2 -loop 0 ,animation-file))
+            ;; (run (sudo mplayer -vo fbdev2 -loop 0 ,animation-file))
+            ;; (run (vt mplayer -really-quiet -vo fbdev2 -loop 0 ,animation-file))
+            ;; (run (mplayer -really-quiet -loop 0 ,animation-file))
+            ))))))
 
 ;; Simulation:1 ends here
