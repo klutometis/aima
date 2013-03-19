@@ -6,6 +6,18 @@
 
 (use heap)
 
+(define (write-dot-preamble width height title)
+ (display "digraph G {")
+ (display "node [shape=point];")
+ (let ((width-in-inches (/ width 96))
+       (height-in-inches (/ height 96)))
+   (format #t "graph [fontsize=48, label=\"~a\", ratio=fill, viewport=\"~a,~a\", size=\"~a,~a!\", labelloc=t];"
+           title
+           (* width-in-inches 72)
+           (* height-in-inches 72)
+           width-in-inches
+           height-in-inches)))
+
 (define (make-agent-random-walk start next-frame)
   (make-agent
    start
@@ -16,7 +28,44 @@
          (previous-action #f)
          (expectations 0)
          (met-expectations 0)
-         (contingency-plans (make-stack)))
+         (contingency-plans (make-stack))
+         (coordinates (make-hash-table))
+         (labels (make-hash-table)))
+
+     (define (update-labels! state)
+       (unless (hash-table-exists? labels state)
+         (hash-table-set!
+          labels
+          state
+          (gensym))))
+
+     ;; Coordinates are a little different here: takes best-guess into
+     ;; account.
+     (define (update-coordinates! state)
+       (let* ((previous-coordinate
+               (hash-table-ref/default
+                coordinates
+                previous-state
+                origin)))
+         (let* ((possible-actions
+                 (hash-table-ref/default
+                  (hash-table-ref/default
+                   state->state->actions
+                   previous-state
+                   (make-hash-table))
+                  state
+                  (make-max-heap)))
+                (action
+                 (if (heap-empty? possible-actions)
+                     previous-action
+                     (heap-extremum possible-actions))))
+           (hash-table-set!
+            coordinates
+            state
+            (make-point (+ (point-x previous-coordinate)
+                           (point-x action))
+                        (+ (point-y previous-coordinate)
+                           (point-y action)))))))
 
      (define (update-statistics! state)
        (hash-table-update!
@@ -59,7 +108,7 @@
           state->actions)
         (lambda () (make-hash-table))))
 
-     (define (maybe-update-goals! previous-state expected-state state)
+     (define (update-goals! previous-state expected-state state)
        (if (not-unexpected-state? expected-state state)
            (begin
              (debug "This state is not unexpected."))
@@ -150,25 +199,72 @@
                    (begin
                      (debug "We're not at the expected state; trying to backtrack.")
                      (move-backwards-or-randomly expected-state state)))))))
+
+     (define (write-agent-as-dot state)
+       (let ((displayed (make-hash-table))
+             (linear-scale (* 5 72)))
+
+         (define (node-display state label)
+           (unless (hash-table-exists? displayed state)
+             (hash-table-set! displayed state #t)
+             (let ((coordinate
+                    (hash-table-ref/default coordinates state origin)))
+               (format #t "~a [pos=\"~a,~a\"];"
+                       label
+                       (* (point-x coordinate) linear-scale)
+                       (* (point-y coordinate) linear-scale)))))
+
+         (write-dot-preamble 1600 900 "Random walk with error correction")
+         ;; Let's just take the top one for now?
+         (hash-table-walk state->state->actions
+           (lambda (whence state->actions)
+             (hash-table-walk state->actions
+               (lambda (whither actions)
+                 (let ((whence-label (hash-table-ref labels whence))
+                       (whither-label (hash-table-ref labels whither)))
+                   (node-display whence whence-label)
+                   (node-display whither whither-label)
+                   (format #t "~a -> ~a [color=~a];"
+                           whence-label
+                           whither-label
+                           (if (equal? whence previous-state)
+                               "orange"
+                               "blue")))))))
+         (display "}")))
+
+     (define (write-agent-as-png png state)
+       (unless (zero? (hash-table-size state->state->actions))  
+       (let ((dot (create-temporary-file ".dot")))
+           (with-output-to-file dot
+             (lambda ()
+               (write-agent-as-dot state)))
+           (run (neato -n1 -Tpng -o ,png < ,dot)))))
+
      (lambda (state goal? score)
        (debug state goal?)
+       (update-labels! state)
+
+       (when previous-action
+         (update-statistics! state)
+         (update-coordinates! state))
+
+       (write-agent-as-png (next-frame) state)
+
        (if goal?
            (begin
              (debug "Found goal.")
              (reset!)
              zero-motion)
            (if previous-action         ; Implied: previous-state, too.
-               (begin
-                 (update-statistics! state)
-                 (let ((expected-state (expected-state)))
-                   (maybe-update-goals! previous-state expected-state state)
-                   (iterate-over-goals state)))
+               (let ((expected-state (expected-state)))
+                 (update-goals! previous-state expected-state state)
+                 (iterate-over-goals state))
                (move-randomly state)))))))
 
 (simulate-navigation make-agent-random-walk
                      n-points: 100
-                     n-steps: 1000
+                     n-steps: 100
                      p-slippage: 0.3
-                     animation-file: #f)
+                     animation-file: "online-dfs-random-statistics.avi")
 
 ;; Non-determinism-and-random-walk:1 ends here
