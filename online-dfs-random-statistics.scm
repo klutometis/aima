@@ -30,7 +30,8 @@
          (met-expectations 0)
          (contingency-plans (make-stack))
          (coordinates (make-hash-table))
-         (labels (make-hash-table)))
+         (labels (make-hash-table))
+         (time 0))
 
      (define (update-labels! state)
        (unless (hash-table-exists? labels state)
@@ -42,30 +43,54 @@
      ;; Coordinates are a little different here: takes best-guess into
      ;; account.
      (define (update-coordinates! state)
-       (let* ((previous-coordinate
+       (let* ((possible-actions
                (hash-table-ref/default
-                coordinates
-                previous-state
-                origin)))
-         (let* ((possible-actions
+                (hash-table-ref/default
+                 state->state->actions
+                 previous-state
+                 (make-hash-table))
+                state
+                (make-max-heap)))
+              (action
+               (if (heap-empty? possible-actions)
+                   previous-action
+                   (heap-extremum possible-actions))))
+         (let* ((previous-coordinate
                  (hash-table-ref/default
-                  (hash-table-ref/default
-                   state->state->actions
-                   previous-state
-                   (make-hash-table))
-                  state
-                  (make-max-heap)))
-                (action
-                 (if (heap-empty? possible-actions)
-                     previous-action
-                     (heap-extremum possible-actions))))
-           (hash-table-set!
-            coordinates
-            state
-            (make-point (+ (point-x previous-coordinate)
-                           (point-x action))
-                        (+ (point-y previous-coordinate)
-                           (point-y action)))))))
+                  coordinates
+                  previous-state
+                  (make-coordinate origin time)))
+                (previous-point
+                 (coordinate-point previous-coordinate)))
+           (if (hash-table-exists? coordinates state)
+               (let* ((coordinate (hash-table-ref coordinates state))
+                      (point (coordinate-point coordinate)))
+                 (when (< (coordinate-time coordinate) time)
+                   (let ((delta-x
+                          (- (point-x point)
+                             (+ (point-x previous-point)
+                                (point-x previous-action))))
+                         (delta-y
+                          (- (point-y point)
+                             (+ (point-y previous-point)
+                                (point-y previous-action)))))
+                     (hash-table-walk coordinates
+                       (when (< (coordinate-time old-coordinate) time)
+                         (coordinate-time-set! old-coordinate time)
+                         (let ((old-point (coordinate-point old-coordinate)))
+                           (coordinate-point-set!
+                            old-coordinate
+                            (make-point (- (point-x old-point) delta-x)
+                                        (- (point-y old-point) delta-y)))))))))
+               (hash-table-set!
+                coordinates
+                state
+                (make-coordinate
+                 (make-point (+ (point-x previous-point)
+                                (point-x action))
+                             (+ (point-y previous-point)
+                                (point-y action)))
+                 time))))))
 
      (define (update-statistics! state)
        (hash-table-update!
@@ -142,7 +167,8 @@
      (define (reset!)
        (set! previous-state #f)
        (set! previous-action #f)
-       (set! contingency-plans (make-stack)))
+       (set! contingency-plans (make-stack))
+       (inc! time))
 
      (define (move state action)
        (set! previous-state state)
@@ -202,17 +228,25 @@
 
      (define (write-agent-as-dot state)
        (let ((displayed (make-hash-table))
-             (linear-scale (* 5 72)))
+             (linear-scale (* 5 72))
+             (contingencies (map (lambda (contingency-plan)
+                                   (contingency-plan state))
+                                 (stack->list contingency-plans))))
 
          (define (node-display state label)
            (unless (hash-table-exists? displayed state)
              (hash-table-set! displayed state #t)
              (let ((coordinate
-                    (hash-table-ref/default coordinates state origin)))
-               (format #t "~a [pos=\"~a,~a\"];"
+                    (hash-table-ref/default coordinates
+                                            state
+                                            (make-coordinate origin time))))
+               (format #t "~a [pos=\"~a,~a\"~a];"
                        label
-                       (* (point-x coordinate) linear-scale)
-                       (* (point-y coordinate) linear-scale)))))
+                       (* (point-x (coordinate-point coordinate)) linear-scale)
+                       (* (point-y (coordinate-point coordinate)) linear-scale)
+                       (if (member state contingencies equal?)
+                           ", shape=circle, label=E, color=red"
+                           "")))))
 
          (write-dot-preamble 1600 900 "Random walk with error correction")
          ;; Let's just take the top one for now?
@@ -261,10 +295,11 @@
                  (iterate-over-goals state))
                (move-randomly state)))))))
 
-(simulate-navigation make-agent-random-walk
-                     n-points: 100
-                     n-steps: 100
-                     p-slippage: 0.3
-                     animation-file: "online-dfs-random-statistics.avi")
+(parameterize ((debug? #f))
+  (simulate-navigation make-agent-random-walk
+                       n-points: 100
+                       n-steps: 100
+                       p-slippage: 0.3
+                       animation-file: "online-dfs-random-statistics.avi"))
 
 ;; Non-determinism-and-random-walk:1 ends here
