@@ -16,8 +16,7 @@
          (previous-action #f)
          (expectations 0)
          (met-expectations 0)
-         ;; Call this: contingency-plans.
-         (expected-states (make-stack)))
+         (contingency-plans (make-stack)))
      (define (update-statistics! state)
        (hash-table-update!
         state->action->states
@@ -64,14 +63,14 @@
              (debug "This state is not unexpected."))
            (begin
              (debug "This state is statistically anomolous.")
-             (debug "Pushing the expected-state unto expected-states.")
+             (debug "Pushing the expected-state unto contingency-plans.")
              (debug expected-state)
-             ;; (stack-push! expected-states expected-state)
-             (stack-push! expected-states (lambda (state) expected-state))
+             ;; (stack-push! contingency-plans expected-state)
+             (stack-push! contingency-plans (lambda (state) expected-state))
              (unless (equal? previous-state state)
-               (debug "Pushing the previous-state unto expected-states.")
+               (debug "Pushing the previous-state unto contingency-plans.")
                (debug previous-state)
-               (stack-push! expected-states (lambda (state) previous-state))))))
+               (stack-push! contingency-plans (lambda (state) previous-state))))))
      (define (expected-state)
        (let* ((possible-states
                (hash-table-ref/default
@@ -89,7 +88,7 @@
      (define (reset!)
        (set! previous-state #f)
        (set! previous-action #f)
-       (set! expected-states (make-stack)))
+       (set! contingency-plans (make-stack)))
      (define (move state action)
        (set! previous-state state)
        (set! previous-action action)
@@ -116,28 +115,28 @@
                (move state return))
              (begin
                (debug "Can't return.")
-               (debug "Pushing a contingency unto expected states.")
-               (stack-push! expected-states
+               (debug "Pushing a contingency unto contingency plans.")
+               (stack-push! contingency-plans
                             (lambda (state)
                               (if (equal? state expected-state)
                                   expected-state
                                   state)))
                (move-randomly state)))))
      (define (iterate-over-goals state)
-       (if (stack-empty? expected-states)
+       (if (stack-empty? contingency-plans)
            (begin
              (debug "There are no expected states.")
              (move-randomly state))
            (begin
              ;; (debug (map (lambda (plan) (plan state))
-             ;;             (stack->list expected-states)))
-             (debug (stack-count expected-states))
-             (let ((expected-state ((stack-peek expected-states) state)))
+             ;;             (stack->list contingency-plans)))
+             (debug (stack-count contingency-plans))
+             (let ((expected-state ((stack-peek contingency-plans) state)))
                (debug expected-state state)
                (if (equal? state expected-state)
                    (begin
-                     (debug "We're at the expected state; popping expected states.")
-                     (stack-pop! expected-states)
+                     (debug "We're at the expected state; popping contingency plans.")
+                     (stack-pop! contingency-plans)
                      (iterate-over-goals state))
                    (begin
                      (debug "We're not at the expected state; trying to backtrack.")
