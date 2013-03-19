@@ -17,6 +17,7 @@
          (expectations 0)
          (met-expectations 0)
          (contingency-plans (make-stack)))
+
      (define (update-statistics! state)
        (hash-table-update!
         state->action->states
@@ -57,6 +58,7 @@
            (lambda () (make-max-heap)))
           state->actions)
         (lambda () (make-hash-table))))
+
      (define (maybe-update-goals! previous-state expected-state state)
        (if (not-unexpected-state? expected-state state)
            (begin
@@ -71,6 +73,7 @@
                (debug "Pushing the previous-state unto contingency-plans.")
                (debug previous-state)
                (stack-push! contingency-plans (lambda (state) previous-state))))))
+
      (define (expected-state)
        (let* ((possible-states
                (hash-table-ref/default
@@ -82,21 +85,26 @@
                 (make-max-heap))))
          (and (not (heap-empty? possible-states))
               (heap-extremum possible-states))))
+
      (define (not-unexpected-state? expected-state state)
        (or (not expected-state)
            (equal? state expected-state)))
+
      (define (reset!)
        (set! previous-state #f)
        (set! previous-action #f)
        (set! contingency-plans (make-stack)))
+
      (define (move state action)
        (set! previous-state state)
        (set! previous-action action)
        (debug action)
        action)
+
      (define (move-randomly state)
        (debug "Moving randomly.")
        (move state (list-ref state (random (length state)))))
+
      (define (move-backwards-or-randomly expected-state state)
        (let* ((return
                (hash-table-ref/default
@@ -122,6 +130,7 @@
                                   expected-state
                                   state)))
                (move-randomly state)))))
+
      (define (iterate-over-goals state)
        (if (stack-empty? contingency-plans)
            (begin
