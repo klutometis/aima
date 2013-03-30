@@ -251,7 +251,10 @@
 
          (write-dot-preamble 800 450 "Random walk with error correction")
          ;; (write-dot-preamble 1600 900 "Random walk with error correction")
-         ;; Let's just take the top one for now?
+
+         ;; Let's just take the top one for now? Theoretically, we'd
+         ;; take state->action->states; make solid the top and dash
+         ;; the rest.
          (hash-table-walk state->state->actions
            (lambda (whence state->actions)
              (hash-table-walk state->actions
