@@ -249,8 +249,48 @@
                            ", shape=circle, label=E, color=red"
                            "")))))
 
-         (write-dot-preamble 800 450 "Random walk with error correction")
-         ;; (write-dot-preamble 1600 900 "Random walk with error correction")
+         ;; (write-dot-preamble 800 450 "Random walk with error correction")
+         (write-dot-preamble 1600 900 "Random walk with error correction")
+
+         (hash-table-walk state->action->states
+           (lambda (whence action->states)
+             (let ((whence-label (hash-table-ref labels whence)))
+               (node-display whence whence-label)
+               (hash-table-walk action->states
+                 (lambda (action whithers)
+                   (let ((whithers (reverse (heap->list whithers))))
+                     (let ((solid (car whithers))
+                           (non-solids (cdr whithers)))
+                       (let ((solid-label (hash-table-ref labels solid))
+                             (non-solids-labels
+                              (map (lambda (non-solid)
+                                     (hash-table-ref labels non-solid))
+                                   non-solids)))
+                         (node-display solid solid-label)
+                         (format #t "~a -> ~a [color=~a];"
+                                 whence-label
+                                 solid-label
+                                 (if (or (member whence contingencies equal?)
+                                         (member solid contingencies equal?))
+                                     "red"
+                                     (if (and (equal? whence previous-state)
+                                              (equal? solid state))
+                                         "orange"
+                                         "blue")))
+                         (for-each (lambda (non-solid non-solid-label)
+                                     (node-display non-solid non-solid-label)
+                                     (format #t "~a -> ~a [style=dashed, color=~a];"
+                                             whence-label
+                                             non-solid-label
+                                             (if (or (member whence contingencies equal?)
+                                                     (member non-solid contingencies equal?))
+                                                 "red"
+                                                 (if (and (equal? whence previous-state)
+                                                          (equal? non-solid state))
+                                                     "orange"
+                                                     "blue"))))
+                           non-solids
+                           non-solids-labels)))))))))
 
          ;; Let's just take the top one for now? Theoretically, we'd
          ;; take state->action->states; make solid the top and dash
