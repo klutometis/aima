@@ -255,20 +255,20 @@
          ;; Let's just take the top one for now? Theoretically, we'd
          ;; take state->action->states; make solid the top and dash
          ;; the rest.
-         (hash-table-walk state->state->actions
-           (lambda (whence state->actions)
-             (hash-table-walk state->actions
-               (lambda (whither actions)
-                 (let ((whence-label (hash-table-ref labels whence))
-                       (whither-label (hash-table-ref labels whither)))
-                   (node-display whence whence-label)
-                   (node-display whither whither-label)
-                   (format #t "~a -> ~a [color=~a];"
-                           whence-label
-                           whither-label
-                           (if (equal? whence previous-state)
-                               "orange"
-                               "blue")))))))
+         ;; (hash-table-walk state->state->actions
+         ;;   (lambda (whence state->actions)
+         ;;     (hash-table-walk state->actions
+         ;;       (lambda (whither actions)
+         ;;         (let ((whence-label (hash-table-ref labels whence))
+         ;;               (whither-label (hash-table-ref labels whither)))
+         ;;           (node-display whence whence-label)
+         ;;           (node-display whither whither-label)
+         ;;           (format #t "~a -> ~a [color=~a];"
+         ;;                   whence-label
+         ;;                   whither-label
+         ;;                   (if (equal? whence previous-state)
+         ;;                       "orange"
+         ;;                       "blue")))))))
          (display "}")))
 
      (define (write-agent-as-png png state)
