@@ -196,6 +196,7 @@
           (when animation-file
             (finalize! animation-file)
             (run (sudo -E vt mplayer -really-quiet -vo fbdev2 -loop 0 ,animation-file))
+            ;; sudo mplayer -really-quiet -vo fbdev2 -vf scale=1440:900 online-dfs-random-statistics.avi
             ;; (run (sudo mplayer -vo fbdev2 -loop 0 ,animation-file))
             ;; (run (vt mplayer -really-quiet -vo fbdev2 -loop 0 ,animation-file))
             ;; (run (mplayer -really-quiet -loop 0 ,animation-file))
