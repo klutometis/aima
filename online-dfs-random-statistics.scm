@@ -340,10 +340,10 @@
                  (iterate-over-goals state))
                (move-randomly state)))))))
 
-(parameterize ((debug? #t))
+(parameterize ((debug? #f))
   (simulate-navigation make-agent-random-walk
-                       n-points: 10
-                       n-steps: 100
+                       n-points: 100
+                       n-steps: 1000
                        p-slippage: 0.3
                        animation-file: "online-dfs-random-statistics.avi"
                        ;; animation-file: #f
