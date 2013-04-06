@@ -165,7 +165,10 @@
               (let* ((goal? (equal? agent-point goal))
                      ;; Initial hypothesis: agent dictates a move.
                      (move ((agent-program agent) relative-points goal? (agent-score agent)))
-                     ;; We may revise this to wind up somewhere else.
+                     ;; We may revise this to wind up somewhere else
+                     ;; (ends up being less than p-slippage, because
+                     ;; it may randomly select the point it meant to
+                     ;; move to).
                      (move (if (< (random-real) p-slippage)
                                ;; Add the zero-motion case.
                                (list-ref (cons zero-motion relative-points)
