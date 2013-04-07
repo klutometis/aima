@@ -342,8 +342,8 @@
 
 (parameterize ((debug? #f))
   (simulate-navigation make-agent-random-walk
-                       n-points: 100
-                       n-steps: 1000
+                       n-points: 20
+                       n-steps: 200
                        p-slippage: 0.3
                        animation-file: "online-dfs-random-statistics.avi"
                        ;; animation-file: #f
