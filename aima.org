@@ -4540,6 +4540,76 @@
   #+BEGIN_SRC scheme :comments link :tangle learning-real-time-a-star.scm :shebang #!/usr/bin/env chicken-scheme
     (display harro)  
   #+END_SRC
+
+  #+BEGIN_QUOTE
+  The LRTA* algorithm was developed by Korf (1990) as part of an
+  investigation into real-time search for environments in which the
+  agent must act after searching for only a fixed amount of time (a
+  common situation in two-player games). LRTA* is in fact a special
+  case of reinforcement learning algorithms for stochastic
+  environments (Bano et al., 1995). Its policy of optimism under
+  uncertainty—always head for the closest unvisited state—can result
+  in an exploration pattern that is less efficient in the uninformed
+  case than simple depth-first search (Koenig, 2000). Dasgupta et al.
+  (1994) show that online iterative deepening search is optimally
+  efficient for finding a goal in a uniform tree with no heuristic
+  information. Sev- eral informed variants on the LRTA* theme have
+  been developed with different methods for searching and updating
+  within the known portion of the graph (Pemberton and Korf, 1992). As
+  yet, there is no good understanding of how to find goals with
+  optimal efficiency when using heuristic information.
+  #+END_QUOTE
+** Korf
+   - A related drawback of A * and IDA* is that they must search all
+     the way to a solution before making a commitment to even the
+     first move in the solution. The reason is that an optimal first
+     move cannot be guararteed until the entire solution is found and
+     shown to be at least as good as any other solution. As a result,
+     A * and IDA* are run to completion in a planning or simulation
+     phase before the first move of the resulting solution is executed
+     in the real world.
+   - Whereas the focus on optimal solutions has seriously limited the
+     applicabality of heuristic search in single-agent problems, the
+     search paradigm has been spectacularly succesful in two-player
+     games.
+   - The goal of this research is to apply the assumptions of
+     two-player games, namely limited search horizon and commitment to
+     moves in constant time, to single-agent heuristic searches.
+   - In RTA*, the merit of a node n is f(n) = g(n) + h(n), as in A*.
+     However, unlike A*, the interpretation of g(n) in RTA* is the
+     actual distance of node n from the current state of the problem
+     solver, rather than from the original initial state.
+   - The key difference between RTA* and A* is that in RTA* the merit
+     of every node is measured relative to the current position of the
+     problem solver, and the initial state is irrelevant.
+   - RTA* is simply a best-first search given this slightly different
+     cost function.
+   - The algorithm maintains in a hash table a list of those nodes
+     that have been visited by an actual move of the problem solver,
+     together with an h value for those nodes.
+   - At each cycle of the algorithm, the current state is expanded,
+     generating its neighbors, and the heuristic function, possibly
+     augment by lookahead search, is applied to each state which is
+     not in the hash table.
+   - For those states in the table, the stored value of h is used
+     instead.
+   - In addition, the cost of the edge to each neighboring state is
+     added to this value, resulting in an f value for each neighbor of
+     the current state.
+   - The node with the minimum f-value is chose for the new current
+     state and a move to that state is executed.
+     - This implies that h(s) is 0?
+   - At the same time, the previous current state is stored in the
+     hash table, and associated with it is the second best f value.
+   - The second best f value is the best of the alternatives that were
+     not chosen, and represents the estimated h cost of solving the
+     problem by returning to this state, from the perspective of the
+     new current state.
+   - If there is a tie among the best values, then the second best
+     will equal the best.
+   - The running time is also linear in the number of moves made. . .
+     Even though the lookahead requires time that is exponential in
+     the search depth, the search depth is bounded by a constant.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
