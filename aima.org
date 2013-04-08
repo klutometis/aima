@@ -4610,6 +4610,64 @@
    - The running time is also linear in the number of moves made. . .
      Even though the lookahead requires time that is exponential in
      the search depth, the search depth is bounded by a constant.
+   - For each of the children c_i of x, if c_i is not in the table,
+     minimin search will be used to compute f_x(c_i).
+   - Both minimin lookahead search and RTA* must be significantly
+     modified to guarantee locally optimal decisions on a graph.
+   - The only way to remove such systematic biases, without further
+     information, is to break ties randomly.
+   - A more sophisticated approach to tie-breaking would use a
+     secondary search to discriminate between tied alternatives.
+     - h(n) = 0 until we find the goal and come up with absolute
+       coordinates; that’s a little tricky: we need to be in the same
+       time space as the goal to trust the absolute coordinates, don’t
+       we?
+   - Solution lengths tend to decrease with increasing search depth.
+   - Learning RTA*: successively solving multiple problem instances in
+     the same problem space with the same set of goals.
+   - The information saved from one trial to the next is the hash
+     table of values recorded for previously visited states.
+   - If the best estimate turns out to be correct, then storing the
+     second best value can result in inflated values for some states.
+     These inflated values will direct the agent in the wrong
+     direction on subsequent problem solving trials.
+   - This difficulty can be overcome simply by modifying the algorithm
+     to store the best value in the previous state instead of the
+     second best value.
+   - LRTA* retains the completeness property of RTA*; it does not,
+     however, always make locally optimal decisions.
+   - Will bounce back and forth between the 5 states until it “fills
+     in the hole.”
+   - Repeated problem solving trials cause the heuristic values to
+     converge to their exact values.
+   - Heuristic values are admissible: do not overestimate the distance
+     to the nearest goal. Ties are broken randomly.
+     - h(n) = 0 until appropriate straight-line-heuristic; that’s some
+       work. Let’s do it.
+   - As before, if node n has never been visited, then h(n) is its
+     heuristic static evaluation.
+     - What the fuck is this?
+   - Otherwise, h(n) is the heuristic value stored with node n the
+     last time it was visited by LRTA*.
+   - A node n is correct if h(n) = h*(n), where h*(n) is the actual
+     cost of an optimal path from node n to a goal node.
+   - When a node n is visited by LRTA*, its new value h(n) is equal to
+     the minimum value of k(n, n') + h(n') over all neighbors of n' of
+     n, where k(n, n') is the cost of the edge from n to n'.
+   - Consider a path (n_s, n_2, ..., n_g) about to be traversed by
+     LRTA* from an initial state n_s to a goal state n_g. Since we
+     assume non-overestimating heuristic values, h(n_g) = 0 = h*(n_g).
+     - The “optimism under uncertainty” principle dictates unknown
+       h(n) are 0, right? “One important detail is that actions that
+       have not yet been tried in a state s are always assumed to lead
+       immediately to the goal with the least possible cost, namely
+       h(s).”
+   - The initial heuristic values are all zero, demonstrating that
+     perfect values can be learned with no initial information.
+     - Voilà! A refinement of this is: if we have straight-line
+       distance (i.e. we’re in a contiguous absolute plane which
+       contains the goal in the same time-series), and the
+       straight-line distance is greater than h(n), use straight-line.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
