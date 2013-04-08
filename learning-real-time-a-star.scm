@@ -88,6 +88,15 @@
                (set! previous-state state)
                action)))))))
 
+(define (make-agent-random-walk start next-frame)
+  (make-agent
+   start
+   0
+   (lambda (points goal? score)
+     (if goal?
+         zero-motion
+         (list-ref points (random (length points)))))))
+
 (simulate-navigation make-agent-lrta*
                      n-nodes: 100
                      n-steps: 100
