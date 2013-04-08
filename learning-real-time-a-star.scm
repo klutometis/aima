@@ -21,6 +21,7 @@
            (+ (point-distance origin previous-action)
               (hash-table-ref cost-estimate state))
            0))
+
      ;; This is slow in the sense that we create hash-tables for every
      ;; non-existent entry; or not? Default memoizes, I think.
      (define (result-ref state action)
@@ -31,11 +32,48 @@
          (make-hash-table))
         action
         #f))
+
+     (define (update-result! state)
+       (hash-table-update!/default
+        result
+        previous-state
+        (lambda (action->state)
+          (hash-table-set!
+           action->state
+           previous-action
+           state)
+          action->state)
+        (make-hash-table)))
+
+     (define (update-cost-estimate!)
+       (let ((minimum-cost
+              (apply
+               min
+               (map (lambda (action)
+                      (lrta*-cost
+                       previous-state
+                       action
+                       (result-ref previous-state action)))
+                    previous-state))))
+         (hash-table-set! cost-estimate previous-state minimum-cost)))
+
+     (define (cheapest-action state)
+       (let ((actions (make-min-heap)))
+         (for-each (lambda (action)
+                     (heap-insert! actions
+                                   (lrta*-cost state action (result-ref state action))
+                                   action))
+           state)
+         (heap-extremum actions)))
+
+     (define (reset-state!)
+       (set! previous-state #f)
+       (set! previous-action #f))
+
      (lambda (state goal? score)
        (if goal?
            (begin
-             (set! previous-state #f)
-             (set! previous-action #f)
+             (reset-state!)
              zero-motion)
            (begin
              (unless (hash-table-exists? cost-estimate state)
@@ -43,38 +81,12 @@
                ;; distance, if we have one.
                (hash-table-set! cost-estimate state 0))
              (when previous-state
-               (hash-table-update!/default
-                result
-                previous-state
-                (lambda (action->state)
-                  (hash-table-set!
-                   action->state
-                   previous-action
-                   state)
-                  action->state)
-                (make-hash-table))
-               (let ((minimum-cost
-                      (apply
-                       min
-                       (map (lambda (action)
-                              (lrta*-cost
-                               previous-state
-                               action
-                               (result-ref previous-state action)))
-                            previous-state))))
-                 (debug minimum-cost)
-                 (hash-table-set! cost-estimate previous-state minimum-cost)))
-             (let ((actions (make-min-heap)))
-               (for-each (lambda (action)
-                           (heap-insert! actions
-                                         (lrta*-cost state action (result-ref state action))
-                                         action))
-                 state)
-               ;; (debug (heap->alist actions))
-               (let ((action (heap-extremum actions)))
-                 (set! previous-action action)
-                 (set! previous-state state)
-                 action))))))))
+               (update-result! state)
+               (update-cost-estimate!))
+             (let ((action (cheapest-action state)))
+               (set! previous-action action)
+               (set! previous-state state)
+               action)))))))
 
 (simulate-navigation make-agent-lrta*
                      n-nodes: 100
