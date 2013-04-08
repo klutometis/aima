@@ -4008,6 +4008,9 @@
    online depth-first-search later.
 
    God, it would be great to integrate it with a LRTA*, too.
+
+   See [[http://www.graphviz.org/content/external-labels][external labels with graphviz]], by the way; that way, we can
+   view the heuristic.
 ** TODO Non-determinism and random-walk
    Let’s see if we can try it out on the random-walk, to avoid the
    depth-first overhead?
