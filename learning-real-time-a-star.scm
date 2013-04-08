@@ -99,7 +99,7 @@
 
 (simulate-navigation make-agent-lrta*
                      ;; make-agent-random-walk
-                     n-nodes: 10
-                     n-steps: 1000)
+                     n-nodes: 100
+                     n-steps: 10000)
 
 ;; 4\.13:1 ends here
