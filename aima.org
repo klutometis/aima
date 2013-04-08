@@ -4534,6 +4534,12 @@
    - Diverge? Depth-first back.
    - Stastistical model of “next” node.
    - Random distribution of probabilities, some asymmetrical.
+* TODO 4.13
+  Let’s see if we can cook up an LRTA*.
+
+  #+BEGIN_SRC scheme :comments link :tangle learning-real-time-a-star.scm :shebang #!/usr/bin/env chicken-scheme
+    (display harro)  
+  #+END_SRC
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
