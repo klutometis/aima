@@ -4008,9 +4008,6 @@
    online depth-first-search later.
 
    God, it would be great to integrate it with a LRTA*, too.
-
-   See [[http://www.graphviz.org/content/external-labels][external labels with graphviz]], by the way; that way, we can
-   view the heuristic.
 ** TODO Non-determinism and random-walk
    Let’s see if we can try it out on the random-walk, to avoid the
    depth-first overhead?
@@ -4562,6 +4559,14 @@
   yet, there is no good understanding of how to find goals with
   optimal efficiency when using heuristic information.
   #+END_QUOTE
+
+  See [[http://www.graphviz.org/content/external-labels][external labels with graphviz]], by the way; that way, we can
+  view the heuristic.
+  
+  The real payoffs for this thing start to become apparent around
+  100,000 iterations on a 10 node graph; when we can expect 600,000
+  points from LRTA* and 10,000 from a random walker.
+
 ** Korf
    - A related drawback of A * and IDA* is that they must search all
      the way to a solution before making a commitment to even the
