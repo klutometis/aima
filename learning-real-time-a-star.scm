@@ -98,8 +98,8 @@
          (list-ref points (random (length points)))))))
 
 (simulate-navigation make-agent-lrta*
-                     n-nodes: 100
-                     n-steps: 100
-                     )
+                     ;; make-agent-random-walk
+                     n-nodes: 10
+                     n-steps: 1000)
 
 ;; 4\.13:1 ends here
