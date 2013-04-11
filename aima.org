@@ -6260,6 +6260,7 @@
      - Partially mapped crossover (PMX): selects two random cut points
        . . .
 * TODOs
+** TODO Integrate the online-search stuff with =aima-chicken=.
 ** TODO Maybe search should be in its own package; it's useful.
 ** TODO Need a generic animation facility.
 ** TODO What the hell: let's add some Bach or Liszt to the animations.
