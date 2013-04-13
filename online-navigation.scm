@@ -202,7 +202,7 @@
             ;; sudo mplayer -really-quiet -vo fbdev2 -vf scale=1440:900 online-dfs-random-statistics.avi
             ;; (run (sudo mplayer -vo fbdev2 -loop 0 ,animation-file))
             ;; (run (vt mplayer -really-quiet -vo fbdev2 -loop 0 ,animation-file))
-            (run (mplayer -really-quiet -loop 0 ,animation-file))
-            ))))))
+            (run (mplayer -really-quiet -loop 0 ,animation-file)))
+          (agent-score agent))))))
 
 ;; Simulation:1 ends here
