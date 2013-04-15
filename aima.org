@@ -6390,6 +6390,34 @@
      - Select the variations to be explored by some process.
        - [Anticipating alpha-beta pruning; AIMA, p. 191: “Alpha-beta
          pruning was described by Hart and Edwards (1961).”]
+       - [No, I think this is forward pruning.]
+     - Stastistical [stochastic] element: choose at random from two
+       equally evaluated moves.
+     - Strength of the play can be adjusted bychanging the depth of
+       calculation and by omitting or adding terms to the evaluation
+       function.
+     - Self-improving, higher-level program changes the terms and
+       coefficients.
+     - Material advantage
+     - Pawn formation
+       - Backward, isolated, doubled pawns
+       - Control of center
+       - Weakness of pawns near king
+       - Pawns on opposite colour squares from bishop
+       - Passed pawns
+     - Positions
+       - Advanced knights
+       - Rook on open file
+       - Rook on seventh rank
+       - Doubled rooks
+     - Attacks, options
+       - Pieces requred for gaurding functions, committed and with
+         limited mobility
+       - Attacks on pieces which give one player an option of exchanging
+       - Attacks on squares adjacent to king
+       - Pins, where the pinned piece is of value not greater than the
+         pinning piece
+     - Mobility
 ** Lectures
 *** 1
     - AI: mapping from sensors to actuators
