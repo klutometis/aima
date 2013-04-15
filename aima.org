@@ -6304,6 +6304,92 @@
    - Utility of node expansion
    - Metareasoning
    - Goal-directed reasoning
+   - Dynamic programming, retrograde analysis
+   - Bidirectional search
+   - 
+*** Chess
+    See [[http://en.wikipedia.org/wiki/Computer_chess#Leaf_evaluation][here]]:
+
+    #+BEGIN_QUOTE
+    When counting up the material for each side, typical values for
+    pieces are 1 point for a pawn, 3 points for a knight or bishop, 5
+    points for a rook, and 9 points for a queen.
+
+    Evaluation functions take many factors into account, such as pawn
+    structure, the fact that a pair of bishops are usually worth more,
+    centralized pieces are worth more, and so on.
+    #+END_QUOTE
+
+**** Shannon, “Programming a Computer to Play Chess”
+     - Perfect information
+     - No practical method is known for determining to which of the
+       three categories a general position belongs. If there were
+       chess would lose most of its interest as a game.
+     - Evaluation function
+     - By working backward from the end one can determine thether
+       there is a forced win, the position is a draw or lost.
+       - [Thus anticipating minimax from leaves]
+     - Problem is not that of designing a machine to play perfect
+       chess (which is quite impractical) nor one which merely plays
+       legal chess (which is trivial).
+     - Strategy for chess
+       - [What RN refer to as a “policy”? P. 176: “A computer, on the
+         other hand, can completely /solve/ the endgame by producing a
+         *policy*, which is a mapping from every possible state to the
+         best move in that state.” Not entirely so, then?]
+     - “Pure” strategy: position -> same action; “mixed”: statistical
+       elements
+       - [An almost clairvoyant article?]
+     - Relative values of queen, rook, bishop, knight and pawn are
+       about 9, 5, 3, 3, 1, respectively.
+     - Rooks should be placed on open files.
+     - Backword, isolated and doubled pawns are weak.
+     - An exposed king is a weakness (until the endgame)
+     - $200(K - K') + 9(Q - Q') + 5(R - R') + 3(B - B' + N - N') +
+       (P - P') - 0.5(D - D' + S - S' + I - I') + 0.1(M - M')$
+     - D, S, I: doubled, backward and isolated pawns
+       - [Probably need some Gnu Chess to show this wesen.]
+     - Evaluation functions applied in relatively quiescent positions.
+       QxQ: black will immediately recover it. Meaningless to
+       calculate an evaluation function of the general type given
+       above during the course of a combination or a series of
+       exchanges.
+       - [AIMA, p. 174: “The evaluation function should be applied
+         only to positions that are *quiescent* — that is, unlikely to
+         exhibit wild swings in value in the near future. Nonquiescent
+         positions can be expanded further until quiescent positions
+         are reached. This extra search is called a *quiescent
+         search*; sometimes it is restricted to consider only certain
+         types of moves, such as capture moves, that will quickly
+         resolve the uncertainties in the position.”]
+     - Combinations, and forced variations in general, are better
+       accounted for by examination of specific variations.
+     - A certain number of variatinos are investigated move by move
+       until a more or less quiescent position is reached and at this
+       point something of the nature of an evaluation is applied to
+       the resulting position.
+     - Type A strategy
+       - [Minmax to some specific depth?]
+       - [This paper came out four years before FORTRAN, the first
+         high-level programming language.]
+     - “Arithmetic organ,” “program”
+     - The rather Procrustean tactics of forcing chess into an
+       arithmetic computer are dictated by economic considerations.
+       Ideally, we would like to design a special computer for chess
+       containing, in place of the arithmetic organ, a “chess organ”
+       specifically designed to perform the simple chess calculations.
+       - [“A Procrustean solution is the undesirable practice of
+         tailoring data to fit its container or some other
+         preconceived structure.” See [[http://en.wikipedia.org/wiki/Procrustes][Procrustes]].]
+     - Three phases: opening, middle end.
+     - One further number $\lambda$ will be $+1$ or $-1$ according as
+       it is White’s or Black’s move.
+     - Examine forceful variations out as far as possible and evaluate
+       only at reasonable positions, where some quasi-stability has
+       been established.
+     - Select the variations to be explored by some process.
+       - [Anticipating alpha-beta pruning; AIMA, p. 191: “Alpha-beta
+         pruning was described by Hart and Edwards (1961).”]
 ** Lectures
 *** 1
     - AI: mapping from sensors to actuators
