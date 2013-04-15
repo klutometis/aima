@@ -30,7 +30,9 @@
          (previous-state #f)
          (previous-action #f)
          (time 0)
-         (labels (make-hash-table)))
+         (labels (make-hash-table))
+         (goal #f)
+         (start #f))
      (define (lrta*-cost previous-state previous-action state)
        (if state
            (+ (point-distance origin previous-action)
@@ -70,6 +72,7 @@
                        action
                        (result-ref previous-state action)))
                     previous-state))))
+         (debug minimum-cost)
          (hash-table-set! cost-estimate previous-state minimum-cost)))
 
      (define (cheapest-action state)
@@ -80,11 +83,6 @@
                                    action))
            state)
          (heap-extremum actions)))
-
-     (define (reset-state!)
-       (set! previous-state #f)
-       (set! previous-action #f)
-       (inc! time))
 
      (define (update-labels! state)
        (unless (hash-table-exists? labels state)
@@ -137,17 +135,23 @@
              (linear-scale (* 5 72)))
 
          (define (node-display state label)
+           ;; (debug state goal (equal? state goal))
            (unless (hash-table-exists? displayed state)
              (hash-table-set! displayed state #t)
              (let ((coordinate
                     (hash-table-ref/default coordinates
                                             state
                                             (make-coordinate origin time))))
-               (format #t "~a [pos=\"~a,~a\", xlabel=\"~,2f\"];"
+               (format #t "~a [pos=\"~a,~a\", xlabel=\"~,2f\"~a];"
                        label
                        (* (point-x (coordinate-point coordinate)) linear-scale)
                        (* (point-y (coordinate-point coordinate)) linear-scale)
-                       (hash-table-ref cost-estimate state)))))
+                       (hash-table-ref cost-estimate state)
+                       (if (equal? state goal)
+                           ", shape=circle, label=E"
+                           (if (equal? state start)
+                               ", shape=circle, label=S"
+                               ""))))))
 
          ;; (write-dot-preamble 800 450 "Random walk with error correction")
          (write-dot-preamble 1600 900 "LRTA*")
@@ -180,28 +184,42 @@
              (write-agent-as-dot state)))
          (run (neato -n1 -Tpng -o ,png < ,dot))))
 
+     (define (reset-state! state)
+       (set! previous-state #f)
+       (set! previous-action #f)
+       (set! goal state)
+       (set! start #f)
+       (inc! time))
+
      (lambda (state goal? score)
+       (unless start
+         (set! start state))
+
        (update-labels! state)
+
+       (unless (hash-table-exists? cost-estimate state)
+         ;; We could refine this by providing the Euclidian
+         ;; distance, if we have one.
+         (hash-table-set! cost-estimate state 0))
+
        (when previous-state
-         (update-coordinates! state))
+         (update-coordinates! state)
+         (update-result! state)
+         (update-cost-estimate!))
+
+
        (unless (zero? (hash-table-size result))
          (write-agent-as-png (next-frame) state))
+
        (if goal?
            (begin
-             (reset-state!)
+             (debug "GOAL!")
+             (reset-state! state)
              zero-motion)
-           (begin
-             (unless (hash-table-exists? cost-estimate state)
-               ;; We could refine this by providing the Euclidian
-               ;; distance, if we have one.
-               (hash-table-set! cost-estimate state 0))
-             (when previous-state
-               (update-result! state)
-               (update-cost-estimate!))
-             (let ((action (cheapest-action state)))
-               (set! previous-action action)
-               (set! previous-state state)
-               action)))))))
+           (let ((action (cheapest-action state)))
+             (set! previous-action action)
+             (set! previous-state state)
+             action))))))
 
 (define (make-agent-random-walk start next-frame)
   (make-agent
@@ -214,8 +232,8 @@
 
 (simulate-navigation make-agent-lrta*
                      ;; make-agent-random-walk
-                     n-nodes: 10
-                     n-steps: 100
+                     n-points: 100
+                     n-steps: 1000
                      animation-file: "learning-real-time-a-star.avi")
 
 ;; 4\.13:1 ends here
