@@ -6070,6 +6070,240 @@
       rather than strings; expansion trees: splicing subtrees rather
       than substrings. Guarantees that offspring all well-formed
       expressions.[fn:16]
+** 5
+   - Plan ahead in a world where other agents are planning against us
+   - Multi-agent
+   - Contingencies
+   - Competitive
+   - Game theory
+   - Very many agents: economies rather than games
+   - Significant, regardless of whether the agents are cooperative or competitive
+   - Deterministic, turn-taking, two-player, zero-sum games of perfect
+     information (such as chess)
+   - Pruning
+   - Heuristic evaluation function
+   - Imperfect information
+   - Max, min
+   - $S_0$ :: initial state
+   - Player(s) :: who moves
+   - Actions(s) :: legal moves
+   - Result(s, a) :: Terminal test, game is over; terminal states
+   - Utility(s, p) :: Utility function (objective function, payoff
+                      function); win, loss, draw: 1, 0, 1/2. Payoffs
+                      in backgammon 0 to 192. Zero-sum game: total
+                      payoff is the same for every instance of game.
+   - Initial state, actions and result define the game tree.
+   - Search tree superimposed on full game tree
+   - Max must find a contingent strategy, max’s moves in the states
+     resulting from every possible response by min; analogous to
+     AND-OR search.
+   - Max nodes, min nodes, terminal nodes
+   - Half-moves: ply
+   - Minimax value of each node
+   - Utility for max of being in the corresponding state, assuming
+     that both players play optimally.
+   - Max prefers to move to a state of maximum value, min prefers to
+     move to a state of minimum value.
+   - $$minimax(s) = utility(s) if terminal-test(s), max_{a \in
+     actions(s)} minimax(result(s, a)) if player(s) = max, min_{a \in
+     actions(s)} minimax(result(s, a)) if player(s) = min$$
+   - Minimax decision at root, maximizes worst-case outcome for max
+   - Minimax algorithm: recursive computation of the minimax values of
+     each successor state
+   - Recursion proceeds to leaves, minimax values backed up
+   - Minimax performs a complete depth-first exploration of game tree
+   - Time complexity: $O(b^m)$, space: $O(bm)$ (all actions at once),
+     $O(m)$ (actions one at a time).
+   - Maximum depth $m$, $b$ legal moves at each point (branching factor)
+   - Muliplayer: vector $<v_a, v_b, v_c>$ associated with each node
+   - In two-player, zero-sum games, the two-element vector can be
+     reduced to a single value because the values are always opposite.
+   - The backed-up value of a node $n$ is always the utility vector of
+     the successor state with the highest values for the player
+     choosing at $n$.
+   - In this way, collaboration emerges from purely selfish behavior.
+   - Not a zero-sum, collaboration with just two players.
+     #+BEGIN_SRC org
+       ,- minimax-decision(state) -> action
+       ,  - return arg max_{a \in actions(s)} min-value(result(state, a))
+       ,- max-value(state) -> utility
+       ,  - if terminal-test(state) return utility(state)
+       ,  - v <- -inf
+       ,  - for each a in actions(state) do
+       ,    - v <- max(v, min-value(result(s, a)))
+       ,  - return v
+       ,- min-value(state) -> utility
+       ,  - if terminal-test(state) then return utility(state)
+       ,  - v <- inf
+       ,  - for each a in actions(state) do
+       ,    - v <- min(v, max-value(result(s, a)))
+       ,  - return v   - Minimax decision:
+     #+END_SRC
+     - Dynamic programming, by the way?
+   - Exponential, depth of tree; effectively cut it in half
+   - Alpha-beta pruning; returns same move as minimax would, but
+     prunes away branches that cannot possibly influence the final
+     decision
+   - Values of root and minimax decision independent of the values of
+     the pruned leaves $x$ and $y$.
+   - If player has a better choice $m$ at the parent node of $n$ or at
+     any choice point further up, then n will never be reached in
+     actual play.
+   - \alpha is the best (highest-value) choice along the path for max;
+     \beta is the best (lowest-value) choice along the path for min
+   - alpha-beta dependent on the order in which the states are examined
+   - Alpha-beta highly dependent on the order in which the states are
+     examined
+   - Examine the first successors that are likely to be the best; then
+     alpha-beta needs examine only $O(b^{m/2})$ instead of $O(b^m)$.
+     Effective branching factor becomes $\sqrt{b}$ instead of $b$.
+   - In random order instead of best-first: $O(b^{3m/4})$ for moderate
+     $b$.
+   - Alpha-beta:
+     #+BEGIN_SRC org
+       ,- alpha-beta-search(state) -> action
+       ,  - v <- max-value(state, -inf, inf)
+       ,  - return action in actions(state) with v
+       ,- max-value(state, alpha, beta) -> utility
+       ,  - if terminal-test(state) return utility(state)
+       ,  - v <- -inf
+       ,  - for each a in actions(state)
+       ,    - v <- max(v, min-value(result(s, a), alpha, beta))
+       ,    - if v >= beta return v
+       ,    - alpha <- max(alpha, v)
+       ,  - return v
+       ,- min-value(state, alpha, beta) -> utility
+       ,  - if terminal-test(state) return utility(state)
+       ,  - v <- inf
+       ,  - for a in actions(state)
+       ,    - v <- min(v, max-value(result(s, a), alpha, beta)
+       ,    - if v <= alpha the return v
+       ,    - beta <- min(beta, v)
+       ,  - return v
+     #+END_SRC
+   - Dynamic move-ordering scheme: trying moves that were found to be
+     best in the past
+   - Iterative deepening search
+   - Iterativet deepening on an exponential game tree adds only a
+     constant fraction to the total search time, which can be more
+     than made up from better move ordering.
+   - Best moves: killer moves; killer move heuristic
+   - Hash-table of previously seen positions: /transposition table/;
+     various strategies to choose which nodes to keep and which to
+     discard.
+   - Alpha-beta still has to search all the way to terminal states
+   - Cut off search early and apply a heuristic evaluation function to
+     states in the search, effectively turning nontermanil nodes into
+     terminal leaves.
+   - Replace utility function by a heuristic evaluation function eval,
+     which estimates the position’s utility; replace the terminal test
+     by a cutoff test that decides when to apply eval.
+   - H-minimax(s, d) = eval(s) if cutoff-test(s, d); max_{a \in
+     actions(s)} h-minimax(result(s, a), d + 1) if player(s) = max,
+     min_{a \in actions(s)} h-minimax(result(s, a), d + 1) if
+     player(s) = min.
+   - Evaluation function: estimate of utility, just as heuristic
+     return an estamet of the distance to the goal.
+   - Evaluation function should order the terminal states in the same
+     way as the true utility function. Efficient. For nonterminal
+     states, evaluation should be strongly correlated with chances of
+     winning.
+   - If the search must be cut off at non-terminal states, the
+     algorithm will necessarily be uncertain about the final outcomes
+     of those states.
+   - Features of the state: pawns, queens, &c.
+   - Evaluation for states in the category is the expected value:
+     $0.72 * 1 + 0.20 * 0 + 0.08 * 12 = 0.76.$
+   - Evaluation function need not return actual expected values as
+     long as the ordering of the states is the same.
+   - Separate numerical contributions from each feature and combine
+     them to find the total value.
+   - Material value to each piece
+   - Weighted linear function: $eval(s) = w_1f_1(s) + ... + w_nf_n(s)
+     = \sum^n_{i=1}w_if_i(s)$
+   - Strong assumption: contribution of each feature is independent of
+     the values of the other features.
+   - Nonlinear combinations of features: e.g. pair of bishops worth
+     slightly more than a single one, and a bishop is worth more in
+     the engame (when the move number feature is high or number of
+     remaining pieces feature is low).
+   - Feature and weight not part of the rules of chess.
+   - cutoff-test(state, depth) returns true for all depth greater than
+     some fixed depth d (d is chose so that a move is selected within
+     the allocated time); more robust: apply iterative deepening. When
+     time runs out, the program returns the move selected by the
+     deepest completed search. Iterative deepening help with move
+     ordering.
+   - The evaluation function should be applied only to positions that
+     are quiescent: unlikely to exhibit wild swings in value in the
+     near future.
+   - Positions in which favorable captures can be made are not
+     quiescent for an evaluation function that just counts material.
+   - Non-quiescent positions can be expanded further until quiescent
+     positions are reached.
+   - Quiescent search: restricted to certain moves, capture moves,
+     quickly resolve uncertainties.
+   - Horizon effect: program is facing opponent’s move that causes
+     serious damage but can be temporarily avoided by delaying
+     tactics.
+   - All it has done is push the inevitable capture of the bishop
+     beyond the horizon that black can see.
+   - Singular extension: move that is “clearly better” in a given
+     position.
+   - Forward pruning: some moves at a given node are pruned
+     immediately without further consideration.
+   - Beam search: on each ply, consider only a “beam” of the $n$ best
+     moves.
+   - No guarantee that the best move will not be pruned away.
+   - probcut: probabilitistic cut (Buro, 1995) is a forward-pruning
+     version of alpha-beta search that uses statistics gained from
+     prior experience to lessen the chance that the best move will be
+     pruned.
+   - Table lookup
+   - Usually, after ten moves we end up in a rarely seen position, and
+     the program must switch from table lookup to search.
+   - Policy: mapping from every possible state to the best move in
+     that state.
+   - Retrograde minimax search
+   - Stochastic games (backgammon)
+   - Game tree in backgammon must include /chance nodes/ in addition
+     to max and min nodes
+   - Expected value of a position: average over all possible outcomes
+     of the chance nodes
+   - minimax -> expectiminimax
+   - $$expectiminimax(s) = utility(s) if terminal-test(s), max_a
+     expectiminimax(result(s, a)) if player(s) = max, min_a
+     expectiminimax(result(s, a)) if player(s) = min, \sum_r P(r)
+     expectiminimax(result(s, r)) if player(s) = chance$$
+   - The evaluation function must be a positive linear transformation
+     of the probability of winning from a position (of the expected
+     utility of the position)
+   - expectiminimax considers all the possible dice rolls $O(b^mn^m)$,
+     $n$ number of distinct rolls
+   - Bound the average
+   - Monte Carlo simulation
+   - Partially observable games
+   - Kriegspiel
+   - Belief state: logically possible board positions
+   - State estimation
+   - Probabilistic checkmate
+   - Minimize information
+   - Optimal play in partially observable games requires a willingness
+     to play somewhat randomly
+   - Equilibrium solution
+   - Card games: stochastic partial observability
+   - Bridge, whist, hearts, poker
+   - $$argmax_a\sum_s P(s) minimax(result(s, a))$$
+   - Monte Carlo approximation: random sample of $N$ deals
+   - Averaging over clairvoyance
+   - Actions that gather information
+   - Singular extensions beyond the depth-limit; 8000 features
+   - Effective branching factor 3 (actual 35)
+   - Null move heuristic: opponent moves twice
+   - Randomness from deal, not adversarial play
+   - Utility of node expansion
+   - Metareasoning
+   - Goal-directed reasoning
 ** Lectures
 *** 1
     - AI: mapping from sensors to actuators
