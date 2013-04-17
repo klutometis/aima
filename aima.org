@@ -4774,6 +4774,8 @@
        distance (i.e. we’re in a contiguous absolute plane which
        contains the goal in the same time-series), and the
        straight-line distance is greater than h(n), use straight-line.
+* TODO 5.1
+  
 * TODO 5.5
   Come up with largest prime; let’s do polling.
 
