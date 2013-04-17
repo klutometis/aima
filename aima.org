@@ -4774,8 +4774,20 @@
        distance (i.e. we’re in a contiguous absolute plane which
        contains the goal in the same time-series), and the
        straight-line distance is greater than h(n), use straight-line.
-* TODO 5.1
+* DONE 5.1
+  CLOSED: [2013-04-17 Wed 13:54]
   
+  If the object is to merely find a winning terminal state, a
+  depth-first search will suffice; to maximize utility, on the other
+  hand, some variant of best-first implemented with a max-heap
+  (instead of a min-heap) would work. The path-cost associated with
+  each action is the cost of our action plus the opponent’s.
+
+  The idea is that alternating moves are fixed and should be
+  considered part of the environment: once $A, \alpha \to B$ is
+  chosen, so is e.g. $B, \beta \to C$; therefore, the path-cost of $A,
+  \alpha$ is $utility(B) + utility(C)$ and the transition model
+  specifies $A, \alpha \to C$.
 * TODO 5.5
   Come up with largest prime; let’s do polling.
 
