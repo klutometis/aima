@@ -4824,6 +4824,8 @@
    This will go on until tails is produced; upon returning to heads,
    the player will attempt to restore win-by-odd. Given a fair coin,
    the lose-by-even player can only defer loss for so long.
+* TODO 5.3
+  
 * TODO 5.5
   Come up with largest prime; let’s do polling.
 
