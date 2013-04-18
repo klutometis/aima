@@ -4825,7 +4825,23 @@
    the player will attempt to restore win-by-odd. Given a fair coin,
    the lose-by-even player can only defer loss for so long.
 * TODO 5.3
-  
+** TODO a
+   #+BEGIN_SRC graphviz-dot :comments link :tangle 5.3.a.dot
+     digraph G {
+       cep [label="?"]
+       cfp [label="?"]
+       aep [label="?"]
+       aep [label="?"]
+       acp [label="?"]
+       bd -> cd
+       bd -> ad
+       cd -> ce
+       cd -> cf
+       cd -> cc
+       ce -> cep
+     }
+     
+   #+END_SRC
 * TODO 5.5
   Come up with largest prime; let’s do polling.
 
