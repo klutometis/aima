@@ -4960,22 +4960,115 @@
    the lose-by-even player can only defer loss for so long.
 * TODO 5.3
 ** TODO 5.3a
-   #+BEGIN_SRC graphviz-dot :comments link :tangle 5.3.a.dot
+   #+BEGIN_SRC dot :file img/5-3a.png :comments link :tangle 5-3a.dot
      digraph G {
-       cep [label="?"]
-       cfp [label="?"]
-       aep [label="?"]
-       aep [label="?"]
-       acp [label="?"]
+       graph [forcelabels=true]
+       node [shape=triangle]
+     
+       {
+         node [shape=invtriangle]
+         cd
+         ad
+         de
+         df
+       }
+     
+       {
+         node [shape=plaintext]
+         cep [label="?"]
+         cfp [label="?"]
+         aep [label="?"]
+         aep [label="?"]
+         acp [label="?"]
+         afp [label="?"]
+       }
+     
+       ded [label="dd", xlabel="-4"]
+       dfd [label="dd", xlabel="-4"]
+     
        bd -> cd
        bd -> ad
+     
        cd -> ce
        cd -> cf
        cd -> cc
-       ce -> cep
-     }
      
+       ad -> ae
+       ad -> af
+       ad -> ac
+     
+       ce -> cep
+       ce -> de -> ded
+     
+       cf -> cfp
+       cf -> df -> dfd
+     
+       ae -> aep
+     
+       af -> afp
+     
+       ac -> acp
+     }
    #+END_SRC
+** TODO 5.3b
+   #+BEGIN_SRC dot :file img/5-3b.png :comments link :tangle 5-3b.dot
+  digraph G {
+    graph [forcelabels=true]
+    {
+      node [shape=triangle]
+      bd [xlabel="[-4,0]"]
+      ce [xlabel="[-4,0]"]
+      cf [xlabel="[-4,0]"]
+      cc [xlabel="-2"]
+      ae [xlabel="[-∞,0]"]
+      af [xlabel="[-∞,0]"]
+      ac [xlabel="[-∞,0]"]
+      ded [label="dd", xlabel="-4"]
+      dfd [label="dd", xlabel="-4"]
+    }
+
+    {
+      node [shape=invtriangle]
+      cd [xlabel="[-4,0]"]
+      ad [xlabel="[-∞,0]"]
+      de [xlabel="[-4,0]"]
+      df [xlabel="[-4,0]"]
+    }
+
+    {
+      node [shape=plaintext]
+      cep [label="?"]
+      cfp [label="?"]
+      aep [label="?"]
+      aep [label="?"]
+      acp [label="?"]
+      afp [label="?"]
+    }
+
+    bd -> cd
+    bd -> ad
+
+    cd -> ce
+    cd -> cf
+    cd -> cc
+
+    ad -> ae
+    ad -> af
+    ad -> ac
+
+    ce -> cep
+    ce -> de -> ded
+
+    cf -> cfp
+    cf -> df -> dfd
+
+    ae -> aep
+
+    af -> afp
+
+    ac -> acp
+  }
+   #+END_SRC   
 * TODO 5.5
   Come up with largest prime; let’s do polling.
 
