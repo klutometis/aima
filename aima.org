@@ -4924,7 +4924,7 @@
   specifies $A, \alpha \to C$.
 * DONE 5.2
   CLOSED: [2013-04-17 Wed 14:21]
-** DONE a
+** DONE 5.2a
    CLOSED: [2013-04-17 Wed 14:21]
    - States :: Location of the eight tiles and blank for each puzzle
    - Initial state :: Each puzzle in any state (due to even/odd
@@ -4936,15 +4936,15 @@
    - Goal test :: Whether each puzzle matches its goal configuration
                   (arbitrary)
    - Path cost :: Unit per move
-** DONE b
+** DONE 5.2b
    CLOSED: [2013-04-17 Wed 14:21]
    An 8-puzzle has $9!/2 = 181,440$ reachable states; for each state
    of one puzzle, the other has $9!/2$ reachable state; total states
    are therefore $9!/2 * 9!/2 = 9!^2/4 = 32,920,473,600$.
-** DONE c
+** DONE 5.2c
    CLOSED: [2013-04-17 Wed 14:21]
    Expectiminimax is appropriate in the adversarial case.
-** DONE d
+** DONE 5.2d
    CLOSED: [2013-04-17 Wed 14:21]
    Provided that the end-state belongs to the same (even or odd)
    permutation as the start-state, every 8-puzzle is solvable.
@@ -4959,7 +4959,7 @@
    the player will attempt to restore win-by-odd. Given a fair coin,
    the lose-by-even player can only defer loss for so long.
 * TODO 5.3
-** TODO a
+** TODO 5.3a
    #+BEGIN_SRC graphviz-dot :comments link :tangle 5.3.a.dot
      digraph G {
        cep [label="?"]
