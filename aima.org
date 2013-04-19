@@ -4958,8 +4958,10 @@
    This will go on until tails is produced; upon returning to heads,
    the player will attempt to restore win-by-odd. Given a fair coin,
    the lose-by-even player can only defer loss for so long.
-* TODO 5.3
-** TODO 5.3a
+* DONE 5.3
+  CLOSED: [2013-04-18 Thu 19:16]
+** DONE 5.3a
+   CLOSED: [2013-04-18 Thu 19:16]
    #+BEGIN_SRC dot :file img/5-3a.png :comments link :tangle 5-3a.dot
      digraph G {
        graph [forcelabels=true]
@@ -5010,7 +5012,8 @@
        ac -> acp
      }
    #+END_SRC
-** TODO 5.3b
+** DONE 5.3b
+   CLOSED: [2013-04-18 Thu 19:16]
    #+BEGIN_SRC dot :file img/5-3b.png :comments link :tangle 5-3b.dot
   digraph G {
     graph [forcelabels=true]
@@ -5069,7 +5072,12 @@
     ac -> acp
   }
    #+END_SRC   
-** TODO 5.3c
+
+   #+RESULTS:
+   [[file:img/5-3b.png]]
+
+** DONE 5.3c
+   CLOSED: [2013-04-18 Thu 19:16]
    #+BEGIN_SRC dot :file img/5-3c.png :comments link :tangle 5-3c.dot
   digraph G {
     graph [forcelabels=true]
@@ -5127,7 +5135,8 @@
     ac -> acp
   }
    #+END_SRC   
-** TODO 5.3d
+** DONE 5.3d
+   CLOSED: [2013-04-18 Thu 19:15]
    #+BEGIN_SRC dot :file img/5-3d.png :comments link :tangle 5-3d.dot
   digraph G {
     graph [forcelabels=true]
@@ -5190,7 +5199,8 @@
    same with =ae= and =af=. =ac=, however, leads to =cc= with a score
    of $-4$ but (assuming that the adversary minimizes the pursuer’s
    score) will choose instead =bd=, also with a total penalty of $-8$.
-** TODO 5.3e
+** DONE 5.3e
+   CLOSED: [2013-04-18 Thu 19:15]
    #+BEGIN_SRC dot :file img/5-3e.png :comments link :tangle 5-3e.dot
   digraph G {
     graph [forcelabels=true]
@@ -5248,7 +5258,8 @@
     ac -> acp
   }
    #+END_SRC   
-** TODO 5.3f
+** DONE 5.3f
+   CLOSED: [2013-04-18 Thu 19:15]
    If the map is a tree and the adversaries start an even number of
    squares apart, the pursuer can always force mate; odd, however,
    the pursuee can evade by slipping past the pursuer.
