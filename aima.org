@@ -5217,11 +5217,11 @@
 
     {
       node [shape=plaintext]
-      cep [label="?\nbe", xlabel="[-∞, -8]"]
-      cfp [label="?\nbf", xlabel="[-∞, -8]"]
-      aep [label="?\nbe", xlabel="[-∞, -8]"]
-      acp [label="?\nbc", xlabel="[-∞, -8]"]
-      afp [label="?\nbf", xlabel="[-∞, -8]"]
+      cep [label="?\nbe\ndon't expand", xlabel="[-∞, -8]"]
+      cfp [label="?\nbf\ndon't expand", xlabel="[-∞, -8]"]
+      aep [label="?\nbe\ndon't consider", xlabel="[-∞, -8]"]
+      acp [label="?\nbc\ndon't consider", xlabel="[-∞, -8]"]
+      afp [label="?\nbf\ndon't consider", xlabel="[-∞, -8]"]
     }
 
     bd -> cd
