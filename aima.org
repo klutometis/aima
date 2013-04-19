@@ -5248,6 +5248,13 @@
     ac -> acp
   }
    #+END_SRC   
+** TODO 5.3f
+   If the map is a tree and the adversaries start an even number of
+   squares apart, the pursuer can always force mate; odd, however,
+   the pursuee can evade by slipping past the pursuer.
+
+   In a graph with cycles, the pursuee can evade by sticking to the
+   cycle of a circuit and reversing direction if need be.
 * TODO 5.5
   Come up with largest prime; let’s do polling.
 
