@@ -7159,6 +7159,7 @@
      - Partially mapped crossover (PMX): selects two random cut points
        . . .
 * TODOs
+** TODO A problem a day is fairly ambitious, depending on the problem.
 ** TODO Integrate the online-search stuff with =aima-chicken=.
 ** TODO Maybe search should be in its own package; it's useful.
 ** TODO Need a generic animation facility.
