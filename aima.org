@@ -5190,6 +5190,64 @@
    same with =ae= and =af=. =ac=, however, leads to =cc= with a score
    of $-4$ but (assuming that the adversary minimizes the pursuer’s
    score) will choose instead =bd=, also with a total penalty of $-8$.
+** TODO 5.3e
+   #+BEGIN_SRC dot :file img/5-3e.png :comments link :tangle 5-3e.dot
+  digraph G {
+    graph [forcelabels=true]
+    {
+      node [shape=triangle]
+      bd [xlabel="[-∞,-4]"]
+      ce [xlabel="[-4,-4]"]
+      cf [xlabel="[-4,-4]"]
+      cc [xlabel="-2"]
+      ae [xlabel="[-∞,-8]"]
+      af [xlabel="[-∞,-8]"]
+      ac [xlabel="[-∞,-8]"]
+      ded [label="dd", xlabel="-4"]
+      dfd [label="dd", xlabel="-4"]
+    }
+
+    {
+      node [shape=invtriangle]
+      cd [xlabel="[-4,-4]"]
+      ad [xlabel="[-∞,-8]"]
+      de [xlabel="[-4,-4]"]
+      df [xlabel="[-4,-4]"]
+    }
+
+    {
+      node [shape=plaintext]
+      cep [label="?\nbe", xlabel="[-∞, -8]"]
+      cfp [label="?\nbf", xlabel="[-∞, -8]"]
+      aep [label="?\nbe", xlabel="[-∞, -8]"]
+      acp [label="?\nbc", xlabel="[-∞, -8]"]
+      afp [label="?\nbf", xlabel="[-∞, -8]"]
+    }
+
+    bd -> cd
+    bd -> ad
+
+    cd -> ce
+    cd -> cf
+    cd -> cc
+
+    ad -> ae
+    ad -> af
+    ad -> ac
+
+    ce -> cep
+    ce -> de -> ded
+
+    cf -> cfp
+    cf -> df -> dfd
+
+    ae -> aep
+
+    af -> afp
+
+    ac -> acp
+  }
+   #+END_SRC   
 * TODO 5.5
   Come up with largest prime; let’s do polling.
 
