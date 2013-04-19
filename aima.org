@@ -5266,6 +5266,80 @@
 
    In a graph with cycles, the pursuee can evade by sticking to the
    cycle of a circuit and reversing direction if need be.
+* TODO 5.4
+  Scrabble: is it the case that the utility and evaluation functions
+  are the same? Not necessary, see Appel, The World’s Fastest Scrabble
+  Program (emphasis mine):
+
+  #+BEGIN_QUOTE
+  Peter Turcan of the University of Reading in England has written a
+  SCRABBLE-player [8, 9] for some unspecified micro-computer. It
+  appears that he generates moves by iterating over the wards in his
+  lexicon in reverse order of length. He somehow decides for each word
+  whether and where it can be played on the current board with the
+  current rack. His program doesn’t attempt any adversary search, but
+  /it does use an evaluation function more sophisticated than the
+  score of the prospective move/. It takes the score and conditionally
+  adds terms depending on simple strategic features of the new
+  position and tiles left in the rack.
+  #+END_QUOTE
+
+  Need a good lexicon; how about just [[file:/usr/share/dict/words]]?
+  Sure. (Apparently, there’s the [[http://en.wikipedia.org/wiki/Tournament_Word_List][tournament word list]]; [[http://en.wikipedia.org/wiki/SOWPODS][SOWPODS]];
+  [[http://en.wikipedia.org/wiki/Official_Scrabble_Players_Dictionary][Player's Dictionary]].) See [[http://www.isc.ro/en/commands/lists.html][word lists]].
+
+  It looks like the evaluation function is the score plus some
+  heuristics.
+
+  #+BEGIN_QUOTE
+  Weiiiberger’s program has no concept of strategy, and simply chooses
+  the highest-scoring play available.
+  #+END_QUOTE
+
+  Using a trie:
+
+  #+BEGIN_QUOTE
+  They represent their lexicon as a tree-structure of letters where
+  each path down the tree has an associated list of words that can be
+  formed using exactly those letters on the path. The letters along
+  each path appear in a canonical order corresponding (approximately)
+  to the point value of the tile in SCRABBLE, by decreasing value. The
+  reason for the putting the higher-valued letters higher in the tree
+  is to help find the most valuable words first, in case a full search
+  cannot be completed.
+  #+END_QUOTE
+
+  We implemented a so-called [[http://en.wikipedia.org/wiki/Radix_tree][radix tree]] for unicode Greek, I think.
+
+  Some heuristic action:
+
+  #+BEGIN_QUOTE
+  Shapiro’s move generator iterates over board posi- tions, taking the
+  tiles in the rack and at the proposed board position, and searching
+  down from the root for acceptable words that can be formed with
+  those letters. His programs do not generally examine all possible
+  board positions where words could be played, only those positions
+  judged worthwhile. Once a move is found yielding at least some
+  pre-determined threshold score, that move is chosen.
+  #+END_QUOTE
+
+  This is cool:
+
+  #+BEGIN_QUOTE
+  Instead of scanning through the entire lexicon each turn for
+  playable words, we begin by scanning over the board for places where
+  a word could connect to letters already on the board. Then we try to
+  build the word up incrementally, using letters from the rack and the
+  board near the proposed place of attachment. We main- tain data
+  structures that make this search one-dimen- sional, so we never have
+  to look outside of a single row or column of the board during move
+  generation.
+  #+END_QUOTE
+
+  Let’s just read them into memory, check infix and available letters.
+
+  How does scrabble work mechanically?
+  
 * TODO 5.5
   Come up with largest prime; let’s do polling.
 
