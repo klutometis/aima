@@ -7162,8 +7162,38 @@
 ** TODO A problem a day is fairly ambitious, depending on the problem.
 ** TODO Integrate the online-search stuff with =aima-chicken=.
 ** TODO Maybe search should be in its own package; it's useful.
-** TODO Need a generic animation facility.
-** TODO What the hell: let's add some Bach or Liszt to the animations.
+** TODO Voronoi
+   Never got a chance to implement from scratch; [[http://www.youtube.com/watch?v%3DxMhBobFoQbk&feature%3Drelated][should have watched]]?
+** TODO A listing environment
+** TODO Blog about barabási-albert vs. depth-first graph-creation.
+   The former produces nice hubs and cycles, but the problem of
+   aligning complementary directions (like graph-coloring?) is
+   NP-complete. Resorting to depth-first with no cycles; would have to
+   have an exponential adjunct for cycles.
+
+   Way to quantify the difference between the two with respect to e.g.
+   average degree of nodes?
+** TODO Should we structure this somehow as a blog instead of an org-doc?
+   Can we create a jekyll-based blog from this org-doc and push it to
+   the github pages?
+
+   /That/ would be beautiful: we could get rid of the generated pdf
+   and might not be confined to the relative obscurity of org
+   (relative to, say, html).
+** TODO Find a reasonable pseudocode package in \LaTeX.
+   See [[http://www.tex.ac.uk/cgi-bin/texfaq2htmllabel%3Dalgorithms][this survey]]. Algorithm2e isn't bad; doesn't seem to have a
+   function, though. [[http://www.math.washington.edu/tex-archive/help/Catalogue/entries/pseudocode.html][Pseudocode]] seems to be relatively natural; even
+   if the output is a little ugly.
+
+   The alternative, I suppose, is straight up lists.
+
+   Algorithm2e has to be wrapped in dollars, which sucks; also:
+   bizarre camel-case macros. Looks good, otherwise. Has no functions,
+   apparently, either.
+** DONE Need a generic animation facility.
+   CLOSED: [2013-04-18 Thu 19:18]
+** DONE What the hell: let's add some Bach or Liszt to the animations.
+   CLOSED: [2013-04-18 Thu 19:18]
 ** DONE 3.22
    Need a graph of possible moves (initially hard-coded for 3x3?); and
    a Manhattan distance calculator. Can we have an abstract game-graph?
@@ -7738,8 +7768,6 @@
    applicable to agents.
 
    See [[http://aima-python.googlecode.com/svn/trunk/search.py][this recursive best-first-search in Python]], by the way.
-** TODO Voronoi
-   Never got a chance to implement from scratch; [[http://www.youtube.com/watch?v%3DxMhBobFoQbk&feature%3Drelated][should have watched]]?
 ** DONE 3.7
    CLOSED: [2012-10-01 Mon 03:29]
   Testing a node for a goal-state when it is selected for expansion is
@@ -10204,18 +10232,6 @@
 ** DONE Focus on one or two problems for the coming week.
    CLOSED: [2012-10-01 Mon 03:29]
    Assign people to be responsible for them.
-** CANCELED Modify 2.11 to list available actions?
-   CLOSED: [2012-10-01 Mon 03:30]
-   No: that changes the problem.
-** TODO A listing environment
-** TODO Blog about barabási-albert vs. depth-first graph-creation.
-   The former produces nice hubs and cycles, but the problem of
-   aligning complementary directions (like graph-coloring?) is
-   NP-complete. Resorting to depth-first with no cycles; would have to
-   have an exponential adjunct for cycles.
-
-   Way to quantify the difference between the two with respect to e.g.
-   average degree of nodes?
 ** DONE 2.11
    CLOSED: [2012-07-16 Mon 12:57]
 *** DONE Graph world
@@ -11657,33 +11673,20 @@
     - CLOSING NOTE [2012-07-08 Sun 05:42] \\
       Involves the viewport, &c.
     See [[http://support.google.com/youtube/bin/static.pyhl%3Den&guide%3D1728585&topic%3D1728569&page%3Dguide.cs][this]]; ideally, this would start at graphviz.
-** TODO Should we structure this somehow as a blog instead of an org-doc?
-   Can we create a jekyll-based blog from this org-doc and push it to
-   the github pages?
-
-   /That/ would be beautiful: we could get rid of the generated pdf
-   and might not be confined to the relative obscurity of org
-   (relative to, say, html).
-** TODO Some sort of blog post or other publicity?
-** TODO Find a reasonable pseudocode package in \LaTeX.
-   See [[http://www.tex.ac.uk/cgi-bin/texfaq2htmllabel%3Dalgorithms][this survey]]. Algorithm2e isn't bad; doesn't seem to have a
-   function, though. [[http://www.math.washington.edu/tex-archive/help/Catalogue/entries/pseudocode.html][Pseudocode]] seems to be relatively natural; even
-   if the output is a little ugly.
-
-   The alternative, I suppose, is straight up lists.
-
-   Algorithm2e has to be wrapped in dollars, which sucks; also:
-   bizarre camel-case macros. Looks good, otherwise. Has no functions,
-   apparently, either.
-** CANCELED Should we tangle to a bunch of text files?
-   CLOSED: [2012-10-01 Mon 03:30]
-   Looking for an alternative to the big-ass pdf.
+** DONE Some sort of blog post or other publicity?
+   CLOSED: [2013-04-18 Thu 19:19]
 ** DONE Reimplement the Lisp environment in Scheme.
   CLOSED: [2012-06-01 Fri 03:09]
   Should we try to map CLOS to [[http://wiki.call-cc.org/eggref/4/coops][coops]]? Or maybe [[http://wiki.call-cc.org/eggref/4/tinyclos][TinyCLOS]] would suffice.
   This takes balls. See [[https://github.com/klutometis/aima-chicken][aima-chicken]].
 ** DONE Personal notes as footnotes.
   CLOSED: [2012-06-01 Fri 03:09]
+** CANCELED Modify 2.11 to list available actions?
+   CLOSED: [2012-10-01 Mon 03:30]
+   No: that changes the problem.
+** CANCELED Should we tangle to a bunch of text files?
+   CLOSED: [2012-10-01 Mon 03:30]
+   Looking for an alternative to the big-ass pdf.
 ** CANCELED Should we try to release an e.g. Wumpus World egg?
   CLOSED: [2012-06-01 Fri 03:08]
   - CLOSING NOTE [2012-06-01 Fri 03:08] \\
