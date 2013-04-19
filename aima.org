@@ -5069,6 +5069,64 @@
     ac -> acp
   }
    #+END_SRC   
+** TODO 5.3c
+   #+BEGIN_SRC dot :file img/5-3c.png :comments link :tangle 5-3c.dot
+  digraph G {
+    graph [forcelabels=true]
+    {
+      node [shape=triangle]
+      bd [xlabel="[-∞,-4]"]
+      ce [xlabel="[-∞,-4]"]
+      cf [xlabel="[-∞,-4]"]
+      cc [xlabel="-2"]
+      ae [xlabel="[-∞,-2]"]
+      af [xlabel="[-∞,-2]"]
+      ac [xlabel="[-∞,-2]"]
+      ded [label="dd", xlabel="-4"]
+      dfd [label="dd", xlabel="-4"]
+    }
+
+    {
+      node [shape=invtriangle]
+      cd [xlabel="[-∞,-4]"]
+      ad [xlabel="[-∞,-2]"]
+      de [xlabel="[-4,-4]"]
+      df [xlabel="[-4,-4]"]
+    }
+
+    {
+      node [shape=plaintext]
+      cep [label="?\nbe"]
+      cfp [label="?\nbf"]
+      aep [label="?\nbe"]
+      acp [label="?\nbc"]
+      afp [label="?\nbf"]
+    }
+
+    bd -> cd
+    bd -> ad
+
+    cd -> ce
+    cd -> cf
+    cd -> cc
+
+    ad -> ae
+    ad -> af
+    ad -> ac
+
+    ce -> cep
+    ce -> de -> ded
+
+    cf -> cfp
+    cf -> df -> dfd
+
+    ae -> aep
+
+    af -> afp
+
+    ac -> acp
+  }
+   #+END_SRC   
 * TODO 5.5
   Come up with largest prime; let’s do polling.
 
