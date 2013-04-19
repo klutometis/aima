@@ -5339,6 +5339,16 @@
   Let’s just read them into memory, check infix and available letters.
 
   How does scrabble work mechanically?
+
+  #+BEGIN_QUOTE
+  Because a two-way dawg has a node for each sub- string of each word,
+  we imagine that it would be a great deal larger than the one-way
+  dawg, although we have never tried to build one. It would be
+  interesting to see just how much space it would occupy, and by how
+  much it would speed up move generation. *
+  #+END_QUOTE
+
+  
   
 * TODO 5.5
   Come up with largest prime; let’s do polling.
