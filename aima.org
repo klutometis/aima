@@ -5355,6 +5355,27 @@
   to lead to higher scores in the next move(s). Avoiding leaving the
   board open for the opponent to make high-scoring moves.
   #+END_QUOTE  
+
+  Initially, let’s ignore triple word scores; &c.: just a board of
+  dimensions $m \times n$ on which to place words. Don’t forget
+  blanks!
+
+  There’s left-hand and right-hand search; or: prefix and suffix. How
+  to use a trie effectively? Brute force:
+
+  Also, two dimensional problem: must make sense up and down; although
+  Appel claims to have reduced it to a one-dimensional problem.
+
+  Don’t forget: can use individual letters, too.
+
+  No prefix: all rows and columns; one letter prefix; to n letter
+  prefices. And this plus suffices. Also: bounded by letters on the
+  board (which become prefices and suffices).
+
+  Need to generalize the problem somehow; wish I had a board.
+** [[http://en.wikipedia.org/wiki/Scrabble][Scrabble]]
+   - $15 \times 15$
+   - 
 * TODO 5.5
   Come up with largest prime; let’s do polling.
 
