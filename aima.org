@@ -5348,8 +5348,13 @@
   much it would speed up move generation. *
   #+END_QUOTE
 
-  
-  
+  Heuristics:
+
+  #+BEGIN_QUOTE
+  Preserving tiles and tile combinations in the rack that are likely
+  to lead to higher scores in the next move(s). Avoiding leaving the
+  board open for the opponent to make high-scoring moves.
+  #+END_QUOTE  
 * TODO 5.5
   Come up with largest prime; let’s do polling.
 
