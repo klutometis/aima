@@ -5379,6 +5379,8 @@
   preëxisting tiles. Also, contiguous tiles.
 
   See [[http://www.ericsink.com/downloads/faster-scrabble-gordon.pdf][Gordon's paper]] on GADDAGs; also, [[http://en.wikipedia.org/wiki/Boyer%E2%80%93Moore_string_search_algorithm][Boyer-Moore]] string search.
+
+  Need some function to determine contiguous words.
 ** [[http://en.wikipedia.org/wiki/Scrabble][Scrabble]]
    - $15 \times 15$
    - $100$ tiles; $2$ blanks
@@ -5421,6 +5423,19 @@
      of at least one word in the lexicon. It then extends each such
      prefix into complete words as constrained by the board and the
      remaining tiles in the rack.
+   - A backtracking, depth-first search12 for every possible path
+     through the GADDAG given the rack of tiles and board constraints
+     generates every legal move.
+   - Being the reverse of the directed acyclic graph for prefixes
+     followed by the directed acyclic graph for suffixes, it will be
+     called a GADDAG. Reversing the prefixes allows them to be played
+     just like suffixes, one tile at a time, moving away from anchor
+     squares.
+   - The shell used the greedy evaluation function (i.e. play the
+     highest scoring move). Ties for high score were broken by using
+     the move found first. Since ties occurred frequently and the
+     algorithms do not generate moves in exactly the same order, the
+     actual games played diverged quickly.
 * TODO 5.5
   Come up with largest prime; let’s do polling.
 
