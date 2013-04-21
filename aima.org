@@ -5377,6 +5377,8 @@
   We’re going to have to consider the board row by row (and column by
   column), I think; considering all combinations of blanks and
   preëxisting tiles. Also, contiguous tiles.
+
+  See [[http://www.ericsink.com/downloads/faster-scrabble-gordon.pdf][Gordon's paper]] on GADDAGs; also, [[http://en.wikipedia.org/wiki/Boyer%E2%80%93Moore_string_search_algorithm][Boyer-Moore]] string search.
 ** [[http://en.wikipedia.org/wiki/Scrabble][Scrabble]]
    - $15 \times 15$
    - $100$ tiles; $2$ blanks
@@ -5402,6 +5404,23 @@
      - 5 points: K ×1
      - 8 points: J ×1, X ×1
      - 10 points: Q ×1, Z ×1
+** Gordon, “A Faster Scrabble Move Generation Algorithm”
+   - However, the inability of a program which knows every word and
+     always plays the highest scoring one to win even half of its
+     games against expert players indicates that strategy must be a
+     significant component of competitive play.
+   - Appel and Jacobson acknowledged that the major remaining source
+     of inefficiency in their algorithm is the unconstrained
+     generation of prefixes. Words can only be generated from left to
+     right with a DAWG. Starting from each anchor square (a square on
+     the board onto which a word could be hooked) the DAWG algorithm
+     handles prefixes (letters before the anchor square) differently
+     to suffixes (those on or after the anchor square). The DAWG
+     algorithm builds every string shorter than a context-dependent
+     length that can be composed from the given rack and is the prefix
+     of at least one word in the lexicon. It then extends each such
+     prefix into complete words as constrained by the board and the
+     remaining tiles in the rack.
 * TODO 5.5
   Come up with largest prime; let’s do polling.
 
