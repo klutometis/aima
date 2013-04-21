@@ -5373,9 +5373,35 @@
   board (which become prefices and suffices).
 
   Need to generalize the problem somehow; wish I had a board.
+
+  We’re going to have to consider the board row by row (and column by
+  column), I think; considering all combinations of blanks and
+  preëxisting tiles. Also, contiguous tiles.
 ** [[http://en.wikipedia.org/wiki/Scrabble][Scrabble]]
    - $15 \times 15$
-   - 
+   - $100$ tiles; $2$ blanks
+   - Pass, exchange tiles
+   - First word played must cover H8 (center tile)
+   - “If any words other than the main word are formed by the play,
+     they are scored as well, and are subject to the same criteria of
+     acceptability.”
+   - “The game ends when (1) one player plays every tile on his or her
+     rack, and there are no tiles remaining in the bag (regardless of
+     the tiles on his or her opponent’s rack); or (2) when six
+     successive scoreless turns have occurred.”
+   - “When the game ends, each player’s score is reduced by the sum of
+     his or her unplayed letters. In addition, if a player has used
+     all of his or her letters (known as “going out”), the sum of the
+     other player’s unplayed letters is added to that player’s score.”
+   - See [[http://en.wikipedia.org/wiki/Scrabble_letter_distributions][letter distributions]]:
+     - 2 blank tiles (scoring 0 points)
+     - 1 point: E ×12, A ×9, I ×9, O ×8, N ×6, R ×6, T ×6, L ×4, S ×4, U ×4
+     - 2 points: D ×4, G ×3
+     - 3 points: B ×2, C ×2, M ×2, P ×2
+     - 4 points: F ×2, H ×2, V ×2, W ×2, Y ×2
+     - 5 points: K ×1
+     - 8 points: J ×1, X ×1
+     - 10 points: Q ×1, Z ×1
 * TODO 5.5
   Come up with largest prime; let’s do polling.
 
