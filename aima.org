@@ -5409,7 +5409,8 @@
 
   #+BEGIN_SRC scheme
     (use debug
-         define-record-and-printer)
+         define-record-and-printer
+         srfi-1)
     
     (define-record-and-printer sentinel)
     (define sentinel (make-sentinel))
@@ -5418,44 +5419,29 @@
       terminal?
       subdag)
     
-    (define terminals (make-parameters (make-hash-table)))
-    (define non-terminals (make-parameters (make-hash-table)))
+    (define (make-terminal-letter)
+      (make-letter #t (make-hash-table)))
     
-    (define (terminal letter)
-      (hash-table-update!
-       (terminals)
-       letter
-       identity
-       (make-letter letter #f)))
-    
-    (define (non-terminal letter)
-      (hash-table-update!
-       (non-terminals)
-       letter
-       identity
-       (make-letter letter #t)))
+    (define (make-non-terminal-letter)
+      (make-letter #f (make-hash-table)))
     
     (define (integrate-fixes dag prefix suffix)
-      (debug 'integrate-fixes prefix suffix)
-      (let* ((prefix (reverse prefix))
-             (characters (if (null? suffix)
+      (let ((characters (if (null? suffix)
                           prefix
                           (append (append prefix (list sentinel))
                                   suffix))))
-        ;; Set the result of this fold to be terminal.
-        (fold (lambda (character dag)
-                (let ((subdag (update-hash-table!/default
-                               dag
-                               character
-                               (lambda (subdag)
-                                 (hash-table-set!
-                                  subdag
-                                  character
-                                  (make-letter #f (make-hash-table)))
-                                 subdag)
-                               (make-hash-table))))))
-              dag
-              characters)))
+        (letter-terminal?-set!
+         (fold (lambda (character letter)
+                 (hash-table-update!
+                  (letter-subdag letter)
+                  character
+                  identity
+                  make-non-terminal-letter))
+               ;; This is a trojan-horse letter containing the root dag;
+               ;; the fold expects a letter.
+               (make-letter #f dag)
+               characters)
+         #t)))
     
     (define (update-dag! dag word)
       (let ((characters (string->list word)))
@@ -5464,7 +5450,15 @@
             ((null? suffix) (integrate-fixes dag prefix suffix))
           (integrate-fixes dag prefix suffix))))
     
-    (update-dag! (make-hash-table) "harro")
+    (define (dag-debug dag)
+      (hash-table-walk dag
+        (lambda (character letter)
+          (debug character letter)
+          (dag-debug (letter-subdag letter)))))
+    
+    (let ((dag (make-hash-table)))
+      (update-dag! dag "harro")
+      (dag-debug dag))
   #+END_SRC
 ** [[http://en.wikipedia.org/wiki/Scrabble][Scrabble]]
    - $15 \times 15$
