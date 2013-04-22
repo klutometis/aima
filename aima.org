@@ -5454,7 +5454,7 @@
                  dag
                  character
                  identity
-                 (make-hash-table)))
+                 make-hash-table))
               ;; This is a trojan-horse letter containing the root dag:
               ;; the fold expects a letter.
               dag
@@ -5475,17 +5475,25 @@
                   character)
           (dag-debug (letter-subdag letter) (add1 depth)))))
     
+    (define (dag-debug dag depth)
+      (hash-table-walk dag
+        (lambda (character subdag)
+          (format #t "~a~a~%"
+                  (make-string depth #\space)
+                  character)
+          (dag-debug subdag (add1 depth)))))
+    
     (let ((dag (make-hash-table)))
       ;; (update-dag! dag "harro")
       ;; (dag-debug dag 0)
-      (let ((dag (make-vector 26 #f)))
-        (with-input-from-file "words-head.txt"
-          (lambda ()
-            (do ((word (read-line) (read-line)))
-                ((eof-object? word))
-              (debug word)
-              (update-dag! dag word))))
-        (dag-debug dag 0)))
+      (with-input-from-file "words.txt"
+        (lambda ()
+          (do ((word (read-line) (read-line)))
+              ((eof-object? word))
+            (debug word)
+            (update-dag! dag word))))
+      ;; (dag-debug dag 0)
+      )
   #+END_SRC
 
   First pass: let’s ascribe to the word arbitrary origin; and move as
