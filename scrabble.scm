@@ -11,17 +11,8 @@
 (define-record-and-printer sentinel)
 (define sentinel (make-sentinel))
 
-(define-record-and-printer letter
-  terminal?
-  subdag)
-
-(define (make-dag) (make-vector 27 #f))
-
-(define (make-terminal-letter)
-  (make-letter #t (make-dag)))
-
-(define (make-non-terminal-letter)
-  (make-letter #f (make-dag)))
+;;; Can get this down to bits?
+(define (make-dag) (make-vector 28 #f))
 
 (define (character->index character)
   (if (sentinel? character)
@@ -38,14 +29,16 @@
                       prefix
                       (append (append prefix (list sentinel))
                               suffix))))
-    (fold (lambda (character letter)
-            (let ((dag (letter-subdag letter))
-                  (index (character->index character)))
-              (unless (vector-ref dag index)
-                (vector-set! dag index (make-non-terminal-letter)))
-              (vector-ref dag index)))
-          (make-letter #f dag)
-          characters)))
+    (vector-set!
+     (fold (lambda (character dag)
+             (let ((index (character->index character)))
+               (unless (vector-ref dag index)
+                 (vector-set! dag index (make-dag)))
+               (vector-ref dag index)))
+           dag
+           characters)
+     27
+     #t)))
 
 (define (update-dag! dag word)
   (let ((characters (string->list word)))
@@ -57,17 +50,16 @@
 (define (dag-debug dag depth)
   (vector-for-each
    (lambda (i x)
-     (when x
+     (when (vector? x)
        ;; (debug (index->character i))
        (format #t "~a~a~%" (make-string depth #\space) (index->character i))
-       (dag-debug (letter-subdag x) (add1 depth))))
+       (dag-debug x (add1 depth))))
    dag))
 
 ;;; Be nice to store these fuckers in a graph database or something.
-(let ((dag (make-vector 27 #f)))
+(let ((dag (make-dag)))
   ;; (update-dag! dag "HARRO")
-  ;; (dag-debug dag 0)
-  (with-input-from-file "words.txt"
+  (with-input-from-file "words-head.txt"
     (lambda ()
       (do ((word (read-line) (read-line)))
           ((eof-object? word))
