@@ -5410,6 +5410,7 @@
   #+BEGIN_SRC scheme
     (use debug
          define-record-and-printer
+         extras
          srfi-1)
     
     (define-record-and-printer sentinel)
@@ -5437,7 +5438,7 @@
                   character
                   identity
                   make-non-terminal-letter))
-               ;; This is a trojan-horse letter containing the root dag;
+               ;; This is a trojan-horse letter containing the root dag:
                ;; the fold expects a letter.
                (make-letter #f dag)
                characters)
@@ -5450,15 +5451,24 @@
             ((null? suffix) (integrate-fixes dag prefix suffix))
           (integrate-fixes dag prefix suffix))))
     
-    (define (dag-debug dag)
+    (define (dag-debug dag depth)
       (hash-table-walk dag
         (lambda (character letter)
-          (debug character letter)
-          (dag-debug (letter-subdag letter)))))
+          (format #t "~a~a~%"
+                  (make-string depth #\space)
+                  character)
+          (dag-debug (letter-subdag letter) (add1 depth)))))
     
     (let ((dag (make-hash-table)))
-      (update-dag! dag "harro")
-      (dag-debug dag))
+      ;; (update-dag! dag "harro")
+      ;; (dag-debug dag 0)
+      (with-input-from-file "words-head.txt"
+        (lambda ()
+          (do ((word (read-line) (read-line)))
+              ((eof-object? word))
+            (debug word)
+            (update-dag! dag word))))
+      (dag-debug dag 0))
   #+END_SRC
 
   First pass: let’s ascribe to the word arbitrary origin; and move as
