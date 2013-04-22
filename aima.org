@@ -5407,7 +5407,7 @@
   Board: two dimensional array of vectors. Need a special sentinel
   that signifies reversal.
 
-  #+BEGIN_SRC scheme
+  #+BEGIN_SRC scheme :comments link :tangle scrabble.scm :shebang #!/usr/bin/env chicken-scheme
     (use debug
          define-record-and-printer
          extras
