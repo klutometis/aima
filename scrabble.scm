@@ -5,7 +5,8 @@
 (use debug
      define-record-and-printer
      extras
-     srfi-1)
+     srfi-1
+     vector-lib)
 
 (define-record-and-printer sentinel)
 (define sentinel (make-sentinel))
@@ -20,23 +21,15 @@
 (define (make-non-terminal-letter)
   (make-letter #f (make-hash-table)))
 
-(define (integrate-fixes dag prefix suffix)
-  (let ((characters (if (null? suffix)
-                      prefix
-                      (append (append prefix (list sentinel))
-                              suffix))))
-    (letter-terminal?-set!
-     (fold (lambda (character letter)
-             (hash-table-update!
-              (letter-subdag letter)
-              character
-              identity
-              make-non-terminal-letter))
-           ;; This is a trojan-horse letter containing the root dag:
-           ;; the fold expects a letter.
-           (make-letter #f dag)
-           characters)
-     #t)))
+(define (character->index character)
+  (if (sentinel? character)
+      26
+      (- (char->integer character) 65)))
+
+(define (index->character index)
+  (if (= index 26)
+      sentinel
+      (integer->char (+ index 65))))
 
 (define (integrate-fixes dag prefix suffix)
   (let ((characters (if (null? suffix)
@@ -44,13 +37,10 @@
                       (append (append prefix (list sentinel))
                               suffix))))
     (fold (lambda (character dag)
-            (hash-table-update!
-             dag
-             character
-             identity
-             make-hash-table))
-          ;; This is a trojan-horse letter containing the root dag:
-          ;; the fold expects a letter.
+            (let ((index (character->index character)))
+              (unless (vector-ref dag index)
+                (vector-set! dag index (make-vector 27 #f)))
+              (vector-ref dag index)))
           dag
           characters)))
 
@@ -62,23 +52,17 @@
       (integrate-fixes dag prefix suffix))))
 
 (define (dag-debug dag depth)
-  (hash-table-walk dag
-    (lambda (character letter)
-      (format #t "~a~a~%"
-              (make-string depth #\space)
-              character)
-      (dag-debug (letter-subdag letter) (add1 depth)))))
+  (vector-for-each
+   (lambda (i x)
+     (when x
+       ;; (debug (index->character i))
+       (format #t "~a~a~%" (make-string depth #\space) (index->character i))
+       (dag-debug x (add1 depth))))
+   dag))
 
-(define (dag-debug dag depth)
-  (hash-table-walk dag
-    (lambda (character subdag)
-      (format #t "~a~a~%"
-              (make-string depth #\space)
-              character)
-      (dag-debug subdag (add1 depth)))))
-
-(let ((dag (make-hash-table)))
-  ;; (update-dag! dag "harro")
+;;; Be nice to store these fuckers in a graph database or something.
+(let ((dag (make-vector 27 #f)))
+  ;; (update-dag! dag "HARRO")
   ;; (dag-debug dag 0)
   (with-input-from-file "words.txt"
     (lambda ()
@@ -86,7 +70,7 @@
           ((eof-object? word))
         (debug word)
         (update-dag! dag word))))
-  ;; (dag-debug dag 0)
+  (dag-debug dag 0)
   )
 
 ;; 5\.4:1 ends here
