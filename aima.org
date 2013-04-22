@@ -5407,6 +5407,65 @@
   Board: two dimensional array of vectors. Need a special sentinel
   that signifies reversal.
 
+  #+BEGIN_SRC scheme
+    (use debug
+         define-record-and-printer)
+    
+    (define-record-and-printer sentinel)
+    (define sentinel (make-sentinel))
+    
+    (define-record-and-printer letter
+      terminal?
+      subdag)
+    
+    (define terminals (make-parameters (make-hash-table)))
+    (define non-terminals (make-parameters (make-hash-table)))
+    
+    (define (terminal letter)
+      (hash-table-update!
+       (terminals)
+       letter
+       identity
+       (make-letter letter #f)))
+    
+    (define (non-terminal letter)
+      (hash-table-update!
+       (non-terminals)
+       letter
+       identity
+       (make-letter letter #t)))
+    
+    (define (integrate-fixes dag prefix suffix)
+      (debug 'integrate-fixes prefix suffix)
+      (let* ((prefix (reverse prefix))
+             (characters (if (null? suffix)
+                          prefix
+                          (append (append prefix (list sentinel))
+                                  suffix))))
+        ;; Set the result of this fold to be terminal.
+        (fold (lambda (character dag)
+                (let ((subdag (update-hash-table!/default
+                               dag
+                               character
+                               (lambda (subdag)
+                                 (hash-table-set!
+                                  subdag
+                                  character
+                                  (make-letter #f (make-hash-table)))
+                                 subdag)
+                               (make-hash-table))))))
+              dag
+              characters)))
+    
+    (define (update-dag! dag word)
+      (let ((characters (string->list word)))
+        (do ((prefix (list (car characters)) (cons (car suffix) prefix))
+             (suffix (cdr characters) (cdr suffix)))
+            ((null? suffix) (integrate-fixes dag prefix suffix))
+          (integrate-fixes dag prefix suffix))))
+    
+    (update-dag! (make-hash-table) "harro")
+  #+END_SRC
 ** [[http://en.wikipedia.org/wiki/Scrabble][Scrabble]]
    - $15 \times 15$
    - $100$ tiles; $2$ blanks
