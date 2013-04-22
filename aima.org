@@ -5444,6 +5444,22 @@
                characters)
          #t)))
     
+    (define (integrate-fixes dag prefix suffix)
+      (let ((characters (if (null? suffix)
+                          prefix
+                          (append (append prefix (list sentinel))
+                                  suffix))))
+        (fold (lambda (character dag)
+                (hash-table-update!
+                 dag
+                 character
+                 identity
+                 (make-hash-table)))
+              ;; This is a trojan-horse letter containing the root dag:
+              ;; the fold expects a letter.
+              dag
+              characters)))
+    
     (define (update-dag! dag word)
       (let ((characters (string->list word)))
         (do ((prefix (list (car characters)) (cons (car suffix) prefix))
@@ -5462,13 +5478,14 @@
     (let ((dag (make-hash-table)))
       ;; (update-dag! dag "harro")
       ;; (dag-debug dag 0)
-      (with-input-from-file "words-head.txt"
-        (lambda ()
-          (do ((word (read-line) (read-line)))
-              ((eof-object? word))
-            (debug word)
-            (update-dag! dag word))))
-      (dag-debug dag 0))
+      (let ((dag (make-vector 26 #f)))
+        (with-input-from-file "words-head.txt"
+          (lambda ()
+            (do ((word (read-line) (read-line)))
+                ((eof-object? word))
+              (debug word)
+              (update-dag! dag word))))
+        (dag-debug dag 0)))
   #+END_SRC
 
   First pass: let’s ascribe to the word arbitrary origin; and move as
