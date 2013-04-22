@@ -5521,6 +5521,36 @@
      the move found first. Since ties occurred frequently and the
      algorithms do not generate moves in exactly the same order, the
      actual games played diverged quickly.
+** Appel, “The World’s Fastest Scrabble Program”
+   - Without loss of generality, we can restrict our attention to
+     generating the across plays only, since the down plays are simply
+     across plays with the board transposed.
+   - Because there are only 26 letters in the alphabet, these
+     cross-check sets can be represented efi- ciently as bit-vectors.
+     The cross-checks can be com- puted before beginning the move
+     generation phase, since they are independent of any particular
+     across move. Since the number of empty squares whose cross-
+     checks can change after any move is small, we need to recompute
+     cross-checks for only a few squares after each move.
+     - Memoized the crosschecks?
+   - Any across word must include some newly-placed tile adjacent to a
+     tile already on the board.4 Therefore, it is natural to use a
+     place of adja- cency as the spot to begin looking for a legal
+     move. We will call the leftmost newly-covered square adjacent to
+     a tile already on the board the anchor square of the word.
+   - It is easy to decide which squares are potential an- chor
+     squares: they are the empty squares that are adja- cent
+     (vertically or horizontally) to filled squares. We call these
+     candidate anchor squares the anchors of the row.
+   - By first computing the cross-checks and the anchors for a given
+     row, we can look for across words in that row without considering
+     the contents of any other row. The move generation problem is
+     thus reduced to the following one-dimensional problem: given a
+     rack of tiles, the contents of a row on the board, and the cross-
+     checks and anchors for the row, generate all legal plays in that
+     row.
+     - Cross-checks are the bridge between the current orientation and
+       the transposition.
 * TODO 5.5
   Come up with largest prime; let’s do polling.
 
