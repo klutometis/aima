@@ -5460,6 +5460,13 @@
       (update-dag! dag "harro")
       (dag-debug dag))
   #+END_SRC
+
+  First pass: let’s ascribe to the word arbitrary origin; and move as
+  far as we need to in any direction. (Board-boundaries are probably
+  a trivial part of the problem.)
+
+  Game state contains $x, y$ coördinates; can we do it in graphviz
+  with pre-computation?
 ** [[http://en.wikipedia.org/wiki/Scrabble][Scrabble]]
    - $15 \times 15$
    - $100$ tiles; $2$ blanks
