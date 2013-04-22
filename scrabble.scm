@@ -15,11 +15,13 @@
   terminal?
   subdag)
 
+(define (make-dag) (make-vector 27 #f))
+
 (define (make-terminal-letter)
-  (make-letter #t (make-hash-table)))
+  (make-letter #t (make-dag)))
 
 (define (make-non-terminal-letter)
-  (make-letter #f (make-hash-table)))
+  (make-letter #f (make-dag)))
 
 (define (character->index character)
   (if (sentinel? character)
@@ -36,12 +38,13 @@
                       prefix
                       (append (append prefix (list sentinel))
                               suffix))))
-    (fold (lambda (character dag)
-            (let ((index (character->index character)))
+    (fold (lambda (character letter)
+            (let ((dag (letter-subdag letter))
+                  (index (character->index character)))
               (unless (vector-ref dag index)
-                (vector-set! dag index (make-vector 27 #f)))
+                (vector-set! dag index (make-non-terminal-letter)))
               (vector-ref dag index)))
-          dag
+          (make-letter #f dag)
           characters)))
 
 (define (update-dag! dag word)
@@ -57,7 +60,7 @@
      (when x
        ;; (debug (index->character i))
        (format #t "~a~a~%" (make-string depth #\space) (index->character i))
-       (dag-debug x (add1 depth))))
+       (dag-debug (letter-subdag x) (add1 depth))))
    dag))
 
 ;;; Be nice to store these fuckers in a graph database or something.
@@ -70,7 +73,6 @@
           ((eof-object? word))
         (debug word)
         (update-dag! dag word))))
-  (dag-debug dag 0)
-  )
+  (dag-debug dag 0))
 
 ;; 5\.4:1 ends here
