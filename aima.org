@@ -5381,6 +5381,32 @@
   See [[http://www.ericsink.com/downloads/faster-scrabble-gordon.pdf][Gordon's paper]] on GADDAGs; also, [[http://en.wikipedia.org/wiki/Boyer%E2%80%93Moore_string_search_algorithm][Boyer-Moore]] string search.
 
   Need some function to determine contiguous words.
+
+  Build the tree; find the anchor points; try the permutations. Maybe
+  we can ignore blanks for the time being; ignore other contiguous
+  words. First, build the DAGs (nested hash-tables, or some kind of
+  array? Former if the space is sparse; otherwise, latter); anchor
+  squares, by the way, are “a square on the board onto which a word
+  could be hooked” (review the Appel paper). Let’s build the GADDAGs
+  first.
+
+  (Had a feeling, by the way, some NP-complete shit lurking under the
+  surface.)
+
+  Play on the edges, since that will generate intermediate matches?
+
+  #+BEGIN_QUOTE
+  There is no need to generate plays from every other internal anchor
+  square of a sequence of contiguous anchor squares (e.g. the square
+  left or right of the B in Figure 2), since every play from a given
+  anchor square would be generated from the adjacent anchor square
+  either to the right (above) or to the left (below).
+  #+END_QUOTE
+
+  Letter records: character, whether terminal; score kept elsewhere.
+  Board: two dimensional array of vectors. Need a special sentinel
+  that signifies reversal.
+
 ** [[http://en.wikipedia.org/wiki/Scrabble][Scrabble]]
    - $15 \times 15$
    - $100$ tiles; $2$ blanks
