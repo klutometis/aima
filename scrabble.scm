@@ -124,4 +124,28 @@
           (if subdag
               (iter subdag (cdr word))
               #f)))))
+
+(let ((state (make-hash-table))
+      (dag (make-dag))
+      (tiles '(#\E #\C #\R #\A)))
+  (update-dag! dag "ABLE")
+  (update-dag! dag "AR")
+  (update-dag! dag "ABLER")
+  (update-dag! dag "BE")
+  (update-dag! dag "CABLE")
+  (update-dag! dag "CARE")
+  (hash-table-set! state (make-square 0 0) #\A)
+  (hash-table-set! state (make-square 0 -1) #\B)
+  (hash-table-set! state (make-square 0 -2) #\L)
+  (hash-table-set! state (make-square 0 -3) #\E)
+  ;; Copy state; place; try; erase.
+  ;; (dag-debug dag 0)
+  (hash-table-walk state
+    (lambda (square character)
+      (let ((word (word-vertical state square)))
+        (debug word (match? dag word))))))
+
+;; (dag-debug (make-dag-from-file "words.txt") 0)
+
+
 ;; 5\.4:1 ends here
