@@ -92,4 +92,17 @@
   (cons (+ (square-x square) 1)
         (square-y square)))
 
+(define (word-vertical state square)
+  (do ((square square (below square)))
+      ((not (hash-table-ref/default state square #f))
+       (do ((square (above square) (above square))
+            (word '() (cons (hash-table-ref/default state square #f) word)))
+           ((not (hash-table-ref/default state square #f)) word)))))
+
+(define (word-horizontal state square)
+  (do ((square square (right-of square)))
+      ((not (hash-table-ref/default state square #f))
+       (do ((square (left-of square) (left-of square))
+            (word '() (cons (hash-table-ref/default state square #f) word)))
+           ((not (hash-table-ref/default state square #f)) word)))))
 ;; 5\.4:1 ends here
