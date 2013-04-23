@@ -5480,6 +5480,8 @@
 
   Game state contains $x, y$ coördinates; can we do it in graphviz
   with pre-computation?
+
+  Append to the anchors according to prefices; do crosschecks.
 ** [[http://en.wikipedia.org/wiki/Scrabble][Scrabble]]
    - $15 \times 15$
    - $100$ tiles; $2$ blanks
