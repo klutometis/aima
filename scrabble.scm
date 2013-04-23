@@ -62,5 +62,15 @@
    dag))
 
 ;;; Be nice to store these fuckers in a graph database or something.
+(define (make-dag-from-file file)
+  (let ((dag (make-dag)))
+    (with-input-from-file file
+      (lambda ()
+        (do ((word (read-line) (read-line)))
+            ((eof-object? word))
+          (debug word)
+          (update-dag! dag word))))
+    dag))
+
 
 ;; 5\.4:1 ends here
