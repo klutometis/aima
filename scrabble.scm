@@ -105,4 +105,23 @@
        (do ((square (left-of square) (left-of square))
             (word '() (cons (hash-table-ref/default state square #f) word)))
            ((not (hash-table-ref/default state square #f)) word)))))
+
+(define (insert-sentinel word)
+  (cons* (car word)
+         sentinel
+         (cdr word)))
+
+(define (match? dag word)
+  (let iter ((dag dag)
+             ;; We have to insert a sentinel when matching because of
+             ;; that idiosyncrasy of GADDAGs where a sentinel always
+             ;; comes second (except when the suffix is ∅).
+             (word (insert-sentinel word)))
+    (if (null? word)
+        (dag-terminal? dag)
+        (let* ((character (car word))
+               (subdag (dag-ref dag character)))
+          (if subdag
+              (iter subdag (cdr word))
+              #f)))))
 ;; 5\.4:1 ends here
