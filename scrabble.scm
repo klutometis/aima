@@ -11,9 +11,6 @@
 (define-record-and-printer sentinel)
 (define sentinel (make-sentinel))
 
-;;; Can get this down to bits?
-(define (make-dag) (make-vector 28 #f))
-
 (define (character->index character)
   (if (sentinel? character)
       26
@@ -24,20 +21,28 @@
       sentinel
       (integer->char (+ index 65))))
 
+;;; Can get this down to bits?
+(define (make-dag) (make-vector 28 #f))
+(define (dag-terminal? dag) (vector-ref dag 27))
+(define (dag-terminal?-set! dag terminal?)
+  (vector-set! dag 27 terminal?))
+(define (dag-ref dag character)
+  (vector-ref dag (character->index character)))
+(define (dag-set! dag character value)
+  (vector-set! dag (character->index character) value))
+
 (define (integrate-fixes dag prefix suffix)
   (let ((characters (if (null? suffix)
                       prefix
                       (append (append prefix (list sentinel))
                               suffix))))
-    (vector-set!
+    (dag-terminal?-set!
      (fold (lambda (character dag)
-             (let ((index (character->index character)))
-               (unless (vector-ref dag index)
-                 (vector-set! dag index (make-dag)))
-               (vector-ref dag index)))
+             (unless (dag-ref dag character)
+               (dag-set! dag character (make-dag)))
+             (dag-ref dag character))
            dag
            characters)
-     27
      #t)))
 
 (define (update-dag! dag word)
