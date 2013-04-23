@@ -72,5 +72,24 @@
           (update-dag! dag word))))
     dag))
 
+(define make-square cons)
+(define square-x car)
+(define square-y cdr)
+
+(define (above square)
+  (cons (square-x square)
+        (+ (square-y square) 1)))
+
+(define (below square)
+  (cons (square-x square)
+        (- (square-y square) 1)))
+
+(define (left-of square)
+  (cons (- (square-x square) 1)
+        (square-y square)))
+
+(define (right-of square)
+  (cons (+ (square-x square) 1)
+        (square-y square)))
 
 ;; 5\.4:1 ends here
