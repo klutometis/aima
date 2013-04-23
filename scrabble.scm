@@ -57,7 +57,7 @@
    (lambda (i x)
      (when (vector? x)
        ;; (debug (index->character i))
-       (format #t "~a~a~%" (make-string depth #\space) (index->character i))
+       (format #t "~a~a~%" (make-string depth #\_) (index->character i))
        (dag-debug x (add1 depth))))
    dag))
 
