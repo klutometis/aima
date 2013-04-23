@@ -62,14 +62,5 @@
    dag))
 
 ;;; Be nice to store these fuckers in a graph database or something.
-(let ((dag (make-dag)))
-  ;; (update-dag! dag "HARRO")
-  (with-input-from-file "words-head.txt"
-    (lambda ()
-      (do ((word (read-line) (read-line)))
-          ((eof-object? word))
-        (debug word)
-        (update-dag! dag word))))
-  (dag-debug dag 0))
 
 ;; 5\.4:1 ends here
