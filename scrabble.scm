@@ -142,6 +142,24 @@
        (do ((square (left-of square) (left-of square))
             (word '() (cons (game-ref/default game square #f) word)))
            ((not (game-ref/default game square #f)) word)))))
+
+(define (square-neighbors square)
+  (list (left-of square)
+        (right-of square)
+        (above square)
+        (below square)))
+
+(define (square-occupied? game square)
+  (game-ref/default game square #f))
+
+(define (anchor? game square)
+  (not (every (cut square-occupied? game <>)
+              (square-neighbors square))))
+
+(define (unoccupied-neighbors game square)
+  (filter (cut (complement square-occupied?) game <>)
+          (square-neighbors square)))
+
       (dag (make-dag))
       (tiles '(#\E #\C #\R #\A)))
   (update-dag! dag "ABLE")
