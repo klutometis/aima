@@ -123,7 +123,11 @@
               (iter subdag (cdr word))
               #f)))))
 
-(let ((state (make-hash-table))
+(define make-game make-hash-table)
+(define game-copy hash-table-copy)
+(define game-set! hash-table-set!)
+(define game-ref hash-table-ref)
+(define game-ref/default hash-table-ref/default)
 
 (define (word-vertical game square)
   (do ((square square (below square)))
