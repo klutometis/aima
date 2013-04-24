@@ -92,19 +92,7 @@
   (cons (+ (square-x square) 1)
         (square-y square)))
 
-(define (word-vertical state square)
-  (do ((square square (below square)))
-      ((not (hash-table-ref/default state square #f))
-       (do ((square (above square) (above square))
-            (word '() (cons (hash-table-ref/default state square #f) word)))
-           ((not (hash-table-ref/default state square #f)) word)))))
 
-(define (word-horizontal state square)
-  (do ((square square (right-of square)))
-      ((not (hash-table-ref/default state square #f))
-       (do ((square (left-of square) (left-of square))
-            (word '() (cons (hash-table-ref/default state square #f) word)))
-           ((not (hash-table-ref/default state square #f)) word)))))
 
 (define (insert-sentinel word)
   (cons* (car word)
@@ -126,6 +114,20 @@
               #f)))))
 
 (let ((state (make-hash-table))
+
+(define (word-vertical game square)
+  (do ((square square (below square)))
+      ((not (game-ref/default game square #f))
+       (do ((square (above square) (above square))
+            (word '() (cons (game-ref/default game square #f) word)))
+           ((not (game-ref/default game square #f)) word)))))
+
+(define (word-horizontal game square)
+  (do ((square square (right-of square)))
+      ((not (game-ref/default game square #f))
+       (do ((square (left-of square) (left-of square))
+            (word '() (cons (game-ref/default game square #f) word)))
+           ((not (game-ref/default game square #f)) word)))))
       (dag (make-dag))
       (tiles '(#\E #\C #\R #\A)))
   (update-dag! dag "ABLE")
