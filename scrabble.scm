@@ -160,7 +160,9 @@
   (filter (cut (complement square-occupied?) game <>)
           (square-neighbors square)))
 
+(let ((game (make-game))
       (dag (make-dag))
+      ;; The rack
       (tiles '(#\E #\C #\R #\A)))
   (update-dag! dag "ABLE")
   (update-dag! dag "AR")
@@ -168,16 +170,51 @@
   (update-dag! dag "BE")
   (update-dag! dag "CABLE")
   (update-dag! dag "CARE")
-  (hash-table-set! state (make-square 0 0) #\A)
-  (hash-table-set! state (make-square 0 -1) #\B)
-  (hash-table-set! state (make-square 0 -2) #\L)
-  (hash-table-set! state (make-square 0 -3) #\E)
-  ;; Copy state; place; try; erase.
+  (game-set! game (make-square 0 0) #\A)
+  (game-set! game (make-square 0 -1) #\B)
+  (game-set! game (make-square 0 -2) #\L)
+  (game-set! game (make-square 0 -3) #\E)
+  ;; Copy game; place; try; erase.
   ;; (dag-debug dag 0)
-  (hash-table-walk state
+  (hash-table-walk game
     (lambda (square character)
-      (let ((word (word-vertical state square)))
-        (debug word (match? dag word))))))
+      (let ((unoccupied-neighbors (unoccupied-neighbors game square)))
+        (for-each
+            (lambda (neighbor)
+              (debug square character neighbor)
+              ;; Copying the game is probably expensive; can't we
+              ;; erase? Optimization. We're going to have to copy the
+              ;; game for every trial, though, aren't we? Ouch.
+              ;;
+              ;; Cheap optimization: copy only after we've placed the
+              ;; first tile. Lots of false starts?
+              ;;
+              ;; Need to keep track of successful crosscheck for
+              ;; scoring purposes.
+              (let ((game (game-copy game)))
+                ;; Place; cross-check if vertical word is longer than
+                ;; one letter: continue. Terminal? Score it in the
+                ;; max-heap.
+                (let iter ((tiles tiles)
+                           (dag dag))
+                  (unless (null? tiles)
+                    (let ((character (car tiles)))
+                      (game-set! game neighbor character)
+                      (let ((vertical (word-vertical game neighbor)))
+                        (when (or (= (length vertical) 1)
+                                  (match? dag vertical))
+                          ;; We should be able to score each vertical
+                          ;; (and, eventually, the anchor).
+                          ;;
+                          ;; Need to answer more generally the
+                          ;; question of whether we have sideways
+                          ;; constraints.
+                          (debug vertical))))
+                    (iter (cdr tiles))))))
+          unoccupied-neighbors))
+      ;; (let ((word (word-vertical game square)))
+      ;;   (debug word (match? dag word) (anchor? game square)))
+      )))
 
 ;; (dag-debug (make-dag-from-file "words.txt") 0)
 
