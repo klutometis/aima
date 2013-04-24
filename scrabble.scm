@@ -92,7 +92,17 @@
   (cons (+ (square-x square) 1)
         (square-y square)))
 
+(define (above? s1 s2)
+  (below? s2 s1))
 
+(define (below? s1 s2)
+  (= 1 (- (square-y s2) (square-y s1))))
+
+(define (left-of? s1 s2)
+  (right-of? s2 s1))
+
+(define (right-of? s1 s2)
+  (= 1 (- (square-x s1) (square-x s2))))
 
 (define (insert-sentinel word)
   (cons* (car word)
