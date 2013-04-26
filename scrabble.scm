@@ -163,6 +163,30 @@
   (filter (cut (complement square-occupied?) game <>)
           (square-neighbors square)))
 
+(define (game-display game)
+  (match
+      (hash-table-fold
+       game
+       (lambda (square character minimum-maximum)
+         (match minimum-maximum
+           ((minimum . maximum)
+            (cons (make-square (inexact->exact (min (square-x minimum)
+                                                    (square-x square)))
+                               (inexact->exact (min (square-y minimum)
+                                                    (square-y square))))
+                  (make-square (inexact->exact (max (square-x maximum)
+                                                    (square-x square)))
+                               (inexact->exact (max (square-y maximum)
+                                                    (square-y square))))))))
+       (cons (make-square +inf.0 +inf.0)
+             (make-square -inf.0 -inf.0)))
+    ((minimum . maximum)
+     (do ((y (square-y maximum) (sub1 y)))
+         ((< y (square-y minimum)))
+       (do ((x (square-x minimum) (add1 x)))
+           ((> x (square-x maximum)) (newline))
+         (display (game-ref/default game (make-square x y) " ")))))))
+
 (let ((game (make-game))
       (dag (make-dag))
       ;; The rack
