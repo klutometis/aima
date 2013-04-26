@@ -5,6 +5,7 @@
 (use debug
      define-record-and-printer
      extras
+     matchable
      srfi-1
      vector-lib)
 
