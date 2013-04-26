@@ -192,6 +192,7 @@
       (dag (make-dag))
       ;; The rack
       (tiles '(#\E #\C #\R #\A)))
+  (debug? #f)
   (update-dag! dag "ABLE")
   (update-dag! dag "AR")
   (update-dag! dag "ABLER")
