@@ -143,6 +143,9 @@
             (word '() (cons (game-ref/default game square #f) word)))
            ((not (game-ref/default game square #f)) word)))))
 
+(define (crosscheck dag word)
+  (and (match? dag word) (length word)))
+
 (define (square-neighbors square)
   (list (left-of square)
         (right-of square)
@@ -178,43 +181,55 @@
   ;; (dag-debug dag 0)
   (hash-table-walk game
     (lambda (square character)
-      (let ((unoccupied-neighbors (unoccupied-neighbors game square)))
-        (for-each
-            (lambda (neighbor)
-              (debug square character neighbor)
-              ;; Copying the game is probably expensive; can't we
-              ;; erase? Optimization. We're going to have to copy the
-              ;; game for every trial, though, aren't we? Ouch.
-              ;;
-              ;; Cheap optimization: copy only after we've placed the
-              ;; first tile. Lots of false starts?
-              ;;
-              ;; Need to keep track of successful crosscheck for
-              ;; scoring purposes.
-              (let ((game (game-copy game)))
-                ;; Place; cross-check if vertical word is longer than
-                ;; one letter: continue. Terminal? Score it in the
-                ;; max-heap.
-                (let iter ((tiles tiles)
-                           (dag dag))
-                  (unless (null? tiles)
-                    (let ((character (car tiles)))
-                      (game-set! game neighbor character)
-                      (let ((vertical (word-vertical game neighbor)))
-                        (when (or (= (length vertical) 1)
-                                  (match? dag vertical))
-                          ;; We should be able to score each vertical
-                          ;; (and, eventually, the anchor).
-                          ;;
-                          ;; Need to answer more generally the
-                          ;; question of whether we have sideways
-                          ;; constraints.
-                          (debug vertical))))
-                    (iter (cdr tiles))))))
-          unoccupied-neighbors))
-      ;; (let ((word (word-vertical game square)))
-      ;;   (debug word (match? dag word) (anchor? game square)))
-      )))
+      (when (anchor? game square)
+        (let iter ((current-square square)
+                   (rack (cons sentinel tiles))
+                   (subdag dag)
+                   (next-square left-of)
+                   (score 0)
+                   (game (game-copy game))
+                   ;; (word '())
+                   )
+          (debug current-square rack score (and subdag #t))
+          ;; Need dag-checks and terminal checks.
+          (when subdag
+            ;; When we determine terminal, we also need to have the
+            ;; word hitherto, don't we?
+            (debug (dag-terminal? subdag) (when (dag-terminal? subdag) (hash-table->alist game)))
+            (let ((character (game-ref/default game current-square #f)))
+              (debug 'preëxisting character)
+              (if character
+                  (iter (next-square current-square)
+                         rack
+                         (dag-ref subdag character)
+                         next-square
+                         (add1 score)
+                         game)
+                  (for-each (lambda (character)
+                              (debug 'iterate character)
+                              (if (sentinel? character)
+                                  (let ((next-square right-of))
+                                    (iter (next-square square)
+                                          (delete sentinel rack)
+                                          (dag-ref subdag sentinel)
+                                          next-square
+                                          score
+                                          game))
+                                  (begin
+                                    (game-set! game current-square character)
+                                    (let* ((vertical (word-vertical game current-square))
+                                           (crosscheck (if (= (length vertical) 1)
+                                                           1
+                                                           (crosscheck dag vertical))))
+                                      (debug crosscheck)
+                                      (when crosscheck
+                                        (iter (next-square current-square)
+                                              (delete character rack)
+                                              (dag-ref subdag character)
+                                              next-square
+                                              (+ score crosscheck)
+                                              (game-copy game)))))))
+                    rack)))))))))
 
 ;; (dag-debug (make-dag-from-file "words.txt") 0)
 
