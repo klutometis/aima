@@ -147,6 +147,9 @@
             (word '() (cons (game-ref/default game square #f) word)))
            ((not (game-ref/default game square #f)) word)))))
 
+;;; This is a misnomer: it may not be a crosscheck, but merely a
+;;; check, in the case where we're testing for parallel contiguous
+;;; words.
 (define (crosscheck dag word)
   (and (match? dag word) (length word)))
 
