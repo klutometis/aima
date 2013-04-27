@@ -225,6 +225,11 @@
                   (below square))))
       anchors))
    '()))
+
+(define-record-and-printer word
+  start
+  characters
+  orientation)
 (let ((game (make-game))
       (dag (make-dag))
       ;; The rack
