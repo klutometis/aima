@@ -247,6 +247,36 @@
 
 (define (word->string characters)
   (list->string (normalize-characters characters)))
+
+;;; A word has: start, letters, orientation; it's a vector. A game
+;;; having extents is more interesting, isn't it? Some constraints.
+;;; The triple-word-score bullshit, too.
+;;;
+;;; Could also simply do a collection of square-character pairs; nah.
+;;;
+;;; A word will be a reversed collection of letters with a possible
+;;; sentinel.
+;;;
+;;; The game server needs to do redundant cross checks, &c.; let's
+;;; abstract this into a function.
+;;;
+;;; We'll also have to have some function which, given a direction,
+;;; finds an inverse.
+;;;
+;;; Should we not do sentinels, &c.; to reduce the burden on other
+;;; clients? Just: start, string, orientation?
+;;;
+;;; Left or down maps most naturally to the DAGGAD, incidentally.
+;;;
+;;; Christ, haven't yet dealt with blanks.
+;;;
+;;; Different versions of the game: some with unlimited extent;
+;;; others, limited with word- and letter-scores? Three dimensional?
+;;;
+;;; Randomly pull off the top candidate.
+;;;
+;;; There's so much logic in here, I'd hate to reproduce it for the
+;;; game server; we need to abstract it.
 (let ((game (make-game))
       (dag (make-dag))
       ;; The rack
