@@ -304,8 +304,7 @@
                    (next-square left-of)
                    (score 0)
                    (game (game-copy game))
-                   ;; (word '())
-                   )
+                   (word '()))
           (debug current-square rack score (and subdag #t))
           ;; Need dag-checks and terminal checks.
           (when subdag
