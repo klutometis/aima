@@ -374,6 +374,7 @@
                                               (cons character word)))))))
                     rack))))))
     (game-anchors game))
+  (debug (heap->alist moves)))
 
 ;; (dag-debug (make-dag-from-file "words.txt") 0)
 
