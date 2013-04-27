@@ -230,6 +230,23 @@
   start
   characters
   orientation)
+
+(define (normalize-characters characters)
+  (if (member sentinel characters)
+      (let iter ((characters characters)
+                 (word '()))
+        (if (null? characters)
+            word
+            (let ((character (car characters)))
+              (if (sentinel? character)
+                  (iter (reverse (cdr characters))
+                        word)
+                  (iter (cdr characters)
+                        (cons character word))))))
+      characters))
+
+(define (word->string characters)
+  (list->string (normalize-characters characters)))
 (let ((game (make-game))
       (dag (make-dag))
       ;; The rack
