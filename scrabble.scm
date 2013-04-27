@@ -310,9 +310,6 @@
           (when subdag
             ;; When we determine terminal, we also need to have the
             ;; word hitherto, don't we?
-            (debug (dag-terminal? subdag)
-                   (when (dag-terminal? subdag)
-                     (hash-table->alist game)))
             (when (dag-terminal? subdag)
               (game-display game))
             (let ((character (game-ref/default game current-square #f)))
