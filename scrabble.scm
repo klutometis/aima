@@ -127,7 +127,9 @@
               (iter subdag (cdr word))
               #f)))))
 
+;;; NB: game -> board, in preparation for make-scrabble.
 (define make-game make-hash-table)
+(define (game-empty? game) (zero? (hash-table-size game)))
 (define game-copy hash-table-copy)
 (define game-set! hash-table-set!)
 (define game-ref hash-table-ref)
