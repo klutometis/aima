@@ -418,4 +418,17 @@
        (if (legal? scrabble move)
            (player-score-set! player (score scrabble move))
            #f)))))
+
+;;; Generalize this at some point; game has a state and some
+;;; termination function.
+(define (play game players)
+  (let iter ((players (apply circular-list players)))
+    (if (game-terminal? game)
+        (game-state game)
+        (if (game-play game (car players))
+            ;; Successful move, go to the next player.
+            (iter (cdr players))
+            ;; Circular; some failure to move.
+            (iter players)))))
+
 ;; 5\.4:1 ends here
