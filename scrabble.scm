@@ -391,5 +391,11 @@
 
 ;; (dag-debug (make-dag-from-file "words.txt") 0)
 
+(define (shuffle! v)
+  (do ((n (vector-length v) (- n 1)))
+      ((zero? n) v)
+    (let* ((r (random n)) (t (vector-ref v r)))
+      (vector-set! v r (vector-ref v (- n 1)))
+      (vector-set! v (- n 1) t))))
 
 ;; 5\.4:1 ends here
