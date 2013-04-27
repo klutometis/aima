@@ -373,6 +373,7 @@
                                               (game-copy game)
                                               (cons character word)))))))
                     rack))))))
+    (game-anchors game))
 
 ;; (dag-debug (make-dag-from-file "words.txt") 0)
 
