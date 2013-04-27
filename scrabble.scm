@@ -314,7 +314,8 @@
             ;; Also crosscheck the sideways word on terminal, in case
             ;; we abut something horizontally.
             (when (dag-terminal? subdag)
-              (game-display game))
+              (debug word (word->string word))
+              (game-display game)
             (let ((character (game-ref/default game current-square #f)))
               (debug 'preëxisting character)
               (if character
