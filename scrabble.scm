@@ -356,6 +356,19 @@
                                               (delete character rack)
                                               (dag-ref subdag character)
                                               next-square
+                                              ;; Subtract 1 from cross
+                                              ;; check; since we'll
+                                              ;; add the score at the
+                                              ;; terminal horizontal
+                                              ;; crosscheck.
+                                              ;;
+                                              ;; This is to account
+                                              ;; for the possibility
+                                              ;; of horizontally
+                                              ;; adjoining words.
+                                              ;;
+                                              ;; No, we'll add it
+                                              ;; later.
                                               (+ score crosscheck)
                                               (game-copy game)))))))
                     rack)))))))))
