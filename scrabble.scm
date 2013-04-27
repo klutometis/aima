@@ -316,6 +316,13 @@
             (when (dag-terminal? subdag)
               (debug word (word->string word))
               (game-display game)
+              (let* ((crosscheck (crosscheck dag (word-horizontal game square)))
+                     ;; We need to account for horizontally adjoining
+                     ;; words (if any): count the current word plus
+                     ;; horizontally adjoining words and the subtract
+                     ;; the current word.
+                     (score (+ score (- crosscheck (length (delete sentinel word))))))
+                (heap-insert! moves score (make-word current-square word left-of))))
             (let ((character (game-ref/default game current-square #f)))
               (debug 'preëxisting character)
               (if character
