@@ -295,9 +295,9 @@
   (game-set! game (make-square 0 -3) #\E)
   ;; Copy game; place; try; erase.
   ;; (dag-debug dag 0)
-  (hash-table-walk game
-    (lambda (square character)
-      (when (anchor? game square)
+  (debug (game-anchors game))
+  (for-each
+      (lambda (square)
         (let iter ((current-square square)
                    (rack (cons sentinel tiles))
                    (subdag dag)
