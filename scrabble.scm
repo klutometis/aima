@@ -398,4 +398,24 @@
       (vector-set! v r (vector-ref v (- n 1)))
       (vector-set! v (- n 1) t))))
 
+(define (make-scrabble-game)
+  (make-game
+   (make-scrabble
+    (make-board)
+    ;; We have a problem: srfi-1#delete deletes all instances. Can't
+    ;; have multiple tiles therewith and delete only one. To hash
+    ;; tables with histograms? Damn.
+    ;;
+    ;; Actually, this is only a problem for agents; the game can shuffle
+    '(#\E #\C #\R #\A)
+    (make-hash-table))
+   (lambda (scrabble)
+     ;; Also, six successive scoreless turns
+     ;; (<http://en.wikipedia.org/wiki/Scrabble#Sequence_of_play>).
+     (zero? (length (scrabble-tiles scrabble))))
+   (lambda (scrabble player)
+     (let ((move ((player-play player) scrabble)))
+       (if (legal? scrabble move)
+           (player-score-set! player (score scrabble move))
+           #f)))))
 ;; 5\.4:1 ends here
