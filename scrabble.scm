@@ -370,8 +370,9 @@
                                               ;; No, we'll add it
                                               ;; later.
                                               (+ score crosscheck)
-                                              (game-copy game)))))))
-                    rack)))))))))
+                                              (game-copy game)
+                                              (cons character word)))))))
+                    rack))))))
 
 ;; (dag-debug (make-dag-from-file "words.txt") 0)
 
