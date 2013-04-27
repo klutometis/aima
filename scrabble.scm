@@ -310,6 +310,9 @@
           (when subdag
             ;; When we determine terminal, we also need to have the
             ;; word hitherto, don't we?
+            ;;
+            ;; Also crosscheck the sideways word on terminal, in case
+            ;; we abut something horizontally.
             (when (dag-terminal? subdag)
               (game-display game))
             (let ((character (game-ref/default game current-square #f)))
