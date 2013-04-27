@@ -327,11 +327,12 @@
               (debug 'preëxisting character)
               (if character
                   (iter (next-square current-square)
-                         rack
-                         (dag-ref subdag character)
-                         next-square
-                         (add1 score)
-                         game)
+                        rack
+                        (dag-ref subdag character)
+                        next-square
+                        (add1 score)
+                        game
+                        (cons character word))
                   (for-each (lambda (character)
                               (debug 'iterate character)
                               (if (sentinel? character)
