@@ -378,6 +378,17 @@
     (game-anchors game))
   (debug (heap->alist moves)))
 
+(define-record-and-printer scrabble
+  board
+  tiles
+  scores)
+
+(define-record-and-printer game
+  state
+  terminal?
+  ;; Updates score, &c.; takes an agent, calls play; updates score?
+  play)
+
 ;; (dag-debug (make-dag-from-file "words.txt") 0)
 
 
