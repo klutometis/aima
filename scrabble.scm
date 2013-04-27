@@ -342,7 +342,8 @@
                                           (dag-ref subdag sentinel)
                                           next-square
                                           score
-                                          game))
+                                          game
+                                          (cons character word)))
                                   (begin
                                     (game-set! game current-square character)
                                     (let* ((vertical (word-vertical game current-square))
