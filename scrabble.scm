@@ -280,8 +280,9 @@
 (let ((game (make-game))
       (dag (make-dag))
       ;; The rack
-      (tiles '(#\E #\C #\R #\A)))
-  (debug? #f)
+      (tiles '(#\E #\C #\R #\A))
+      (moves (make-max-heap)))
+  ;; (debug? #f)
   (update-dag! dag "ABLE")
   (update-dag! dag "AR")
   (update-dag! dag "ABLER")
