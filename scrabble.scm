@@ -201,6 +201,30 @@
            ((> x (square-x maximum)) (newline))
          (display (game-ref/default game (make-square x y) " ")))))))
 
+;;; This is somehow orientation-dependent; how, is a little weird. It
+;;; would be nice to think about this generally: why don't the
+;;; horizontal neighbors of anchors "count" when thinking horizontal?
+;;; They do: it's just that they're pruned; they get considered when
+;;; proceeding horizontally from anchors.
+;;;
+;;; Vertical neighbors, on the other hand, don't get considered unless
+;;; we explicitly add them in. Why is that? Why can't we solve this
+;;; more generally?
+(define (game-anchors game)
+  (hash-table-fold
+   game
+   (lambda (square character anchors)
+     (append
+      (filter
+       identity
+       (list (and (anchor? game square)
+                  square)
+             (and (not (square-occupied? game (above square)))
+                  (above square))
+             (and (not (square-occupied? game (below square)))
+                  (below square))))
+      anchors))
+   '()))
 (let ((game (make-game))
       (dag (make-dag))
       ;; The rack
