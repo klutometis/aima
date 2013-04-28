@@ -250,6 +250,16 @@
 (define (word->string characters)
   (list->string (normalize-characters characters)))
 
+(define delete-first
+  (case-lambda
+   ((x list) (delete-first x list equal?))
+   ((x list =)
+    (receive (prefix suffix)
+      (break (lambda (y) (= x y)) list)
+      (if (null? suffix)
+          prefix
+          (append prefix (cdr suffix)))))))
+
 ;;; A word has: start, letters, orientation; it's a vector. A game
 ;;; having extents is more interesting, isn't it? Some constraints.
 ;;; The triple-word-score bullshit, too.
@@ -355,7 +365,7 @@
                                       (debug crosscheck)
                                       (when crosscheck
                                         (iter (next-square current-square)
-                                              (delete character rack)
+                                              (delete-first character rack)
                                               (dag-ref subdag character)
                                               next-square
                                               ;; Subtract 1 from cross
@@ -405,6 +415,8 @@
     ;; We have a problem: srfi-1#delete deletes all instances. Can't
     ;; have multiple tiles therewith and delete only one. To hash
     ;; tables with histograms? Damn.
+    ;;
+    ;; That's ok; implemented delete-first.
     ;;
     ;; Actually, this is only a problem for agents; the game can shuffle
     '(#\E #\C #\R #\A)
