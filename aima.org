@@ -5482,6 +5482,24 @@
   with pre-computation?
 
   Append to the anchors according to prefices; do crosschecks.
+  
+  #+BEGIN_SRC scheme
+    (use debug srfi-1 test)
+    
+    (define delete-first
+      (case-lambda
+       ((x list) (delete-first x list equal?))
+       ((x list =)
+        (receive (prefix suffix)
+          (break (lambda (y) (= x y)) list)
+          (if (null? suffix)
+              prefix
+              (append prefix (cdr suffix)))))))
+    
+    (test '(#\B #\A #\Z)
+          (delete-first #\A '(#\B #\A #\A #\Z)))
+    
+  #+END_SRC
 ** [[http://en.wikipedia.org/wiki/Scrabble][Scrabble]]
    - $15 \times 15$
    - $100$ tiles; $2$ blanks
