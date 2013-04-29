@@ -237,34 +237,27 @@
            ((> x (square-x maximum)) (newline))
          (display (board-ref/default board (make-square x y) " ")))))))
 
-;;; This is somehow orientation-dependent; how, is a little weird. It
-;;; would be nice to think about this generally: why don't the
-;;; horizontal neighbors of anchors "count" when thinking horizontal?
-;;; They do: it's just that they're pruned; they get considered when
-;;; proceeding horizontally from anchors.
-;;;
-;;; Vertical neighbors, on the other hand, don't get considered unless
-;;; we explicitly add them in. Why is that? Why can't we solve this
-;;; more generally?
-(define (board-anchors board)
-  (hash-table-fold
-   board
-   (lambda (square character anchors)
-     (append
-      (filter
-       identity
-       (list (and (anchor? board square)
-                  square)
-             (and (not (square-occupied? board (above square)))
-                  (above square))
-             (and (not (square-occupied? board (below square)))
-                  (below square))))
-      anchors))
-   '()))
 (define (anchor? board square)
   (not (every (cut square-occupied? board <>)
               (square-neighbors square))))
 
+(define (board-anchors board next-square)
+  (let* ((above (orthogonal-to next-square))
+         (below (reverse-of above)))
+    (hash-table-fold
+     board
+     (lambda (square character anchors)
+       (append
+        (filter
+         identity
+         (list (and (anchor? board square)
+                    square)
+               (and (not (square-occupied? board (above square)))
+                    (above square))
+               (and (not (square-occupied? board (below square)))
+                    (below square))))
+        anchors))
+     '())))
 
 (define-record-and-printer word
   start
