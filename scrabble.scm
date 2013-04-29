@@ -465,10 +465,15 @@
 ;;; Let's also test against the lexicon here.
 (define (scrabble-score scrabble player move)
   (let ((board (board-copy (scrabble-board scrabble)))
-        (next-square (reading-of (word-orientation move))))
+        (next-square (word-orientation move)))
+    (debug 'scrabble-score
+           (word-orientation move)
+           next-square)
     (let iter ((square (word-start move))
                (characters (word-characters move))
-               (score 0))
+               (score 0)
+               (next-square next-square))
+      (debug square)
       (board-display board)
       (if (null? characters)
           ;; Shit; we can also check the word incrementally; avoiding
