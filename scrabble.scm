@@ -333,6 +333,7 @@
         (next-square (word-orientation move)))
     (debug 'scrabble-score
            (word-orientation move)
+           (word-characters move)
            next-square)
     (let iter ((square (word-start move))
                (characters (word-characters move))
