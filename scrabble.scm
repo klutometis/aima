@@ -461,6 +461,8 @@
 
 ;;; Scrabble is also known as: "game"; return a copy of the board, so
 ;;; we don't have to propagate later?
+;;;
+;;; Let's also test against the lexicon here.
 (define (scrabble-score scrabble player move)
   (let ((board (board-copy (scrabble-board scrabble)))
         (next-square (reading-of (word-orientation move))))
