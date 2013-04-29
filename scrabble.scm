@@ -113,6 +113,8 @@
          sentinel
          (cdr word)))
 
+;;; To avoid that bizarre sentinel-insertion shit, why not reverse the
+;;; letters?
 (define (match? dag word)
   (let iter ((dag dag)
              ;; We have to insert a sentinel when matching because of
