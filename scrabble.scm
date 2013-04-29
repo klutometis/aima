@@ -129,6 +129,20 @@
               (iter subdag (cdr word))
               #f)))))
 
+(define (match? dag word)
+  (let iter ((dag dag)
+             ;; We have to insert a sentinel when matching because of
+             ;; that idiosyncrasy of GADDAGs where a sentinel always
+             ;; comes second (except when the suffix is ∅).
+             (word word))
+    (if (null? word)
+        (dag-terminal? dag)
+        (let* ((character (car word))
+               (subdag (dag-ref dag character)))
+          (if subdag
+              (iter subdag (cdr word))
+              #f)))))
+
 ;;; NB: game -> board, in preparation for make-scrabble.
 (define make-board make-hash-table)
 (define (board-empty? board) (zero? (hash-table-size board)))
