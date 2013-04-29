@@ -634,12 +634,14 @@
                  (when (dag-terminal? subdag)
                    ;; (debug word (word->string word))
                    ;; (board-display board)
+                   ;; (let* ((crosscheck (crosscheck lexicon (reverse (word-horizontal board square))))
                    (let* ((crosscheck (crosscheck lexicon (reverse (word-horizontal board square))))
                           ;; We need to account for horizontally adjoining
                           ;; words (if any): count the current word plus
                           ;; horizontally adjoining words and the subtract
                           ;; the current word.
                           (score (+ score (- crosscheck (length (delete sentinel word))))))
+                     (debug next-square)
                      (heap-insert! moves
                                    score
                                    ;; Would be right-of or below,
