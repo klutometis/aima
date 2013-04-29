@@ -180,12 +180,6 @@
               (word '() (cons (board-ref/default board square #f) word)))
              ((not (board-ref/default board square #f)) word))))))
 
-(define (word-vertical board square)
-  (word-scan board square below))
-
-(define (word-horizontal board square)
-  (word-scan board square right-of))
-
 ;;; This is a misnomer: it may not be a crosscheck, but merely a
 ;;; check, in the case where we're testing for parallel contiguous
 ;;; words.
