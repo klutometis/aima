@@ -439,46 +439,51 @@
      ;; Player forfeits turn on n bad moves (i.e. passes).
      (lambda (scrabble player)
        (plenish-rack! scrabble player)
-       (let* ((move ((player-play player)
-                     (scrabble-board scrabble)
-                     (player-rack player)))
-              (score (scrabble-score scrabble player move)))
-         ;; Must also take player into consideration: do they have the
-         ;; appropriate tiles, &c.? Is it worthwhile calculating this
-         ;; separately from the score, since there's some ovelap
-         ;; (crosschecks, &c.); or all at once?
-         ;;
-         ;; Also, should `legal?' be a formal part of the game
-         ;; structure? Nah; it's an ad-hoc subproblem.
-         ;;
-         ;; Score is an integer or `#f' if the move is illegal?
-         ;; (debug move score)
-         (if score
+       (debug (player-rack player))
+       (let ((move ((player-play player)
+                    (scrabble-board scrabble)
+                    (player-rack player))))
+         (if move
+             (let ((score (scrabble-score scrabble player move)))
+               ;; Must also take player into consideration: do they have the
+               ;; appropriate tiles, &c.? Is it worthwhile calculating this
+               ;; separately from the score, since there's some ovelap
+               ;; (crosschecks, &c.); or all at once?
+               ;;
+               ;; Also, should `legal?' be a formal part of the game
+               ;; structure? Nah; it's an ad-hoc subproblem.
+               ;;
+               ;; Score is an integer or `#f' if the move is illegal?
+               ;; (debug move score)
+               (if score
+                   (begin
+                     (debug (player-score player) score)
+                     (player-score-set! player (+ (player-score player) score))
+                     (hash-table-set! wrong-moves player 0)
+                     (hash-table-set! pass player #f)
+                     ;; Normalize-characters and reading-of should be redundant
+                     ;; (and even destructive, if the former reverses yet
+                     ;; again).
+                     (let iter ((characters (word-characters move))
+                                (square (word-start move)))
+                       (unless (null? characters)
+                         (let ((character (car characters)))
+                           ;; (board-set! (scrabble-board scrabble) square character)
+                           (player-rack-set! player (delete-first character (player-rack player)))
+                           (iter (cdr characters)
+                                 ((word-orientation move) square))))))
+                   (begin
+                     (hash-table-update!/default
+                      wrong-moves
+                      player
+                      add1
+                      0)
+                     (and (= (hash-table-ref/default wrong-moves player 0)
+                             (n-wrong-moves))
+                          (hash-table-set! pass player #t)))))
              (begin
-               (debug (player-score player) score)
-               (player-score-set! player (+ (player-score player) score))
-               (hash-table-set! wrong-moves player 0)
-               (hash-table-set! pass player #f)
-               ;; Normalize-characters and reading-of should be redundant
-               ;; (and even destructive, if the former reverses yet
-               ;; again).
-               (let iter ((characters (word-characters move))
-                          (square (word-start move)))
-                 (unless (null? characters)
-                   (let ((character (car characters)))
-                     ;; (board-set! (scrabble-board scrabble) square character)
-                     (player-rack-set! player (delete-first character (player-rack player)))
-                     (iter (cdr characters)
-                           ((word-orientation move) square))))))
-             (begin
-               (hash-table-update!/default
-                wrong-moves
-                player
-                add1
-                0)
-               (and (= (hash-table-ref/default wrong-moves player 0)
-                       (n-wrong-moves))
-                    (hash-table-set! pass player #t)))))))))
+               (hash-table-set! pass player #t)
+               #t)))))))
 
 (define (calculate-moves! lexicon moves next-square board rack)
   (for-each
