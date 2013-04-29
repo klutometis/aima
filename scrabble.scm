@@ -171,7 +171,7 @@
         ((eq? orientation below) above)))
 
 ;;; Need a generic word which happens to take an orientation.
-(define (word board square next-square)
+(define (word-scan board square next-square)
   (let ((previous-square (reverse-of next-square)))
     (do ((square square (next-square square)))
         ((not (board-ref/default board square #f))
@@ -181,10 +181,10 @@
              ((not (board-ref/default board square #f)) word))))))
 
 (define (word-vertical board square)
-  (word board square below))
+  (word-scan board square below))
 
 (define (word-horizontal board square)
-  (word board square right-of))
+  (word-scan board square right-of))
 
 ;;; This is a misnomer: it may not be a crosscheck, but merely a
 ;;; check, in the case where we're testing for parallel contiguous
@@ -353,7 +353,9 @@
           (begin
             (debug "Characters are null.")
             (and (match? (scrabble-lexicon scrabble)
-                         (reverse (word board (word-start move) next-square)))
+                         (word-scan board
+                                    (word-start move)
+                                    (crosscheck-of next-square)))
                  ;; Need some terminal arithmetic here for adjoining
                  ;; words.
                  (scrabble-board-set! scrabble board)
@@ -380,7 +382,8 @@
                         (debug "The character is not a sentinel.")
                         (board-set! board square character)
                         ;; Let `word' reverse?
-                        (let* ((orthogonal (word board square (orthogonal-to next-square)))
+                        (debug (orthogonal-to next-square))
+                        (let* ((orthogonal (word-scan board square (crosscheck-of (orthogonal-to next-square))))
                                (crosscheck (if (= (length orthogonal) 1)
                                                1
                                                (crosscheck (scrabble-lexicon scrabble)
@@ -514,7 +517,7 @@
                    ;; (debug word (word->string word))
                    ;; (board-display board)
                    ;; (let* ((crosscheck (crosscheck lexicon (reverse (word-horizontal board square))))
-                   (let* ((crosscheck (crosscheck lexicon (reverse (word-horizontal board square))))
+                   (let* ((crosscheck (crosscheck lexicon (word-scan board square (crosscheck-of next-square))))
                           ;; We need to account for horizontally adjoining
                           ;; words (if any): count the current word plus
                           ;; horizontally adjoining words and the subtract
