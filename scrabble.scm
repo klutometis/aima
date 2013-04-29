@@ -520,12 +520,74 @@
 (define (make-scrabble-game lexicon)
   (let ((pass (make-hash-table))
         (wrong-moves (make-hash-table)))
+    (make-game
+     (make-scrabble
+      (make-board)
+      ;; We have a problem: srfi-1#delete deletes all instances. Can't
+      ;; have multiple tiles therewith and delete only one. To hash
+      ;; tables with histograms? Damn.
+      ;;
+      ;; That's ok: implemented delete-first.
+      ;;
+      ;; Actually, this is only a problem for agents; the game can shuffle
+      '(#\E #\C #\R #\A)
+      lexicon)
+     (lambda (scrabble players)
+       (for-each (cut plenish-rack! scrabble <>) players))
+     ;; Also end the game if everyone passes.
+     (lambda (scrabble players)
+       ;; Also, six successive scoreless turns
+       ;; (<http://en.wikipedia.org/wiki/Scrabble#Sequence_of_play>).
        ;;
-       ;; Also, should `legal?' be a formal part of the game
-       ;; structure? Nah; it's an ad-hoc subproblem.
-       ;;
-       ;; Score is an integer or `#f' if the move is illegal?
-       (and score (player-score-set! player score))))))
+       ;; Need to also check the players' racks.
+       (or (and (zero? (length (scrabble-tiles scrabble)))
+                (every zero?
+                       (map (lambda (player) (length (player-rack player)))
+                            players)))
+           (and (positive? (hash-table-size pass))
+                (every values (hash-table-values pass)))))
+     ;; Player forfeits turn on n bad moves (i.e. passes).
+     (lambda (scrabble player)
+       (plenish-rack! scrabble player)
+       (let* ((move ((player-play player)
+                     (scrabble-board scrabble)
+                     (player-rack player)))
+              (score (scrabble-score scrabble player move)))
+         ;; Must also take player into consideration: do they have the
+         ;; appropriate tiles, &c.? Is it worthwhile calculating this
+         ;; separately from the score, since there's some ovelap
+         ;; (crosschecks, &c.); or all at once?
+         ;;
+         ;; Also, should `legal?' be a formal part of the game
+         ;; structure? Nah; it's an ad-hoc subproblem.
+         ;;
+         ;; Score is an integer or `#f' if the move is illegal?
+         (debug move score)
+         (if score
+             (begin
+               (player-score-set! player (+ (player-score player) score))
+               (hash-table-set! wrong-moves player 0)
+               (hash-table-set! pass player #f)
+               ;; Normalize-characters and reading-of should be redundant
+               ;; (and even destructive, if the former reverses yet
+               ;; again).
+               (let iter ((characters (word-characters move))
+                          (square (word-start move)))
+                 (unless (null? characters)
+                   (let ((character (car characters)))
+                     ;; (board-set! (scrabble-board scrabble) square character)
+                     (player-rack-set! player (delete-first character (player-rack player)))
+                     (iter (cdr characters)
+                           ((word-orientation move) square))))))
+             (begin
+               (hash-table-update!/default
+                wrong-moves
+                player
+                add1
+                0)
+               (and (= (hash-table-ref/default wrong-moves player 0)
+                       (n-wrong-moves))
+                    (hash-table-set! pass player #t)))))))))
 
 ;;; Make a player here; game has state; we have a rack. Authoritative?
 ;;; Ask the server? What happens when they diverge?
