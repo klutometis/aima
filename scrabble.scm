@@ -497,6 +497,23 @@
                                (cdr characters)
                                (+ score crosscheck)))))))))))
 
+(define n-tiles-in-rack (make-parameter 7))
+
+(define (plenish-rack! scrabble player)
+  (let ((rack-deficit (- (n-tiles-in-rack)
+                         (length (player-rack player))))
+        (n-tiles (length (scrabble-tiles scrabble))))
+    (when (and (positive? rack-deficit)
+               (positive? n-tiles))
+      (let* ((n-new-tiles (min rack-deficit n-tiles))
+             (new-tiles
+              (take (scrabble-tiles scrabble) n-new-tiles)))
+        (player-rack-set! player
+                          (append (player-rack player)
+                                  new-tiles))
+        (scrabble-tiles-set! scrabble
+                             (drop (scrabble-tiles scrabble)
+                                   n-new-tiles))))))
 (define (make-scrabble-game lexicon)
   (make-game
    (make-scrabble
