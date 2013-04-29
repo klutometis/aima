@@ -412,6 +412,9 @@
     (board-anchors board))
   (debug (heap->alist moves)))
 
+(define-record-and-printer player
+  play
+  score)
 (define-record-and-printer scrabble
   board
   tiles
