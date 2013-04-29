@@ -458,6 +458,7 @@
          ;; (debug move score)
          (if score
              (begin
+               (debug (player-score player) score)
                (player-score-set! player (+ (player-score player) score))
                (hash-table-set! wrong-moves player 0)
                (hash-table-set! pass player #f)
