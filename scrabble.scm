@@ -699,15 +699,18 @@
 ;;; Generalize this at some point; game has a state and some
 ;;; termination function.
 (define (play game players)
-  (let iter ((players (apply circular-list players)))
-    (if (game-terminal? game)
+  ((game-init game) (game-state game) players)
+  (let iter ((round-robin (apply circular-list players)))
+    (debug ((game-terminal? game) (game-state game) players))
+    ;; Players isn't part of the game-state, huh?
+    (if ((game-terminal? game) (game-state game) players)
         (game-state game)
-        (if (game-play game (car players))
+        (if ((game-play game) (game-state game) (car round-robin))
             ;; Successful move, go to the next player.
-            (iter (cdr players))
+            (iter (cdr round-robin))
             ;; Circular; some failure to move. Should the player
             ;; forfeit? That's up to the game, isn't it?
-            (iter players)))))
+            (iter round-robin)))))
 
 (let ((lexicon (make-dag)))
   (update-dag! lexicon "ABLE")
