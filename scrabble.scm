@@ -649,15 +649,19 @@
                                    ;; characters.
                                    ;;
                                    ;; Should we denormalize?
-                                   (let* ((characters (normalize-characters word))
-                                          (start (make-square
-                                                  (- (square-x current-square)
-                                                     (length characters))
-                                                  (square-y current-square))))
-                                     (let ((orientation (reading-of next-square)))
-                                       (make-word current-square
-                                                  (normalize-characters word)
-                                                  (reading-of next-square)))))))
+                                   (make-word ((reverse-of next-square) current-square)
+                                              word
+                                              (reverse-of next-square))
+                                   ;; (let* ((characters (normalize-characters word))
+                                   ;;        (start (make-square
+                                   ;;                (- (square-x current-square)
+                                   ;;                   (length characters))
+                                   ;;                (square-y current-square))))
+                                   ;;   (let ((orientation (reverse-of next-square)))
+                                   ;;     (make-word (orientation current-square)
+                                   ;;                (normalize-characters word)
+                                   ;;                orientation)))
+                                   )))
                  (let ((character (board-ref/default board current-square #f)))
                    ;; (debug 'preëxisting character)
                    (if character
