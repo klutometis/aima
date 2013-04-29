@@ -350,6 +350,8 @@
                  (scrabble-board-set! scrabble board)
                  score))
           (let ((character (board-ref/default board square #f)))
+            ;; TODO: We have to test this against their rack, don't
+            ;; we? Every placement, for that matter.
             (if character
                 (begin
                   (debug "There is a character on the board.")
