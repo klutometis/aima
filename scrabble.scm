@@ -155,18 +155,22 @@
         ((eq? orientation left-of) right-of)
         ((eq? orientation above) below)
         ((eq? orientation below) below)))
-  (do ((square square (below square)))
-      ((not (game-ref/default game square #f))
-       (do ((square (above square) (above square))
-            (word '() (cons (game-ref/default game square #f) word)))
-           ((not (game-ref/default game square #f)) word)))))
 
-(define (word-horizontal game square)
-  (do ((square square (right-of square)))
-      ((not (game-ref/default game square #f))
-       (do ((square (left-of square) (left-of square))
-            (word '() (cons (game-ref/default game square #f) word)))
-           ((not (game-ref/default game square #f)) word)))))
+;;; Need a generic word which happens to take an orientation.
+(define (word board square next-square)
+  (let ((previous-square (reverse-of next-square)))
+    (do ((square square (next-square square)))
+        ((not (board-ref/default board square #f))
+         (do ((square (previous-square square)
+                      (previous-square square))
+              (word '() (cons (board-ref/default board square #f) word)))
+             ((not (board-ref/default board square #f)) word))))))
+
+(define (word-vertical board square)
+  (word board square below))
+
+(define (word-horizontal board square)
+  (word board square right-of))
 
 ;;; This is a misnomer: it may not be a crosscheck, but merely a
 ;;; check, in the case where we're testing for parallel contiguous
