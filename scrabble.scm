@@ -184,21 +184,21 @@
         (above square)
         (below square)))
 
-(define (square-occupied? game square)
-  (game-ref/default game square #f))
+(define (square-occupied? board square)
+  (board-ref/default board square #f))
 
-(define (anchor? game square)
-  (not (every (cut square-occupied? game <>)
+(define (anchor? board square)
+  (not (every (cut square-occupied? board <>)
               (square-neighbors square))))
 
-(define (unoccupied-neighbors game square)
-  (filter (cut (complement square-occupied?) game <>)
+(define (unoccupied-neighbors board square)
+  (filter (cut (complement square-occupied?) board <>)
           (square-neighbors square)))
 
-(define (game-display game)
+(define (board-display board)
   (match
       (hash-table-fold
-       game
+       board
        (lambda (square character minimum-maximum)
          (match minimum-maximum
            ((minimum . maximum)
@@ -224,7 +224,7 @@
        (display (abs (remainder y 10)))
        (do ((x (square-x minimum) (add1 x)))
            ((> x (square-x maximum)) (newline))
-         (display (game-ref/default game (make-square x y) " ")))))))
+         (display (board-ref/default board (make-square x y) " ")))))))
 
 ;;; This is somehow orientation-dependent; how, is a little weird. It
 ;;; would be nice to think about this generally: why don't the
@@ -235,18 +235,18 @@
 ;;; Vertical neighbors, on the other hand, don't get considered unless
 ;;; we explicitly add them in. Why is that? Why can't we solve this
 ;;; more generally?
-(define (game-anchors game)
+(define (board-anchors board)
   (hash-table-fold
-   game
+   board
    (lambda (square character anchors)
      (append
       (filter
        identity
-       (list (and (anchor? game square)
+       (list (and (anchor? board square)
                   square)
-             (and (not (square-occupied? game (above square)))
+             (and (not (square-occupied? board (above square)))
                   (above square))
-             (and (not (square-occupied? game (below square)))
+             (and (not (square-occupied? board (below square)))
                   (below square))))
       anchors))
    '()))
@@ -312,7 +312,8 @@
 ;;;
 ;;; There's so much logic in here, I'd hate to reproduce it for the
 ;;; game server; we need to abstract it.
-(let ((game (make-game))
+#;
+(let ((board (make-board))
       (dag (make-dag))
       ;; The rack
       (tiles '(#\E #\C #\R #\A))
@@ -324,13 +325,13 @@
   (update-dag! dag "BE")
   (update-dag! dag "CABLE")
   (update-dag! dag "CARE")
-  (game-set! game (make-square 0 0) #\A)
-  (game-set! game (make-square 0 -1) #\B)
-  (game-set! game (make-square 0 -2) #\L)
-  (game-set! game (make-square 0 -3) #\E)
+  (board-set! board (make-square 0 0) #\A)
+  (board-set! board (make-square 0 -1) #\B)
+  (board-set! board (make-square 0 -2) #\L)
+  (board-set! board (make-square 0 -3) #\E)
   ;; Copy game; place; try; erase.
   ;; (dag-debug dag 0)
-  (debug (game-anchors game))
+  (debug (board-anchors board))
   (for-each
       (lambda (square)
         (let iter ((current-square square)
@@ -338,7 +339,7 @@
                    (subdag dag)
                    (next-square left-of)
                    (score 0)
-                   (game (game-copy game))
+                   (board (board-copy board))
                    (word '()))
           (debug current-square rack score (and subdag #t))
           ;; Need dag-checks and terminal checks.
@@ -350,15 +351,15 @@
             ;; we abut something horizontally.
             (when (dag-terminal? subdag)
               (debug word (word->string word))
-              (game-display game)
-              (let* ((crosscheck (crosscheck dag (word-horizontal game square)))
+              (board-display board)
+              (let* ((crosscheck (crosscheck dag (word-horizontal board square)))
                      ;; We need to account for horizontally adjoining
                      ;; words (if any): count the current word plus
                      ;; horizontally adjoining words and the subtract
                      ;; the current word.
                      (score (+ score (- crosscheck (length (delete sentinel word))))))
                 (heap-insert! moves score (make-word current-square word left-of))))
-            (let ((character (game-ref/default game current-square #f)))
+            (let ((character (board-ref/default board current-square #f)))
               (debug 'preëxisting character)
               (if character
                   (iter (next-square current-square)
@@ -366,7 +367,7 @@
                         (dag-ref subdag character)
                         next-square
                         (add1 score)
-                        game
+                        board
                         (cons character word))
                   (for-each (lambda (character)
                               (debug 'iterate character)
@@ -377,11 +378,11 @@
                                           (dag-ref subdag sentinel)
                                           next-square
                                           score
-                                          game
+                                          board
                                           (cons character word)))
                                   (begin
-                                    (game-set! game current-square character)
-                                    (let* ((vertical (word-vertical game current-square))
+                                    (board-set! board current-square character)
+                                    (let* ((vertical (word-vertical board current-square))
                                            (crosscheck (if (= (length vertical) 1)
                                                            1
                                                            (crosscheck dag vertical))))
@@ -405,10 +406,10 @@
                                               ;; No, we'll add it
                                               ;; later.
                                               (+ score crosscheck)
-                                              (game-copy game)
+                                              (board-copy board)
                                               (cons character word)))))))
                     rack))))))
-    (game-anchors game))
+    (board-anchors board))
   (debug (heap->alist moves)))
 
 (define-record-and-printer scrabble
