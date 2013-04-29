@@ -202,10 +202,6 @@
 (define (square-occupied? board square)
   (board-ref/default board square #f))
 
-(define (anchor? board square)
-  (not (every (cut square-occupied? board <>)
-              (square-neighbors square))))
-
 (define (unoccupied-neighbors board square)
   (filter (cut (complement square-occupied?) board <>)
           (square-neighbors square)))
@@ -265,6 +261,10 @@
                   (below square))))
       anchors))
    '()))
+(define (anchor? board square)
+  (not (every (cut square-occupied? board <>)
+              (square-neighbors square))))
+
 
 (define-record-and-printer word
   start
