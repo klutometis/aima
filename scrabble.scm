@@ -607,7 +607,8 @@
         (if (game-play game (car players))
             ;; Successful move, go to the next player.
             (iter (cdr players))
-            ;; Circular; some failure to move.
+            ;; Circular; some failure to move. Should the player
+            ;; forfeit? That's up to the game, isn't it?
             (iter players)))))
 
 ;; 5\.4:1 ends here
