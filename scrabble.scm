@@ -685,7 +685,7 @@
                                                (cons character word)))
                                        (begin
                                          (board-set! board current-square character)
-                                         (let* ((vertical (word-vertical board current-square))
+                                         (let* ((vertical (reverse (word-vertical board current-square)))
                                                 (crosscheck (if (= (length vertical) 1)
                                                                 1
                                                                 (crosscheck lexicon vertical))))
