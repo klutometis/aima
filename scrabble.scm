@@ -130,14 +130,12 @@
               #f)))))
 
 ;;; NB: game -> board, in preparation for make-scrabble.
-(define make-game make-hash-table)
-(define (game-empty? game) (zero? (hash-table-size game)))
-(define game-copy hash-table-copy)
-(define game-set! hash-table-set!)
-(define game-ref hash-table-ref)
-(define game-ref/default hash-table-ref/default)
-
-(define (word-vertical game square)
+(define make-board make-hash-table)
+(define (board-empty? board) (zero? (hash-table-size board)))
+(define board-copy hash-table-copy)
+(define board-set! hash-table-set!)
+(define board-ref hash-table-ref)
+(define board-ref/default hash-table-ref/default)
   (do ((square square (below square)))
       ((not (game-ref/default game square #f))
        (do ((square (above square) (above square))
