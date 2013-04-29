@@ -488,7 +488,7 @@
     ;;
     ;; Actually, this is only a problem for agents; the game can shuffle
     '(#\E #\C #\R #\A)
-    (make-hash-table))
+    lexicon)
    (lambda (scrabble)
      ;; Also, six successive scoreless turns
      ;; (<http://en.wikipedia.org/wiki/Scrabble#Sequence_of_play>).
