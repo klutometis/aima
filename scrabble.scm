@@ -419,7 +419,8 @@
       ;; That's ok: implemented delete-first.
       ;;
       ;; Actually, this is only a problem for agents; the game can shuffle
-      '(#\E #\C #\R #\A)
+      ;; '(#\E #\C #\R #\A)
+      '(#\X)
       lexicon)
      (lambda (scrabble players)
        (for-each (cut plenish-rack! scrabble <>) players))
