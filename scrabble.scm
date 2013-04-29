@@ -190,6 +190,7 @@
 ;;; check, in the case where we're testing for parallel contiguous
 ;;; words.
 (define (crosscheck dag word)
+  (debug word (match? dag word))
   (and (match? dag word) (length word)))
 
 (define (square-neighbors square)
