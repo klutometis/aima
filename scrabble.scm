@@ -136,6 +136,25 @@
 (define board-set! hash-table-set!)
 (define board-ref hash-table-ref)
 (define board-ref/default hash-table-ref/default)
+
+(define (reverse-of orientation)
+  (cond ((eq? orientation right-of) left-of)
+        ((eq? orientation left-of) right-of)
+        ((eq? orientation above) below)
+        ((eq? orientation below) above)))
+
+(define (orthogonal-to orientation)
+  (cond ((eq? orientation right-of) above)
+        ((eq? orientation left-of) below)
+        ((eq? orientation above) right-of)
+        ((eq? orientation below) left-of)))
+
+;;; For a given orientation, the direction in which we read.
+(define (reading-of orientation)
+  (cond ((eq? orientation right-of) right-of)
+        ((eq? orientation left-of) right-of)
+        ((eq? orientation above) below)
+        ((eq? orientation below) below)))
   (do ((square square (below square)))
       ((not (game-ref/default game square #f))
        (do ((square (above square) (above square))
