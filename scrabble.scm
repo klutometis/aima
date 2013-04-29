@@ -514,6 +514,9 @@
         (scrabble-tiles-set! scrabble
                              (drop (scrabble-tiles scrabble)
                                    n-new-tiles))))))
+
+(define n-wrong-moves (make-parameter 3))
+
 (define (make-scrabble-game lexicon)
   (make-game
    (make-scrabble
