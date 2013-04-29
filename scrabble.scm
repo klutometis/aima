@@ -489,18 +489,24 @@
                  score))
           (let ((character (board-ref/default board square #f)))
             (if character
-                (if (char=? character (car characters))
-                    (iter (next-square square)
-                          (cdr characters)
-                          (add1 score)
-                          next-square))
-                (let ((character (car characters)))
-                  (if (sentinel? character)
-                      (iter square
+                (begin
+                  (debug "There is a character on the board.")
+                  (if (char=? character (car characters))
+                      (iter (next-square square)
                             (cdr characters)
-                            score
-                            (reverse-of next-square))
+                            (add1 score)
+                            next-square)))
+                (let ((character (car characters)))
+                  (debug "There is not a character on the board.")
+                  (if (sentinel? character)
                       (begin
+                        (debug "The character is a sentinel.")
+                        (iter square
+                              (cdr characters)
+                              score
+                              (reverse-of next-square)))
+                      (begin
+                        (debug "The character is not a sentinel.")
                         (board-set! board square character)
                         ;; Let `word' reverse?
                         (let* ((orthogonal (word board square (orthogonal-to next-square)))
@@ -580,7 +586,7 @@
          ;; structure? Nah; it's an ad-hoc subproblem.
          ;;
          ;; Score is an integer or `#f' if the move is illegal?
-         (debug move score)
+         ;; (debug move score)
          (if score
              (begin
                (player-score-set! player (+ (player-score player) score))
@@ -643,7 +649,7 @@
                           ;; horizontally adjoining words and the subtract
                           ;; the current word.
                           (score (+ score (- crosscheck (length (delete sentinel word))))))
-                     (debug next-square)
+                     ;; (debug next-square)
                      (heap-insert! moves
                                    score
                                    ;; Would be right-of or below,
