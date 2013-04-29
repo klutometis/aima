@@ -611,4 +611,21 @@
             ;; forfeit? That's up to the game, isn't it?
             (iter players)))))
 
+(let ((lexicon (make-dag)))
+  (update-dag! lexicon "ABLE")
+  (update-dag! lexicon "AR")
+  (update-dag! lexicon "ABLER")
+  (update-dag! lexicon "BE")
+  (update-dag! lexicon "CABLE")
+  (update-dag! lexicon "CARE")
+  (let ((scrabble (make-scrabble-game lexicon))
+        (players (list (make-player lexicon 0))))
+    (let ((board (scrabble-board (game-state scrabble))))
+      (board-set! board (make-square 0 0) #\A)
+      (board-set! board (make-square 0 -1) #\B)
+      (board-set! board (make-square 0 -2) #\L)
+      (board-set! board (make-square 0 -3) #\E))
+    (play scrabble players)
+    (board-display (scrabble-board (game-state scrabble)))))
+
 ;; 5\.4:1 ends here
