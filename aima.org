@@ -5507,6 +5507,10 @@
   No tile-swapping mechanism yet; need to clean up nominations (“word”
   vs. “move”). Also, the scoring and move-generation code has a lot of
   duplication.
+
+** TODO Blanks
+** TODO Randomly pull off top candidates
+** TODO Word -> move
 ** [[http://en.wikipedia.org/wiki/Scrabble][Scrabble]]
    - $15 \times 15$
    - $100$ tiles; $2$ blanks
