@@ -445,6 +445,7 @@
 
 (define-record-and-printer game
   state
+  init
   terminal?
   ;; Updates score, &c.; takes an agent, calls play; updates score?
   play)
