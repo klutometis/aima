@@ -5500,6 +5500,9 @@
           (delete-first #\A '(#\B #\A #\A #\Z)))
     
   #+END_SRC
+
+  What we call a “dag” is really a lexicon. Games and players will
+  have them; hopefully they correspond.
 ** [[http://en.wikipedia.org/wiki/Scrabble][Scrabble]]
    - $15 \times 15$
    - $100$ tiles; $2$ blanks
