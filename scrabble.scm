@@ -580,6 +580,8 @@
   (make-player
    (lambda (board rack)
      (let ((moves (make-max-heap)))
+       (calculate-moves! lexicon moves left-of board rack)
+       (calculate-moves! lexicon moves above board rack)
        ;; Heap might be empty; might have to forfeit the turn.
        (heap-extract-extremum! moves)))
    0
