@@ -442,7 +442,6 @@
       (vector-set! v r (vector-ref v (- n 1)))
       (vector-set! v (- n 1) t))))
 
-(define (make-scrabble-game)
 ;;; Scrabble is also known as: "game".
 (define (scrabble-score scrabble player move)
   (let ((board (board-copy-board (scrabble-board scrabble)))
@@ -477,6 +476,7 @@
                                (cdr characters)
                                (+ score crosscheck)))))))))))
 
+(define (make-scrabble-game lexicon)
   (make-game
    (make-scrabble
     (make-board)
