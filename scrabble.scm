@@ -490,19 +490,28 @@
                 (if (char=? character (car characters))
                     (iter (next-square square)
                           (cdr characters)
-                          (add1 score)))
+                          (add1 score)
+                          next-square))
                 (let ((character (car characters)))
-                  (board-set! board square character)
-                  (let* ((orthogonal (word board square (orthogonal-to next-square)))
-                         (crosscheck (if (= (length orthogonal) 1)
-                                         1
-                                         (crosscheck (scrabble-lexicon scrabble)
-                                                     orthogonal))))
-                    (debug orthogonal crosscheck)
-                    (and crosscheck
-                         (iter (next-square square)
-                               (cdr characters)
-                               (+ score crosscheck)))))))))))
+                  (if (sentinel? character)
+                      (iter square
+                            (cdr characters)
+                            score
+                            (reverse-of next-square))
+                      (begin
+                        (board-set! board square character)
+                        ;; Let `word' reverse?
+                        (let* ((orthogonal (word board square (orthogonal-to next-square)))
+                               (crosscheck (if (= (length orthogonal) 1)
+                                               1
+                                               (crosscheck (scrabble-lexicon scrabble)
+                                                           orthogonal))))
+                          (debug orthogonal crosscheck)
+                          (and crosscheck
+                               (iter (next-square square)
+                                     (cdr characters)
+                                     (+ score crosscheck)
+                                     next-square))))))))))))
 
 (define n-tiles-in-rack (make-parameter 7))
 
