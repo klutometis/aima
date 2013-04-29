@@ -533,17 +533,7 @@
                                    ;; Should we denormalize?
                                    (make-word ((reverse-of next-square) current-square)
                                               word
-                                              (reverse-of next-square))
-                                   ;; (let* ((characters (normalize-characters word))
-                                   ;;        (start (make-square
-                                   ;;                (- (square-x current-square)
-                                   ;;                   (length characters))
-                                   ;;                (square-y current-square))))
-                                   ;;   (let ((orientation (reverse-of next-square)))
-                                   ;;     (make-word (orientation current-square)
-                                   ;;                (normalize-characters word)
-                                   ;;                orientation)))
-                                   )))
+                                              (reverse-of next-square)))))
                  (let ((character (board-ref/default board current-square #f)))
                    ;; (debug 'preëxisting character)
                    (if character
@@ -577,19 +567,6 @@
                                                    (delete-first character rack)
                                                    (dag-ref subdag character)
                                                    next-square
-                                                   ;; Subtract 1 from cross
-                                                   ;; check; since we'll
-                                                   ;; add the score at the
-                                                   ;; terminal horizontal
-                                                   ;; crosscheck.
-                                                   ;;
-                                                   ;; This is to account
-                                                   ;; for the possibility
-                                                   ;; of horizontally
-                                                   ;; adjoining words.
-                                                   ;;
-                                                   ;; No, we'll add it
-                                                   ;; later.
                                                    (+ score crosscheck)
                                                    (board-copy board)
                                                    (cons character word)))))))
