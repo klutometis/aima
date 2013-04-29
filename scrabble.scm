@@ -518,29 +518,6 @@
 (define n-wrong-moves (make-parameter 3))
 
 (define (make-scrabble-game lexicon)
-  (make-game
-   (make-scrabble
-    (make-board)
-    ;; We have a problem: srfi-1#delete deletes all instances. Can't
-    ;; have multiple tiles therewith and delete only one. To hash
-    ;; tables with histograms? Damn.
-    ;;
-    ;; That's ok; implemented delete-first.
-    ;;
-    ;; Actually, this is only a problem for agents; the game can shuffle
-    '(#\E #\C #\R #\A)
-    lexicon)
-   (lambda (scrabble)
-     ;; Also, six successive scoreless turns
-     ;; (<http://en.wikipedia.org/wiki/Scrabble#Sequence_of_play>).
-     (zero? (length (scrabble-tiles scrabble))))
-   (lambda (scrabble player)
-     (let* ((move ((player-play player) scrabble))
-            (score (scrabble-score scrabble player move)))
-       ;; Must also take player into consideration: do they have the
-       ;; appropriate tiles, &c.? Is it worthwhile calculating this
-       ;; separately from the score, since there's some ovelap
-       ;; (crosschecks, &c.); or all at once?
        ;;
        ;; Also, should `legal?' be a formal part of the game
        ;; structure? Nah; it's an ad-hoc subproblem.
