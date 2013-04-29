@@ -494,8 +494,9 @@
                    (next-square next-square)
                    (score 0)
                    (board (board-copy board))
-                   (word '()))
-          ;; (debug current-square rack score (and subdag #t))
+                   (word '())
+                   (played-yet? #f))
+          (debug current-square rack score (and subdag #t))
           ;; Need dag-checks and terminal checks.
           (when subdag
             ;; When we determine terminal, we also need to have the
@@ -503,7 +504,7 @@
             ;;
             ;; Also crosscheck the sideways word on terminal, in case
             ;; we abut something horizontally.
-            (when (dag-terminal? subdag)
+            (when (and played-yet? (dag-terminal? subdag))
               ;; (debug word (word->string word))
               ;; (board-display board)
               ;; (let* ((crosscheck (crosscheck lexicon (reverse (word-horizontal board square))))
@@ -540,7 +541,8 @@
                         next-square
                         (add1 score)
                         board
-                        (cons character word))
+                        (cons character word)
+                        played-yet?)
                   (for-each (lambda (character)
                               ;; (debug 'iterate character)
                               (if (sentinel? character)
@@ -551,7 +553,8 @@
                                           next-square
                                           score
                                           board
-                                          (cons character word)))
+                                          (cons character word)
+                                          played-yet?))
                                   (begin
                                     (board-set! board current-square character)
                                     (let* ((orthogonal (word-scan
@@ -569,7 +572,8 @@
                                               next-square
                                               (+ score crosscheck)
                                               (board-copy board)
-                                              (cons character word)))))))
+                                              (cons character word)
+                                              #t))))))
                     rack))))))
     (board-anchors board next-square)))
 
