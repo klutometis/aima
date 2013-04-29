@@ -164,11 +164,11 @@
         ((eq? orientation below) left-of)))
 
 ;;; For a given orientation, the direction in which we read.
-(define (reading-of orientation)
-  (cond ((eq? orientation right-of) right-of)
-        ((eq? orientation left-of) right-of)
-        ((eq? orientation above) below)
-        ((eq? orientation below) below)))
+(define (crosscheck-of orientation)
+  (cond ((eq? orientation right-of) left-of)
+        ((eq? orientation left-of) left-of)
+        ((eq? orientation above) above)
+        ((eq? orientation below) above)))
 
 ;;; Need a generic word which happens to take an orientation.
 (define (word board square next-square)
