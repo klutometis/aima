@@ -483,6 +483,94 @@
                        (n-wrong-moves))
                     (hash-table-set! pass player #t)))))))))
 
+(define (calculate-moves! lexicon moves next-square board rack)
+  (for-each
+      (lambda (square)
+        (let iter ((current-square square)
+                   (rack (cons sentinel rack))
+                   (subdag lexicon)
+                   (next-square next-square)
+                   (score 0)
+                   (board (board-copy board))
+                   (word '()))
+          ;; (debug current-square rack score (and subdag #t))
+          ;; Need dag-checks and terminal checks.
+          (when subdag
+            ;; When we determine terminal, we also need to have the
+            ;; word hitherto, don't we?
+            ;;
+            ;; Also crosscheck the sideways word on terminal, in case
+            ;; we abut something horizontally.
+            (when (dag-terminal? subdag)
+              ;; (debug word (word->string word))
+              ;; (board-display board)
+              ;; (let* ((crosscheck (crosscheck lexicon (reverse (word-horizontal board square))))
+              ;; (debug square
+              ;;        next-square
+              ;;        (crosscheck-of next-square)
+              ;;        (word-scan board square (crosscheck-of next-square))
+              ;;        (crosscheck lexicon (word-scan board square (crosscheck-of next-square)))
+              ;;        word)
+              ;; We need to account for horizontally adjoining
+              ;; words (if any): count the current word plus
+              ;; horizontally adjoining words and the subtract
+              ;; the current word.
+              (let ((crosscheck (crosscheck lexicon (word-scan board square (crosscheck-of next-square)))))
+                ;; (debug next-square)
+                (when crosscheck
+                  (let ((score (+ score (- crosscheck (length (delete sentinel word))))))
+                    (heap-insert! moves
+                                  score
+                                  ;; Would be right-of or below,
+                                  ;; since we've normalized the
+                                  ;; characters.
+                                  ;;
+                                  ;; Should we denormalize?
+                                  (make-word ((reverse-of next-square) current-square)
+                                             word
+                                             (reverse-of next-square)))))))
+            (let ((character (board-ref/default board current-square #f)))
+              ;; (debug 'preëxisting character)
+              (if character
+                  (iter (next-square current-square)
+                        rack
+                        (dag-ref subdag character)
+                        next-square
+                        (add1 score)
+                        board
+                        (cons character word))
+                  (for-each (lambda (character)
+                              ;; (debug 'iterate character)
+                              (if (sentinel? character)
+                                  (let ((next-square (reverse-of next-square)))
+                                    (iter (next-square square)
+                                          (delete sentinel rack)
+                                          (dag-ref subdag sentinel)
+                                          next-square
+                                          score
+                                          board
+                                          (cons character word)))
+                                  (begin
+                                    (board-set! board current-square character)
+                                    (let* ((orthogonal (word-scan
+                                                        board
+                                                        current-square
+                                                        (crosscheck-of (orthogonal-to next-square))))
+                                           (crosscheck (if (= (length orthogonal) 1)
+                                                           1
+                                                           (crosscheck lexicon orthogonal))))
+                                      ;; (debug crosscheck)
+                                      (when crosscheck
+                                        (iter (next-square current-square)
+                                              (delete-first character rack)
+                                              (dag-ref subdag character)
+                                              next-square
+                                              (+ score crosscheck)
+                                              (board-copy board)
+                                              (cons character word)))))))
+                    rack))))))
+    (board-anchors board next-square)))
+
 ;;; Make a player here; game has state; we have a rack. Authoritative?
 ;;; Ask the server? What happens when they diverge?
 ;;;
@@ -492,82 +580,6 @@
   (make-player
    (lambda (board rack)
      (let ((moves (make-max-heap)))
-       (for-each
-           (lambda (square)
-             (let iter ((current-square square)
-                        (rack (cons sentinel rack))
-                        (subdag lexicon)
-                        (next-square left-of)
-                        (score 0)
-                        (board (board-copy board))
-                        (word '()))
-               ;; (debug current-square rack score (and subdag #t))
-               ;; Need dag-checks and terminal checks.
-               (when subdag
-                 ;; When we determine terminal, we also need to have the
-                 ;; word hitherto, don't we?
-                 ;;
-                 ;; Also crosscheck the sideways word on terminal, in case
-                 ;; we abut something horizontally.
-                 (when (dag-terminal? subdag)
-                   ;; (debug word (word->string word))
-                   ;; (board-display board)
-                   ;; (let* ((crosscheck (crosscheck lexicon (reverse (word-horizontal board square))))
-                   (let* ((crosscheck (crosscheck lexicon (word-scan board square (crosscheck-of next-square))))
-                          ;; We need to account for horizontally adjoining
-                          ;; words (if any): count the current word plus
-                          ;; horizontally adjoining words and the subtract
-                          ;; the current word.
-                          (score (+ score (- crosscheck (length (delete sentinel word))))))
-                     ;; (debug next-square)
-                     (heap-insert! moves
-                                   score
-                                   ;; Would be right-of or below,
-                                   ;; since we've normalized the
-                                   ;; characters.
-                                   ;;
-                                   ;; Should we denormalize?
-                                   (make-word ((reverse-of next-square) current-square)
-                                              word
-                                              (reverse-of next-square)))))
-                 (let ((character (board-ref/default board current-square #f)))
-                   ;; (debug 'preëxisting character)
-                   (if character
-                       (iter (next-square current-square)
-                             rack
-                             (dag-ref subdag character)
-                             next-square
-                             (add1 score)
-                             board
-                             (cons character word))
-                       (for-each (lambda (character)
-                                   ;; (debug 'iterate character)
-                                   (if (sentinel? character)
-                                       (let ((next-square right-of))
-                                         (iter (next-square square)
-                                               (delete sentinel rack)
-                                               (dag-ref subdag sentinel)
-                                               next-square
-                                               score
-                                               board
-                                               (cons character word)))
-                                       (begin
-                                         (board-set! board current-square character)
-                                         (let* ((vertical (reverse (word-vertical board current-square)))
-                                                (crosscheck (if (= (length vertical) 1)
-                                                                1
-                                                                (crosscheck lexicon vertical))))
-                                           ;; (debug crosscheck)
-                                           (when crosscheck
-                                             (iter (next-square current-square)
-                                                   (delete-first character rack)
-                                                   (dag-ref subdag character)
-                                                   next-square
-                                                   (+ score crosscheck)
-                                                   (board-copy board)
-                                                   (cons character word)))))))
-                         rack))))))
-         (board-anchors board))
        ;; Heap might be empty; might have to forfeit the turn.
        (heap-extract-extremum! moves)))
    0
