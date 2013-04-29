@@ -5503,6 +5503,10 @@
 
   What we call a “dag” is really a lexicon. Games and players will
   have them; hopefully they correspond.
+
+  No tile-swapping mechanism yet; need to clean up nominations (“word”
+  vs. “move”). Also, the scoring and move-generation code has a lot of
+  duplication.
 ** [[http://en.wikipedia.org/wiki/Scrabble][Scrabble]]
    - $15 \times 15$
    - $100$ tiles; $2$ blanks
