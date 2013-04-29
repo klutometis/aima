@@ -443,6 +443,40 @@
       (vector-set! v (- n 1) t))))
 
 (define (make-scrabble-game)
+;;; Scrabble is also known as: "game".
+(define (scrabble-score scrabble player move)
+  (let ((board (board-copy-board (scrabble-board scrabble)))
+        (next-square (move-orientation move)))
+    (let iter ((square (move-start move))
+               (characters (move-word move))
+               (score 0))
+      (if (null? characters)
+          ;; Shit; we can also check the word incrementally; avoiding
+          ;; expensive crosschecks, &c. It really is identical in
+          ;; player and game.
+          (and (match? (scrabble-lexicon scrabble)
+                       (word board square (reading-of next-square)))
+               ;; Need some terminal arithmetic here for adjoining
+               ;; words.
+               score)
+          (let ((character (board-ref board square)))
+            (if character
+                (if (char=? character (car characters))
+                    (iter (next-square square)
+                          (cdr characters)
+                          (add1 score)))
+                (begin
+                  (board-set! board square)
+                  (let* ((orthogonal (word board square (orthogonal-to next-square)))
+                         (crosscheck (if (= (length orthogonal) 1)
+                                         1
+                                         (crosscheck (scrabble-lexicon scrabble)
+                                                     orthogonal))))
+                    (and crosscheck
+                         (iter (next-square square)
+                               (cdr characters)
+                               (+ score crosscheck)))))))))))
+
   (make-game
    (make-scrabble
     (make-board)
