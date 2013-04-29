@@ -582,6 +582,7 @@
      (let ((moves (make-max-heap)))
        (calculate-moves! lexicon moves left-of board rack)
        (calculate-moves! lexicon moves above board rack)
+       (debug (heap->alist moves))
        ;; Heap might be empty; might have to forfeit the turn.
        (heap-extract-extremum! moves)))
    0
