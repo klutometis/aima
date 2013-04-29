@@ -494,10 +494,18 @@
      ;; (<http://en.wikipedia.org/wiki/Scrabble#Sequence_of_play>).
      (zero? (length (scrabble-tiles scrabble))))
    (lambda (scrabble player)
-     (let ((move ((player-play player) scrabble)))
-       (if (legal? scrabble move)
-           (player-score-set! player (score scrabble move))
-           #f)))))
+     (let* ((move ((player-play player) scrabble))
+            (score (scrabble-score scrabble player move)))
+       ;; Must also take player into consideration: do they have the
+       ;; appropriate tiles, &c.? Is it worthwhile calculating this
+       ;; separately from the score, since there's some ovelap
+       ;; (crosschecks, &c.); or all at once?
+       ;;
+       ;; Also, should `legal?' be a formal part of the game
+       ;; structure? Nah; it's an ad-hoc subproblem.
+       ;;
+       ;; Score is an integer or `#f' if the move is illegal?
+       (and score (player-score-set! player score))))))
 
 ;;; Generalize this at some point; game has a state and some
 ;;; termination function.
