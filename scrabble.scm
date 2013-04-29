@@ -190,7 +190,7 @@
 ;;; check, in the case where we're testing for parallel contiguous
 ;;; words.
 (define (crosscheck dag word)
-  (debug word (match? dag word))
+  ;; (debug word (match? dag word))
   (and (match? dag word) (length word)))
 
 (define (square-neighbors square)
@@ -479,12 +479,14 @@
           ;; Shit; we can also check the word incrementally; avoiding
           ;; expensive crosschecks, &c. It really is identical in
           ;; player and game.
-          (and (match? (scrabble-lexicon scrabble)
-                       (word board (word-start move) next-square))
-               ;; Need some terminal arithmetic here for adjoining
-               ;; words.
-               (scrabble-board-set! scrabble board)
-               score)
+          (begin
+            (debug "Characters are null.")
+            (and (match? (scrabble-lexicon scrabble)
+                         (reverse (word board (word-start move) next-square)))
+                 ;; Need some terminal arithmetic here for adjoining
+                 ;; words.
+                 (scrabble-board-set! scrabble board)
+                 score))
           (let ((character (board-ref/default board square #f)))
             (if character
                 (if (char=? character (car characters))
