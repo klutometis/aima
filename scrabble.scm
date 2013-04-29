@@ -459,35 +459,39 @@
       (vector-set! v r (vector-ref v (- n 1)))
       (vector-set! v (- n 1) t))))
 
-;;; Scrabble is also known as: "game".
+;;; Scrabble is also known as: "game"; return a copy of the board, so
+;;; we don't have to propagate later?
 (define (scrabble-score scrabble player move)
-  (let ((board (board-copy-board (scrabble-board scrabble)))
-        (next-square (move-orientation move)))
-    (let iter ((square (move-start move))
-               (characters (move-word move))
+  (let ((board (board-copy (scrabble-board scrabble)))
+        (next-square (reading-of (word-orientation move))))
+    (let iter ((square (word-start move))
+               (characters (word-characters move))
                (score 0))
+      (board-display board)
       (if (null? characters)
           ;; Shit; we can also check the word incrementally; avoiding
           ;; expensive crosschecks, &c. It really is identical in
           ;; player and game.
           (and (match? (scrabble-lexicon scrabble)
-                       (word board square (reading-of next-square)))
+                       (word board (word-start move) next-square))
                ;; Need some terminal arithmetic here for adjoining
                ;; words.
+               (scrabble-board-set! scrabble board)
                score)
-          (let ((character (board-ref board square)))
+          (let ((character (board-ref/default board square #f)))
             (if character
                 (if (char=? character (car characters))
                     (iter (next-square square)
                           (cdr characters)
                           (add1 score)))
-                (begin
-                  (board-set! board square)
+                (let ((character (car characters)))
+                  (board-set! board square character)
                   (let* ((orthogonal (word board square (orthogonal-to next-square)))
                          (crosscheck (if (= (length orthogonal) 1)
                                          1
                                          (crosscheck (scrabble-lexicon scrabble)
                                                      orthogonal))))
+                    (debug orthogonal crosscheck)
                     (and crosscheck
                          (iter (next-square square)
                                (cdr characters)
