@@ -370,9 +370,9 @@
                       (begin
                         (debug "The character is a sentinel.")
                         (iter square
-                              (cdr characters)
+                              (reverse (cdr characters))
                               score
-                              (reverse-of next-square)))
+                              next-square))
                       (begin
                         (debug "The character is not a sentinel.")
                         (board-set! board square character)
