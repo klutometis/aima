@@ -421,10 +421,11 @@
   start
   word
   orientation)
+
 (define-record-and-printer scrabble
   board
   tiles
-  scores)
+  lexicon)
 
 (define-record-and-printer game
   state
