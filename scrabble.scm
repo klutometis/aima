@@ -429,7 +429,8 @@
 
 (define-record-and-printer player
   play
-  score)
+  score
+  rack)
 
 ;;; In additional to `reverse', need an `orthogonal' for orientations.
 (define-record-and-printer scrabble-move
