@@ -518,6 +518,8 @@
 (define n-wrong-moves (make-parameter 3))
 
 (define (make-scrabble-game lexicon)
+  (let ((pass (make-hash-table))
+        (wrong-moves (make-hash-table)))
        ;;
        ;; Also, should `legal?' be a formal part of the game
        ;; structure? Nah; it's an ad-hoc subproblem.
