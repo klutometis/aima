@@ -415,6 +415,12 @@
 (define-record-and-printer player
   play
   score)
+
+;;; In additional to `reverse', need an `orthogonal' for orientations.
+(define-record-and-printer scrabble-move
+  start
+  word
+  orientation)
 (define-record-and-printer scrabble
   board
   tiles
