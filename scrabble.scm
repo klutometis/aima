@@ -310,13 +310,6 @@
 
 ;; (dag-debug (make-dag-from-file "words.txt") 0)
 
-(define (shuffle! v)
-  (do ((n (vector-length v) (- n 1)))
-      ((zero? n) v)
-    (let* ((r (random n)) (t (vector-ref v r)))
-      (vector-set! v r (vector-ref v (- n 1)))
-      (vector-set! v (- n 1) t))))
-
 ;;; Scrabble is also known as: "game"; return a copy of the board, so
 ;;; we don't have to propagate later?
 ;;;
@@ -406,6 +399,12 @@
 
 (define n-wrong-moves (make-parameter 3))
 
+(define (shuffle! v)
+  (do ((n (vector-length v) (- n 1)))
+      ((zero? n) v)
+    (let* ((r (random n)) (t (vector-ref v r)))
+      (vector-set! v r (vector-ref v (- n 1)))
+      (vector-set! v (- n 1) t))))
 (define (make-scrabble-game lexicon)
   (let ((pass (make-hash-table))
         (wrong-moves (make-hash-table)))
