@@ -318,22 +318,22 @@
 (define (scrabble-score scrabble player move)
   (let ((board (board-copy (scrabble-board scrabble)))
         (next-square (word-orientation move)))
-    (debug 'scrabble-score
-           (word-orientation move)
-           (word-characters move)
-           next-square)
+    ;; (debug 'scrabble-score
+    ;;        (word-orientation move)
+    ;;        (word-characters move)
+    ;;        next-square)
     (let iter ((square (word-start move))
                (characters (word-characters move))
                (score 0)
                (next-square next-square))
-      (debug square)
-      (board-display board)
+      ;; (debug square)
+      ;; (board-display board)
       (if (null? characters)
           ;; Shit; we can also check the word incrementally; avoiding
           ;; expensive crosschecks, &c. It really is identical in
           ;; player and game.
           (begin
-            (debug "Characters are null.")
+            ;; (debug "Characters are null.")
             (and (match? (scrabble-lexicon scrabble)
                          (word-scan board
                                     (word-start move)
@@ -347,32 +347,43 @@
             ;; we? Every placement, for that matter.
             (if character
                 (begin
-                  (debug "There is a character on the board.")
-                  (if (char=? character (car characters))
-                      (iter (next-square square)
-                            (cdr characters)
-                            (add1 score)
-                            next-square)))
+                  ;; (debug "There is a character on the board.")
+                  ;; (when (and (not (sentinel? (car characters)))
+                  ;;            (not (char=? character (car characters))))
+                  ;;   (debug "Character mismatch!"
+                  ;;          character
+                  ;;          (car characters)
+                  ;;          move))
+                  (if (sentinel? (car characters))
+                      (iter square
+                            (reverse (cdr characters))
+                            score
+                            next-square)
+                      (and (char=? character (car characters))
+                           (iter (next-square square)
+                                 (cdr characters)
+                                 (add1 score)
+                                 next-square))))
                 (let ((character (car characters)))
-                  (debug "There is not a character on the board.")
+                  ;; (debug "There is not a character on the board.")
                   (if (sentinel? character)
                       (begin
-                        (debug "The character is a sentinel.")
+                        ;; (debug "The character is a sentinel.")
                         (iter square
                               (reverse (cdr characters))
                               score
                               next-square))
                       (begin
-                        (debug "The character is not a sentinel.")
+                        ;; (debug "The character is not a sentinel.")
                         (board-set! board square character)
                         ;; Let `word' reverse?
-                        (debug (orthogonal-to next-square))
+                        ;; (debug (orthogonal-to next-square))
                         (let* ((orthogonal (word-scan board square (crosscheck-of (orthogonal-to next-square))))
                                (crosscheck (if (= (length orthogonal) 1)
                                                1
                                                (crosscheck (scrabble-lexicon scrabble)
                                                            orthogonal))))
-                          (debug orthogonal crosscheck)
+                          ;; (debug orthogonal crosscheck)
                           (and crosscheck
                                (iter (next-square square)
                                      (cdr characters)
@@ -465,6 +476,9 @@
        ;; (<http://en.wikipedia.org/wiki/Scrabble#Sequence_of_play>).
        ;;
        ;; Need to also check the players' racks.
+       ;; (debug (scrabble-tiles scrabble)
+       ;;        (map player-rack players)
+       ;;        (hash-table->alist pass))
        (or (and (zero? (length (scrabble-tiles scrabble)))
                 (every zero?
                        (map (lambda (player) (length (player-rack player)))
@@ -474,10 +488,11 @@
      ;; Player forfeits turn on n bad moves (i.e. passes).
      (lambda (scrabble player)
        (plenish-rack! scrabble player)
-       (debug (player-rack player))
+       ;; (debug (player-rack player))
        (let ((move ((player-play player)
                     (scrabble-board scrabble)
                     (player-rack player))))
+         (debug move (player-rack player))
          (if move
              (let ((score (scrabble-score scrabble player move)))
                ;; Must also take player into consideration: do they have the
@@ -490,9 +505,11 @@
                ;;
                ;; Score is an integer or `#f' if the move is illegal?
                ;; (debug move score)
+               (debug score)
                (if score
                    (begin
-                     (debug (player-score player) score)
+                     (board-display (scrabble-board scrabble))
+                     ;; (debug (player-score player) score)
                      (player-score-set! player (+ (player-score player) score))
                      (hash-table-set! wrong-moves player 0)
                      (hash-table-set! pass player #f)
@@ -531,7 +548,7 @@
                    (board (board-copy board))
                    (word '())
                    (played-yet? #f))
-          (debug current-square rack score (and subdag #t))
+          ;; (debug current-square rack score (and subdag #t))
           ;; Need dag-checks and terminal checks.
           (when subdag
             ;; When we determine terminal, we also need to have the
@@ -625,7 +642,7 @@
        (calculate-moves! lexicon moves above board rack)
        (and (not (heap-empty? moves))
             (begin
-              (debug (heap->alist moves))
+              ;; (debug (heap->alist moves))
               ;; Heap might be empty; might have to forfeit the turn.
               (heap-extract-extremum! moves)))))
    0
@@ -636,7 +653,7 @@
 (define (play game players)
   ((game-init game) (game-state game) players)
   (let iter ((round-robin (apply circular-list players)))
-    (debug ((game-terminal? game) (game-state game) players))
+    ;; (debug ((game-terminal? game) (game-state game) players))
     ;; Players isn't part of the game-state, huh?
     (if ((game-terminal? game) (game-state game) players)
         (game-state game)
