@@ -5513,6 +5513,9 @@
 
   Back to the database problem: can we compile something and load it
   as a library?
+** TODO GADDAGs in a database of some kind
+** TODO Debug the fucking thing
+** TODO Name
 ** TODO Blanks
 ** TODO Randomly pull off top candidates
 ** TODO Word -> move
