@@ -466,7 +466,8 @@
       ;;
       ;; Actually, this is only a problem for agents; the game can shuffle
       ;; '(#\E #\C #\R #\A)
-      '(#\X)
+      ;; '(#\X)
+      (make-scrabble-tiles)
       lexicon)
      (lambda (scrabble players)
        (for-each (cut plenish-rack! scrabble <>) players))
