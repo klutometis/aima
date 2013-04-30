@@ -405,6 +405,42 @@
     (let* ((r (random n)) (t (vector-ref v r)))
       (vector-set! v r (vector-ref v (- n 1)))
       (vector-set! v (- n 1) t))))
+
+;;; Fuck; forgot about points per tile. We can have that in a table
+;;; elsewhere, though. Display it somehow?
+(define (make-scrabble-tiles)
+  (let ((tiles
+         (list->vector
+          (append
+           (make-list 12 #\E)
+           (make-list 9 #\A)
+           (make-list 9 #\I)
+           (make-list 8 #\O)
+           (make-list 6 #\N)
+           (make-list 6 #\R)
+           (make-list 6 #\T)
+           (make-list 4 #\L)
+           (make-list 4 #\S)
+           (make-list 4 #\U)
+           (make-list 4 #\D)
+           (make-list 3 #\G)
+           (make-list 2 #\B)
+           (make-list 2 #\C)
+           (make-list 2 #\M)
+           (make-list 2 #\P)
+           (make-list 2 #\F)
+           (make-list 2 #\H)
+           (make-list 2 #\V)
+           (make-list 2 #\W)
+           (make-list 2 #\Y)
+           (make-list 1 #\K)
+           (make-list 1 #\J)
+           (make-list 1 #\X)
+           (make-list 1 #\Q)
+           (make-list 1 #\Z)))))
+    (shuffle! tiles)
+    (vector->list tiles)))
+
 (define (make-scrabble-game lexicon)
   (let ((pass (make-hash-table))
         (wrong-moves (make-hash-table)))
