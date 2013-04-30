@@ -512,8 +512,8 @@
                      (board-display (scrabble-board scrabble))
                      ;; (debug (player-score player) score)
                      (player-score-set! player (+ (player-score player) score))
-                     (hash-table-set! wrong-moves player 0)
-                     (hash-table-set! pass player #f)
+                     (hash-table-set! wrong-moves (player-play player) 0)
+                     (hash-table-set! pass (player-play player) #f)
                      ;; Normalize-characters and reading-of should be redundant
                      ;; (and even destructive, if the former reverses yet
                      ;; again).
@@ -528,14 +528,14 @@
                    (begin
                      (hash-table-update!/default
                       wrong-moves
-                      player
+                      (player-play player)
                       add1
                       0)
-                     (and (= (hash-table-ref/default wrong-moves player 0)
+                     (and (= (hash-table-ref/default wrong-moves (player-play player) 0)
                              (n-wrong-moves))
-                          (hash-table-set! pass player #t)))))
+                          (hash-table-set! pass (player-play player) #t)))))
              (begin
-               (hash-table-set! pass player #t)
+               (hash-table-set! pass (player-play player) #t)
                #t)))))))
 
 (define (calculate-moves! lexicon moves next-square board rack)
