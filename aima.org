@@ -5508,6 +5508,11 @@
   vs. “move”). Also, the scoring and move-generation code has a lot of
   duplication.
 
+  Debug with rack, move, board. Let’s do a primitive reader for human
+  interaction.
+
+  Back to the database problem: can we compile something and load it
+  as a library?
 ** TODO Blanks
 ** TODO Randomly pull off top candidates
 ** TODO Word -> move
