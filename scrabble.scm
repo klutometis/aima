@@ -742,6 +742,7 @@
         (board-set! board (make-square 0 -3) #\E))
      (play game players)
      (board-display (scrabble-board scrabble))
-     (debug (map player-score players)))))
+     (debug (map player-score players)
+            (map player-rack players)))))
 
 ;; 5\.4:1 ends here
