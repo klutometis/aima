@@ -514,6 +514,7 @@
       ;; '(#\E #\C #\R #\A)
       ;; '(#\X)
       (make-scrabble-tiles)
+      ;; (make-play-tiles)
       lexicon)
      (lambda (scrabble players)
        (for-each (cut plenish-rack! scrabble <>) players))
