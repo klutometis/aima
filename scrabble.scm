@@ -619,6 +619,7 @@
               ;; horizontally adjoining words and the subtract
               ;; the current word.
               (let ((crosscheck (crosscheck lexicon (word-scan board square (crosscheck-of next-square)))))
+                ;; (debug crosscheck)
                 ;; (debug next-square)
                 (when crosscheck
                   (let ((score (+ score (- crosscheck (length (delete sentinel word))))))
