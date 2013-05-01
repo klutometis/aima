@@ -640,7 +640,7 @@
                         rack
                         (dag-ref subdag character)
                         next-square
-                        (add1 score)
+                        (+ score (hash-table-ref character->points character))
                         board
                         (cons character word)
                         played-yet?)
