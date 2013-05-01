@@ -5516,6 +5516,11 @@
 
   Consolidate scoring and generation; we’re dealing with some shitty
   sync problems right now.
+** DONE Need to check the terminal conditions.
+   CLOSED: [2013-04-30 Tue 19:47]
+   It looks like =plenish-rack!= is called after =terminal?=, so we
+   can’t check for empty racks there unless there are no tiles. Oh,
+   we do that! Nice.
 ** TODO Scoring
    From [[http://www.hasbro.com/scrabble/en_US/gamePlayRules.cfm][here]]:
 
