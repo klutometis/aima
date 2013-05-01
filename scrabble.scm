@@ -372,7 +372,7 @@
                       (and (char=? character (car characters))
                            (iter (next-square square)
                                  (cdr characters)
-                                 (add1 score)
+                                 (+ score (hash-table-ref character->points character))
                                  next-square))))
                 (let ((character (car characters)))
                   ;; (debug "There is not a character on the board.")
