@@ -388,11 +388,14 @@
                         (board-set! board square character)
                         ;; Let `word' reverse?
                         ;; (debug (orthogonal-to next-square))
-                        (let* ((orthogonal (word-scan board square (crosscheck-of (orthogonal-to next-square))))
-                               (crosscheck (if (= (length orthogonal) 1)
-                                               1
-                                               (crosscheck (scrabble-lexicon scrabble)
-                                                           orthogonal))))
+                        (let* ((orthogonal
+                                (word-scan board
+                                           square
+                                           (crosscheck-of
+                                            (orthogonal-to next-square))))
+                               ;; Can we put this logic in crosscheck itself?
+                               (crosscheck (crosscheck (scrabble-lexicon scrabble)
+                                                       orthogonal)))
                           ;; (debug orthogonal crosscheck)
                           (and crosscheck
                                (iter (next-square square)
