@@ -108,32 +108,8 @@
 (define (right-of? s1 s2)
   (= 1 (- (square-x s1) (square-x s2))))
 
-(define (insert-sentinel word)
-  (cons* (car word)
-         sentinel
-         (cdr word)))
-
-;;; To avoid that bizarre sentinel-insertion shit, why not reverse the
-;;; letters?
 (define (match? dag word)
   (let iter ((dag dag)
-             ;; We have to insert a sentinel when matching because of
-             ;; that idiosyncrasy of GADDAGs where a sentinel always
-             ;; comes second (except when the suffix is ∅).
-             (word (insert-sentinel word)))
-    (if (null? word)
-        (dag-terminal? dag)
-        (let* ((character (car word))
-               (subdag (dag-ref dag character)))
-          (if subdag
-              (iter subdag (cdr word))
-              #f)))))
-
-(define (match? dag word)
-  (let iter ((dag dag)
-             ;; We have to insert a sentinel when matching because of
-             ;; that idiosyncrasy of GADDAGs where a sentinel always
-             ;; comes second (except when the suffix is ∅).
              (word word))
     (if (null? word)
         (dag-terminal? dag)
@@ -143,7 +119,6 @@
               (iter subdag (cdr word))
               #f)))))
 
-;;; NB: game -> board, in preparation for make-scrabble.
 (define make-board make-hash-table)
 (define (board-empty? board) (zero? (hash-table-size board)))
 (define board-copy hash-table-copy)
@@ -163,14 +138,12 @@
         ((eq? orientation above) right-of)
         ((eq? orientation below) left-of)))
 
-;;; For a given orientation, the direction in which we read.
 (define (crosscheck-of orientation)
   (cond ((eq? orientation right-of) left-of)
         ((eq? orientation left-of) left-of)
         ((eq? orientation above) above)
         ((eq? orientation below) above)))
 
-;;; Need a generic word which happens to take an orientation.
 (define (word-scan board square next-square)
   (let ((previous-square (reverse-of next-square)))
     (do ((square square (next-square square)))
@@ -191,7 +164,6 @@
 ;;; check, in the case where we're testing for parallel contiguous
 ;;; words.
 (define (crosscheck dag word)
-  ;; (debug word (match? dag word))
   (and (or (= (length word) 1)
            (match? dag word))
        (word-score word)))
@@ -304,7 +276,6 @@
   rack
   name)
 
-;;; In additional to `reverse', need an `orthogonal' for orientations.
 (define-record-and-printer scrabble-move
   start
   word
@@ -319,10 +290,7 @@
   state
   init
   terminal?
-  ;; Updates score, &c.; takes an agent, calls play; updates score?
   play)
-
-;; (dag-debug (make-dag-from-file "words.txt") 0)
 
 ;;; Scrabble is also known as: "game"; return a copy of the board, so
 ;;; we don't have to propagate later?
@@ -332,75 +300,46 @@
 (define (scrabble-score scrabble player move)
   (let ((board (board-copy (scrabble-board scrabble)))
         (next-square (word-orientation move)))
-    ;; (debug 'scrabble-score
-    ;;        (word-orientation move)
-    ;;        (word-characters move)
-    ;;        next-square)
     (let iter ((square (word-start move))
                (characters (word-characters move))
                (score 0)
                (next-square next-square))
-      ;; (debug square)
-      ;; (board-display board)
       (if (null? characters)
-          ;; Shit; we can also check the word incrementally; avoiding
-          ;; expensive crosschecks, &c. It really is identical in
-          ;; player and game.
-          (begin
-            ;; (debug "Characters are null.")
-            (and (match? (scrabble-lexicon scrabble)
-                         (word-scan board
-                                    (word-start move)
-                                    (crosscheck-of next-square)))
-                 ;; Need some terminal arithmetic here for adjoining
-                 ;; words.
-                 (scrabble-board-set! scrabble board)
-                 score))
+          (and (match? (scrabble-lexicon scrabble)
+                       (word-scan board
+                                  (word-start move)
+                                  (crosscheck-of next-square)))
+               (scrabble-board-set! scrabble board)
+               score)
           (let ((character (board-ref/default board square #f)))
             ;; TODO: We have to test this against their rack, don't
             ;; we? Every placement, for that matter.
             (if character
-                (begin
-                  ;; (debug "There is a character on the board.")
-                  ;; (when (and (not (sentinel? (car characters)))
-                  ;;            (not (char=? character (car characters))))
-                  ;;   (debug "Character mismatch!"
-                  ;;          character
-                  ;;          (car characters)
-                  ;;          move))
-                  (if (sentinel? (car characters))
+                (if (sentinel? (car characters))
+                    (iter square
+                          (reverse (cdr characters))
+                          score
+                          next-square)
+                    (and (char=? character (car characters))
+                         (iter (next-square square)
+                               (cdr characters)
+                               (+ score (hash-table-ref character->points character))
+                               next-square)))
+                (let ((character (car characters)))
+                  (if (sentinel? character)
                       (iter square
                             (reverse (cdr characters))
                             score
                             next-square)
-                      (and (char=? character (car characters))
-                           (iter (next-square square)
-                                 (cdr characters)
-                                 (+ score (hash-table-ref character->points character))
-                                 next-square))))
-                (let ((character (car characters)))
-                  ;; (debug "There is not a character on the board.")
-                  (if (sentinel? character)
                       (begin
-                        ;; (debug "The character is a sentinel.")
-                        (iter square
-                              (reverse (cdr characters))
-                              score
-                              next-square))
-                      (begin
-                        ;; (debug "The character is not a sentinel.")
                         (board-set! board square character)
-                        ;; Let `word' reverse?
-                        ;; (debug (orthogonal-to next-square))
                         (let* ((orthogonal
                                 (word-scan board
                                            square
                                            (crosscheck-of
                                             (orthogonal-to next-square))))
-                               ;; Can we put this logic in crosscheck itself?
                                (crosscheck (crosscheck (scrabble-lexicon scrabble)
                                                        orthogonal)))
-                          ;; (debug orthogonal crosscheck)
                           (and crosscheck
                                (iter (next-square square)
                                      (cdr characters)
@@ -464,8 +403,6 @@
      (#\Q . 10)
      (#\Z . 10))))
 
-;;; Fuck; forgot about points per tile. We can have that in a table
-;;; elsewhere, though. Display it somehow?
 (define (make-scrabble-tiles)
   (let ((tiles
          (list->vector
@@ -508,39 +445,19 @@
     (make-game
      (make-scrabble
       (make-board)
-      ;; We have a problem: srfi-1#delete deletes all instances. Can't
-      ;; have multiple tiles therewith and delete only one. To hash
-      ;; tables with histograms? Damn.
-      ;;
-      ;; That's ok: implemented delete-first.
-      ;;
-      ;; Actually, this is only a problem for agents; the game can shuffle
-      ;; '(#\E #\C #\R #\A)
-      ;; '(#\X)
       (make-scrabble-tiles)
-      ;; (make-play-tiles)
       lexicon)
      (lambda (scrabble players)
        (for-each (cut plenish-rack! scrabble <>) players))
-     ;; Also end the game if everyone passes.
      (lambda (scrabble players)
-       ;; Also, six successive scoreless turns
-       ;; (<http://en.wikipedia.org/wiki/Scrabble#Sequence_of_play>).
-       ;;
-       ;; Need to also check the players' racks.
-       ;; (debug (scrabble-tiles scrabble)
-       ;;        (map player-rack players)
-       ;;        (hash-table->alist pass))
        (or (and (zero? (length (scrabble-tiles scrabble)))
                 (any zero?
                      (map (lambda (player) (length (player-rack player)))
                           players)))
            (and (positive? (hash-table-size pass))
                 (every values (hash-table-values pass)))))
-     ;; Player forfeits turn on n bad moves (i.e. passes).
      (lambda (scrabble player)
        (plenish-rack! scrabble player)
-       ;; (debug (player-rack player))
        (let ((move ((player-play player)
                     (scrabble-board scrabble)
                     (player-rack player))))
@@ -548,31 +465,18 @@
          (if move
              (let ((score (scrabble-score scrabble player move)))
                ;; Must also take player into consideration: do they have the
-               ;; appropriate tiles, &c.? Is it worthwhile calculating this
-               ;; separately from the score, since there's some ovelap
-               ;; (crosschecks, &c.); or all at once?
-               ;;
-               ;; Also, should `legal?' be a formal part of the game
-               ;; structure? Nah; it's an ad-hoc subproblem.
-               ;;
-               ;; Score is an integer or `#f' if the move is illegal?
-               ;; (debug move score)
+               ;; appropriate tiles, &c.?
                (debug score)
                (if score
                    (begin
                      (board-display (scrabble-board scrabble))
-                     ;; (debug (player-score player) score)
                      (player-score-set! player (+ (player-score player) score))
                      (hash-table-set! wrong-moves (player-name player) 0)
                      (hash-table-set! pass (player-name player) #f)
-                     ;; Normalize-characters and reading-of should be redundant
-                     ;; (and even destructive, if the former reverses yet
-                     ;; again).
                      (let iter ((characters (word-characters move))
                                 (square (word-start move)))
                        (unless (null? characters)
                          (let ((character (car characters)))
-                           ;; (board-set! (scrabble-board scrabble) square character)
                            (player-rack-set! player (delete-first character (player-rack player)))
                            (iter (cdr characters)
                                  ((word-orientation move) square))))))
@@ -600,45 +504,24 @@
                    (board board)
                    (word '())
                    (played-yet? #f))
-          ;; (debug current-square rack score (and subdag #t))
-          ;; Need dag-checks and terminal checks.
           (when subdag
-            ;; When we determine terminal, we also need to have the
-            ;; word hitherto, don't we?
-            ;;
-            ;; Also crosscheck the sideways word on terminal, in case
-            ;; we abut something horizontally.
             (when (and played-yet? (dag-terminal? subdag))
-              ;; (debug word (word->string word))
-              ;; (board-display board)
-              ;; (let* ((crosscheck (crosscheck lexicon (reverse (word-horizontal board square))))
-              ;; (debug square
-              ;;        next-square
-              ;;        (crosscheck-of next-square)
-              ;;        (word-scan board square (crosscheck-of next-square))
-              ;;        (crosscheck lexicon (word-scan board square (crosscheck-of next-square)))
-              ;;        word)
-              ;; We need to account for horizontally adjoining
-              ;; words (if any): count the current word plus
-              ;; horizontally adjoining words and the subtract
-              ;; the current word.
-              (let ((crosscheck (crosscheck lexicon (word-scan board square (crosscheck-of next-square)))))
-                ;; (debug crosscheck)
-                ;; (debug next-square)
+              ;; We need to account for horizontally adjoining words
+              ;; (if any): count the current word plus horizontally
+              ;; adjoining words and the subtract the current word.
+              (let ((crosscheck
+                     (crosscheck lexicon
+                                 (word-scan board
+                                            square
+                                            (crosscheck-of next-square)))))
                 (when crosscheck
                   (let ((score (+ score (- crosscheck (length (delete sentinel word))))))
                     (heap-insert! moves
                                   score
-                                  ;; Would be right-of or below,
-                                  ;; since we've normalized the
-                                  ;; characters.
-                                  ;;
-                                  ;; Should we denormalize?
                                   (make-word ((reverse-of next-square) current-square)
                                              word
                                              (reverse-of next-square)))))))
             (let ((character (board-ref/default board current-square #f)))
-              ;; (debug 'preëxisting character)
               (if character
                   (iter (next-square current-square)
                         rack
@@ -649,7 +532,6 @@
                         (cons character word)
                         played-yet?)
                   (for-each (lambda (character)
-                              ;; (debug 'iterate character)
                               (if (sentinel? character)
                                   (let ((next-square (reverse-of next-square)))
                                     (iter (next-square square)
@@ -669,7 +551,6 @@
                                                          (crosscheck-of
                                                           (orthogonal-to next-square))))
                                              (crosscheck (crosscheck lexicon orthogonal)))
-                                        ;; (debug crosscheck)
                                         (when crosscheck
                                           (iter (next-square current-square)
                                                 (delete-first character rack)
@@ -682,11 +563,6 @@
                     rack))))))
     (board-anchors board next-square)))
 
-;;; Make a player here; game has state; we have a rack. Authoritative?
-;;; Ask the server? What happens when they diverge?
-;;;
-;;; Should the game communicate back what our state is, whether the
-;;; move succeeded?
 (define (make-scrabble-player lexicon)
   (make-player
    (lambda (board rack)
@@ -694,20 +570,14 @@
        (calculate-moves! lexicon moves left-of board rack)
        (calculate-moves! lexicon moves above board rack)
        (and (not (heap-empty? moves))
-            (begin
-              ;; (debug (heap->alist moves))
-              ;; Heap might be empty; might have to forfeit the turn.
-              (heap-extract-extremum! moves)))))
+            (heap-extract-extremum! moves))))
    0
    '()
    (gensym)))
 
-;;; Generalize this at some point; game has a state and some
-;;; termination function.
 (define (play game players)
   ((game-init game) (game-state game) players)
   (let iter ((round-robin (apply circular-list players)))
-    ;; (debug ((game-terminal? game) (game-state game) players))
     ;; Players isn't part of the game-state, huh?
     (if ((game-terminal? game) (game-state game) players)
         (game-state game)
@@ -729,21 +599,11 @@
     lexicon))
 
 (let ((lexicon (parameterize ((debug? #f))
-                 ;; (make-dag-from-file "words-four-letter.txt")
-                 (make-dag-from-file "words.txt"))
-               ;; (make-dag-from-file "words.txt")
-               ;; (make-play-dag)
-               ))
+                 (make-dag-from-file "words.txt"))))
   (let ((game (make-scrabble-game lexicon))
         (players (list (make-scrabble-player lexicon)
-                       (make-scrabble-player lexicon)
-                       )))
+                       (make-scrabble-player lexicon))))
     (let ((scrabble (game-state game)))
-      ;; (let ((board (scrabble-board scrabble)))
-      ;;   (board-set! board (make-square 0 0) #\A)
-      ;;   (board-set! board (make-square 0 -1) #\B)
-      ;;   (board-set! board (make-square 0 -2) #\L)
-      ;;   (board-set! board (make-square 0 -3) #\E))
      (play game players)
      (board-display (scrabble-board scrabble))
      (debug (map player-score players)
