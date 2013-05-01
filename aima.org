@@ -5513,6 +5513,93 @@
 
   Back to the database problem: can we compile something and load it
   as a library?
+
+  Consolidate scoring and generation; we’re dealing with some shitty
+  sync problems right now.
+** TODO Scoring
+   From [[http://www.hasbro.com/scrabble/en_US/gamePlayRules.cfm][here]]:
+
+   #+BEGIN_QUOTE
+   The player gets full credit for all words formed or modified on
+   his or her turn.
+   #+END_QUOTE
+
+   We’re doing it right, I think: letter-score for preëxisting
+   letters; word-score for new crosschecks.
+
+   #+BEGIN_QUOTE
+   Use a score pad or piece of paper to keep a tally of each player’s
+   score, entering it after each turn. The score value of each letter
+   is indicated by a number at the bottom of the tile. The score
+   value of a blank is zero.
+
+   The score for each turn is the sum of the letter values in each
+   word(s) formed or modified on that turn, plus the additional points
+   obtained from placing letters on Premium Squares.
+
+   Premium Letter Squares: A light blue square doubles the score of a
+   letter placed on it; a dark blue square triples the letter score.
+
+   Premium Word Squares: The score for an entire word is doubled when
+   one of its letters is placed on a pink square: it is tripled when one
+   of its letters is placed on a red square. Include premiums for double
+   or triple letter values, if any, before doubling or tripling the word
+   score. If a word is formed that covers two premium word squares, the
+   score is doubled and then re-doubled (4 times the letter count), or
+   tripled and then re-tripled (9 times the letter count). NOTE: the
+   center square is a pink square, which doubles the score for the first
+   word.
+
+   Letter and word premiums count only on the turn in which they are
+   played. On later turns, letters already played on premium squares
+   count at face value.
+
+   When a blank tile is played on a pink or red square, the value of the
+   word is doubled or tripled, even though the blank itself has no score
+   value.
+
+   When two or more words are formed in the same play, each is scored.
+   The common letter is counted (with full premium value, if any) for
+   each word. (See Turns 3, 4 and 5 in the Scoring Examples section.)
+
+   BINGO! If you play seven tiles on a turn, it’s a Bingo. You score a
+   premium of 50 points after totaling your score for the turn.
+
+   Unplayed Letters: When the game ends, each player’s score is reduced
+   by the sum of his or her unplayed letters. In addition, if a player
+   has used all of his or her letters, the sum of the other players’
+   unplayed letters is added to that player’s score.
+
+   The player with the highest final score wins the game. In case of a
+   tie, the player with the highest score before adding or deducting
+   unplayed letters wins.
+   #+END_QUOTE
+** TODO Bonus, all seven; end game
+   From [[http://www.scrabblepages.com/scrabble/rules/][here]]:
+
+   #+BEGIN_QUOTE
+   When a player is able to place all seven tiles from the tile rack
+   on the board at the same time, that player receives a 50 point
+   bonus.
+   #+END_QUOTE
+
+   Deductions:
+
+   #+BEGIN_QUOTE
+   Once the game has ended, each player counts the points on the
+   tiles left remaining in their rack. Each player has that number
+   deducted from their final score.
+   #+END_QUOTE
+
+   Transfer of points:
+
+   #+BEGIN_QUOTE
+   The player who ended the game and who therefore has no more tiles
+   remaining is given an added bonus. Add the total of all points of
+   all remaining players with tiles left on their racks. This number
+   is added to the final score of the player who is “out” of tiles.
+   #+END_QUOTE
+** TODO Exchange tiles
 ** TODO GADDAGs in a database of some kind
 ** TODO Debug the fucking thing
 ** TODO Name the players
