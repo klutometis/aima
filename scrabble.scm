@@ -247,22 +247,24 @@
 (define origin (make-square 0 0))
 
 (define (board-anchors board next-square)
-  (let* ((above (orthogonal-to next-square))
-         (below (reverse-of above)))
-    (hash-table-fold
-     board
-     (lambda (square character anchors)
-       (append
-        (filter
-         identity
-         (list (and (anchor? board square)
-                    square)
-               (and (not (square-occupied? board (above square)))
-                    (above square))
-               (and (not (square-occupied? board (below square)))
-                    (below square))))
-        anchors))
-     '())))
+  (if (board-empty? board)
+      (list origin)
+      (let* ((above (orthogonal-to next-square))
+             (below (reverse-of above)))
+        (hash-table-fold
+         board
+         (lambda (square character anchors)
+           (append
+            (filter
+             identity
+             (list (and (anchor? board square)
+                        square)
+                   (and (not (square-occupied? board (above square)))
+                        (above square))
+                   (and (not (square-occupied? board (below square)))
+                        (below square))))
+            anchors))
+         '()))))
 
 (define-record-and-printer word
   start
