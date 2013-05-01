@@ -695,7 +695,8 @@
               ;; Heap might be empty; might have to forfeit the turn.
               (heap-extract-extremum! moves)))))
    0
-   '()))
+   '()
+   (gensym)))
 
 ;;; Generalize this at some point; game has a state and some
 ;;; termination function.
