@@ -528,9 +528,9 @@
        ;;        (map player-rack players)
        ;;        (hash-table->alist pass))
        (or (and (zero? (length (scrabble-tiles scrabble)))
-                (every zero?
-                       (map (lambda (player) (length (player-rack player)))
-                            players)))
+                (any zero?
+                     (map (lambda (player) (length (player-rack player)))
+                          players)))
            (and (positive? (hash-table-size pass))
                 (every values (hash-table-values pass)))))
      ;; Player forfeits turn on n bad moves (i.e. passes).
