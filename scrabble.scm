@@ -593,7 +593,7 @@
                    (subdag lexicon)
                    (next-square next-square)
                    (score 0)
-                   (board (board-copy board))
+                   (board board)
                    (word '())
                    (played-yet? #f))
           ;; (debug current-square rack score (and subdag #t))
