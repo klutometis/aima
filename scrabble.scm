@@ -244,6 +244,8 @@
   (not (every (cut square-occupied? board <>)
               (square-neighbors square))))
 
+(define origin (make-square 0 0))
+
 (define (board-anchors board next-square)
   (let* ((above (orthogonal-to next-square))
          (below (reverse-of above)))
