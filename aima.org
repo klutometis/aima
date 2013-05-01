@@ -5267,146 +5267,6 @@
    In a graph with cycles, the pursuee can evade by sticking to the
    cycle of a circuit and reversing direction if need be.
 * TODO 5.4
-  Scrabble: is it the case that the utility and evaluation functions
-  are the same? Not necessary, see Appel, The World’s Fastest Scrabble
-  Program (emphasis mine):
-
-  #+BEGIN_QUOTE
-  Peter Turcan of the University of Reading in England has written a
-  SCRABBLE-player [8, 9] for some unspecified micro-computer. It
-  appears that he generates moves by iterating over the wards in his
-  lexicon in reverse order of length. He somehow decides for each word
-  whether and where it can be played on the current board with the
-  current rack. His program doesn’t attempt any adversary search, but
-  /it does use an evaluation function more sophisticated than the
-  score of the prospective move/. It takes the score and conditionally
-  adds terms depending on simple strategic features of the new
-  position and tiles left in the rack.
-  #+END_QUOTE
-
-  Need a good lexicon; how about just [[file:/usr/share/dict/words]]?
-  Sure. (Apparently, there’s the [[http://en.wikipedia.org/wiki/Tournament_Word_List][tournament word list]]; [[http://en.wikipedia.org/wiki/SOWPODS][SOWPODS]];
-  [[http://en.wikipedia.org/wiki/Official_Scrabble_Players_Dictionary][Player's Dictionary]].) See [[http://www.isc.ro/en/commands/lists.html][word lists]].
-
-  It looks like the evaluation function is the score plus some
-  heuristics.
-
-  #+BEGIN_QUOTE
-  Weiiiberger’s program has no concept of strategy, and simply chooses
-  the highest-scoring play available.
-  #+END_QUOTE
-
-  Using a trie:
-
-  #+BEGIN_QUOTE
-  They represent their lexicon as a tree-structure of letters where
-  each path down the tree has an associated list of words that can be
-  formed using exactly those letters on the path. The letters along
-  each path appear in a canonical order corresponding (approximately)
-  to the point value of the tile in SCRABBLE, by decreasing value. The
-  reason for the putting the higher-valued letters higher in the tree
-  is to help find the most valuable words first, in case a full search
-  cannot be completed.
-  #+END_QUOTE
-
-  We implemented a so-called [[http://en.wikipedia.org/wiki/Radix_tree][radix tree]] for unicode Greek, I think.
-
-  Some heuristic action:
-
-  #+BEGIN_QUOTE
-  Shapiro’s move generator iterates over board posi- tions, taking the
-  tiles in the rack and at the proposed board position, and searching
-  down from the root for acceptable words that can be formed with
-  those letters. His programs do not generally examine all possible
-  board positions where words could be played, only those positions
-  judged worthwhile. Once a move is found yielding at least some
-  pre-determined threshold score, that move is chosen.
-  #+END_QUOTE
-
-  This is cool:
-
-  #+BEGIN_QUOTE
-  Instead of scanning through the entire lexicon each turn for
-  playable words, we begin by scanning over the board for places where
-  a word could connect to letters already on the board. Then we try to
-  build the word up incrementally, using letters from the rack and the
-  board near the proposed place of attachment. We main- tain data
-  structures that make this search one-dimen- sional, so we never have
-  to look outside of a single row or column of the board during move
-  generation.
-  #+END_QUOTE
-
-  Let’s just read them into memory, check infix and available letters.
-
-  How does scrabble work mechanically?
-
-  #+BEGIN_QUOTE
-  Because a two-way dawg has a node for each sub- string of each word,
-  we imagine that it would be a great deal larger than the one-way
-  dawg, although we have never tried to build one. It would be
-  interesting to see just how much space it would occupy, and by how
-  much it would speed up move generation. *
-  #+END_QUOTE
-
-  Heuristics:
-
-  #+BEGIN_QUOTE
-  Preserving tiles and tile combinations in the rack that are likely
-  to lead to higher scores in the next move(s). Avoiding leaving the
-  board open for the opponent to make high-scoring moves.
-  #+END_QUOTE  
-
-  Initially, let’s ignore triple word scores; &c.: just a board of
-  dimensions $m \times n$ on which to place words. Don’t forget
-  blanks!
-
-  There’s left-hand and right-hand search; or: prefix and suffix. How
-  to use a trie effectively? Brute force:
-
-  Also, two dimensional problem: must make sense up and down; although
-  Appel claims to have reduced it to a one-dimensional problem.
-
-  Don’t forget: can use individual letters, too.
-
-  No prefix: all rows and columns; one letter prefix; to n letter
-  prefices. And this plus suffices. Also: bounded by letters on the
-  board (which become prefices and suffices).
-
-  Need to generalize the problem somehow; wish I had a board.
-
-  We’re going to have to consider the board row by row (and column by
-  column), I think; considering all combinations of blanks and
-  preëxisting tiles. Also, contiguous tiles.
-
-  See [[http://www.ericsink.com/downloads/faster-scrabble-gordon.pdf][Gordon's paper]] on GADDAGs; also, [[http://en.wikipedia.org/wiki/Boyer%E2%80%93Moore_string_search_algorithm][Boyer-Moore]] string search.
-
-  Need some function to determine contiguous words.
-
-  Build the tree; find the anchor points; try the permutations. Maybe
-  we can ignore blanks for the time being; ignore other contiguous
-  words. First, build the DAGs (nested hash-tables, or some kind of
-  array? Former if the space is sparse; otherwise, latter); anchor
-  squares, by the way, are “a square on the board onto which a word
-  could be hooked” (review the Appel paper). Let’s build the GADDAGs
-  first.
-
-  (Had a feeling, by the way, some NP-complete shit lurking under the
-  surface.)
-
-  Play on the edges, since that will generate intermediate matches?
-
-  #+BEGIN_QUOTE
-  There is no need to generate plays from every other internal anchor
-  square of a sequence of contiguous anchor squares (e.g. the square
-  left or right of the B in Figure 2), since every play from a given
-  anchor square would be generated from the adjacent anchor square
-  either to the right (above) or to the left (below).
-  #+END_QUOTE
-
-  Letter records: character, whether terminal; score kept elsewhere.
-  Board: two dimensional array of vectors. Need a special sentinel
-  that signifies reversal.
-
   #+BEGIN_SRC scheme :comments link :tangle scrabble.scm :shebang #!/usr/bin/env chicken-scheme
   (use debug
        define-record-and-printer
@@ -6021,229 +5881,6 @@
        (debug (map player-score players)
               (map player-rack players)))))
   #+END_SRC
-
-  First pass: let’s ascribe to the word arbitrary origin; and move as
-  far as we need to in any direction. (Board-boundaries are probably
-  a trivial part of the problem.)
-
-  Game state contains $x, y$ coördinates; can we do it in graphviz
-  with pre-computation?
-
-  Append to the anchors according to prefices; do crosschecks.
-  
-  #+BEGIN_SRC scheme
-    (use debug srfi-1 test)
-    
-    (define delete-first
-      (case-lambda
-       ((x list) (delete-first x list equal?))
-       ((x list =)
-        (receive (prefix suffix)
-          (break (lambda (y) (= x y)) list)
-          (if (null? suffix)
-              prefix
-              (append prefix (cdr suffix)))))))
-    
-    (test '(#\B #\A #\Z)
-          (delete-first #\A '(#\B #\A #\A #\Z)))
-    
-  #+END_SRC
-
-  What we call a “dag” is really a lexicon. Games and players will
-  have them; hopefully they correspond.
-
-  No tile-swapping mechanism yet; need to clean up nominations (“word”
-  vs. “move”). Also, the scoring and move-generation code has a lot of
-  duplication.
-
-  Debug with rack, move, board. Let’s do a primitive reader for human
-  interaction.
-
-  Back to the database problem: can we compile something and load it
-  as a library?
-
-  Consolidate scoring and generation; we’re dealing with some shitty
-  sync problems right now.
-** DONE Need to check the terminal conditions.
-   CLOSED: [2013-04-30 Tue 19:47]
-   It looks like =plenish-rack!= is called after =terminal?=, so we
-   can’t check for empty racks there unless there are no tiles. Oh,
-   we do that! Nice.
-** TODO Scoring
-   From [[http://www.hasbro.com/scrabble/en_US/gamePlayRules.cfm][here]]:
-
-   #+BEGIN_QUOTE
-   The player gets full credit for all words formed or modified on
-   his or her turn.
-   #+END_QUOTE
-
-   We’re doing it right, I think: letter-score for preëxisting
-   letters; word-score for new crosschecks.
-
-   #+BEGIN_QUOTE
-   Use a score pad or piece of paper to keep a tally of each player’s
-   score, entering it after each turn. The score value of each letter
-   is indicated by a number at the bottom of the tile. The score
-   value of a blank is zero.
-
-   The score for each turn is the sum of the letter values in each
-   word(s) formed or modified on that turn, plus the additional points
-   obtained from placing letters on Premium Squares.
-
-   Premium Letter Squares: A light blue square doubles the score of a
-   letter placed on it; a dark blue square triples the letter score.
-
-   Premium Word Squares: The score for an entire word is doubled when
-   one of its letters is placed on a pink square: it is tripled when one
-   of its letters is placed on a red square. Include premiums for double
-   or triple letter values, if any, before doubling or tripling the word
-   score. If a word is formed that covers two premium word squares, the
-   score is doubled and then re-doubled (4 times the letter count), or
-   tripled and then re-tripled (9 times the letter count). NOTE: the
-   center square is a pink square, which doubles the score for the first
-   word.
-
-   Letter and word premiums count only on the turn in which they are
-   played. On later turns, letters already played on premium squares
-   count at face value.
-
-   When a blank tile is played on a pink or red square, the value of the
-   word is doubled or tripled, even though the blank itself has no score
-   value.
-
-   When two or more words are formed in the same play, each is scored.
-   The common letter is counted (with full premium value, if any) for
-   each word. (See Turns 3, 4 and 5 in the Scoring Examples section.)
-
-   BINGO! If you play seven tiles on a turn, it’s a Bingo. You score a
-   premium of 50 points after totaling your score for the turn.
-
-   Unplayed Letters: When the game ends, each player’s score is reduced
-   by the sum of his or her unplayed letters. In addition, if a player
-   has used all of his or her letters, the sum of the other players’
-   unplayed letters is added to that player’s score.
-
-   The player with the highest final score wins the game. In case of a
-   tie, the player with the highest score before adding or deducting
-   unplayed letters wins.
-   #+END_QUOTE
-** TODO Bonus, all seven; end game
-   From [[http://www.scrabblepages.com/scrabble/rules/][here]]:
-
-   #+BEGIN_QUOTE
-   When a player is able to place all seven tiles from the tile rack
-   on the board at the same time, that player receives a 50 point
-   bonus.
-   #+END_QUOTE
-
-   Deductions:
-
-   #+BEGIN_QUOTE
-   Once the game has ended, each player counts the points on the
-   tiles left remaining in their rack. Each player has that number
-   deducted from their final score.
-   #+END_QUOTE
-
-   Transfer of points:
-
-   #+BEGIN_QUOTE
-   The player who ended the game and who therefore has no more tiles
-   remaining is given an added bonus. Add the total of all points of
-   all remaining players with tiles left on their racks. This number
-   is added to the final score of the player who is “out” of tiles.
-   #+END_QUOTE
-** TODO Exchange tiles
-** TODO GADDAGs in a database of some kind
-** TODO Debug the fucking thing
-** TODO Name the players
-** TODO Blanks
-** TODO Randomly pull off top candidates
-** TODO Word -> move
-** [[http://en.wikipedia.org/wiki/Scrabble][Scrabble]]
-   - $15 \times 15$
-   - $100$ tiles; $2$ blanks
-   - Pass, exchange tiles
-   - First word played must cover H8 (center tile)
-   - “If any words other than the main word are formed by the play,
-     they are scored as well, and are subject to the same criteria of
-     acceptability.”
-   - “The game ends when (1) one player plays every tile on his or her
-     rack, and there are no tiles remaining in the bag (regardless of
-     the tiles on his or her opponent’s rack); or (2) when six
-     successive scoreless turns have occurred.”
-   - “When the game ends, each player’s score is reduced by the sum of
-     his or her unplayed letters. In addition, if a player has used
-     all of his or her letters (known as “going out”), the sum of the
-     other player’s unplayed letters is added to that player’s score.”
-   - See [[http://en.wikipedia.org/wiki/Scrabble_letter_distributions][letter distributions]]:
-     - 2 blank tiles (scoring 0 points)
-     - 1 point: E ×12, A ×9, I ×9, O ×8, N ×6, R ×6, T ×6, L ×4, S ×4, U ×4
-     - 2 points: D ×4, G ×3
-     - 3 points: B ×2, C ×2, M ×2, P ×2
-     - 4 points: F ×2, H ×2, V ×2, W ×2, Y ×2
-     - 5 points: K ×1
-     - 8 points: J ×1, X ×1
-     - 10 points: Q ×1, Z ×1
-** Gordon, “A Faster Scrabble Move Generation Algorithm”
-   - However, the inability of a program which knows every word and
-     always plays the highest scoring one to win even half of its
-     games against expert players indicates that strategy must be a
-     significant component of competitive play.
-   - Appel and Jacobson acknowledged that the major remaining source
-     of inefficiency in their algorithm is the unconstrained
-     generation of prefixes. Words can only be generated from left to
-     right with a DAWG. Starting from each anchor square (a square on
-     the board onto which a word could be hooked) the DAWG algorithm
-     handles prefixes (letters before the anchor square) differently
-     to suffixes (those on or after the anchor square). The DAWG
-     algorithm builds every string shorter than a context-dependent
-     length that can be composed from the given rack and is the prefix
-     of at least one word in the lexicon. It then extends each such
-     prefix into complete words as constrained by the board and the
-     remaining tiles in the rack.
-   - A backtracking, depth-first search12 for every possible path
-     through the GADDAG given the rack of tiles and board constraints
-     generates every legal move.
-   - Being the reverse of the directed acyclic graph for prefixes
-     followed by the directed acyclic graph for suffixes, it will be
-     called a GADDAG. Reversing the prefixes allows them to be played
-     just like suffixes, one tile at a time, moving away from anchor
-     squares.
-   - The shell used the greedy evaluation function (i.e. play the
-     highest scoring move). Ties for high score were broken by using
-     the move found first. Since ties occurred frequently and the
-     algorithms do not generate moves in exactly the same order, the
-     actual games played diverged quickly.
-** Appel, “The World’s Fastest Scrabble Program”
-   - Without loss of generality, we can restrict our attention to
-     generating the across plays only, since the down plays are simply
-     across plays with the board transposed.
-   - Because there are only 26 letters in the alphabet, these
-     cross-check sets can be represented efi- ciently as bit-vectors.
-     The cross-checks can be com- puted before beginning the move
-     generation phase, since they are independent of any particular
-     across move. Since the number of empty squares whose cross-
-     checks can change after any move is small, we need to recompute
-     cross-checks for only a few squares after each move.
-     - Memoized the crosschecks?
-   - Any across word must include some newly-placed tile adjacent to a
-     tile already on the board.4 Therefore, it is natural to use a
-     place of adja- cency as the spot to begin looking for a legal
-     move. We will call the leftmost newly-covered square adjacent to
-     a tile already on the board the anchor square of the word.
-   - It is easy to decide which squares are potential an- chor
-     squares: they are the empty squares that are adja- cent
-     (vertically or horizontally) to filled squares. We call these
-     candidate anchor squares the anchors of the row.
-   - By first computing the cross-checks and the anchors for a given
-     row, we can look for across words in that row without considering
-     the contents of any other row. The move generation problem is
-     thus reduced to the following one-dimensional problem: given a
-     rack of tiles, the contents of a row on the board, and the cross-
-     checks and anchors for the row, generate all legal plays in that
-     row.
-     - Cross-checks are the bridge between the current orientation and
-       the transposition.
 * TODO 5.5
   Come up with largest prime; let’s do polling.
 
@@ -8137,6 +7774,987 @@
      - Partially mapped crossover (PMX): selects two random cut points
        . . .
 * TODOs
+** TODO 5.5
+   Scrabble: is it the case that the utility and evaluation functions
+   are the same? Not necessary, see Appel, The World’s Fastest Scrabble
+   Program (emphasis mine):
+
+   #+BEGIN_QUOTE
+   Peter Turcan of the University of Reading in England has written a
+   SCRABBLE-player [8, 9] for some unspecified micro-computer. It
+   appears that he generates moves by iterating over the wards in his
+   lexicon in reverse order of length. He somehow decides for each word
+   whether and where it can be played on the current board with the
+   current rack. His program doesn’t attempt any adversary search, but
+   /it does use an evaluation function more sophisticated than the
+   score of the prospective move/. It takes the score and conditionally
+   adds terms depending on simple strategic features of the new
+   position and tiles left in the rack.
+   #+END_QUOTE
+
+   Need a good lexicon; how about just [[file:/usr/share/dict/words]]?
+   Sure. (Apparently, there’s the [[http://en.wikipedia.org/wiki/Tournament_Word_List][tournament word list]]; [[http://en.wikipedia.org/wiki/SOWPODS][SOWPODS]];
+   [[http://en.wikipedia.org/wiki/Official_Scrabble_Players_Dictionary][Player's Dictionary]].) See [[http://www.isc.ro/en/commands/lists.html][word lists]].
+
+   It looks like the evaluation function is the score plus some
+   heuristics.
+
+   #+BEGIN_QUOTE
+   Weiiiberger’s program has no concept of strategy, and simply chooses
+   the highest-scoring play available.
+   #+END_QUOTE
+
+   Using a trie:
+
+   #+BEGIN_QUOTE
+   They represent their lexicon as a tree-structure of letters where
+   each path down the tree has an associated list of words that can be
+   formed using exactly those letters on the path. The letters along
+   each path appear in a canonical order corresponding (approximately)
+   to the point value of the tile in SCRABBLE, by decreasing value. The
+   reason for the putting the higher-valued letters higher in the tree
+   is to help find the most valuable words first, in case a full search
+   cannot be completed.
+   #+END_QUOTE
+
+   We implemented a so-called [[http://en.wikipedia.org/wiki/Radix_tree][radix tree]] for unicode Greek, I think.
+
+   Some heuristic action:
+
+   #+BEGIN_QUOTE
+   Shapiro’s move generator iterates over board posi- tions, taking the
+   tiles in the rack and at the proposed board position, and searching
+   down from the root for acceptable words that can be formed with
+   those letters. His programs do not generally examine all possible
+   board positions where words could be played, only those positions
+   judged worthwhile. Once a move is found yielding at least some
+   pre-determined threshold score, that move is chosen.
+   #+END_QUOTE
+
+   This is cool:
+
+   #+BEGIN_QUOTE
+   Instead of scanning through the entire lexicon each turn for
+   playable words, we begin by scanning over the board for places where
+   a word could connect to letters already on the board. Then we try to
+   build the word up incrementally, using letters from the rack and the
+   board near the proposed place of attachment. We main- tain data
+   structures that make this search one-dimen- sional, so we never have
+   to look outside of a single row or column of the board during move
+   generation.
+   #+END_QUOTE
+
+   Let’s just read them into memory, check infix and available letters.
+
+   How does scrabble work mechanically?
+
+   #+BEGIN_QUOTE
+   Because a two-way dawg has a node for each sub- string of each word,
+   we imagine that it would be a great deal larger than the one-way
+   dawg, although we have never tried to build one. It would be
+   interesting to see just how much space it would occupy, and by how
+   much it would speed up move generation. *
+   #+END_QUOTE
+
+   Heuristics:
+
+   #+BEGIN_QUOTE
+   Preserving tiles and tile combinations in the rack that are likely
+   to lead to higher scores in the next move(s). Avoiding leaving the
+   board open for the opponent to make high-scoring moves.
+   #+END_QUOTE  
+
+   Initially, let’s ignore triple word scores; &c.: just a board of
+   dimensions $m \times n$ on which to place words. Don’t forget
+   blanks!
+
+   There’s left-hand and right-hand search; or: prefix and suffix. How
+   to use a trie effectively? Brute force:
+
+   Also, two dimensional problem: must make sense up and down; although
+   Appel claims to have reduced it to a one-dimensional problem.
+
+   Don’t forget: can use individual letters, too.
+
+   No prefix: all rows and columns; one letter prefix; to n letter
+   prefices. And this plus suffices. Also: bounded by letters on the
+   board (which become prefices and suffices).
+
+   Need to generalize the problem somehow; wish I had a board.
+
+   We’re going to have to consider the board row by row (and column by
+   column), I think; considering all combinations of blanks and
+   preëxisting tiles. Also, contiguous tiles.
+
+   See [[http://www.ericsink.com/downloads/faster-scrabble-gordon.pdf][Gordon's paper]] on GADDAGs; also, [[http://en.wikipedia.org/wiki/Boyer%E2%80%93Moore_string_search_algorithm][Boyer-Moore]] string search.
+
+   Need some function to determine contiguous words.
+
+   Build the tree; find the anchor points; try the permutations. Maybe
+   we can ignore blanks for the time being; ignore other contiguous
+   words. First, build the DAGs (nested hash-tables, or some kind of
+   array? Former if the space is sparse; otherwise, latter); anchor
+   squares, by the way, are “a square on the board onto which a word
+   could be hooked” (review the Appel paper). Let’s build the GADDAGs
+   first.
+
+   (Had a feeling, by the way, some NP-complete shit lurking under the
+   surface.)
+
+   Play on the edges, since that will generate intermediate matches?
+
+   #+BEGIN_QUOTE
+   There is no need to generate plays from every other internal anchor
+   square of a sequence of contiguous anchor squares (e.g. the square
+   left or right of the B in Figure 2), since every play from a given
+   anchor square would be generated from the adjacent anchor square
+   either to the right (above) or to the left (below).
+   #+END_QUOTE
+
+   Letter records: character, whether terminal; score kept elsewhere.
+   Board: two dimensional array of vectors. Need a special sentinel
+   that signifies reversal.
+
+   #+BEGIN_SRC scheme :comments link :tangle scrabble.scm :shebang #!/usr/bin/env chicken-scheme
+   (use debug
+        define-record-and-printer
+        extras
+        format
+        heap
+        loops
+        matchable
+        srfi-1
+        vector-lib)
+
+   (define-record-and-printer sentinel)
+   (define sentinel (make-sentinel))
+
+   (define sentinel-index (make-parameter 26))
+   (define terminal-index (make-parameter 27))
+
+   (define (character->index character)
+     (if (sentinel? character)
+         (sentinel-index)
+         (- (char->integer character) 65)))
+
+   (define (index->character index)
+     (if (= index (sentinel-index))
+         sentinel
+         (integer->char (+ index 65))))
+
+   (define dag-length (make-parameter (+ 26 ; Alphabet
+                                         1 ; Sentinel
+                                         1 ; Terminal?
+                                         )))
+   (define (make-dag) (make-vector (dag-length) #f))
+   (define (dag-terminal? dag) (vector-ref dag (terminal-index)))
+   (define (dag-terminal?-set! dag terminal?)
+     (vector-set! dag (terminal-index) terminal?))
+   (define (dag-ref dag character)
+     (vector-ref dag (character->index character)))
+   (define (dag-set! dag character value)
+     (vector-set! dag (character->index character) value))
+
+   (define (integrate-fixes dag prefix suffix)
+     (let ((characters (if (null? suffix)
+                         prefix
+                         (append (append prefix (list sentinel))
+                                 suffix))))
+       (dag-terminal?-set!
+        (fold (lambda (character dag)
+                (unless (dag-ref dag character)
+                  (dag-set! dag character (make-dag)))
+                (dag-ref dag character))
+              dag
+              characters)
+        #t)))
+
+   (define (update-dag! dag word)
+     (let ((characters (string->list word)))
+       (do ((prefix (list (car characters)) (cons (car suffix) prefix))
+            (suffix (cdr characters) (cdr suffix)))
+           ((null? suffix) (integrate-fixes dag prefix suffix))
+         (integrate-fixes dag prefix suffix))))
+
+   (define (dag-debug dag depth)
+     (vector-for-each
+      (lambda (i x)
+        (when (vector? x)
+          ;; (debug (index->character i))
+          (format #t "~a~a~%" (make-string depth #\_) (index->character i))
+          (dag-debug x (add1 depth))))
+      dag))
+
+   ;;; Be nice to store these fuckers in a graph database or something.
+   (define (make-dag-from-file file)
+     (let ((dag (make-dag)))
+       (with-input-from-file file
+         (lambda ()
+           (do ((word (read-line) (read-line)))
+               ((eof-object? word))
+             (debug word)
+             (update-dag! dag word))))
+       dag))
+
+   (define make-square cons)
+   (define square-x car)
+   (define square-y cdr)
+
+   (define (above square)
+     (cons (square-x square)
+           (+ (square-y square) 1)))
+
+   (define (below square)
+     (cons (square-x square)
+           (- (square-y square) 1)))
+
+   (define (left-of square)
+     (cons (- (square-x square) 1)
+           (square-y square)))
+
+   (define (right-of square)
+     (cons (+ (square-x square) 1)
+           (square-y square)))
+
+   (define (above? s1 s2)
+     (below? s2 s1))
+
+   (define (below? s1 s2)
+     (= 1 (- (square-y s2) (square-y s1))))
+
+   (define (left-of? s1 s2)
+     (right-of? s2 s1))
+
+   (define (right-of? s1 s2)
+     (= 1 (- (square-x s1) (square-x s2))))
+
+   (define (match? dag word)
+     (let iter ((dag dag)
+                (word word))
+       (if (null? word)
+           (dag-terminal? dag)
+           (let* ((character (car word))
+                  (subdag (dag-ref dag character)))
+             (if subdag
+                 (iter subdag (cdr word))
+                 #f)))))
+
+   (define make-board make-hash-table)
+   (define (board-empty? board) (zero? (hash-table-size board)))
+   (define board-copy hash-table-copy)
+   (define board-set! hash-table-set!)
+   (define board-ref hash-table-ref)
+   (define board-ref/default hash-table-ref/default)
+
+   (define (reverse-of orientation)
+     (cond ((eq? orientation right-of) left-of)
+           ((eq? orientation left-of) right-of)
+           ((eq? orientation above) below)
+           ((eq? orientation below) above)))
+
+   (define (orthogonal-to orientation)
+     (cond ((eq? orientation right-of) above)
+           ((eq? orientation left-of) below)
+           ((eq? orientation above) right-of)
+           ((eq? orientation below) left-of)))
+
+   (define (crosscheck-of orientation)
+     (cond ((eq? orientation right-of) left-of)
+           ((eq? orientation left-of) left-of)
+           ((eq? orientation above) above)
+           ((eq? orientation below) above)))
+
+   (define (word-scan board square next-square)
+     (let ((previous-square (reverse-of next-square)))
+       (do ((square square (next-square square)))
+           ((not (board-ref/default board square #f))
+            (do ((square (previous-square square)
+                         (previous-square square))
+                 (word '() (cons (board-ref/default board square #f) word)))
+                ((not (board-ref/default board square #f)) word))))))
+
+   (define (word-score word)
+     (fold (lambda (character score)
+             (+ (hash-table-ref character->points character)
+                score))
+           0
+           word))
+
+   ;;; This is a misnomer: it may not be a crosscheck, but merely a
+   ;;; check, in the case where we're testing for parallel contiguous
+   ;;; words.
+   (define (crosscheck dag word)
+     (and (or (= (length word) 1)
+              (match? dag word))
+          (word-score word)))
+
+   (define (square-neighbors square)
+     (list (left-of square)
+           (right-of square)
+           (above square)
+           (below square)))
+
+   (define (square-occupied? board square)
+     (board-ref/default board square #f))
+
+   (define (unoccupied-neighbors board square)
+     (filter (cut (complement square-occupied?) board <>)
+             (square-neighbors square)))
+
+   (define (board-display board)
+     (match
+         (hash-table-fold
+          board
+          (lambda (square character minimum-maximum)
+            (match minimum-maximum
+              ((minimum . maximum)
+               (cons (make-square (inexact->exact (min (square-x minimum)
+                                                       (square-x square)))
+                                  (inexact->exact (min (square-y minimum)
+                                                       (square-y square))))
+                     (make-square (inexact->exact (max (square-x maximum)
+                                                       (square-x square)))
+                                  (inexact->exact (max (square-y maximum)
+                                                       (square-y square))))))))
+          (cons (make-square +inf.0 +inf.0)
+                (make-square -inf.0 -inf.0)))
+       ((minimum . maximum)
+        (do ((y (square-y maximum) (sub1 y)))
+            ((< y (square-y minimum)))
+          (when (= y (square-y maximum))
+            (display " ")
+            (do ((x (square-x minimum) (add1 x)))
+                ((> x (square-x maximum)))
+              (display (abs (remainder x 10))))
+            (newline))
+          (display (abs (remainder y 10)))
+          (do ((x (square-x minimum) (add1 x)))
+              ((> x (square-x maximum)) (newline))
+            (display (board-ref/default board (make-square x y) " ")))))))
+
+   (define (anchor? board square)
+     (not (every (cut square-occupied? board <>)
+                 (square-neighbors square))))
+
+   (define origin (make-square 0 0))
+
+   (define (board-anchors board next-square)
+     (if (board-empty? board)
+         (list origin)
+         (let* ((above (orthogonal-to next-square))
+                (below (reverse-of above)))
+           (hash-table-fold
+            board
+            (lambda (square character anchors)
+              (append
+               (filter
+                identity
+                (list (and (anchor? board square)
+                           square)
+                      (and (not (square-occupied? board (above square)))
+                           (above square))
+                      (and (not (square-occupied? board (below square)))
+                           (below square))))
+               anchors))
+            '()))))
+
+   (define-record-and-printer word
+     start
+     characters
+     orientation)
+
+   (define (normalize-characters characters)
+     (if (member sentinel characters)
+         (let iter ((characters characters)
+                    (word '()))
+           (if (null? characters)
+               word
+               (let ((character (car characters)))
+                 (if (sentinel? character)
+                     (iter (reverse (cdr characters))
+                           word)
+                     (iter (cdr characters)
+                           (cons character word))))))
+         characters))
+
+   (define (word->string characters)
+     (list->string (normalize-characters characters)))
+
+   (define delete-first
+     (case-lambda
+      ((x list) (delete-first x list equal?))
+      ((x list =)
+       (receive (prefix suffix)
+         (break (lambda (y) (= x y)) list)
+         (if (null? suffix)
+             prefix
+             (append prefix (cdr suffix)))))))
+
+   (define-record-and-printer player
+     play
+     score
+     rack
+     name)
+
+   (define-record-and-printer scrabble-move
+     start
+     word
+     orientation)
+
+   (define-record-and-printer scrabble
+     board
+     tiles
+     lexicon)
+
+   (define-record-and-printer game
+     state
+     init
+     terminal?
+     play)
+
+   ;;; Scrabble is also known as: "game"; return a copy of the board, so
+   ;;; we don't have to propagate later?
+   ;;;
+   ;;; Let's also test against the lexicon here instead of waiting for
+   ;;; the end.
+   (define (scrabble-score scrabble player move)
+     (let ((board (board-copy (scrabble-board scrabble)))
+           (next-square (word-orientation move)))
+       (let iter ((square (word-start move))
+                  (characters (word-characters move))
+                  (score 0)
+                  (next-square next-square))
+         (if (null? characters)
+             (and (match? (scrabble-lexicon scrabble)
+                          (word-scan board
+                                     (word-start move)
+                                     (crosscheck-of next-square)))
+                  (scrabble-board-set! scrabble board)
+                  score)
+             (let ((character (board-ref/default board square #f)))
+               ;; TODO: We have to test this against their rack, don't
+               ;; we? Every placement, for that matter.
+               (if character
+                   (if (sentinel? (car characters))
+                       (iter square
+                             (reverse (cdr characters))
+                             score
+                             next-square)
+                       (and (char=? character (car characters))
+                            (iter (next-square square)
+                                  (cdr characters)
+                                  (+ score (hash-table-ref character->points character))
+                                  next-square)))
+                   (let ((character (car characters)))
+                     (if (sentinel? character)
+                         (iter square
+                               (reverse (cdr characters))
+                               score
+                               next-square)
+                         (begin
+                           (board-set! board square character)
+                           (let* ((orthogonal
+                                   (word-scan board
+                                              square
+                                              (crosscheck-of
+                                               (orthogonal-to next-square))))
+                                  (crosscheck (crosscheck (scrabble-lexicon scrabble)
+                                                          orthogonal)))
+                             (and crosscheck
+                                  (iter (next-square square)
+                                        (cdr characters)
+                                        (+ score crosscheck)
+                                        next-square))))))))))))
+
+   (define n-tiles-in-rack (make-parameter 7))
+
+   (define (plenish-rack! scrabble player)
+     (let ((rack-deficit (- (n-tiles-in-rack)
+                            (length (player-rack player))))
+           (n-tiles (length (scrabble-tiles scrabble))))
+       (when (and (positive? rack-deficit)
+                  (positive? n-tiles))
+         (let* ((n-new-tiles (min rack-deficit n-tiles))
+                (new-tiles
+                 (take (scrabble-tiles scrabble) n-new-tiles)))
+           (player-rack-set! player
+                             (append (player-rack player)
+                                     new-tiles))
+           (scrabble-tiles-set! scrabble
+                                (drop (scrabble-tiles scrabble)
+                                      n-new-tiles))))))
+
+   (define n-wrong-moves (make-parameter 3))
+
+   (define (shuffle! v)
+     (do ((n (vector-length v) (- n 1)))
+         ((zero? n) v)
+       (let* ((r (random n)) (t (vector-ref v r)))
+         (vector-set! v r (vector-ref v (- n 1)))
+         (vector-set! v (- n 1) t))))
+
+   (define character->points
+     (alist->hash-table
+      `((,sentinel . 0)
+        (#\E . 1)
+        (#\A . 1)
+        (#\I . 1)
+        (#\O . 1)
+        (#\N . 1)
+        (#\R . 1)
+        (#\T . 1)
+        (#\L . 1)
+        (#\S . 1)
+        (#\U . 1)
+        (#\D . 2)
+        (#\G . 2)
+        (#\B . 3)
+        (#\C . 3)
+        (#\M . 3)
+        (#\P . 3)
+        (#\F . 4)
+        (#\H . 4)
+        (#\V . 4)
+        (#\W . 4)
+        (#\Y . 4)
+        (#\K . 5)
+        (#\J . 8)
+        (#\X . 8)
+        (#\Q . 10)
+        (#\Z . 10))))
+
+   (define (make-scrabble-tiles)
+     (let ((tiles
+            (list->vector
+             (append
+              (make-list 12 #\E)
+              (make-list 9 #\A)
+              (make-list 9 #\I)
+              (make-list 8 #\O)
+              (make-list 6 #\N)
+              (make-list 6 #\R)
+              (make-list 6 #\T)
+              (make-list 4 #\L)
+              (make-list 4 #\S)
+              (make-list 4 #\U)
+              (make-list 4 #\D)
+              (make-list 3 #\G)
+              (make-list 2 #\B)
+              (make-list 2 #\C)
+              (make-list 2 #\M)
+              (make-list 2 #\P)
+              (make-list 2 #\F)
+              (make-list 2 #\H)
+              (make-list 2 #\V)
+              (make-list 2 #\W)
+              (make-list 2 #\Y)
+              (make-list 1 #\K)
+              (make-list 1 #\J)
+              (make-list 1 #\X)
+              (make-list 1 #\Q)
+              (make-list 1 #\Z)))))
+       (shuffle! tiles)
+       (vector->list tiles)))
+
+   (define (make-play-tiles)
+     (list #\C #\A #\R #\E))
+
+   (define (make-scrabble-game lexicon)
+     (let ((pass (make-hash-table))
+           (wrong-moves (make-hash-table)))
+       (make-game
+        (make-scrabble
+         (make-board)
+         (make-scrabble-tiles)
+         lexicon)
+        (lambda (scrabble players)
+          (for-each (cut plenish-rack! scrabble <>) players))
+        (lambda (scrabble players)
+          (or (and (zero? (length (scrabble-tiles scrabble)))
+                   (any zero?
+                        (map (lambda (player) (length (player-rack player)))
+                             players)))
+              (and (positive? (hash-table-size pass))
+                   (every values (hash-table-values pass)))))
+        (lambda (scrabble player)
+          (plenish-rack! scrabble player)
+          (let ((move ((player-play player)
+                       (scrabble-board scrabble)
+                       (player-rack player))))
+            (debug move (player-rack player))
+            (if move
+                (let ((score (scrabble-score scrabble player move)))
+                  ;; Must also take player into consideration: do they have the
+                  ;; appropriate tiles, &c.?
+                  (debug score)
+                  (if score
+                      (begin
+                        (board-display (scrabble-board scrabble))
+                        (player-score-set! player (+ (player-score player) score))
+                        (hash-table-set! wrong-moves (player-name player) 0)
+                        (hash-table-set! pass (player-name player) #f)
+                        (let iter ((characters (word-characters move))
+                                   (square (word-start move)))
+                          (unless (null? characters)
+                            (let ((character (car characters)))
+                              (player-rack-set! player (delete-first character (player-rack player)))
+                              (iter (cdr characters)
+                                    ((word-orientation move) square))))))
+                      (begin
+                        (hash-table-update!/default
+                         wrong-moves
+                         (player-name player)
+                         add1
+                         0)
+                        (and (= (hash-table-ref/default wrong-moves (player-play name) 0)
+                                (n-wrong-moves))
+                             (hash-table-set! pass (player-name player) #t)))))
+                (begin
+                  (hash-table-set! pass (player-name player) #t)
+                  #t)))))))
+
+   (define (calculate-moves! lexicon moves next-square board rack)
+     (for-each
+         (lambda (square)
+           (let iter ((current-square square)
+                      (rack (cons sentinel rack))
+                      (subdag lexicon)
+                      (next-square next-square)
+                      (score 0)
+                      (board board)
+                      (word '())
+                      (played-yet? #f))
+             (when subdag
+               (when (and played-yet? (dag-terminal? subdag))
+                 ;; We need to account for horizontally adjoining words
+                 ;; (if any): count the current word plus horizontally
+                 ;; adjoining words and the subtract the current word.
+                 (let ((crosscheck
+                        (crosscheck lexicon
+                                    (word-scan board
+                                               square
+                                               (crosscheck-of next-square)))))
+                   (when crosscheck
+                     (let ((score (+ score (- crosscheck (length (delete sentinel word))))))
+                       (heap-insert! moves
+                                     score
+                                     (make-word ((reverse-of next-square) current-square)
+                                                word
+                                                (reverse-of next-square)))))))
+               (let ((character (board-ref/default board current-square #f)))
+                 (if character
+                     (iter (next-square current-square)
+                           rack
+                           (dag-ref subdag character)
+                           next-square
+                           (+ score (hash-table-ref character->points character))
+                           board
+                           (cons character word)
+                           played-yet?)
+                     (for-each (lambda (character)
+                                 (if (sentinel? character)
+                                     (let ((next-square (reverse-of next-square)))
+                                       (iter (next-square square)
+                                             (delete sentinel rack)
+                                             (dag-ref subdag sentinel)
+                                             next-square
+                                             score
+                                             board
+                                             (cons character word)
+                                             played-yet?))
+                                     (begin
+                                       (let ((board (board-copy board)))
+                                         (board-set! board current-square character)
+                                         (let* ((orthogonal
+                                                 (word-scan board
+                                                            current-square
+                                                            (crosscheck-of
+                                                             (orthogonal-to next-square))))
+                                                (crosscheck (crosscheck lexicon orthogonal)))
+                                           (when crosscheck
+                                             (iter (next-square current-square)
+                                                   (delete-first character rack)
+                                                   (dag-ref subdag character)
+                                                   next-square
+                                                   (+ score crosscheck)
+                                                   board
+                                                   (cons character word)
+                                                   #t)))))))
+                       rack))))))
+       (board-anchors board next-square)))
+
+   (define (make-scrabble-player lexicon)
+     (make-player
+      (lambda (board rack)
+        (let ((moves (make-max-heap)))
+          (calculate-moves! lexicon moves left-of board rack)
+          (calculate-moves! lexicon moves above board rack)
+          (and (not (heap-empty? moves))
+               (heap-extract-extremum! moves))))
+      0
+      '()
+      (gensym)))
+
+   (define (play game players)
+     ((game-init game) (game-state game) players)
+     (let iter ((round-robin (apply circular-list players)))
+       ;; Players isn't part of the game-state, huh?
+       (if ((game-terminal? game) (game-state game) players)
+           (game-state game)
+           (if ((game-play game) (game-state game) (car round-robin))
+               ;; Successful move, go to the next player.
+               (iter (cdr round-robin))
+               ;; Circular; some failure to move. Should the player
+               ;; forfeit? That's up to the game, isn't it?
+               (iter round-robin)))))
+
+   (define (make-play-dag)
+     (let ((lexicon (make-dag)))
+       (update-dag! lexicon "ABLE")
+       (update-dag! lexicon "AR")
+       (update-dag! lexicon "ABLER")
+       (update-dag! lexicon "BE")
+       (update-dag! lexicon "CABLE")
+       (update-dag! lexicon "CARE")
+       lexicon))
+
+   (let ((lexicon (parameterize ((debug? #f))
+                    (make-dag-from-file "words.txt"))))
+     (let ((game (make-scrabble-game lexicon))
+           (players (list (make-scrabble-player lexicon)
+                          (make-scrabble-player lexicon))))
+       (let ((scrabble (game-state game)))
+        (play game players)
+        (board-display (scrabble-board scrabble))
+        (debug (map player-score players)
+               (map player-rack players)))))
+   #+END_SRC
+
+   First pass: let’s ascribe to the word arbitrary origin; and move as
+   far as we need to in any direction. (Board-boundaries are probably
+   a trivial part of the problem.)
+
+   Game state contains $x, y$ coördinates; can we do it in graphviz
+   with pre-computation?
+
+   Append to the anchors according to prefices; do crosschecks.
+
+   #+BEGIN_SRC scheme
+     (use debug srfi-1 test)
+
+     (define delete-first
+       (case-lambda
+        ((x list) (delete-first x list equal?))
+        ((x list =)
+         (receive (prefix suffix)
+           (break (lambda (y) (= x y)) list)
+           (if (null? suffix)
+               prefix
+               (append prefix (cdr suffix)))))))
+
+     (test '(#\B #\A #\Z)
+           (delete-first #\A '(#\B #\A #\A #\Z)))
+
+   #+END_SRC
+
+   What we call a “dag” is really a lexicon. Games and players will
+   have them; hopefully they correspond.
+
+   No tile-swapping mechanism yet; need to clean up nominations (“word”
+   vs. “move”). Also, the scoring and move-generation code has a lot of
+   duplication.
+
+   Debug with rack, move, board. Let’s do a primitive reader for human
+   interaction.
+
+   Back to the database problem: can we compile something and load it
+   as a library?
+
+   Consolidate scoring and generation; we’re dealing with some shitty
+   sync problems right now.
+*** TODO Scoring
+    From [[http://www.hasbro.com/scrabble/en_US/gamePlayRules.cfm][here]]:
+
+    #+BEGIN_QUOTE
+    The player gets full credit for all words formed or modified on
+    his or her turn.
+    #+END_QUOTE
+
+    We’re doing it right, I think: letter-score for preëxisting
+    letters; word-score for new crosschecks.
+
+    #+BEGIN_QUOTE
+    Use a score pad or piece of paper to keep a tally of each player’s
+    score, entering it after each turn. The score value of each letter
+    is indicated by a number at the bottom of the tile. The score
+    value of a blank is zero.
+
+    The score for each turn is the sum of the letter values in each
+    word(s) formed or modified on that turn, plus the additional points
+    obtained from placing letters on Premium Squares.
+
+    Premium Letter Squares: A light blue square doubles the score of a
+    letter placed on it; a dark blue square triples the letter score.
+
+    Premium Word Squares: The score for an entire word is doubled when
+    one of its letters is placed on a pink square: it is tripled when one
+    of its letters is placed on a red square. Include premiums for double
+    or triple letter values, if any, before doubling or tripling the word
+    score. If a word is formed that covers two premium word squares, the
+    score is doubled and then re-doubled (4 times the letter count), or
+    tripled and then re-tripled (9 times the letter count). NOTE: the
+    center square is a pink square, which doubles the score for the first
+    word.
+
+    Letter and word premiums count only on the turn in which they are
+    played. On later turns, letters already played on premium squares
+    count at face value.
+
+    When a blank tile is played on a pink or red square, the value of the
+    word is doubled or tripled, even though the blank itself has no score
+    value.
+
+    When two or more words are formed in the same play, each is scored.
+    The common letter is counted (with full premium value, if any) for
+    each word. (See Turns 3, 4 and 5 in the Scoring Examples section.)
+
+    BINGO! If you play seven tiles on a turn, it’s a Bingo. You score a
+    premium of 50 points after totaling your score for the turn.
+
+    Unplayed Letters: When the game ends, each player’s score is reduced
+    by the sum of his or her unplayed letters. In addition, if a player
+    has used all of his or her letters, the sum of the other players’
+    unplayed letters is added to that player’s score.
+
+    The player with the highest final score wins the game. In case of a
+    tie, the player with the highest score before adding or deducting
+    unplayed letters wins.
+    #+END_QUOTE
+*** TODO Bonus, all seven; end game
+    From [[http://www.scrabblepages.com/scrabble/rules/][here]]:
+
+    #+BEGIN_QUOTE
+    When a player is able to place all seven tiles from the tile rack
+    on the board at the same time, that player receives a 50 point
+    bonus.
+    #+END_QUOTE
+
+    Deductions:
+
+    #+BEGIN_QUOTE
+    Once the game has ended, each player counts the points on the
+    tiles left remaining in their rack. Each player has that number
+    deducted from their final score.
+    #+END_QUOTE
+
+    Transfer of points:
+
+    #+BEGIN_QUOTE
+    The player who ended the game and who therefore has no more tiles
+    remaining is given an added bonus. Add the total of all points of
+    all remaining players with tiles left on their racks. This number
+    is added to the final score of the player who is “out” of tiles.
+    #+END_QUOTE
+*** TODO Exchange tiles
+*** TODO GADDAGs in a database of some kind
+*** TODO Blanks
+*** TODO Randomly pull off top candidates
+*** DONE Need to check the terminal conditions.
+    CLOSED: [2013-04-30 Tue 19:47]
+    It looks like =plenish-rack!= is called after =terminal?=, so we
+    can’t check for empty racks there unless there are no tiles. Oh,
+    we do that! Nice.
+*** DONE Debug the fucking thing
+    CLOSED: [2013-05-01 Wed 16:43]
+*** DONE Name the players
+    CLOSED: [2013-05-01 Wed 16:43]
+*** DONE Word -> move
+    CLOSED: [2013-05-01 Wed 16:43]
+*** [[http://en.wikipedia.org/wiki/Scrabble][Scrabble]]
+    - $15 \times 15$
+    - $100$ tiles; $2$ blanks
+    - Pass, exchange tiles
+    - First word played must cover H8 (center tile)
+    - “If any words other than the main word are formed by the play,
+      they are scored as well, and are subject to the same criteria of
+      acceptability.”
+    - “The game ends when (1) one player plays every tile on his or her
+      rack, and there are no tiles remaining in the bag (regardless of
+      the tiles on his or her opponent’s rack); or (2) when six
+      successive scoreless turns have occurred.”
+    - “When the game ends, each player’s score is reduced by the sum of
+      his or her unplayed letters. In addition, if a player has used
+      all of his or her letters (known as “going out”), the sum of the
+      other player’s unplayed letters is added to that player’s score.”
+    - See [[http://en.wikipedia.org/wiki/Scrabble_letter_distributions][letter distributions]]:
+      - 2 blank tiles (scoring 0 points)
+      - 1 point: E ×12, A ×9, I ×9, O ×8, N ×6, R ×6, T ×6, L ×4, S ×4, U ×4
+      - 2 points: D ×4, G ×3
+      - 3 points: B ×2, C ×2, M ×2, P ×2
+      - 4 points: F ×2, H ×2, V ×2, W ×2, Y ×2
+      - 5 points: K ×1
+      - 8 points: J ×1, X ×1
+      - 10 points: Q ×1, Z ×1
+*** Gordon, “A Faster Scrabble Move Generation Algorithm”
+    - However, the inability of a program which knows every word and
+      always plays the highest scoring one to win even half of its
+      games against expert players indicates that strategy must be a
+      significant component of competitive play.
+    - Appel and Jacobson acknowledged that the major remaining source
+      of inefficiency in their algorithm is the unconstrained
+      generation of prefixes. Words can only be generated from left to
+      right with a DAWG. Starting from each anchor square (a square on
+      the board onto which a word could be hooked) the DAWG algorithm
+      handles prefixes (letters before the anchor square) differently
+      to suffixes (those on or after the anchor square). The DAWG
+      algorithm builds every string shorter than a context-dependent
+      length that can be composed from the given rack and is the prefix
+      of at least one word in the lexicon. It then extends each such
+      prefix into complete words as constrained by the board and the
+      remaining tiles in the rack.
+    - A backtracking, depth-first search12 for every possible path
+      through the GADDAG given the rack of tiles and board constraints
+      generates every legal move.
+    - Being the reverse of the directed acyclic graph for prefixes
+      followed by the directed acyclic graph for suffixes, it will be
+      called a GADDAG. Reversing the prefixes allows them to be played
+      just like suffixes, one tile at a time, moving away from anchor
+      squares.
+    - The shell used the greedy evaluation function (i.e. play the
+      highest scoring move). Ties for high score were broken by using
+      the move found first. Since ties occurred frequently and the
+      algorithms do not generate moves in exactly the same order, the
+      actual games played diverged quickly.
+*** Appel, “The World’s Fastest Scrabble Program”
+    - Without loss of generality, we can restrict our attention to
+      generating the across plays only, since the down plays are simply
+      across plays with the board transposed.
+    - Because there are only 26 letters in the alphabet, these
+      cross-check sets can be represented efi- ciently as bit-vectors.
+      The cross-checks can be com- puted before beginning the move
+      generation phase, since they are independent of any particular
+      across move. Since the number of empty squares whose cross-
+      checks can change after any move is small, we need to recompute
+      cross-checks for only a few squares after each move.
+      - Memoized the crosschecks?
+    - Any across word must include some newly-placed tile adjacent to a
+      tile already on the board.4 Therefore, it is natural to use a
+      place of adja- cency as the spot to begin looking for a legal
+      move. We will call the leftmost newly-covered square adjacent to
+      a tile already on the board the anchor square of the word.
+    - It is easy to decide which squares are potential an- chor
+      squares: they are the empty squares that are adja- cent
+      (vertically or horizontally) to filled squares. We call these
+      candidate anchor squares the anchors of the row.
+    - By first computing the cross-checks and the anchors for a given
+      row, we can look for across words in that row without considering
+      the contents of any other row. The move generation problem is
+      thus reduced to the following one-dimensional problem: given a
+      rack of tiles, the contents of a row on the board, and the cross-
+      checks and anchors for the row, generate all legal plays in that
+      row.
+      - Cross-checks are the bridge between the current orientation and
+        the transposition.
 ** TODO A problem a day is fairly ambitious, depending on the problem.
 ** TODO Integrate the online-search stuff with =aima-chicken=.
 ** TODO Maybe search should be in its own package; it's useful.
