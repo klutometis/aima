@@ -657,24 +657,24 @@
                                           (cons character word)
                                           played-yet?))
                                   (begin
-                                    (board-set! board current-square character)
-                                    (let* ((orthogonal (word-scan
-                                                        board
-                                                        current-square
-                                                        (crosscheck-of (orthogonal-to next-square))))
-                                           (crosscheck (if (= (length orthogonal) 1)
-                                                           1
-                                                           (crosscheck lexicon orthogonal))))
-                                      ;; (debug crosscheck)
-                                      (when crosscheck
-                                        (iter (next-square current-square)
-                                              (delete-first character rack)
-                                              (dag-ref subdag character)
-                                              next-square
-                                              (+ score crosscheck)
-                                              (board-copy board)
-                                              (cons character word)
-                                              #t))))))
+                                    (let ((board (board-copy board)))
+                                      (board-set! board current-square character)
+                                      (let* ((orthogonal
+                                              (word-scan board
+                                                         current-square
+                                                         (crosscheck-of
+                                                          (orthogonal-to next-square))))
+                                             (crosscheck (crosscheck lexicon orthogonal)))
+                                        ;; (debug crosscheck)
+                                        (when crosscheck
+                                          (iter (next-square current-square)
+                                                (delete-first character rack)
+                                                (dag-ref subdag character)
+                                                next-square
+                                                (+ score crosscheck)
+                                                board
+                                                (cons character word)
+                                                #t)))))))
                     rack))))))
     (board-anchors board next-square)))
 
