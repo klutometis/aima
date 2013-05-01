@@ -180,12 +180,21 @@
               (word '() (cons (board-ref/default board square #f) word)))
              ((not (board-ref/default board square #f)) word))))))
 
+(define (word-score word)
+  (fold (lambda (character score)
+          (+ (hash-table-ref character->points character)
+             score))
+        0
+        word))
+
 ;;; This is a misnomer: it may not be a crosscheck, but merely a
 ;;; check, in the case where we're testing for parallel contiguous
 ;;; words.
 (define (crosscheck dag word)
   ;; (debug word (match? dag word))
-  (and (match? dag word) (length word)))
+  (and (or (= (length word) 1)
+           (match? dag word))
+       (word-score word)))
 
 (define (square-neighbors square)
   (list (left-of square)
