@@ -495,6 +495,9 @@
     (shuffle! tiles)
     (vector->list tiles)))
 
+(define (make-play-tiles)
+  (list #\C #\A #\R #\E))
+
 (define (make-scrabble-game lexicon)
   (let ((pass (make-hash-table))
         (wrong-moves (make-hash-table)))
