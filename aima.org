@@ -5942,6 +5942,9 @@
                      delta)))
              "Nope")))))
   #+END_SRC
+
+  TCP server where multiple clients connect; every client reads every
+  message; relevant messages will be prefixed by a client’s ID.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
