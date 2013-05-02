@@ -5944,7 +5944,8 @@
   #+END_SRC
 
   TCP server where multiple clients connect; every client reads every
-  message; relevant messages will be prefixed by a client’s ID.
+  message; relevant messages will be prefixed by a client’s ID. See
+  [[http://stackoverflow.com/questions/10812920/tcp-server-with-multiple-clients-sending-message-back-to-all-connected-clients][this]].
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
