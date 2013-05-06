@@ -5968,6 +5968,13 @@
               (let ((message (receive-message* socket)))
                 (send-message socket message))))
   #+END_SRC
+
+  Since =req= and =rep= types work in [[http://api.zeromq.org/2-1:zmq-socket][round-robin]], it suffices for a
+  client to connect: that secures its place in line (it can even come
+  to the game late).
+
+  The client receives a game state: board + rack; sends: start, word,
+  orientation?
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
