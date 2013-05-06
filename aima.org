@@ -5947,12 +5947,26 @@
   message; relevant messages will be prefixed by a client’s ID. See
   [[http://stackoverflow.com/questions/10812920/tcp-server-with-multiple-clients-sending-message-back-to-all-connected-clients][this]].
 
-  #+BEGIN_SRC scheme :tangle zmq-client.scm :shebang #!/usr/bin/env chicken-scheme
-    (use zmq)  
+  #+BEGIN_SRC scheme :comments link :tangle zmq-client.scm :shebang #!/usr/bin/env chicken-scheme
+  (use debug posix zmq)
+  (let ((socket (make-socket 'req))
+        (name (number->string (current-seconds))))
+    (connect-socket socket "tcp://*:5555")
+    (send-message socket name)
+    (debug name (receive-message socket))
+    (sleep 2)
+    (send-message socket name)
+    (debug name (receive-message socket)))
   #+END_SRC
 
-  #+BEGIN_SRC scheme :tangle zmq-server.scm :shebang #!/usr/bin/env chicken-scheme
-    (use zmq)
+  #+BEGIN_SRC scheme :comments link :tangle zmq-server.scm :shebang #!/usr/bin/env chicken-scheme
+  (use debug loops zmq)
+
+  (let ((socket (make-socket 'rep)))
+    (bind-socket socket "tcp://*:5555")
+    (do-times i 4
+              (let ((message (receive-message* socket)))
+                (send-message socket message))))
   #+END_SRC
 * Meetups
 ** Mon Jun 11 2012
