@@ -584,17 +584,21 @@
                     rack))))))
     (board-anchors board next-square)))
 
-(define (make-scrabble-player lexicon)
-  (make-player
-   (lambda (board rack)
-     (let ((moves (make-max-heap)))
-       (calculate-moves! lexicon moves left-of board rack)
-       (calculate-moves! lexicon moves above board rack)
-       (and (not (heap-empty? moves))
-            (heap-extract-extremum! moves))))
-   0
-   '()
-   (gensym)))
+(define make-scrabble-player
+  (case-lambda
+   ((lexicon)
+    (make-scrabble-player lexicon (gensym)))
+   ((lexicon name)
+    (make-player
+     (lambda (board rack)
+       (let ((moves (make-max-heap)))
+         (calculate-moves! lexicon moves left-of board rack)
+         (calculate-moves! lexicon moves above board rack)
+         (and (not (heap-empty? moves))
+              (heap-extract-extremum! moves))))
+     0
+     '()
+     name))))
 
 (define (play game players)
   ((game-init game) (game-state game) players)
