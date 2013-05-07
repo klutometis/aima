@@ -6067,7 +6067,6 @@
               (let ((player (hash-table-ref players name)))
                 ((game-play game) (game-state game) player)))))))
   #+END_SRC
-
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
@@ -6223,6 +6222,8 @@
    - Polar vs. cartesian relativism
    - Similarity to simulated annealing
    - Expanding frontier
+** Mon May  6 2013
+   Plot the number of possible moves over $n$ games.
 * Notes
 ** 1
    - Two dimensions: thought vs. action, humanity vs. rationality.
