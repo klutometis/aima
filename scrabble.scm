@@ -624,7 +624,7 @@
     lexicon))
 
 ;; (let ((lexicon (parameterize ((debug? #f))
-;;                  (make-dag-from-file "words-four-letter.txt"))))
+;;                  (make-dag-from-file "words.txt"))))
 ;;   (let ((game (make-scrabble-game lexicon))
 ;;         (players (list (make-scrabble-player lexicon)
 ;;                        (make-scrabble-player lexicon))))
