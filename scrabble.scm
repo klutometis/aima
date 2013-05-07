@@ -9,6 +9,7 @@
      heap
      loops
      matchable
+     medea
      srfi-1
      vector-lib)
 
@@ -187,7 +188,21 @@
   (filter (cut (complement square-occupied?) board <>)
           (square-neighbors square)))
 
+(define (board->json board)
+  (list->vector
+   (hash-table-fold board
+                    (lambda (square character json)
+                      (cons `((x . ,(square-x square))
+                              (y . ,(square-y square))
+                              (letter . ,(make-string 1 character)))
+                            json))
+                    '())))
+
+(define (board-display-as-json board)
+  (write-json (board->json board)))
+
 (define (board-display board)
+  ;; (board-display-as-json board)
   (match
       (hash-table-fold
        board
