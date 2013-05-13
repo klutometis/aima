@@ -30,6 +30,23 @@
 ;; ((move #(word (-1 . 22) (#\V #\A #\L #\E) #<procedure (below square182)>))
 ;;  ((player-rack player) (#\N #\A #\V #\L)))
 
+(define (string->orientation string)
+  (cond ((string=? string "RIGHT-OF") right-of)
+        ((string=? string "LEFT-OF") left-of)
+        ((string=? string "ABOVE") above)
+        ((string=? string "BELOW") below)))
+
+(define (json->move move)
+  (match move
+    ((('name . name)
+      ('x . x)
+      ('y . y)
+      ('characters . characters)
+      ('orientation . orientation))
+     (make-word (make-square x y)
+                (json->characters characters)
+                (string->orientation orientation)))))
+
 (define (make-remote-scrabble-player socket name)
   (make-player
    (lambda (board rack)
@@ -37,23 +54,15 @@
       socket
       (json->string
        `((board . ,(board->json board))
-         (rack . ,(list->vector
-                   (map (lambda (character)
-                          (make-string 1 character))
-                        rack))))
-       ;; `((board ,(board->json board))
-       ;;   ;; (rack . ,(list->vector
-       ;;   ;;           (map (lambda (character) (make-string 1 character))
-       ;;   ;;                rack)))
-       ;;   )
-       ))
-     #f)
+         (rack . ,(characters->json rack)))))
+     (let ((move (json->move (read-json (receive-message* socket)))))
+       move))
    0
    '()
    name))
 
 (let ((lexicon (parameterize ((debug? #f))
-                 (make-dag-from-file "words-sample.txt")))
+                 (make-dag-from-file "words-four-letters.txt")))
       (socket (make-socket 'rep)))
   (let ((game (make-scrabble-game lexicon))
         ;; (players (list (make-scrabble-player lexicon)
@@ -65,18 +74,20 @@
       (board-set! board (make-square 0 -2) #\L)
       (board-set! board (make-square 0 -3) #\E))
     (bind-socket socket "tcp://*:5555")
-    (let iter ((move (read-json (receive-message* socket))))
-      (if ((game-terminal? game) (game-state game) (hash-table-values players))
-          (begin
-            (board-display (scrabble-board scrabble))
-            (debug (map player-score players)
-                   (map player-rack players)))
-          (let ((name (alist-ref move 'name)))
-            (unless (hash-table-exists? players name)
-              (let ((player (make-remote-scrabble-player socket name)))
-                ((game-init game) (game-state game) (list player))
-                (hash-table-set! players name player)))
-            (let ((player (hash-table-ref players name)))
-              ((game-play game) (game-state game) player)))))))
+    (let ((name (alist-ref (read-json (receive-message* socket)) 'name)))
+      (let iter ()
+        (if ((game-terminal? game) (game-state game) (hash-table-values players))
+            (begin
+              (board-display (scrabble-board scrabble))
+              (debug (map player-score players)
+                     (map player-rack players)))
+            (begin
+              (unless (hash-table-exists? players name)
+                (let ((player (make-remote-scrabble-player socket name)))
+                  ((game-init game) (game-state game) (list player))
+                  (hash-table-set! players name player)))
+              (let ((player (hash-table-ref players name)))
+                ((game-play game) (game-state game) player)
+                (iter))))))))
 
 ;; 5\.5:5 ends here

@@ -188,6 +188,21 @@
   (filter (cut (complement square-occupied?) board <>)
           (square-neighbors square)))
 
+(define (characters->json characters)
+  (list->vector
+   (map (lambda (character)
+          (if (sentinel? character)
+              "SENTINEL"
+              (make-string 1 character)))
+        characters)))
+
+(define (json->characters characters)
+  (map (lambda (letter)
+         (if (string=? letter "SENTINEL")
+             sentinel
+             (car (string->list letter))))
+       (vector->list characters)))
+
 (define (board->json board)
   (list->vector
    (hash-table-fold board
