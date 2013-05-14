@@ -7903,6 +7903,25 @@
      - Partially mapped crossover (PMX): selects two random cut points
        . . .
 * TODOs
+** TODO Implement Scrabble server over REST with polling.
+   - Pass possible word moves with score, geometry
+   - Generate all possible opponent-moves for each 61 choose 7 rack.
+   - Weighted
+   - Specify which opponent-racks to evaluate
+   - If I’ve played word $w$; evaluate the possible moves against some
+     opponent rack $R$.
+   - As part of the game state, send the remaining letters.
+   - Some fixed number of opponent racks to evaluate?
+   - As a parameter: how many racks allowed to query per turn.
+   - For each rack, get back a list of words sorted by score.
+   - Code locally for generating playable sets: heuristics (“I’m only
+     going to generate four letter words this turn,” i.e. operate on
+     some subset of the dictionary.)
+   - Local search: lexicon (access full scrabble lexicon);
+     board-state; rack.
+   - Communication with the server at that point: querying for the
+     board state; including which in bag, which in rack; whose turn it
+     i.s
 ** TODO A problem a day is fairly ambitious, depending on the problem.
 ** TODO Integrate the online-search stuff with =aima-chicken=.
 ** TODO Maybe search should be in its own package; it's useful.
