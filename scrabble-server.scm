@@ -9,6 +9,7 @@
      loops
      medea
      srfi-1
+     srfi-18
      zmq)
 
 (define (play game players)
@@ -50,7 +51,7 @@
 
 (define current-move (make-parameter #f))
 
-(define (make-remote-scrabble-player socket name)
+(define (make-remote-scrabble-player name)
   (make-player
    (lambda (board rack)
      (current-move))
@@ -60,35 +61,47 @@
 
 (let ((lexicon (parameterize ((debug? #f))
                  (make-dag-from-file "words-four-letter.txt")))
-      (socket (make-socket 'rep)))
+      (meta (make-socket 'rep))
+      (state (make-socket 'pub))
+      (play (make-socket 'pull)))
+  (bind-socket meta "tcp://*:5555")
+  (bind-socket state "tcp://*:5556")
+  (bind-socket play "tcp://*:5557")
   (let ((game (make-scrabble-game lexicon))
         ;; (players (list (make-scrabble-player lexicon)
         ;;                (make-scrabble-player lexicon)))
         (players (make-hash-table))
         (turns '()))
+    (thread-start!
+     (make-thread
+      (lambda ()
+        (receive-message* meta)
+        (let* ((name (symbol->string (gensym)))
+               (player (make-remote-scrabble-player name)))
+          ((game-init game) (game-state game) (list player))
+          (hash-table-set! players name player)
+          (set! turns (apply circular-list (hash-table-keys players)))))))
     (let ((board (scrabble-board (game-state game))))
       (board-set! board (make-square 0 0) #\A)
       (board-set! board (make-square 0 -1) #\B)
       (board-set! board (make-square 0 -2) #\L)
       (board-set! board (make-square 0 -3) #\E))
-    (bind-socket socket "tcp://*:5555")
-    (let iter ((message (read-json (receive-message* socket))))
-      (debug 'server message)
+    (let iter ((message (read-json (receive-message* play))))
       (if ((game-terminal? game) (game-state game) (hash-table-values players))
           (begin
             (board-display (scrabble-board scrabble))
             (debug (map player-score players)
                    (map player-rack players)))
           (let ((name (alist-ref message 'name)))
-            (unless (hash-table-exists? players name)
-              (let ((player (make-remote-scrabble-player socket name)))
-                ((game-init game) (game-state game) (list player))
-                (hash-table-set! players name player)
-                (set! turns (apply circular-list (hash-table-keys players)))))
+            ;; (unless (hash-table-exists? players name)
+            ;;   (let ((player (make-remote-scrabble-player socket name)))
+            ;;     ((game-init game) (game-state game) (list player))
+            ;;     (hash-table-set! players name player)
+            ;;     (set! turns (apply circular-list (hash-table-keys players)))))
             (let ((player (hash-table-ref players name))
                   (turn (car turns)))
               (send-message
-               socket
+               state
                (json->string
                 `((board . ,(board->json (scrabble-board (game-state game))))
                   (rack . ,(characters->json (player-rack player)))
