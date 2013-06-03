@@ -6208,6 +6208,32 @@
       (debug (receive-message* socket))
       (iter)))
   #+END_SRC
+
+  Hybrid server/pubsub model; endpoints: =new=, =join=, =list=,
+  =play=.
+
+  Advantage of one-file-per-endpoint model: an endpoint can go down,
+  but not the whole app; advantage of the one-file-many-endpoint
+  model: code reuse. The latter is a little more complex in the
+  former: have to include a common file, &c.; also, some per-file
+  boilerplate. Not to mention that the latter model has shared state.
+  Going to have to persist to database otherwise.
+
+  How do frameworks solve that problem: can the one endpoint 500 or is
+  the whole app down?
+
+  - =(new)= :: =gameid=
+  - =(join gameid)= :: =userid=, =pubsub URL=
+  - =(list)= :: =gameids=
+  - =(play gameid userid move)= :: =status=
+  - =(state gameid)= :: =state=
+
+  Client can call state after they’ve subscribed to the pubsub stream
+  to bootstrap themselves.
+
+  Just give me a fucking key-value store; actually, I don’t want to
+  even deal with serialization: let’s use a monolithic app and a
+  hash-table.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
