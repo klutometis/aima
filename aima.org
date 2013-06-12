@@ -7954,6 +7954,33 @@
    - $X = \{WA, NT, ...\}$
    - $C = \{SA \neq WA\}$
    - Constraint graph
+   - Many problems that are intractable for regular state-space search
+     can be solved quickly when formulated as a CSP.
+   - Precedence constraint
+   - Disjunctive constraint
+   - CSP formalism
+   - Discrete, finite domains
+   - Discrete, infinite (integers)
+   - Constraint language
+   - Linear constraints
+   - No algorithm exists for solving general nonlinear constraints on
+     integer variables.
+   - Continuous domains
+   - Operations research
+   - Continuous-domain CSPs: linear programming; polynomial time over
+     variables
+   - Quadratic programming, second-order conic programming
+   - Unary constraint
+   - Binary constraint
+   - Higher-order constraints
+   - Global constraints: $Alldiff$
+   - Constraint hypergraph: $n$-ary constraints
+   - Every finite-domain constraint can be reduced to a set of binary
+     constraints if enough auxiliary variables are introduced.
+   - Dual-graph transformation: create a new graph in which there will
+     be one variable for each constraint in the original graph, and
+     one binary constraint for each pair of constraints in the
+     original graph that share variables.
 ** Lectures
 *** 1
     - AI: mapping from sensors to actuators
