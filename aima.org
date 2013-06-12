@@ -7945,6 +7945,15 @@
        - Pins, where the pinned piece is of value not greater than the
          pinning piece
      - Mobility
+** 6
+   - Constraint satisfaction
+   - Variables, domains, constraints
+   - Domains: enumerable
+   - Constraint: $\<scope, rep\>$: $scope$ participates in constraint,
+     $rel$ defines the values those relations can take on
+   - $X = \{WA, NT, ...\}$
+   - $C = \{SA \neq WA\}$
+   - Constraint graph
 ** Lectures
 *** 1
     - AI: mapping from sensors to actuators
