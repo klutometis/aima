@@ -7981,6 +7981,8 @@
      be one variable for each constraint in the original graph, and
      one binary constraint for each pair of constraints in the
      original graph that share variables.
+   - Preference constraints: costs on invidiual variable assignments
+   - Constraint optimization problem
 ** Lectures
 *** 1
     - AI: mapping from sensors to actuators
