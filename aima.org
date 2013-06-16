@@ -7983,6 +7983,34 @@
      original graph that share variables.
    - Preference constraints: costs on invidiual variable assignments
    - Constraint optimization problem
+   - Search, constraint propagation: using the constraints to reduce
+     the number of legal values for a variable, in turn reduce the
+     legal values for anothor, etc.
+   - Local consistency
+   - Node consistency
+     - Since variable (CSP network) node-consistent: if all the values
+       in the variable’s domain satisfy the variable’s unary
+       constraints.
+     - Network: node-consistent, every node node-consistent.
+     - Eliminate unary constraints, node-consistency
+     - Transform $n$-ary constraints into binary constraints
+   - Arc-consistency
+     - Variably is arc-consistent if every value in its domain
+       satisfies the variable’s binary constrainst.
+     - AC-3
+       #+BEGIN_SRC org
+         ,- (AC-3 csp) \to false, true
+         ,  - let
+         ,    - queue, queue of arcs, initially all the arcs in csp
+         ,      - while queue is not empty
+         ,        - (X_i, X_j) \gets (dequeue queue)
+         ,        - if (revise X_i X_j)
+         ,          - if (positive? (size D_i))
+         ,            - return false
+         ,            - for each X_k in X_i.neighbors - {X_j}
+         ,              - add (X_k, X_i) to queue
+         ,      - return true
+       #+END_SRC
 ** Lectures
 *** 1
     - AI: mapping from sensors to actuators
