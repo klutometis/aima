@@ -8060,6 +8060,37 @@
      - CSP formalism: each new problem area, define the problem in
        terms of constraints; the general constraint-solving mechanism
        can take over.
+   - Solved by inference over constraints; not sufficient, need to
+     search: backtracking search algorithms.
+   - Depth-limited search; CSP with n variables of a domain size d:
+     branching factor at top level $nd$; next: $(n - 1)d$, etc. Tree
+     with $n!\dot d^n$ leaves.
+   - CSPs: commutativity; order of application no effect on the
+     outcome; with this restriction: leaves is $d^n$.
+   - Backtracking search
+     #+BEGIN_SRC org
+       ,- backtracking-search(csp) -> solution, failure
+       ,  - return backtrack({}, csp)
+       ,- backtrack(assignment, csp) -> solution, failure
+       ,  - if assignment is complete
+       ,    - return assignment
+       ,    - var <- select-unassigned-variable(csp)
+       ,      - for each value in order-domain-variables(var, assignment, csp)
+       ,        - if value is consistent with assignment
+       ,          - add { var = value } to assignment
+       ,          - inferences <- inference(csp, var, value)
+       ,          - if inferences != failure then
+       ,            - add inferences to assignment
+       ,            - result <- backtrack(assignment, csp)
+       ,            - if result != failure then
+       ,              - return result
+       ,        - remove {var = value} and inferences from assignment
+       ,    - return failure
+     #+END_SRC
+   - Improve performance of CSPs without domain-specific knowledge
+     - Which variable assigned next; what order values tried?
+     - What inferences performed?
+     - Violates a constraint, avoid violating it?
 ** Lectures
 *** 1
     - AI: mapping from sensors to actuators
