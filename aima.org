@@ -8010,7 +8010,42 @@
          ,            - for each X_k in X_i.neighbors - {X_j}
          ,              - add (X_k, X_i) to queue
          ,      - return true
+         ,- (revise csp X_i X_j) -> true iff we revise the domain of X_i
+         ,  - revised <- false
+         ,  - for x in D_i
+         ,    - if no value y in D_j allows (x, y) to satisfy the constraint
+         ,      between X_i and X_j then
+         ,      - delete x from D_j
+         ,      - revised <- true
+         ,  - return revised
        #+END_SRC
+     - After AC-3, we are left with a CSP that is equivalent to the
+       original CSP–they both have the same solutions–but the
+       arc-consistent CSP will in most cases be faster to search
+       because its vriables have smaller domains.
+     - Extend arc-consistency to handle $n$-ary cases: hyperarc.
+     - $O(cd^3)$ worst-case time
+   - Path-consistency
+     - Arc-consistency fails to make enough inferences.
+     - Map coloring, for instance: satisfy each binary but not the
+       network.
+     - Path-consistency tightens the binary constraints by using
+       implicit constraints that are inferred by looking at triples of
+       variables.
+     - PC-2 algorithm
+   - $K$-consistency
+     - CSP is $k$-consistent if, for any set of $k - 1$ variables and
+       for any consistent assignment to those variables, a consistent
+       value can always be assigned to any $k$th variables.
+     - Node-consistency: 1-consistency
+     - Arc-consistency: 2-consistency
+     - Path-consistency: 3-consistency
+     - Strongly $k$-consistent: also $k-1 .. 1$-consistent.
+     - $n$-consistency, exponential in time, space.
+     - In practice: 2-, 3-consistency
+   - Global constraints
+     - Higher-order constraints: resource constraints (atmost), bounds
+       propagation (upper and lower bounds)
 ** Lectures
 *** 1
     - AI: mapping from sensors to actuators
