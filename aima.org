@@ -8046,6 +8046,20 @@
    - Global constraints
      - Higher-order constraints: resource constraints (atmost), bounds
        propagation (upper and lower bounds)
+   - Sudoku
+     - Empty squares have domain [0 .. 9], pre-filled squares have a
+       single-digit domain
+     - 27 different Alldiff constraints
+     - Alldiff constraints expanded into binary constraints (apply
+       AC-3).
+     - Eliminate by arc-consistency
+     - Solve entire puzzle by AC-3: all variables have domains reduced
+       to a single value
+     - AC-3 solves only the easiest Sudoku puzzles.
+       - [“From that . . .” not “from the fact that . . .”]
+     - CSP formalism: each new problem area, define the problem in
+       terms of constraints; the general constraint-solving mechanism
+       can take over.
 ** Lectures
 *** 1
     - AI: mapping from sensors to actuators
