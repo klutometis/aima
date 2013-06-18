@@ -8091,6 +8091,97 @@
      - Which variable assigned next; what order values tried?
      - What inferences performed?
      - Violates a constraint, avoid violating it?
+   - Variable and value ordering
+     - Next unassigned variable: inefficient
+     - Minimum remaining values heuristic (most constrained variable,
+       fail-first heuristic)
+     - If variable X has no legal values left, will pick and fail
+       immediately.
+     - Degree heuristic: reduce the branching factor on future choices
+       by selecting the variable that is nivolved in the largest
+       number of constaints on other unassigned variables.
+     - Minimum remaining values with degree heuristic as tie-breaker.
+     - Least-constraining value heuristic: tries to leave maximum
+       flexibility for subseqent value assignments.
+     - Trying to find all solutions, not just one: order doesn’t
+       matter; same holds: no solutions.
+     - Variable-select fail-first; value-selection fail-last.
+   - Interleaving search and inference
+     - AC-3 infer reductions in the domain of variables before we
+       begin the search.
+     - Forward checking: whenever a variable X is assigned, the
+       forward-checking process establishes arc consistency for it.
+     - MRV heuristic with forward checking: forward checking as an
+       efficient way to incrementally compute the information that the
+       MRV heuristic needs to do its job.
+     - Doesn’t look far enough ahead; MAC (Maintaining Arc
+       Consistency) does.
+     - Unlike MAC, forward checking does not recursively propagate
+       constraints when changes are made to the domains of variables.
+   - Intelligent backtracking
+     - Chronological backtracking (most recent decision point revisited)
+     - Backtrack to variable that might fix the problem
+     - Keep track of assignments that are in conflict with some value
+       for SA: conflict set
+     - Backjumping: most recent assignment in conflict set.
+     - Forward checking supplies conflict set with no extra work
+     - Every branch pruned by forward checking also pruned by
+       backjumping
+     - Conflict-directed backjumping: set of preceding variables,
+       together with any subsequent variables
+     - Constraint learning: finding minumum set of variables from the
+       conflict set that causes the problem.
+   - Local search
+     - Min-conflicts heuristic: select the value that results in the
+       minimum number of conflicts with other variables
+       #+BEGIN_SRC org
+         ,- (min-conflicts csp max-steps) -> solution or failure
+         ,  - current <- initial complete assignment for csp
+         ,  - for i = 1 to max-steps
+         ,    - if current is a solution for csp
+         ,      - return current
+         ,      - begin
+         ,        - var <- randomly chosen conflicted variable for csp.variables
+         ,        - value <- the value v for var that minimizes conflicts(var,
+         ,          v, current, csp)
+         ,        - set var = value in current
+         ,  - return failure
+       #+END_SRC
+     - n-queens, independent of problem size; 1m queens in 50 steps.
+     - n-queens easy for local search, densely distributed through
+       state space.
+     - Local search techniques candidates for CSP; landscape of CSP
+       under min-conflicts heuristic has a series of plateux.
+     - Tabu search: small list of recently visited states, forbidding
+       algorithm to return to those states.
+     - Simulated annealing
+     - Constraint weighting
+     - Local search: used online
+   - Structure of the problem
+     - Independent subproblems
+     - Connected components
+     - Constraint graph is a tree when any two variables connected by
+       only one path
+     - Any tree-structured CSP can be solved in time linear to the
+       number of variables.
+     - Directed arc consistency (DAC)
+     - Topological sort
+     - Constraint graphs reduced to trees: removing nodes, collapsing
+       nodes
+     - Choose e.g. SA, treat the rest of the problem like a tree
+     - Cycle cutset
+       - 1. Choose a subset S of the CSP’s variables, constraint graph
+         becomes a tree: cycle subset
+       - 2. For each possible assignment to the variables in S:
+         - a. remove inconsistent values from domain
+         - b. if has a solution, return with assignment for S
+     - Finding smallest cycle cutset NP-hard
+     - Cutset conditioning
+     - Tree decomposition of graph into connected subproblems
+     - Each subproblem solved independently, resulting solutions are
+       combined
+     - Value symmetry
+     - Symmetry-breaking constraint
 ** Lectures
 *** 1
     - AI: mapping from sensors to actuators
