@@ -6299,6 +6299,46 @@
         curl -v 'http://localhost/scm/aima/scrabble-service.scm/join?game-id=g0'
   #+END_SRC
 
+* TODO 6.1
+  [[http://en.wikipedia.org/wiki/Graph_coloring#Bounds_on_the_chromatic_number][Chromatic number]]: clique number is the lower bound; [[http://en.wikipedia.org/wiki/Graph_coloring#Chromatic_polynomial][chromatic
+  polynomial]]: number of ways to color a graph using no more than $k$
+  colors: “the chromatic polynomial is a function P(G, t) that counts
+  the number of t-colorings of G.”
+
+  Calculating by [[http://en.wikipedia.org/wiki/Chromatic_polynomial#Deletion.E2.80.93contraction][deletion-contraction]]: “A recursive way of computing
+  the chromatic polynomial is based on edge contraction: for a pair of
+  vertices $u$ and $v$ the graph $G/uv$ is obtained by merging the two
+  vertices and removing any edges between them.”
+
+  #+BEGIN_SRC scheme
+    (define (backtracking-search csp)
+      (backtrack '() csp))
+    
+    (define make-assignment make-hash-table)
+    
+    (define make-)
+    
+    ;;; This version just does the first solution; need to enumerate them.
+    (define (backtrack assignment csp)
+      (if (complete? assignment)
+          assignment
+          (let ((var (select-unassigned-variable csp)))
+            (for-each
+                (lambda (value)
+                  (when (consistent? value assignment)
+                    (assignment-add assignment var value)
+                    (let ((inferences (inference scp var value)))
+                      (unless (failure? inference)
+                        (assignment-add-inferences assignment)
+                        (let ((result (backtrack assignment csp)))
+                          (unless (failure? result)
+                            ;; return
+                            result))))))
+                (order-domain-values var assignment csp)))))
+  #+END_SRC
+  
+  CSP has variables which in turn have values? There is a thing called
+  “assigment,” really a lookup-table?
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
