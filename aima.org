@@ -6311,23 +6311,70 @@
   vertices and removing any edges between them.”
 
   #+BEGIN_SRC scheme
-    (define (backtracking-search csp)
-      (backtrack '() csp))
+    (use debug
+         define-record-and-printer)
+    
+    (define-record-and-printer unassigned)
+    (define unassigned (make-unassigned))
+    (define assigned? (complement unassigned?))
     
     (define make-assignment make-hash-table)
     
-    (define make-)
+    (define make-assignment
+      (alist->hash-table `((wa . ,unassigned)
+                           (nt . ,unassigned)
+                           (q . ,unassigned)
+                           (nsw . ,unassigned)
+                           (v . ,unassigned)
+                           (sa . ,unassigned)
+                           (t . ,unassigned))))
+    
+    (define assignment-copy hash-table-copy)
+    
+    (define (backtracking-search csp)
+      (backtrack (make-assignment) csp))
+    
+    (define (complete? assignment)
+      (hash-table-fold
+       assignment
+       (lambda (variable value complete?)
+         (and (assigned? value) complete?))
+       #t))
+    
+    (debug (complete? (alist->hash-table `((a . 2))))
+           (complete? (alist->hash-table `((a . ,unassigned)))))
+    
+    (define )
     
     ;;; This version just does the first solution; need to enumerate them.
     (define (backtrack assignment csp)
       (if (complete? assignment)
           assignment
+          ;; Asks the CSP, since it might have information about the
+          ;; constraints; e.g. degree heuristic. Don't we need the current
+          ;; assignment, though, too?
+          ;;
+          ;; Oh, but the CSP has information about the domains
+          ;; corresponding to variables; which change according to the
+          ;; assignment.
+          ;;
+          ;; This is why, for instance, inference is called on the CSP.
+          ;;
+          ;; As we make assignments, therefore, we should also constrain
+          ;; the domain contained in the CSP.
+          ;;
+          ;; In fact, as regards the CSP: hash-table containing variables,
+          ;; domains (which are constrained by inference); and a list of
+          ;; constraints: a table indexed by a tuple of variables pointing
+          ;; to a either 1) possible tuples that satisfy constraint; 2)
+          ;; abstract relation specifying whether e.g. X_1, X_2 satisfy
+          ;; the constraint and enumurating the members of the relation.
           (let ((var (select-unassigned-variable csp)))
             (for-each
                 (lambda (value)
                   (when (consistent? value assignment)
                     (assignment-add assignment var value)
-                    (let ((inferences (inference scp var value)))
+                    (let ((inferences (inference csp var value)))
                       (unless (failure? inference)
                         (assignment-add-inferences assignment)
                         (let ((result (backtrack assignment csp)))
@@ -6339,6 +6386,11 @@
   
   CSP has variables which in turn have values? There is a thing called
   “assigment,” really a lookup-table?
+
+  Is it the case that merely searching depth-firstly suffices for
+  enumeration?
+
+  $CSP$ has $X$, $D$, $C$: variables, domains, constraints.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
