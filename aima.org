@@ -6370,6 +6370,10 @@
                                           value
                                           (hash-table-ref assignment neighbor)))
                            assigned-neighbors))))
+    
+    (define (inference csp variable value)
+      (make-hash-table))
+    
     ;;; This version just does the first solution; need to enumerate them.
     (define (backtrack assignment csp)
       (if (complete? assignment)
