@@ -6397,20 +6397,31 @@
           ;; to a either 1) possible tuples that satisfy constraint; 2)
           ;; abstract relation specifying whether e.g. X_1, X_2 satisfy
           ;; the constraint and enumurating the members of the relation.
-          (let ((var (select-unassigned-variable csp)))
-            (for-each
-                (lambda (value)
-                  (when (consistent? value assignment)
-                    (assignment-add assignment var value)
-                    (let ((inferences (inference csp var value)))
-                      (unless (failure? inference)
-                        (assignment-add-inferences assignment)
-                        (let ((result (backtrack assignment csp)))
-                          (unless (failure? result)
-                            ;; return
-                            result))))))
-              (order-domain-values var assignment csp)))))
-    
+          (let ((variable (select-unassigned-variable assignment)))
+            (let iter ((values (order-domain-values variable csp)))
+              (if (null? values)
+                  failure
+                  (let ((value (car values)))
+                    ;; Do we have to address constraints at this point? Yes.
+                    (if (consistent? variable value assignment csp)
+                        (begin
+                          ;; Copy at this point?
+                          (hash-table-set! assignment variable value)
+                          ;; This might actually modify the domains in the CSP;
+                          ;; better copy before we get here?
+                          (let ((inferences (inference csp variable value)))
+                            (if (failure? inferences)
+                                (iter (cdr values))
+                                (begin
+                                  ;; When duplicate, take inferences; the only
+                                  ;; values we should be overriding, however, are
+                                  ;; unassigned.
+                                  (hash-table-merge! inferences assignment)
+                                  (let ((result (backtrack assignment csp)))
+                                    (if (failure? result)
+                                        (iter (cdr values))
+                                        result))))))
+                        (iter (cdr values)))))))))
     
     ;;; Do we need to copy the thing? We're constantly destroying the CSP.
     (define (ac-3 csp)
