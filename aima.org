@@ -6411,10 +6411,6 @@
                             result))))))
               (order-domain-values var assignment csp)))))
     
-    (define-record-and-printer csp
-      domains
-      constraints
-      graph)
     
     ;;; Do we need to copy the thing? We're constantly destroying the CSP.
     (define (ac-3 csp)
