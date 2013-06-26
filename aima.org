@@ -6488,6 +6488,11 @@
     
     (test-assert (not (ac-3 arc-inconsistent-coloring)))
     
+    (test '((b . white) (a . black))
+          (hash-table->alist (backtracking-search arc-consistent-coloring)))
+    
+    (test-assert (failure? (backtracking-search arc-inconsistent-coloring)))
+    
   #+END_SRC
   
   CSP has variables which in turn have values? There is a thing called
