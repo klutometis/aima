@@ -6438,7 +6438,7 @@
                          (begin
                            (for-each (lambda (neighbor)
                                        (queue-add! queue (cons neighbor x)))
-                             (delete y (hash-table-ref (csp-graph csp) x)))
+                             (delete y (hash-table-ref (csp-neighbors csp) x)))
                            (iter)))
                      (iter))))))))
     
