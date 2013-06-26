@@ -6344,7 +6344,9 @@
     (debug (complete? (alist->hash-table `((a . 2))))
            (complete? (alist->hash-table `((a . ,unassigned)))))
     
-    (define )
+    (define-record-and-printer csp
+      variable->domain
+      constraints)
     
     ;;; This version just does the first solution; need to enumerate them.
     (define (backtrack assignment csp)
@@ -6381,7 +6383,10 @@
                           (unless (failure? result)
                             ;; return
                             result))))))
-                (order-domain-values var assignment csp)))))
+              (order-domain-values var assignment csp)))))
+    
+    (define (ac-3 csp)
+      )
   #+END_SRC
   
   CSP has variables which in turn have values? There is a thing called
@@ -6391,6 +6396,23 @@
   enumeration?
 
   $CSP$ has $X$, $D$, $C$: variables, domains, constraints.
+
+  Implementing e.g. AC-3 will help clarify the nature of a CSP, I
+  think. By arcs, it’s doing bidirectional constraints? I.e., for a
+  given constraint $C$, have to add each side of the scope as whence?
+  Seems like it.
+
+  Yeah: “To make X arc-consistent with respect Y, we reduce X’s domain
+  to {0, 1, 2, 3}. If we also make Y arc-consistent with respect to X,
+  then Y’s domain becomes {0, 1, 4, 9} and the whole CSP is
+  arc-consistent” (p. 208).
+
+  If constraints are hash-tables, need to normalize the scope for
+  lookup; alphabetize?
+
+  Let’s restrict ourselves to binary constraints.
+
+  Let’s furthermore add bidirectional constraints.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
