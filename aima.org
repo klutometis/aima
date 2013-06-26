@@ -6346,8 +6346,6 @@
          (and (assigned? value) complete?))
        #t))
     
-    ;; (debug (complete? (alist->hash-table `((a . 2))))
-    ;;        (complete? (alist->hash-table `((a . ,unassigned)))))
     
     ;;; This version just does the first solution; need to enumerate them.
     (define (backtrack assignment csp)
