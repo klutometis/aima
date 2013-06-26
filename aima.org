@@ -6390,18 +6390,6 @@
       constraints
       graph)
     
-    (define neq? (complement eq?))
-    
-    (define coloring
-      (make-csp
-       ;; Domain can also be lambdas?
-       (alist->hash-table '((a . (white black))
-                            (b . (white black))))
-       (alist->hash-table `(((a . b) . ,neq?)
-                            ((b . a) . ,neq?)))
-       (alist->hash-table '((a b)
-                            (b a)))))
-    
     ;;; Do we need to copy the thing? We're constantly destroying the CSP.
     (define (ac-3 csp)
       (let ((queue (list->queue (hash-table-keys (csp-constraints csp)))))
@@ -6440,6 +6428,8 @@
                        (lambda (x-domain)
                          (delete x-value x-domain)))
                       (iter #t (cdr x-domain)))))))))
+    
+    (define neq? (complement eq?))
     
     (define arc-consistent-coloring
       (make-csp
