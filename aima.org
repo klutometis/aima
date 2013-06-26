@@ -6325,6 +6325,10 @@
     (define-record-and-printer failure)
     (define failure (make-failure))
     
+    (define-record-and-printer csp
+      domains
+      constraints
+      neighbors)
     
     ;;; Dispense with this and do equality on the number of keys!
     (define (make-assignment csp)
