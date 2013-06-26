@@ -6356,6 +6356,20 @@
     ;;; Need assignment, at some point, to do least-constraining-value.
     (define (order-domain-values variable csp)
       (hash-table-ref (csp-domains csp) variable))
+    
+    ;;; Find the assigned neighbors of the variable; does the value
+    ;;; satisfy each constraint?
+    ;;;
+    ;;; What if the variable is already assigned something else? Seems
+    ;;; like a pathological case.
+    (define (consistent? variable value assignment csp)
+      (let* ((neighbors (hash-table-ref (csp-neighbors csp) variable))
+             (assigned-neighbors (filter (lambda (neighbor) (assigned? (hash-table-ref assignment neighbor)))
+                                         neighbors)))
+        (every values (map (lambda (neighbor) ((hash-table-ref (csp-constraints csp) (cons variable neighbor))
+                                          value
+                                          (hash-table-ref assignment neighbor)))
+                           assigned-neighbors))))
     ;;; This version just does the first solution; need to enumerate them.
     (define (backtrack assignment csp)
       (if (complete? assignment)
