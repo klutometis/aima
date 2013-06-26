@@ -6322,20 +6322,16 @@
     (define unassigned (make-unassigned))
     (define assigned? (complement unassigned?))
     
-    (define make-assignment make-hash-table)
     (define-record-and-printer failure)
     (define failure (make-failure))
     
-    (define make-assignment
-      (alist->hash-table `((wa . ,unassigned)
-                           (nt . ,unassigned)
-                           (q . ,unassigned)
-                           (nsw . ,unassigned)
-                           (v . ,unassigned)
-                           (sa . ,unassigned)
-                           (t . ,unassigned))))
     
     (define assignment-copy hash-table-copy)
+    ;;; Dispense with this and do equality on the number of keys!
+    (define (make-assignment csp)
+      (alist->hash-table
+       (map (lambda (variable) (cons variable unassigned))
+            (hash-table-keys (csp-domains csp)))))
     
     (define (backtracking-search csp)
       (backtrack (make-assignment) csp))
