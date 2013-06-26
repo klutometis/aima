@@ -6367,6 +6367,8 @@
     ;;;
     ;;; What if the variable is already assigned something else? Seems
     ;;; like a pathological case.
+    ;;;
+    ;;; Should we check here if we've already assigned something?
     (define (consistent? variable value assignment csp)
       (let* ((neighbors (hash-table-ref (csp-neighbors csp) variable))
              (assigned-neighbors (filter (lambda (neighbor) (assigned? (hash-table-ref assignment neighbor)))
