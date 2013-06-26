@@ -6312,7 +6312,11 @@
 
   #+BEGIN_SRC scheme
     (use debug
-         define-record-and-printer)
+         define-record-and-printer
+         matchable
+         srfi-1
+         srfi-69
+         test)
     
     (define-record-and-printer unassigned)
     (define unassigned (make-unassigned))
@@ -6341,12 +6345,8 @@
          (and (assigned? value) complete?))
        #t))
     
-    (debug (complete? (alist->hash-table `((a . 2))))
-           (complete? (alist->hash-table `((a . ,unassigned)))))
-    
-    (define-record-and-printer csp
-      variable->domain
-      constraints)
+    ;; (debug (complete? (alist->hash-table `((a . 2))))
+    ;;        (complete? (alist->hash-table `((a . ,unassigned)))))
     
     ;;; This version just does the first solution; need to enumerate them.
     (define (backtrack assignment csp)
@@ -6385,8 +6385,86 @@
                             result))))))
               (order-domain-values var assignment csp)))))
     
+    (define-record-and-printer csp
+      domains
+      constraints
+      graph)
+    
+    (define neq? (complement eq?))
+    
+    (define coloring
+      (make-csp
+       ;; Domain can also be lambdas?
+       (alist->hash-table '((a . (white black))
+                            (b . (white black))))
+       (alist->hash-table `(((a . b) . ,neq?)
+                            ((b . a) . ,neq?)))
+       (alist->hash-table '((a b)
+                            (b a)))))
+    
+    ;;; Do we need to copy the thing? We're constantly destroying the CSP.
     (define (ac-3 csp)
-      )
+      (let ((queue (list->queue (hash-table-keys (csp-constraints csp)))))
+        (let iter ()
+          (if (queue-empty? queue)
+              #t
+              (match (queue-remove! queue)
+                ((x . y)
+                 (if (revise csp x y)
+                     ;; How does this work for e.g. infinite domains?
+                     (if (zero? (length (hash-table-ref (csp-domains csp) x)))
+                         #f
+                         (begin
+                           (for-each (lambda (neighbor)
+                                       (queue-add! queue (cons neighbor x)))
+                             (delete y (hash-table-ref (csp-graph csp) x)))
+                           (iter)))
+                     (iter))))))))
+    
+    (define (revise csp x y)
+      (let ((y-domain (hash-table-ref (csp-domains csp) y))
+            (constraint (hash-table-ref (csp-constraints csp) (cons x y))))
+        (let iter ((revised #f)
+                   (x-domain (hash-table-ref (csp-domains csp) x)))
+          ;; (debug revised x-domain)
+          ;; How does this work for infinite domains?
+          (if (null? x-domain)
+              revised
+              (let ((x-value (car x-domain)))
+                (if (any values (map (lambda (y-value) (constraint x-value y-value)) y-domain))
+                    (iter revised (cdr x-domain))
+                    (begin
+                      (hash-table-update!
+                       (csp-domains csp)
+                       x
+                       (lambda (x-domain)
+                         (delete x-value x-domain)))
+                      (iter #t (cdr x-domain)))))))))
+    
+    (define arc-consistent-coloring
+      (make-csp
+       ;; Domain can also be lambdas?
+       (alist->hash-table '((a . (white black))
+                            (b . (white black))))
+       (alist->hash-table `(((a . b) . ,neq?)
+                            ((b . a) . ,neq?)))
+       (alist->hash-table '((a b)
+                            (b a)))))
+    
+    (define arc-inconsistent-coloring
+      (make-csp
+       ;; Domain can also be lambdas?
+       (alist->hash-table '((a . (white))
+                            (b . (white))))
+       (alist->hash-table `(((a . b) . ,neq?)
+                            ((b . a) . ,neq?)))
+       (alist->hash-table '((a b)
+                            (b a)))))
+    
+    (test-assert (ac-3 arc-consistent-coloring))
+    
+    (test-assert (not (ac-3 arc-inconsistent-coloring)))
+    
   #+END_SRC
   
   CSP has variables which in turn have values? There is a thing called
