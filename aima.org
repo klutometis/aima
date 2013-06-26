@@ -6323,6 +6323,8 @@
     (define assigned? (complement unassigned?))
     
     (define make-assignment make-hash-table)
+    (define-record-and-printer failure)
+    (define failure (make-failure))
     
     (define make-assignment
       (alist->hash-table `((wa . ,unassigned)
