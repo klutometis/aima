@@ -6353,6 +6353,9 @@
       ;; We can assume there is at least one unassigned variable.
       (car (find (compose unassigned? cdr) (hash-table->alist assignment))))
     
+    ;;; Need assignment, at some point, to do least-constraining-value.
+    (define (order-domain-values variable csp)
+      (hash-table-ref (csp-domains csp) variable))
     ;;; This version just does the first solution; need to enumerate them.
     (define (backtrack assignment csp)
       (if (complete? assignment)
