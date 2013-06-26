@@ -6326,7 +6326,6 @@
     (define failure (make-failure))
     
     
-    (define assignment-copy hash-table-copy)
     ;;; Dispense with this and do equality on the number of keys!
     (define (make-assignment csp)
       (alist->hash-table
