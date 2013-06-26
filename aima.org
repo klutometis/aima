@@ -6330,6 +6330,11 @@
       constraints
       neighbors)
     
+    (define (csp-copy csp)
+      (make-csp (hash-table-copy (csp-domains csp))
+                (hash-table-copy (csp-constraints csp))
+                (hash-table-copy (csp-neighbors csp))))
+    
     ;;; Dispense with this and do equality on the number of keys!
     (define (make-assignment csp)
       (alist->hash-table
