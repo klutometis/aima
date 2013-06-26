@@ -6346,6 +6346,12 @@
          (and (assigned? value) complete?))
        #t))
     
+    ;;; Too bad this is linear across variables, right? Optimize later.
+    ;;; 
+    ;;; Need the CSP, at some point, to do the degree heuristic.
+    (define (select-unassigned-variable assignment)
+      ;; We can assume there is at least one unassigned variable.
+      (car (find (compose unassigned? cdr) (hash-table->alist assignment))))
     
     ;;; This version just does the first solution; need to enumerate them.
     (define (backtrack assignment csp)
