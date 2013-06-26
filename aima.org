@@ -6491,6 +6491,45 @@
        (alist->hash-table '((a b)
                             (b a)))))
     
+    (define 3-colors '(red green blue))
+    
+    ;;; Could find a mechanism for automatically creating these things;
+    ;;; indeed, will have to randomly.
+    (define 3-color-australia
+      (make-csp
+       (alist->hash-table `((wa . ,3-colors)
+                            (nt . ,3-colors)
+                            (sa . ,3-colors)
+                            (q . ,3-colors)
+                            (nsw . ,3-colors)
+                            (v . ,3-colors)
+                            (t . ,3-colors)))
+       (alist->hash-table `(((wa . nt) . ,neq?)
+                            ((nt . wa) . ,neq?)
+                            ((wa . sa) . ,neq?)
+                            ((sa . wa) . ,neq?)
+                            ((nt . sa) . ,neq?)
+                            ((sa . nt) . ,neq?)
+                            ((nt . q) . ,neq?)
+                            ((q . nt) . ,neq?)
+                            ((sa . q) . ,neq?)
+                            ((q . sa) . ,neq?)
+                            ((nsw . q) . ,neq?)
+                            ((q . nsw) . ,neq?)
+                            ((nsw . v) . ,neq?)
+                            ((v . nsw) . ,neq?)
+                            ((sa . nsw) . ,neq?)
+                            ((nsw . sa) . ,neq?)
+                            ((sa . v) . ,neq?)
+                            ((v . sa) . ,neq?)))
+       (alist->hash-table '((wa nt sa)
+                            (nt wa sa)
+                            (sa wa nt q nsw v)
+                            (q nt sa nsw)
+                            (nsw q sa v)
+                            (v nsw sa)
+                            (t)))))
+    
     (test-assert (ac-3 arc-consistent-coloring))
     
     (test-assert (not (ac-3 arc-inconsistent-coloring)))
@@ -6499,6 +6538,15 @@
           (hash-table->alist (backtracking-search arc-consistent-coloring)))
     
     (test-assert (failure? (backtracking-search arc-inconsistent-coloring)))
+    
+    (test '((wa . red)
+            (v . red)
+            (t . red)
+            (q . red)
+            (sa . green)
+            (nt . blue)
+            (nsw . blue))
+          (hash-table->alist (backtracking-search 3-color-australia)))
     
   #+END_SRC
   
