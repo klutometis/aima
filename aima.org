@@ -6333,7 +6333,7 @@
             (hash-table-keys (csp-domains csp)))))
     
     (define (backtracking-search csp)
-      (backtrack (make-assignment) csp))
+      (backtrack (make-assignment csp) csp))
     
     (define (complete? assignment)
       (hash-table-fold
