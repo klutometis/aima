@@ -6600,6 +6600,29 @@
   Let’s restrict ourselves to binary constraints.
 
   Let’s furthermore add bidirectional constraints.
+
+  An [[http://en.wikipedia.org/wiki/Backtracking][alternative]] to copying data structures:
+
+  #+BEGIN_QUOTE
+  In addition to retaining minimal recovery values used in backing up,
+  backtracking implementations commonly keep a variable trail, to
+  record value change history. An efficient implementation will avoid
+  creating a variable trail entry between two successive changes when
+  there is no choice point, as the backtracking will erase all of the
+  changes as a single operation.
+
+  An alternative to the variable trail is to keep a timestamp of when
+  the last change was made to the variable. The timestamp is compared
+  to the timestamp of a choice point. If the choice point has an
+  associated time later than that of the variable, it is unnecessary
+  to revert the variable when the choice point is backtracked, as it
+  was changed before the choice point occurred.
+  #+END_QUOTE
+
+  It doesn’t suffice merely to copy; we need to remove assignments and
+  inferences to do exhaustive search, I think.
+
+  See [[http://see.stanford.edu/materials/icspacs106b/H19-RecBacktrackExamples.pdf%0A][here]].
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
