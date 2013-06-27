@@ -61,6 +61,11 @@
 ;;;
 ;;; Should we check here if we've already assigned something?
 (define (consistent? variable value assignment csp)
+  ;; (debug variable
+  ;;        value
+  ;;        (hash-table-ref assignment variable)
+  ;;        (or (unassigned? (hash-table-ref assignment variable))
+  ;;            (eq? value (hash-table-ref assignment variable))))
   (let* ((neighbors (hash-table-ref (csp-neighbors csp) variable))
          (assigned-neighbors (filter (lambda (neighbor) (assigned? (hash-table-ref assignment neighbor)))
                                      neighbors)))
@@ -122,6 +127,65 @@
                                     (iter (cdr values))
                                     result))))))
                     (iter (cdr values)))))))))
+
+(define (backtracking-enumeration csp)
+  (let ((enumeration (make-parameter '())))
+    (backtrack-enumerate enumeration (make-assignment csp) csp)
+    (enumeration)))
+
+;;; This version just does the first solution; need to enumerate them.
+(define (backtrack-enumerate enumeration assignment csp)
+  ;; No inference.
+  (let iter-variables ((variables (hash-table-keys csp)))
+    (unless (null? variables)
+      (let ((variable (car variables)))
+        (let iter-values ((values (hash-table-ref (csp-domain csp) variable)))
+          (if (null? values)
+              (iter-variables (cdr variables))
+              (let ((value (car values)))
+                (if (consistent? variable value assignment csp)
+                    (begin
+                      (hash-table-set! assignment variable value)
+                      (let ((inference (inference csp variable value)))
+                        (if (failure? inference)
+                            (iter-values (cdr values))
+                            (begin
+                              (hash-table-merge! inferences assignment)
+                              (let ((result (backtrack-enumerate enumeration assignment csp)))
+                                (if (failure? result)
+                                    (iter-variables (cdr variables))
+                                    result)))))))))))))
+  ;; (debug (hash-table->alist assignment))
+  ;; (if (complete? assignment)
+  ;;     (enumeration (cons assignment (enumeration)))
+  ;;     (let ((variable (select-unassigned-variable assignment)))
+  ;;       (let iter ((values (order-domain-values variable csp)))
+  ;;         (if (null? values)
+  ;;             failure
+  ;;             (let ((value (car values))
+  ;;                   (csp (csp-copy csp))
+  ;;                   (assignment (hash-table-copy assignment)))
+  ;;               ;; Do we have to address constraints at this point? Yes.
+  ;;               (if (consistent? variable value assignment csp)
+  ;;                   (begin
+  ;;                     ;; Copy at this point?
+  ;;                     (hash-table-set! assignment variable value)
+  ;;                     ;; This might actually modify the domains in the CSP;
+  ;;                     ;; better copy before we get here?
+  ;;                     (let ((inferences (inference csp variable value)))
+  ;;                       (if (failure? inferences)
+  ;;                           (iter (cdr values))
+  ;;                           (begin
+  ;;                             ;; When duplicate, take inferences; the only
+  ;;                             ;; values we should be overriding, however, are
+  ;;                             ;; unassigned.
+  ;;                             (hash-table-merge! inferences assignment)
+  ;;                             (let ((result (backtrack-enumerate enumeration assignment csp)))
+  ;;                               (if (failure? result)
+  ;;                                   (iter (cdr values))
+  ;;                                   result))))))
+  ;;                   (iter (cdr values))))))))
+  )
 
 ;;; Do we need to copy the thing? We're constantly destroying the CSP.
 (define (ac-3 csp)
@@ -223,22 +287,24 @@
                         (v nsw sa)
                         (t)))))
 
-(test-assert (ac-3 arc-consistent-coloring))
+;; (test-assert (ac-3 arc-consistent-coloring))
 
-(test-assert (not (ac-3 arc-inconsistent-coloring)))
+;; (test-assert (not (ac-3 arc-inconsistent-coloring)))
 
-(test '((b . white) (a . black))
-      (hash-table->alist (backtracking-search arc-consistent-coloring)))
+;; (test '((b . white) (a . black))
+;;       (hash-table->alist (backtracking-search arc-consistent-coloring)))
 
-(test-assert (failure? (backtracking-search arc-inconsistent-coloring)))
+;; (test-assert (failure? (backtracking-search arc-inconsistent-coloring)))
 
-(test '((wa . red)
-        (v . red)
-        (t . red)
-        (q . red)
-        (sa . green)
-        (nt . blue)
-        (nsw . blue))
-      (hash-table->alist (backtracking-search 3-color-australia)))
+;; (test '((wa . red)
+;;         (v . red)
+;;         (t . red)
+;;         (q . red)
+;;         (sa . green)
+;;         (nt . blue)
+;;         (nsw . blue))
+;;       (hash-table->alist (backtracking-search 3-color-australia)))
+
+(debug (map hash-table->alist (backtracking-enumeration 3-color-australia)))
 
 ;; 6\.1:1 ends here
