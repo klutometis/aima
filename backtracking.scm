@@ -270,23 +270,23 @@
                         (v nsw sa)
                         (t)))))
 
-;; (test-assert (ac-3 arc-consistent-coloring))
+(test-assert (ac-3 arc-consistent-coloring))
 
-;; (test-assert (not (ac-3 arc-inconsistent-coloring)))
+(test-assert (not (ac-3 arc-inconsistent-coloring)))
 
-;; (test '((b . white) (a . black))
-;;       (hash-table->alist (backtracking-search arc-consistent-coloring)))
+(test '((b . white) (a . black))
+      (hash-table->alist (backtracking-search arc-consistent-coloring)))
 
-;; (test-assert (failure? (backtracking-search arc-inconsistent-coloring)))
+(test-assert (failure? (backtracking-search arc-inconsistent-coloring)))
 
-;; (test '((wa . red)
-;;         (v . red)
-;;         (t . red)
-;;         (q . red)
-;;         (sa . green)
-;;         (nt . blue)
-;;         (nsw . blue))
-;;       (hash-table->alist (backtracking-search 3-color-australia)))
+(test '((wa . red)
+        (v . red)
+        (t . red)
+        (q . red)
+        (sa . green)
+        (nt . blue)
+        (nsw . blue))
+      (hash-table->alist (backtracking-search 3-color-australia)))
 
 (debug (map hash-table->alist (backtracking-enumeration 3-color-australia)))
 
