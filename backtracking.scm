@@ -33,7 +33,10 @@
         (hash-table-keys (csp-domains csp)))))
 
 (define (backtracking-search csp)
-  (backtrack (make-assignment csp) csp))
+  (let ((enumeration (backtracking-enumeration 1 csp)))
+    ;; Return #f here? No, need to distinguish between failure and the
+    ;; legitimate value #f.
+    (if (null? enumeration) failure (car enumeration))))
 
 (define (complete? assignment)
   (hash-table-fold
