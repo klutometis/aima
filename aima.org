@@ -8490,7 +8490,8 @@
      - Partially mapped crossover (PMX): selects two random cut points
        . . .
 * TODOs
-** TODO 6.1
+** DONE 6.1
+   CLOSED: [2013-06-28 Fri 01:14]
    [[http://en.wikipedia.org/wiki/Graph_coloring#Bounds_on_the_chromatic_number][Chromatic number]]: clique number is the lower bound; [[http://en.wikipedia.org/wiki/Graph_coloring#Chromatic_polynomial][chromatic
    polynomial]]: number of ways to color a graph using no more than $k$
    colors: “the chromatic polynomial is a function P(G, t) that counts
