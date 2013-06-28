@@ -80,57 +80,6 @@
 (define (inference csp variable value)
   (make-hash-table))
 
-;;; This version just does the first solution; need to enumerate them.
-(define (backtrack assignment csp)
-  (if (complete? assignment)
-      assignment
-      ;; Asks the CSP, since it might have information about the
-      ;; constraints; e.g. degree heuristic. Don't we need the current
-      ;; assignment, though, too?
-      ;;
-      ;; Oh, but the CSP has information about the domains
-      ;; corresponding to variables; which change according to the
-      ;; assignment.
-      ;;
-      ;; This is why, for instance, inference is called on the CSP.
-      ;;
-      ;; As we make assignments, therefore, we should also constrain
-      ;; the domain contained in the CSP.
-      ;;
-      ;; In fact, as regards the CSP: hash-table containing variables,
-      ;; domains (which are constrained by inference); and a list of
-      ;; constraints: a table indexed by a tuple of variables pointing
-      ;; to a either 1) possible tuples that satisfy constraint; 2)
-      ;; abstract relation specifying whether e.g. X_1, X_2 satisfy
-      ;; the constraint and enumurating the members of the relation.
-      (let ((variable (select-unassigned-variable assignment)))
-        (let iter ((values (order-domain-values variable csp)))
-          (if (null? values)
-              failure
-              (let ((value (car values))
-                    (csp (csp-copy csp))
-                    (assignment (hash-table-copy assignment)))
-                ;; Do we have to address constraints at this point? Yes.
-                (if (consistent? variable value assignment csp)
-                    (begin
-                      ;; Copy at this point?
-                      (hash-table-set! assignment variable value)
-                      ;; This might actually modify the domains in the CSP;
-                      ;; better copy before we get here?
-                      (let ((inferences (inference csp variable value)))
-                        (if (failure? inferences)
-                            (iter (cdr values))
-                            (begin
-                              ;; When duplicate, take inferences; the only
-                              ;; values we should be overriding, however, are
-                              ;; unassigned.
-                              (hash-table-merge! inferences assignment)
-                              (let ((result (backtrack assignment csp)))
-                                (if (failure? result)
-                                    (iter (cdr values))
-                                    result))))))
-                    (iter (cdr values)))))))))
-
 (define (backtracking-enumeration n csp)
   (let ((enumeration (make-parameter '())))
     (backtrack-enumerate n enumeration (make-assignment csp) csp)
