@@ -128,9 +128,9 @@
                                     result))))))
                     (iter (cdr values)))))))))
 
-(define (backtracking-enumeration csp)
+(define (backtracking-enumeration n csp)
   (let ((enumeration (make-parameter '())))
-    (backtrack-enumerate enumeration (make-assignment csp) csp)
+    (backtrack-enumerate n enumeration (make-assignment csp) csp)
     (enumeration)))
 
 ;;; This version just does the first solution; need to enumerate them.
