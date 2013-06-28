@@ -80,10 +80,12 @@
 (define (inference csp variable value)
   (make-hash-table))
 
-(define (backtracking-enumeration n csp)
-  (let ((enumeration (make-parameter '())))
-    (backtrack-enumerate n enumeration (make-assignment csp) csp)
-    (enumeration)))
+(define backtracking-enumeration
+  (case-lambda
+   ((csp) (backtracking-enumeration #f csp))
+   ((n csp) (let ((enumeration (make-parameter '())))
+              (backtrack-enumerate n enumeration (make-assignment csp) csp)
+              (enumeration)))))
 
 (define (backtrack-enumerate n enumeration assignment csp)
   (if (complete? assignment)
@@ -531,8 +533,8 @@
          (sa . green)
          (nt . blue)
          (nsw . blue)))
-      (map hash-table->alist (backtracking-enumeration #f 3-color-australia)))
+      (map hash-table->alist (backtracking-enumeration 3-color-australia)))
 
-(test '() (backtracking-enumeration #f 2-color-australia))
+(test '() (backtracking-enumeration 2-color-australia))
 
 ;; 6\.1:1 ends here
