@@ -118,7 +118,7 @@
                                 ;; (debug (if (failure? result) result (hash-table->alist result)))
                                 (if (failure? result)
                                     (iter (cdr values))
-                                    (unless (and n (> (length (enumeration)) n))
+                                    (unless (and n (= (length (enumeration)) n))
                                       (iter (cdr values)))))))))
                     (iter (cdr values)))))))))
 
