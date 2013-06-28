@@ -133,59 +133,42 @@
     (backtrack-enumerate n enumeration (make-assignment csp) csp)
     (enumeration)))
 
-;;; This version just does the first solution; need to enumerate them.
-(define (backtrack-enumerate enumeration assignment csp)
-  ;; No inference.
-  (let iter-variables ((variables (hash-table-keys csp)))
-    (unless (null? variables)
-      (let ((variable (car variables)))
-        (let iter-values ((values (hash-table-ref (csp-domain csp) variable)))
+(define (backtrack-enumerate n enumeration assignment csp)
+  (if (complete? assignment)
+      (enumeration (cons assignment (enumeration)))
+      (let ((variable (select-unassigned-variable assignment)))
+        (let iter ((values (order-domain-values variable csp)))
           (if (null? values)
-              (iter-variables (cdr variables))
-              (let ((value (car values)))
+              failure
+              (let ((value (car values))
+                    (csp (csp-copy csp))
+                    (assignment (hash-table-copy assignment)))
+                ;; Do we have to address constraints at this point? Yes.
                 (if (consistent? variable value assignment csp)
                     (begin
+                      ;; Copy at this point?
                       (hash-table-set! assignment variable value)
-                      (let ((inference (inference csp variable value)))
-                        (if (failure? inference)
-                            (iter-values (cdr values))
+                      ;; This might actually modify the domains in the CSP;
+                      ;; better copy before we get here?
+                      (let ((inferences (inference csp variable value)))
+                        (if (failure? inferences)
+                            (iter (cdr values))
                             (begin
+                              ;; When duplicate, take inferences; the only
+                              ;; values we should be overriding, however, are
+                              ;; unassigned.
                               (hash-table-merge! inferences assignment)
-                              (let ((result (backtrack-enumerate enumeration assignment csp)))
+                              ;; By the time this finishes recursing,
+                              ;; we have a complete assignment; don't
+                              ;; we? Or should we handle the
+                              ;; enumeration at the leaf?
+                              (let ((result (backtrack-enumerate n enumeration assignment csp)))
+                                ;; (debug (if (failure? result) result (hash-table->alist result)))
                                 (if (failure? result)
-                                    (iter-variables (cdr variables))
-                                    result)))))))))))))
-  ;; (debug (hash-table->alist assignment))
-  ;; (if (complete? assignment)
-  ;;     (enumeration (cons assignment (enumeration)))
-  ;;     (let ((variable (select-unassigned-variable assignment)))
-  ;;       (let iter ((values (order-domain-values variable csp)))
-  ;;         (if (null? values)
-  ;;             failure
-  ;;             (let ((value (car values))
-  ;;                   (csp (csp-copy csp))
-  ;;                   (assignment (hash-table-copy assignment)))
-  ;;               ;; Do we have to address constraints at this point? Yes.
-  ;;               (if (consistent? variable value assignment csp)
-  ;;                   (begin
-  ;;                     ;; Copy at this point?
-  ;;                     (hash-table-set! assignment variable value)
-  ;;                     ;; This might actually modify the domains in the CSP;
-  ;;                     ;; better copy before we get here?
-  ;;                     (let ((inferences (inference csp variable value)))
-  ;;                       (if (failure? inferences)
-  ;;                           (iter (cdr values))
-  ;;                           (begin
-  ;;                             ;; When duplicate, take inferences; the only
-  ;;                             ;; values we should be overriding, however, are
-  ;;                             ;; unassigned.
-  ;;                             (hash-table-merge! inferences assignment)
-  ;;                             (let ((result (backtrack-enumerate enumeration assignment csp)))
-  ;;                               (if (failure? result)
-  ;;                                   (iter (cdr values))
-  ;;                                   result))))))
-  ;;                   (iter (cdr values))))))))
-  )
+                                    (iter (cdr values))
+                                    (unless (and n (> (length (enumeration)) n))
+                                      (iter (cdr values)))))))))
+                    (iter (cdr values)))))))))
 
 ;;; Do we need to copy the thing? We're constantly destroying the CSP.
 (define (ac-3 csp)
