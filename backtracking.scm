@@ -222,6 +222,45 @@
                         (v nsw sa)
                         (t)))))
 
+(define 2-colors '(red green))
+
+;;; Could find a mechanism for automatically creating these things;
+;;; indeed, will have to randomly.
+(define 2-color-australia
+  (make-csp
+   (alist->hash-table `((wa . ,2-colors)
+                        (nt . ,2-colors)
+                        (sa . ,2-colors)
+                        (q . ,2-colors)
+                        (nsw . ,2-colors)
+                        (v . ,2-colors)
+                        (t . ,2-colors)))
+   (alist->hash-table `(((wa . nt) . ,neq?)
+                        ((nt . wa) . ,neq?)
+                        ((wa . sa) . ,neq?)
+                        ((sa . wa) . ,neq?)
+                        ((nt . sa) . ,neq?)
+                        ((sa . nt) . ,neq?)
+                        ((nt . q) . ,neq?)
+                        ((q . nt) . ,neq?)
+                        ((sa . q) . ,neq?)
+                        ((q . sa) . ,neq?)
+                        ((nsw . q) . ,neq?)
+                        ((q . nsw) . ,neq?)
+                        ((nsw . v) . ,neq?)
+                        ((v . nsw) . ,neq?)
+                        ((sa . nsw) . ,neq?)
+                        ((nsw . sa) . ,neq?)
+                        ((sa . v) . ,neq?)
+                        ((v . sa) . ,neq?)))
+   (alist->hash-table '((wa nt sa)
+                        (nt wa sa)
+                        (sa wa nt q nsw v)
+                        (q nt sa nsw)
+                        (nsw q sa v)
+                        (v nsw sa)
+                        (t)))))
+
 (test-assert (ac-3 arc-consistent-coloring))
 
 (test-assert (not (ac-3 arc-inconsistent-coloring)))
@@ -493,5 +532,7 @@
          (nt . blue)
          (nsw . blue)))
       (map hash-table->alist (backtracking-enumeration #f 3-color-australia)))
+
+(test '() (backtracking-enumeration #f 2-color-australia))
 
 ;; 6\.1:1 ends here
