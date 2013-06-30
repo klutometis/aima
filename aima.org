@@ -6323,7 +6323,8 @@
         curl -v 'http://localhost/scm/aima/scrabble-service.scm/join?game-id=g0'
   #+END_SRC
 
-* TODO 6.1
+* DONE 6.1
+  CLOSED: [2013-06-30 Sun 16:37]
   There are 36 solutions for 3-color Australia: 12 for mainland and 3
   for Tasmania; there are 0 for 2-color Australia; 1152 for 4-color Australia.
 
