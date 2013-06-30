@@ -6329,7 +6329,47 @@
 
   #+BEGIN_SRC scheme
     (use aima-csp
+         debug
          test)
+    
+    (define 4-colors '(red green blue yellow))
+    
+    ;;; Could find a mechanism for automatically creating these things;
+    ;;; indeed, will have to randomly.
+    (define 4-color-australia
+      (make-csp
+       (alist->hash-table `((wa . ,4-colors)
+                            (nt . ,4-colors)
+                            (sa . ,4-colors)
+                            (q . ,4-colors)
+                            (nsw . ,4-colors)
+                            (v . ,4-colors)
+                            (t . ,4-colors)))
+       (alist->hash-table `(((wa . nt) . ,neq?)
+                            ((nt . wa) . ,neq?)
+                            ((wa . sa) . ,neq?)
+                            ((sa . wa) . ,neq?)
+                            ((nt . sa) . ,neq?)
+                            ((sa . nt) . ,neq?)
+                            ((nt . q) . ,neq?)
+                            ((q . nt) . ,neq?)
+                            ((sa . q) . ,neq?)
+                            ((q . sa) . ,neq?)
+                            ((nsw . q) . ,neq?)
+                            ((q . nsw) . ,neq?)
+                            ((nsw . v) . ,neq?)
+                            ((v . nsw) . ,neq?)
+                            ((sa . nsw) . ,neq?)
+                            ((nsw . sa) . ,neq?)
+                            ((sa . v) . ,neq?)
+                            ((v . sa) . ,neq?)))
+       (alist->hash-table '((wa nt sa)
+                            (nt wa sa)
+                            (sa wa nt q nsw v)
+                            (q nt sa nsw)
+                            (nsw q sa v)
+                            (v nsw sa)
+                            (t)))))
     
     (define 3-colors '(red green blue))
     
@@ -6416,6 +6456,11 @@
     (test "2-color Australia count"
           0
           (length (backtracking-enumeration 2-color-australia)))
+    
+    (test "4-color Australia count"
+          1152
+          (length (backtracking-enumeration 4-color-australia)))
+    
   #+END_SRC
 * Meetups
 ** Mon Jun 11 2012
