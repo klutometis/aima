@@ -6325,7 +6325,7 @@
 
 * TODO 6.1
   There are 36 solutions for 3-color Australia: 12 for mainland and 3
-  for Tasmania; there are 0 for 2-color Australia.
+  for Tasmania; there are 0 for 2-color Australia; 1152 for 4-color Australia.
 
   #+BEGIN_SRC scheme
     (use aima-csp
