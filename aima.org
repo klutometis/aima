@@ -6433,6 +6433,23 @@
   $2$ nor $1$; choose $3$. $U$ is therefore $6$.
 
   Assign $5$ to $F$.
+* DONE 6.6
+  CLOSED: [2013-06-30 Sun 20:01]
+  The ternary constraint $A + B = C$ can be turned into the binary
+  constraints: $D = C$, $A$ is the first variable of the additive pair
+  $D$, and $B$ is the second variable of the additive pair $D$.
+
+  This recursive grouping can occur with $n$ variables even in
+  non-commutative systems as long as order is preserved.
+
+  Unary constraints on constituent variables can be propagated to
+  composite variables by operating on the constiuent domains; in the
+  example above, for instance, if $A$ is constained to be $0 .. 10$
+  and $B$ is constrained to bo $10 .. 20$, $A + B$ is constrained to
+  be $10 .. 30$.
+
+  Unary constraints can be eliminated by preprocessing the domains of
+  variables, pre-constraining them.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
