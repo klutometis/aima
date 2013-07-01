@@ -6455,8 +6455,42 @@
     (use aima-csp
          debug)
     
-    (make-csp
-     )
+    (define zebra
+      (make-csp
+       (alist->hash-table '((n1 . (english norweigan))
+                            (n2 . (english norweigan))
+                            (h1 . (1 2))
+                            (h2 . (1 2))))
+       (alist->hash-table `(((n1 . h2) . ,(lambda (n h) (and (eq? n 'norweigan)
+                                                        (= h 1))))
+                            ((h2 . n1) . ,(lambda (h n) (and (eq? n 'norweigan)
+                                                        (= h 1))))
+                            ((h1 . h2) . ,(lambda (h1 h2) (= h1 (+ h2 1))))
+                            ((h2 . h1) . ,(lambda (h2 h1) (= h2 (- h1 1))))))
+       (alist->hash-table '((n1 h2)
+                            (n2)
+                            (h1 h2)
+                            (h2 n1 h1)))))
+    
+    (define zebra
+      (make-csp
+       (alist->hash-table '((n1 . (english norweigan))
+                            (n2 . (english norweigan))
+                            (h1 . (1 2))
+                            (h2 . (1 2))))
+       (alist->hash-table `(((n1 . h2) . ,(lambda (n h) (and (eq? n 'norweigan)
+                                                        (= h 1))))
+                            ((h2 . n1) . ,(lambda (h n) (and (eq? n 'norweigan)
+                                                        (= h 1))))
+                            ((h1 . h2) . ,(lambda (h1 h2) (= h1 (+ h2 1))))
+                            ((h2 . h1) . ,(lambda (h2 h1) (= h2 (- h1 1))))))
+       (alist->hash-table '((n1 h2)
+                            (n2)
+                            (h1 h2)
+                            (h2 n1 h1)))))
+    
+    (debug (map hash-table->alist (backtracking-enumeration zebra)))
+    
   #+END_SRC
 * Meetups
 ** Mon Jun 11 2012
