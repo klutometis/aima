@@ -6409,6 +6409,19 @@
   The constraint-satisfaction problem might enable one to constrain
   the domain of possible words by forward propagation, such that one
   doesn’t have to reconsider the entire dictionary at every step.
+* DONE 6.4
+  CLOSED: [2013-06-30 Sun 19:10]
+  1. In rectilinear floor planning, each variable is a small
+     rectangle; value is: possible placements without overlapping
+     other rectangles.
+  2. In class scheduling, the assignments are tuples of the form
+     $(professor, class, time, schedule)$; constraints: $(professor,
+     class)$ must belong to set of enumerated $(professor, class)$
+     values; no two assignments can overlap one another in time or
+     class.
+  3. In Hamiltonian tour, variables are the city visited at time $i$;
+     such that no city $i$ can be a city visited at times $0 .. i - 1$
+     or $i + 1 .. n$ and all cities must be visited.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
