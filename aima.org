@@ -6422,6 +6422,17 @@
   3. In Hamiltonian tour, variables are the city visited at time $i$;
      such that no city $i$ can be a city visited at times $0 .. i - 1$
      or $i + 1 .. n$ and all cities must be visited.
+* DONE 6.5
+  CLOSED: [2013-06-30 Sun 19:37]
+  Since none of the values is initially constrained, MRV doesn’t work;
+  take the degree heuristic and select $O$. Try $O$ at 1; by forward
+  checking, $R$ is 2 and $W$ is $\emptyset$.
+
+  Backtrack to $O$; select 2. $R$ is 4 and $T$ is 1. Neither MRV nor
+  the degree heuristic apply; take $W$ at random. $W$ can neither be
+  $2$ nor $1$; choose $3$. $U$ is therefore $6$.
+
+  Assign $5$ to $F$.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
