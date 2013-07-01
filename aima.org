@@ -6394,6 +6394,21 @@
   4. There can be $\frak{1}{2}n^2$ knights (if $n$ is even),
      $\frak{1}{2}(n^2 + 1)$ if $n$ is odd. Place $k$ knights on the
      board; action: move knights; result: the knight is moved.
+* DONE 6.3
+  CLOSED: [2013-06-30 Sun 18:52]
+  1. The search problem is effectively scrabble: see [[5.4]]; take
+     best-first search with some heuristic, such as: length of word;
+     or, to select for density, number of words touched by this word.
+
+     Filling in the blanks one letter at a time can be efficient,
+     given an appropriate data structure (e.g. [[http://en.wikipedia.org/wiki/GADDAG%0A][GADDAGs]]).
+  2. As a constraint satisfaction problem, employ words; words are
+     constrained such that they can only intersect with other words
+     whose intersection is itself a valid word.
+
+  The constraint-satisfaction problem might enable one to constrain
+  the domain of possible words by forward propagation, such that one
+  doesn’t have to reconsider the entire dictionary at every step.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
