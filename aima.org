@@ -6541,7 +6541,7 @@
        (xor (and (is? x 'kit-kat) (is? x 'yellow))
             (and (is? y 'kit-kat) (is? y 'yellow)))))
     
-    (debug (hash-table->alist (neighbors-from-constraints (csp-constraints zebra))))
+    ;; (debug (hash-table->alist (neighbors-from-constraints (csp-constraints zebra))))
     
     (define domains (make-hash-table))
     
@@ -6553,13 +6553,47 @@
                             red ivory yellow green blue
                             water coffee orange-juice milk tee))
     
-    (debug (hash-table->alist domains))
+    ;; (debug (hash-table->alist domains))
     
-    (debug (map hash-table->alist
-                (backtracking-enumeration
-                 (make-csp domains constraints (neighbors-from-constraints constraints)))))
+    ;; (debug (map hash-table->alist
+    ;;             (backtracking-enumeration
+    ;;              (make-csp domains constraints (neighbors-from-constraints constraints)))))
     
-    (debug (xor #t #f))
+    ;; (debug (xor #t #f))
+    
+    (define (set-bidirectional-constraint! constraints x y constraint-x constraint-y)
+      (hash-table-set! constraints (cons x y) constraint-x)
+      (hash-table-set! constraints (cons y x) constraint-y))
+    
+    (let ((domains (make-hash-table))
+          (constraints (make-hash-table)))
+      (set-domains! domains '(n1 n2) '(E N))
+      (set-domains! domains '(c1 c2) '(R G))
+      (set-bidirectional-constraint!
+       constraints
+       'n1
+       'c2
+       (lambda (n c)
+         (and (eq? n 'E)
+              (eq? c 'R)))
+       (lambda (c n)
+         (and (eq? n 'E)
+              (eq? c 'R))))
+      (set-bidirectional-constraint!
+       constraints
+       'n2
+       'c1
+       (lambda (n c)
+         (and (eq? n 'E)
+              (eq? c 'R)))
+       (lambda (c n)
+         (and (eq? n 'E)
+              (eq? c 'R))))
+      (set-pairwise-constraints! constraints '(n1 n2) '(n1 n2) neq?)
+      (set-pairwise-constraints! constraints '(c1 c2) '(c1 c2) neq?)
+      (let* ((neighbors (neighbors-from-constraints constraints))
+             (csp (make-csp domains constraints neighbors)))
+        (debug (map hash-table->alist (backtracking-enumeration csp)))))
     
   #+END_SRC
 
