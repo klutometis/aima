@@ -6453,7 +6453,10 @@
 * TODO 6.7
   #+BEGIN_SRC scheme
     (use aima-csp
-         debug)
+         debug
+         matchable)
+    
+    (import-for-syntax matchable)
     
     (define zebra
       (make-csp
@@ -6489,9 +6492,86 @@
                             (h1 h2)
                             (h2 n1 h1)))))
     
-    (debug (map hash-table->alist (backtracking-enumeration zebra)))
+    (define (neighbors-from-constraints constraints)
+      (let ((neighbors (make-hash-table)))
+        (for-each (match-lambda ((x . y)
+                            (hash-table-update!/default
+                             neighbors
+                             x
+                             (lambda (Y) (cons y Y))
+                             '())))
+          (hash-table-keys constraints))
+        neighbors))
+    
+    (define (set-domains! domains variables domain)
+      (for-each (lambda (variable) (hash-table-set! domains variable domain))
+        variables))
+    
+    (define-syntax xor
+      (lambda (expression rename compare)
+        (match expression
+          ((_ x y)
+           (let ((%or (rename 'or))
+                 (%and (rename 'and))
+                 (%not (rename 'not)))
+             `(,%and (,%or ,x ,y)
+                     (,%not (,%and ,x ,y))))))))
+    
+    (define (set-pairwise-constraints! constraints X Y relation)
+      (for-each
+          (lambda (x)
+            (for-each
+                (lambda (y)
+                  ;; Or do we want to merge these with some binary
+                  ;; operation?
+                  (hash-table-set! constraints (cons x y) relation))
+              (delete x Y)))
+        X))
+    
+    (define constraints (make-hash-table))
+    
+    (define (is? x y)
+      (and (memq y x) #t))
+    
+    (set-pairwise-constraints!
+     constraints
+     '(h1 h2 h3 h4 h5)
+     '(h1 h2 h3 h4 h5)
+     (lambda (x y)
+       (xor (and (is? x 'kit-kat) (is? x 'yellow))
+            (and (is? y 'kit-kat) (is? y 'yellow)))))
+    
+    (debug (hash-table->alist (neighbors-from-constraints (csp-constraints zebra))))
+    
+    (define domains (make-hash-table))
+    
+    (set-domains! domains
+                  '(h1 h2 h3 h4 h5)
+                  '(english spanish norwegian japanese ukrainian
+                            dog zebra snail fox horse
+                            smarties snickers milky-way kit-kat hershey
+                            red ivory yellow green blue
+                            water coffee orange-juice milk tee))
+    
+    (debug (hash-table->alist domains))
+    
+    (debug (map hash-table->alist
+                (backtracking-enumeration
+                 (make-csp domains constraints (neighbors-from-constraints constraints)))))
+    
+    (debug (xor #t #f))
     
   #+END_SRC
+
+  Ease of implementation vs. ease of specification is the difference
+  between binary and n-ary CSPs:
+
+  #+BEGIN_QUOTE
+  We could transform any CSP into noe with only binary constraints;
+  this makes the algorithms simpler. . . [On the other hand], it is
+  easier and less error-prone to write the problem description using
+  [e.g.] $Alldiff$.
+  #+END_QUOTE
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
