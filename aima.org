@@ -6614,11 +6614,15 @@
   constraints.
 
   #+BEGIN_SRC scheme :link comments :tangle zebra.scm :shebang #!/usr/bin/env chicken-scheme
-    (use aima-csp
-         debug
+    (use debug
          matchable)
     
     (import-for-syntax matchable)
+    
+    (use define-record-and-printer
+         srfi-1)
+    
+    (include "~/prg/scm/aima-chicken/aima-csp-core.scm")
     
     (define (neighbors-from-constraints constraints)
       (let ((neighbors (make-hash-table)))
