@@ -6613,7 +6613,7 @@
   should get redundant results; we’ll clean it up with ad-hoc global
   constraints.
 
-  #+BEGIN_SRC scheme
+  #+BEGIN_SRC scheme :link comments :tangle zebra.scm :shebang #!/usr/bin/env chicken-scheme
     (use aima-csp
          debug
          matchable)
