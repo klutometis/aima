@@ -6744,6 +6744,18 @@
          (if (eq? s 'kit-kat)
              (eq? c 'yellow)
              #t)))
+      (set-pairwise-bidirectional-constraints!
+       constraints
+       '(s1 s2 s3 s4 s5)
+       '(p1 p2 p3 p4 p5)
+       (lambda (s p)
+         (if (eq? s 'smarties)
+             (eq? p 'snail)
+             #t))
+       (lambda (p s)
+         (if (eq? s 'smarties)
+             (eq? p 'snail)
+             #t)))
       (let* ((neighbors (neighbors-from-constraints constraints))
              (csp (make-csp domains constraints neighbors)))
         (debug (map hash-table->alist (backtracking-enumeration 1 csp)))))
