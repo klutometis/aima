@@ -6732,6 +6732,18 @@
          (if (eq? n 'norwegian)
              (= a 1)
              #t)))
+      (set-pairwise-bidirectional-constraints!
+       constraints
+       '(s1 s2 s3 s4 s5)
+       '(c1 c2 c3 c4 c5)
+       (lambda (s c)
+         (if (eq? s 'kit-kat)
+             (eq? c 'yellow)
+             #t))
+       (lambda (c s)
+         (if (eq? s 'kit-kat)
+             (eq? c 'yellow)
+             #t)))
       (let* ((neighbors (neighbors-from-constraints constraints))
              (csp (make-csp domains constraints neighbors)))
         (debug (map hash-table->alist (backtracking-enumeration 1 csp)))))
