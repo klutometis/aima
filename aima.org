@@ -6823,6 +6823,41 @@
   #+END_SRC
 
   Some macro-sugar, such as: =set-zebra-constraint!=.
+
+  Results of running the binary constraints:
+
+  #+BEGIN_SRC scheme
+    ((p1 . dog)
+     (n5 . english)
+     (n4 . norwegian)
+     (n3 . japanese)
+     (n2 . ukrainian)
+     (n1 . spanish)
+     (d5 . water)
+     (d4 . coffee)
+     (d3 . milk)
+     (d2 . tea)
+     (d1 . orange-juice)
+     (c5 . red)
+     (c4 . green)
+     (c3 . ivory)
+     (c2 . yellow)
+     (c1 . blue)
+     (a5 . 2)
+     (a4 . 1)
+     (a3 . 3)
+     (a2 . 4)
+     (a1 . 5)
+     (s5 . smarties)
+     (s4 . hershey)
+     (s3 . milky-way)
+     (s2 . kit-kat)
+     (s1 . snickers)
+     (p5 . snail)
+     (p4 . zebra)
+     (p3 . fox)
+     (p2 . horse))
+  #+END_SRC
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
