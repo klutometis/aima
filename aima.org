@@ -6804,6 +6804,18 @@
          (if (eq? d 'coffee)
              (eq? c 'green)
              #t)))
+      (set-pairwise-bidirectional-constraints!
+       constraints
+       '(d1 d2 d3 d4 d5)
+       '(a1 a2 a3 a4 a5)
+       (lambda (d a)
+         (if (eq? d 'milk)
+             (= a 3)
+             #t))
+       (lambda (a d)
+         (if (eq? d 'milk)
+             (= a 3)
+             #t)))
       (let* ((neighbors (neighbors-from-constraints constraints))
              (csp (make-csp domains constraints neighbors)))
         (debug (map hash-table->alist (backtracking-enumeration 1 csp)))))
