@@ -6606,6 +6606,140 @@
   easier and less error-prone to write the problem description using
   [e.g.] $Alldiff$.
   #+END_QUOTE
+
+  Can we unleash pattern matching on this thing; is that cheating?
+  That way, we could implement e.g. alldiff. Why don’t we ignore
+  alldiff for the time being? It should be less stringent; and we
+  should get redundant results; we’ll clean it up with ad-hoc global
+  constraints.
+
+  #+BEGIN_SRC scheme
+    (use aima-csp
+         debug
+         matchable)
+    
+    (import-for-syntax matchable)
+    
+    (define (neighbors-from-constraints constraints)
+      (let ((neighbors (make-hash-table)))
+        (for-each (match-lambda ((x . y)
+                            (hash-table-update!/default
+                             neighbors
+                             x
+                             (lambda (Y) (cons y Y))
+                             '())))
+          (hash-table-keys constraints))
+        neighbors))
+    
+    (define (set-domains! domains variables domain)
+      (for-each (lambda (variable) (hash-table-set! domains variable domain))
+        variables))
+    
+    (define-syntax xor
+      (lambda (expression rename compare)
+        (match expression
+          ((_ x y)
+           (let ((%or (rename 'or))
+                 (%and (rename 'and))
+                 (%not (rename 'not)))
+             `(,%and (,%or ,x ,y)
+                     (,%not (,%and ,x ,y))))))))
+    
+    (define (set-pairwise-constraints! constraints X Y relation)
+      (for-each
+          (lambda (x)
+            (for-each
+                (lambda (y)
+                  ;; Or do we want to merge these with some binary
+                  ;; operation?
+                  (hash-table-set! constraints (cons x y) relation))
+              (delete x Y)))
+        X))
+    
+    (define (set-bidirectional-constraint! constraints x y constraint-x constraint-y)
+      (hash-table-set! constraints (cons x y) constraint-x)
+      (hash-table-set! constraints (cons y x) constraint-y))
+    
+    (define (set-pairwise-bidirectional-constraints! constraints X Y constraint-x constraint-y)
+      (for-each
+          (lambda (x y)
+            (set-bidirectional-constraint! constraints x y constraint-x constraint-y))
+        X
+        Y))
+    
+    (define (is? x y)
+      (and (memq y x) #t))
+    
+    (define (set-alldiff-constraints! constraints variables)
+      (set-pairwise-constraints! constraints variables variables neq?))
+    
+    (let ((domains (make-hash-table))
+          (constraints (make-hash-table)))
+      (set-domains! domains
+                    '(a1 a2 a3 a4 a5)
+                    '(1 2 3 4 5))
+      (set-domains! domains
+                    '(n1 n2 n3 n4 n5)
+                    '(english spanish norwegian japanese ukrainian))
+      (set-domains! domains
+                    '(p1 p2 p3 p4 p5)
+                    '(dog zebra snail fox horse))
+      (set-domains! domains
+                    '(s1 s2 s3 s4 s5)
+                    '(smarties snickers milky-way kit-kat hershey))
+      (set-domains! domains
+                    '(c1 c2 c3 c4 c5)
+                    '(red ivory yellow green blue))
+      (set-domains! domains
+                    '(d1 d2 d3 d4 d5)
+                    '(water coffee orange-juice milk tee))
+      (set-alldiff-constraints! constraints '(a1 a2 a3 a4 a5))
+      (set-alldiff-constraints! constraints '(n1 n2 n3 n4 n5))
+      (set-alldiff-constraints! constraints '(d1 d2 d3 d4 d5))
+      (set-alldiff-constraints! constraints '(c1 c2 c3 c4 c5))
+      (set-alldiff-constraints! constraints '(s1 s2 s3 s4 s5))
+      (set-alldiff-constraints! constraints '(p1 p2 p3 p4 p5))
+      (set-pairwise-bidirectional-constraints!
+       constraints
+       '(n1 n2 n3 n4 n5)
+       '(c1 c2 c3 c4 c5)
+       (lambda (n c)
+         (if (eq? n 'english)
+             (eq? c 'red)
+             #t))
+       (lambda (c n)
+         (if (eq? n 'english)
+             (eq? c 'red)
+             #t)))
+      (set-pairwise-bidirectional-constraints!
+       constraints
+       '(n1 n2 n3 n4 n5)
+       '(p1 p2 p3 p4 p5)
+       (lambda (n p)
+         (if (eq? n 'spanish)
+             (eq? p 'dog)
+             #t))
+       (lambda (p n)
+         (if (eq? n 'spanish)
+             (eq? p 'dog)
+             #t)))
+      (set-pairwise-bidirectional-constraints!
+       constraints
+       '(n1 n2 n3 n4 n5)
+       '(a1 a2 a3 a4 a5)
+       (lambda (n a)
+         (if (eq? n 'norwegian)
+             (= a 1)
+             #t))
+       (lambda (a n)
+         (if (eq? n 'norwegian)
+             (= a 1)
+             #t)))
+      (let* ((neighbors (neighbors-from-constraints constraints))
+             (csp (make-csp domains constraints neighbors)))
+        (debug (map hash-table->alist (backtracking-enumeration 1 csp)))))
+    
+  #+END_SRC
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
