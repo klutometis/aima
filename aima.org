@@ -6821,6 +6821,8 @@
         (debug (map hash-table->alist (backtracking-enumeration 1 csp)))))
     
   #+END_SRC
+
+  Some macro-sugar, such as: =set-zebra-constraint!=.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
