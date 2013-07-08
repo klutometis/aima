@@ -6862,6 +6862,100 @@
      (p3 . fox)
      (p2 . horse))
   #+END_SRC
+
+  For n-ary constraints, we’d probably have to do some ordering to
+  make it feasible; unfortunately, we have to be aware of this
+  ordering in the lambda. That’s messy; can we call it alphabetical?
+
+  [[http://www.cs.mcgill.ca/~legri1/masters_thesis.pdf%0A][Here]]:
+
+  #+BEGIN_QUOTE
+  Inspired by Dalmau’s work on linear Datalog and Reingold’s
+  breakthrough that undirected graph connectivity is in logarithmic
+  space, we use a new restriction of Datalog called symmetric Datalog
+  to identify a class of CSPs solvable in logarithmic space.
+
+  The main result of this thesis is that directed st-connectivity and
+  a closely related CSP cannot be defined in symmetric Datalog.
+  Because undirected st-connectivity can be defined in symmetric
+  Datalog, this result also sheds new light on the com- putational
+  differences between the undirected and directed st-connectivity
+  problems.
+  #+END_QUOTE
+
+  Can restrict ourselves to symmetric relationships? Also [[http://www.cis.temple.edu/~giorgio/cis587/readings/constraints.html][here]]:
+
+  #+BEGIN_QUOTE
+  A CS problem is usually represented as an undirected graph, called
+  Constraint Graph where the nodes are the variables and the edges are
+  the binary constraints.
+  #+END_QUOTE
+
+  The directed constraints don’t make sense in an n-ary context, do
+  they? What does it mean to apply the constraint to e.g. =x, z, y=
+  instead of =x, y, z=? YAGNI!
+
+  That, or: different mechanism than hash-table for constraint
+  lookups? It’s the hash-table that enforces order, I believe. What
+  about the lambda? We need some well-defined order there, too.
+
+  Or, instead of passing in values; we pass in some sort of
+  variable-value combination; and we fish out the values we want in
+  the order we want them?
+
+  Can we do a hash-table lookup on =equal?=? (I feel like we’ve tried
+  this before.) Nope:
+
+  #+BEGIN_EXAMPLE
+    #;111> (let ((table (make-hash-table #:test equal?))) (hash-table-set! table '(1 2) 'harro) (hash-table-ref table '(2 1)))
+    
+    Error: (hash-table-ref) hash-table does not contain key
+    (2 1)
+    #<hash-table (1)>
+    
+        Call history:
+    
+        <syntax>      (let ((table (make-hash-table test: equal?))) (hash-table-set! table (quote (1 2)) (quote harro)) (h......
+        <syntax>      (##core#let ((table (make-hash-table test: equal?))) (hash-table-set! table (quote (1 2)) (quote har......
+        <syntax>      (##core#begin (hash-table-set! table (quote (1 2)) (quote harro)) (hash-table-ref table (quote (2 1)...
+        <syntax>      (hash-table-set! table (quote (1 2)) (quote harro))
+        <syntax>      (quote (1 2))
+        <syntax>      (##core#quote (1 2))
+        <syntax>      (quote harro)
+        <syntax>      (##core#quote harro)
+        <syntax>      (hash-table-ref table (quote (2 1)))
+        <syntax>      (quote (2 1))
+        <syntax>      (##core#quote (2 1))
+        <syntax>      (make-hash-table test: equal?)
+        <eval>    (make-hash-table test: equal?)
+        <eval>    (hash-table-set! table (quote (1 2)) (quote harro))
+        <eval>    (hash-table-ref table (quote (2 1)))  <--
+    #;111> 
+  #+END_EXAMPLE
+
+  We can enforce ordering during lookup, can’t we? Sure; just not in
+  lambda: that’s too sticky. The constraint can be called with any
+  order of variables.
+
+  The key, therefore, for constraints is some ordered (proper) list of
+  variables.
+
+  With this model, though, we can’t reuse lambdas across scopes; we
+  have to specifically look for variables =p1=, =p2=, etc. Is it
+  ridiculous to name classes of variables? God, this is getting more
+  and more ugly.
+
+  Otherwise, resort to some convention that =relation-apply= will
+  apply the values sorted alphabetically by variable.
+
+  We can’t predict which order we’ll see the variables, either, given
+  =select-unassigned-variable=; =consistent?=, on the other hand,
+  always applies them in neighborly order. If we generate neighbors
+  from constraints (which we’ll have to do with set-union now), we
+  don’t have control over that order, however.
+
+  Lot of work implementing n-ary constraints: not a quick surgery;
+  punt.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
