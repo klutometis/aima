@@ -6689,7 +6689,7 @@
                     '(red ivory yellow green blue))
       (set-domains! domains
                     '(d1 d2 d3 d4 d5)
-                    '(water coffee orange-juice milk tee))
+                    '(water coffee orange-juice milk tea))
       (set-alldiff-constraints! constraints '(a1 a2 a3 a4 a5))
       (set-alldiff-constraints! constraints '(n1 n2 n3 n4 n5))
       (set-alldiff-constraints! constraints '(d1 d2 d3 d4 d5))
@@ -6767,6 +6767,18 @@
        (lambda (d s)
          (if (eq? s 'snickers)
              (eq? d 'orange-juice)
+             #t)))
+      (set-pairwise-bidirectional-constraints!
+       constraints
+       '(n1 n2 n3 n4 n5)
+       '(d1 d2 d3 d4 d5)
+       (lambda (n d)
+         (if (eq? n 'ukrainian)
+             (eq? d 'tea)
+             #t))
+       (lambda (d n)
+         (if (eq? n 'ukrainian)
+             (eq? d 'tea)
              #t)))
       (let* ((neighbors (neighbors-from-constraints constraints))
              (csp (make-csp domains constraints neighbors)))
