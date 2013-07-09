@@ -6664,8 +6664,18 @@
       X))
 
   (define (set-bidirectional-constraint! constraints x y constraint-x constraint-y)
-    (hash-table-set! constraints (cons x y) constraint-x)
-    (hash-table-set! constraints (cons y x) constraint-y))
+    (hash-table-update!/default constraints
+                                (cons x y)
+                                (lambda (constraints-x)
+                                  (lambda (x y) (and (constraint-x x y)
+                                                (constraints-x x y))))
+                                (lambda (x y) #t))
+    (hash-table-update!/default constraints
+                                (cons y x)
+                                (lambda (constraints-y)
+                                  (lambda (y x) (and (constraint-y y x)
+                                                (constraints-y y x))))
+                                (lambda (x y) #t)))
 
   (define (set-pairwise-bidirectional-constraints! constraints X Y constraint-x constraint-y)
     (for-each
@@ -6679,12 +6689,12 @@
 
   (let ((domains (make-hash-table))
         (constraints (make-hash-table)))
-    ;; (set-domains! domains
-    ;;               '(n1)
-    ;;               '(norwegian))
     (set-domains! domains
-                  '(n1 n2 n3 n4 n5)
-                  '(norwegian english spanish japanese ukrainian))
+                  '(n1)
+                  '(norwegian))
+    (set-domains! domains
+                  '(n2 n3 n4 n5)
+                  '(english spanish japanese ukrainian))
     (set-domains! domains
                   '(p1 p2 p3 p4 p5)
                   '(dog zebra snail fox horse))
@@ -6735,20 +6745,38 @@
                  (neq? p 'dog)))))
     (set-pairwise-bidirectional-constraints!
      constraints
+     '(c1 c1 c1 c2 c2 c3 c3 c4 c4 c5 c5 c5)
+     '(c3 c4 c5 c4 c5 c1 c5 c1 c2 c1 c2 c3)
+     (lambda (c1 c2)
+       (not (or (and (eq? c1 'ivory)
+                     (eq? c2 'green))
+                (and (eq? c2 'ivory)
+                     (eq? c1 'green)))))
+     (lambda (c2 c1)
+       (not (or (and (eq? c1 'ivory)
+                     (eq? c2 'green))
+                (and (eq? c2 'ivory)
+                     (eq? c1 'green))))))  
+    (set-pairwise-bidirectional-constraints!
+     constraints
      '(c1 c2 c3 c4)
      '(c2 c3 c4 c5)
      (lambda (left right)
-       (and (neq? left right)
-            (if (or (eq? right 'ivory)
+       (if (and (or (eq? right 'ivory)
                     (eq? left 'ivory))
-                (eq? right 'green)
-                #t)))
+                (or (eq? right 'green)
+                    (eq? left 'green)))
+           (and (eq? left 'ivory)
+                (eq? right 'green))
+           #t))
      (lambda (right left)
-       (and (neq? left right)
-            (if (or (eq? right 'ivory)
+       (if (and (or (eq? right 'ivory)
                     (eq? left 'ivory))
-                (eq? right 'green)
-                #t))))
+                (or (eq? right 'green)
+                    (eq? left 'green)))
+           (and (eq? left 'ivory)
+                (eq? right 'green))
+           #t)))
     ;; (set-pairwise-bidirectional-constraints!
     ;;  constraints
     ;;  '(s1 s2 s2 s3 s3 s4 s4 s5)
@@ -6761,14 +6789,18 @@
     ;;              (neq? p 'fox)))))
     (set-pairwise-bidirectional-constraints!
      constraints
-     '(s1 s1 s1 s2 s2 s3 s3 s4 s4)
-     '(p3 p4 p5 p4 p5 p1 p5 p1 p2)
+     '(s1 s1 s1 s1 s2 s2 s2 s3 s3 s3 s4 s4 s4 s5 s5 s5 s5)
+     '(p1 p3 p4 p5 p2 p4 p5 p3 p1 p5 p4 p1 p2 p5 p1 p2 p3)
      (lambda (s p)
-       (not (and (eq? s 'hershey)
-                 (eq? p 'fox))))
+       (not (or (and (eq? s 'hershey)
+                     (eq? p 'fox))
+                (and (eq? s 'kit-kat)
+                     (eq? p 'horse)))))
      (lambda (p s)
-       (not (and (eq? s 'hershey)
-                 (eq? p 'fox)))))
+       (not (or (and (eq? s 'hershey)
+                     (eq? p 'fox))
+                (and (eq? s 'kit-kat)
+                     (eq? p 'horse))))))
     (set-pairwise-bidirectional-constraints!
      constraints
      '(s1 s2 s3 s4 s5)
@@ -6795,8 +6827,8 @@
     ;;              (neq? n 'norwegian)))))
     (set-pairwise-bidirectional-constraints!
      constraints
-     '(n1 n1 n1 n2 n2 n3 n3 n4 n4)
-     '(c3 c4 c5 c4 c5 c1 c5 c1 c2)
+     '(n1 n1 n1 n1 n2 n2 n2 n3 n3 n3 n4 n4 n4 n5 n5 n5 n5)
+     '(c1 c3 c4 c5 c2 c4 c5 c3 c1 c5 c4 c1 c2 c5 c1 c2 c3)
      (lambda (n c)
        (not (and (eq? n 'norwegian)
                  (eq? c 'blue))))
@@ -6859,31 +6891,49 @@
                  (eq? s 'milky-way))
             (and (neq? n 'japanese)
                  (neq? s 'milky-way)))))
-    (set-pairwise-bidirectional-constraints!
-     constraints
-     '(s1 s2 s2 s3 s3 s4 s4 s5)
-     '(p2 p1 p3 p2 p4 p3 p5 p4)
-     (lambda (s p)
-       (not (and (eq? s 'kit-kat)
-                 (neq? p 'horse))))
-     (lambda (p s)
-       (not (and (eq? p 'horse)
-                 (neq? s 'kit-kat)))))
+    ;; (set-pairwise-bidirectional-constraints!
+    ;;  constraints
+    ;;  '(s1 s1 s1 s2 s2 s3 s3 s4 s4)
+    ;;  '(p3 p4 p5 p4 p5 p1 p5 p1 p2)
+    ;;  (lambda (s p)
+    ;;    (not (and (eq? s 'hershey)
+    ;;              (eq? p 'fox))))
+    ;;  (lambda (p s)
+    ;;    (not (and (eq? s 'hershey)
+    ;;              (eq? p 'fox)))))
+    ;; (set-pairwise-bidirectional-constraints!
+    ;;  constraints
+    ;;  '(s1 s2 s2 s3 s3 s4 s4 s5)
+    ;;  '(p2 p1 p3 p2 p4 p3 p5 p4)
+    ;;  (lambda (s p)
+    ;;    (not (and (eq? s 'kit-kat)
+    ;;              (neq? p 'horse))))
+    ;;  (lambda (p s)
+    ;;    (not (and (eq? p 'horse)
+    ;;              (neq? s 'kit-kat)))))
     (set-pairwise-bidirectional-constraints!
      constraints
      '(d1 d2 d3 d4 d5)
      '(c1 c2 c3 c4 c5)
      (lambda (d c)
-       (not (and (eq? d 'coffee)
+       (xor (and (eq? d 'coffee)
+                 (eq? c 'green))
+            (and (neq? d 'coffee)
                  (neq? c 'green))))
      (lambda (c d)
-       (not (and (eq? c 'green)
-                 (neq? d 'coffee)))))
+       (xor (and (eq? d 'coffee)
+                 (eq? c 'green))
+            (and (neq? d 'coffee)
+                 (neq? c 'green)))))
     (let* ((neighbors (neighbors-from-constraints constraints))
-           (csp (make-csp domains constraints neighbors)))
+           (csp (make-csp domains constraints neighbors))
+           (result (backtracking-search csp)))
       ;; (debug (hash-table->alist neighbors))
       ;; (debug (hash-table->alist constraints))
-      (debug (map hash-table->alist (backtracking-enumeration 1 csp)))))
+      (unless (failure? result)
+        (debug (sort (hash-table->alist (backtracking-search csp))
+                     string<?
+                     (compose symbol->string car))))))
   #+END_SRC
 
   Some macro-sugar, such as: =set-zebra-constraint!=.
