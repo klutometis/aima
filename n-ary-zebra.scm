@@ -106,17 +106,20 @@
   ;; (set-domains! domains '(a b c) '(1 2 3))
   (debug (expand '(constraint-set! constraints (b c a) (and (> b a) (> c b)))))
   (constraint-set! constraints (b c a) (and (> b a) (> c b)))
-  (let ((alldiff (constraint-lambda x (list? x))))
-    (constraint-set! constraints (a b) alldiff))
+  (let ((alldiff (constraint-lambda x (equal? x (delete-duplicates x)))))
+    (constraint-set!/lambda constraints (a b) alldiff))
   (debug (hash-table->alist constraints))
+  (debug (hash-table->alist (neighbors-from-constraints constraints)))
   (let ((variable-values (zip-alist '(b c a) '(2 3 1))))
-    (debug (hash-table->alist constraints)
+    (debug
            (apply
             (hash-table-ref constraints (scope-order '(b c a)))
-            (map cdr (sort variable-values string<? (compose symbol->string car))))
+            (map cdr (sort variable-values symbol-printname<? car)))))
+  (let ((variable-values (zip-alist '(b a) '(3 3))))
+    (debug
            (apply
             (hash-table-ref constraints (scope-order '(b a)))
-            (map cdr (sort variable-values string<? (compose symbol->string car))))))
+            (map cdr (sort variable-values symbol-printname<? car)))))
   (debug ((constraint-lambda (b c a) (and (> b a) (> c b))) 1 2 3))
   )
 
