@@ -7066,6 +7066,56 @@
 
   Lot of work implementing n-ary constraints: not a quick surgery;
   punt.
+
+  N-ary syntax:
+
+  #+BEGIN_SRC scheme
+    (constraint-set!
+     <constraints>
+     <scope>
+     <body>)
+  #+END_SRC
+
+  E.g.:
+
+  #+BEGIN_SRC scheme
+    (constraint-set!
+     constraints
+     (c d a b)
+     (xor (and a b)
+          (and c d)))
+  #+END_SRC
+
+  With code reuse:
+
+  #+BEGIN_SRC scheme
+    (define constraint (constraint-lambda (c d a b) (xor (and (a b) (c d)))))
+    
+    (constraint-set!/lambda constraints (c1 d1 a1 b1) constraint)
+  #+END_SRC
+
+  The idea is that the metavariables =(c d a b)= will be ordered the
+  same as =(c1 d1 a1 b1)=. Should we check for that and error out?
+  Maybe a warning.
+
+  #+BEGIN_SRC scheme :comments link :tangle n-ary-zebra.scm :shebang #!/usr/bin/env chicken-scheme
+    (use data-structures
+         define-record-and-printer
+         matchable
+         srfi-1
+         srfi-69)
+    
+    (include "~/prg/scm/aima-chicken/aima-csp-core.scm")
+  #+END_SRC
+
+  N-ary =alldiff= sucks, because it won’t be violated until all the
+  variables are defined; let’s keep our pairwise alldiff. Also, if we
+  keep a dag-representation of the graph, the
+  =neighbors-from-constraints= thing will have to do the usual
+  set-operations bidirectionally.
+
+  Under n-ary, though, =alldiff= only has to apply to combinations,
+  not permutations.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
