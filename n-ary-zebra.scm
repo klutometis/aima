@@ -20,13 +20,21 @@
 (define-for-syntax (scope-order scope)
   (map string->symbol (sort (map symbol->string scope) string<?)))
 
+(define (scope-order scope)
+  (map string->symbol (sort (map symbol->string scope) string<?))
+  ;; (map string->symbol (sort scope string<? symbol->string))
+  )
+
 (define-syntax constraint-lambda
   (lambda (expression rename compare)
     (match expression
       ((_
         scope
         body)
-       `(lambda ,(scope-order scope) ,body)))))
+       (let ((scope (if (list? scope)
+                        (scope-order scope)
+                        scope)))
+         `(lambda ,scope ,body))))))
 
 (define-syntax constraint-set!
   (lambda (expression rename compare)
@@ -36,7 +44,7 @@
         scope
         body)
        `(hash-table-set! ,constraints
-                         ',(scope-order scope)
+                         (quote ,(scope-order scope))
                          (constraint-lambda ,scope ,body))
        ;; (let ((constraint (constraint-lambda scope body)))
        ;;   `(hash-table-update!/default
@@ -50,13 +58,20 @@
 (let ((domains (make-hash-table))
       (constraints (make-hash-table)))
   ;; (set-domains! domains '(a b c) '(1 2 3))
+  (debug (expand '(constraint-set! constraints (b c a) (and (> b a) (> c b)))))
   (constraint-set! constraints (b c a) (and (> b a) (> c b)))
+  (let ((alldiff (constraint-lambda x (list? x))))
+    (constraint-set! constraints (a b) alldiff))
+  (debug (hash-table->alist constraints))
   (let ((variable-values (zip-alist '(b c a) '(2 3 1))))
     (debug (hash-table->alist constraints)
            (apply
             (hash-table-ref constraints (scope-order '(b c a)))
+            (map cdr (sort variable-values string<? (compose symbol->string car))))
+           (apply
+            (hash-table-ref constraints (scope-order '(b a)))
             (map cdr (sort variable-values string<? (compose symbol->string car))))))
-  ;; (debug ((constraint-lambda (b c a) (and (> b a) (> c b))) 1 2 3))
+  (debug ((constraint-lambda (b c a) (and (> b a) (> c b))) 1 2 3))
   )
 
 ;; 6\.7:7 ends here
