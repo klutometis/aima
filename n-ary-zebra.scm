@@ -4,7 +4,8 @@
 
 (use debug
      ;; expand-full
-     list-utils)
+     list-utils
+     symbol-utils)
 
 (use data-structures
      define-record-and-printer
@@ -13,17 +14,17 @@
      srfi-69
      srfi-95)
 
-(import-for-syntax matchable)
+(import-for-syntax matchable symbol-utils)
+
+(import-for-syntax symbol-utils)
 
 ;; (include "~/prg/scm/aima-chicken/aima-csp-core.scm")
 
 (define-for-syntax (scope-order scope)
-  (map string->symbol (sort (map symbol->string scope) string<?)))
+  (sort scope symbol-printname<?))
 
 (define (scope-order scope)
-  (map string->symbol (sort (map symbol->string scope) string<?))
-  ;; (map string->symbol (sort scope string<? symbol->string))
-  )
+  (sort scope symbol-printname<?))
 
 (define-syntax constraint-lambda
   (lambda (expression rename compare)
