@@ -7120,6 +7120,21 @@
   Handle the case, too, where the scope to =constraint-lambda= is a
   single variable for e.g. =alldiff=; where the order and arity is
   irrelevant.
+
+  When it comes time for application, how do we do lookups: based on
+  the variables at hand, or some subset of them?
+
+  Every combination, theoretically, right? Unary through n-ary; that’s
+  where I wonder whether it wouldn’t be worthwhile to do a linear
+  search on the constraints instead of generating every combination.
+
+  In that sense, having a hash-table is nearly worthless; can we cache
+  lookups on combinations of variables, somehow?
+
+  If we have an ordering, this is where a tree-based representation
+  would come in handy.
+
+  Let’s do nested hash-tables and e.g. =every-applicable-constraint=, 
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
