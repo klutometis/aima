@@ -56,6 +56,24 @@
        ;;     #f))
        ))))
 
+(define-syntax constraint-set!/lambda
+  (lambda (expression rename compare)
+    (match expression
+      ((_
+        constraints
+        scope
+        lambda)
+       `(hash-table-set! ,constraints
+                         (quote ,(scope-order scope))
+                         ,lambda)
+       ;; (let ((constraint (constraint-lambda scope body)))
+       ;;   `(hash-table-update!/default
+       ;;     constraints
+       ;;     (lambda (pre-constraint)
+       ;;       (if pre-constraint
+       ;;           (constraint-lambda scope (and ))))
+       ;;     #f))
+       ))))
 (let ((domains (make-hash-table))
       (constraints (make-hash-table)))
   ;; (set-domains! domains '(a b c) '(1 2 3))
