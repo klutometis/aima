@@ -74,6 +74,20 @@
        ;;           (constraint-lambda scope (and ))))
        ;;     #f))
        ))))
+
+(define (neighbors-from-constraints constraints)
+  (let ((neighbors (make-hash-table)))
+    (for-each (lambda (neighborhood)
+                (for-each (lambda (neighbor)
+                            (hash-table-update!/default
+                             neighbors
+                             neighbor
+                             (lambda (neighbors)
+                               (lset-union eq? neighbors (delete neighbor neighborhood)))
+                             '()))
+                  neighborhood))
+      (hash-table-keys constraints))
+    neighbors))
 (let ((domains (make-hash-table))
       (constraints (make-hash-table)))
   ;; (set-domains! domains '(a b c) '(1 2 3))
