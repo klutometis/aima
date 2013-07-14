@@ -88,6 +88,19 @@
                   neighborhood))
       (hash-table-keys constraints))
     neighbors))
+
+(define (consistent? variable value assignment csp)
+  ;; Use the default case when there are no neighbors.
+  (let* ((neighbors (hash-table-ref/default (csp-neighbors csp) variable '()))
+         (assigned-neighbors (filter (lambda (neighbor) (assigned? (hash-table-ref assignment neighbor)))
+                                     neighbors)))
+    (let ((results (map (lambda (neighbor) ((hash-table-ref (csp-constraints csp) (cons variable neighbor))
+                                       value
+                                       (hash-table-ref assignment neighbor)))
+                        assigned-neighbors)))
+      ;; (debug variable value neighbors assigned-neighbors results)
+      (every values results))))
+
 (let ((domains (make-hash-table))
       (constraints (make-hash-table)))
   ;; (set-domains! domains '(a b c) '(1 2 3))
