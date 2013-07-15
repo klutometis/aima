@@ -155,6 +155,33 @@
             (hash-table-ref constraints (scope-order '(b a)))
             (map cdr (sort variable-values symbol-printname<? car)))))
   (debug ((constraint-lambda (b c a) (and (> b a) (> c b))) 1 2 3))
-  )
+  (let ((variable 'f)
+        (value 5))
+    (let* ((assignment (alist->hash-table (alist-cons
+                                           variable
+                                           value
+                                           '((a . 1)
+                                             (b . 2)
+                                             (c . 3)
+                                             (d . 4)))))
+           (variables (hash-table-keys assignment)))
+      (debug (filter (lambda (scope) (lset<= eq? scope variables))
+                     (hash-table-keys constraints)))
+      ;; (hash-table-fold constraints
+      ;;                  (lambda (scope constraint applicable-constraints)
+      ;;                    )
+      ;;                  '())
+      (debug
+       (let iter ((scopes (hash-table-keys constraints)))
+         (if (null? scopes)
+             #t
+             (let ((scope (car scopes)))
+               (if (applicable? scope variables)
+                   (let ((applicable-variables (lset-intersection eq? scope variables))
+                         (constraint (hash-table-ref constraints scope)))
+                     (if (constraint-apply constraint applicable-variables assignment)
+                         (iter (cdr scopes))
+                         #f))
+                   (iter (cdr scopes))))))))))
 
 ;; 6\.7:7 ends here
