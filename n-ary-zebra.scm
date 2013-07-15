@@ -37,6 +37,28 @@
                         scope)))
          `(lambda ,scope ,body))))))
 
+;; (define-record-and-printer node
+;;   neighbors
+;;   constraint)
+
+;; (define (constraint-update! node scope constraint)
+;;   (if (null? (cdr scope))
+;;       (node-constraint-set! node constraint)
+;;       (let ((variable (car scope)))))
+;;   (let ((node (hash-table-ref constraints))))
+;;   (let iter ((scope scope)
+;;              (node (hash-table-ref constraints
+;;                                    constraint
+;;                                    (lambda () (make-node (make-hash-table) #f)))))
+;;     (if (null? scope)
+;;         (node-datum-set! node constraint)
+;;         (let* ((variable (car scope))
+;;                (next-node (hash-table-ref (node-neighbors node) variable (lambda () (make-node (make-hash-table) #f)))))
+;;           (begin
+;;             (hash-table-set! (node-neighbors node) variable next-node)
+;;             (iter (cdr scope)
+;;                   next-node))))))
+
 (define-syntax constraint-set!
   (lambda (expression rename compare)
     (match expression
@@ -47,6 +69,7 @@
        `(hash-table-set! ,constraints
                          (quote ,(scope-order scope))
                          (constraint-lambda ,scope ,body))
+       ;; `(constraint-update! ,constraints (quote ,(scope-order scope)) (constraint-lambda ,scope ,body))
        ;; (let ((constraint (constraint-lambda scope body)))
        ;;   `(hash-table-update!/default
        ;;     constraints
@@ -66,6 +89,7 @@
        `(hash-table-set! ,constraints
                          (quote ,(scope-order scope))
                          ,lambda)
+       ;; `(constraint-update! ,constraints (quote ,(scope-order scope)) ,lambda)
        ;; (let ((constraint (constraint-lambda scope body)))
        ;;   `(hash-table-update!/default
        ;;     constraints
