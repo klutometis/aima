@@ -129,6 +129,10 @@
   (let ((values
          (map (lambda (variable) (hash-table-ref assignment variable)) variables)))
     (apply constraint values)))
+
+(define (applicable? scope variables)
+  (lset<= eq? scope variables))
+
 (let ((domains (make-hash-table))
       (constraints (make-hash-table)))
   ;; (set-domains! domains '(a b c) '(1 2 3))
