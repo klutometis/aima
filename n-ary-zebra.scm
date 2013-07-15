@@ -138,6 +138,8 @@
   ;; (set-domains! domains '(a b c) '(1 2 3))
   (debug (expand '(constraint-set! constraints (b c a) (and (> b a) (> c b)))))
   (constraint-set! constraints (b c a) (and (> b a) (> c b)))
+  (constraint-set! constraints (e) (= e 4))
+  (constraint-set! constraints (f) (= f 4))
   (let ((alldiff (constraint-lambda x (equal? x (delete-duplicates x)))))
     (constraint-set!/lambda constraints (a b) alldiff))
   (debug (hash-table->alist constraints))
