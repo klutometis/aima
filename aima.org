@@ -7134,7 +7134,10 @@
   If we have an ordering, this is where a tree-based representation
   would come in handy.
 
-  Let’s do nested hash-tables and e.g. =every-applicable-constraint=, 
+  Let’s do nested hash-tables and e.g. =every-applicable-constraint=;
+  problem with this, though, is you have to distinguish between
+  datum-leaves and datum-internal nodes. Nodes have a datum and a
+  hash-table?
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
