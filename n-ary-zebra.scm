@@ -125,6 +125,10 @@
       ;; (debug variable value neighbors assigned-neighbors results)
       (every values results))))
 
+(define (constraint-apply constraint variables assignment)
+  (let ((values
+         (map (lambda (variable) (hash-table-ref assignment variable)) variables)))
+    (apply constraint values)))
 (let ((domains (make-hash-table))
       (constraints (make-hash-table)))
   ;; (set-domains! domains '(a b c) '(1 2 3))
