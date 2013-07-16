@@ -153,6 +153,11 @@
                                              (and (neq? n 'english)
                                                   (neq? c 'red)))))
 
+(define (backtracking-search/domains+constraints domains constraints)
+  (let* ((neighbors (neighbors-from-constraints constraints))
+         (csp (make-csp domains constraints neighbors)))
+    (backtracking-search csp)))
+
 (let ((domains (make-hash-table))
       (constraints (make-hash-table)))
   (set-domains! domains
@@ -181,17 +186,17 @@
   (constraint-set!/lambda constraints (c1 c2 c3 c4 c5) alldiff)
   (constraint-set!/lambda constraints (s1 s2 s3 s4 s5) alldiff)
   (constraint-set!/lambda constraints (p1 p2 p3 p4 p5) alldiff)
+
   (constraint-set!/lambda constraints (n1 c1) english-red)
   (constraint-set!/lambda constraints (n2 c2) english-red)
   (constraint-set!/lambda constraints (n3 c3) english-red)
   (constraint-set!/lambda constraints (n4 c4) english-red)
   (constraint-set!/lambda constraints (n5 c5) english-red)
-  (let* ((neighbors (neighbors-from-constraints constraints))
-         (csp (make-csp domains constraints neighbors)))
-    (parameterize ((consistent? n-ary-consistent?)
-                   (inference (lambda x (make-hash-table))))
-      (let ((result (backtracking-search csp)))
-        (unless (failure? result)
-          (debug (hash-table->alist result)))))))
+
+  (parameterize ((consistent? n-ary-consistent?)
+                 (inference (lambda x (make-hash-table))))
+    (let ((result (backtracking-search/domains+constraints domains constraints)))
+      (unless (failure? result)
+        (debug (hash-table->alist result))))))
 
 ;; 6\.7:7 ends here
