@@ -18,7 +18,7 @@
 
 (import-for-syntax symbol-utils)
 
-;; (include "~/prg/scm/aima-chicken/aima-csp-core.scm")
+(include "~/prg/scm/aima-chicken/aima-csp-core.scm")
 
 (define-for-syntax (scope-order scope)
   (sort scope symbol-printname<?))
@@ -113,17 +113,30 @@
       (hash-table-keys constraints))
     neighbors))
 
-(define (consistent? variable value assignment csp)
+(define (n-ary-consistent? variable value assignment csp)
   ;; Use the default case when there are no neighbors.
   (let* ((neighbors (hash-table-ref/default (csp-neighbors csp) variable '()))
          (assigned-neighbors (filter (lambda (neighbor) (assigned? (hash-table-ref assignment neighbor)))
-                                     neighbors)))
-    (let ((results (map (lambda (neighbor) ((hash-table-ref (csp-constraints csp) (cons variable neighbor))
-                                       value
-                                       (hash-table-ref assignment neighbor)))
-                        assigned-neighbors)))
-      ;; (debug variable value neighbors assigned-neighbors results)
-      (every values results))))
+                                     neighbors))
+         (assignment (alist->hash-table (alist-cons variable
+                                                    value
+                                                    (zip-alist assigned-neighbors
+                                                               (map (lambda (neighbor)
+                                                                      (hash-table-ref assignment neighbor))
+                                                                    assigned-neighbors)))))
+         (variables (hash-table-keys assignment)))
+    (let ((constraints (csp-constraints csp)))
+      (let iter ((scopes (hash-table-keys constraints)))
+        (if (null? scopes)
+            #t
+            (let ((scope (car scopes)))
+              (if (applicable? scope variables)
+                  (let ((applicable-variables (lset-intersection eq? scope variables))
+                        (constraint (hash-table-ref constraints scope)))
+                    (if (constraint-apply constraint applicable-variables assignment)
+                        (iter (cdr scopes))
+                        #f))
+                  (iter (cdr scopes)))))))))
 
 (define (constraint-apply constraint variables assignment)
   (let ((values
@@ -135,11 +148,11 @@
 
 (let ((domains (make-hash-table))
       (constraints (make-hash-table)))
-  ;; (set-domains! domains '(a b c) '(1 2 3))
+  (set-domains! domains '(a b c d e f) '(1 2 3))
   (debug (expand '(constraint-set! constraints (b c a) (and (> b a) (> c b)))))
   (constraint-set! constraints (b c a) (and (> b a) (> c b)))
-  (constraint-set! constraints (e) (= e 4))
-  (constraint-set! constraints (f) (= f 4))
+  ;; (constraint-set! constraints (e) (= e 4))
+  ;; (constraint-set! constraints (f) (= f 4))
   (let ((alldiff (constraint-lambda x (equal? x (delete-duplicates x)))))
     (constraint-set!/lambda constraints (a b) alldiff))
   (debug (hash-table->alist constraints))
@@ -182,6 +195,13 @@
                      (if (constraint-apply constraint applicable-variables assignment)
                          (iter (cdr scopes))
                          #f))
-                   (iter (cdr scopes))))))))))
+                   (iter (cdr scopes)))))))))
+  (let* ((neighbors (neighbors-from-constraints constraints))
+         (csp (make-csp domains constraints neighbors)))
+    (parameterize ((consistent? n-ary-consistent?)
+                   (inference (lambda x (make-hash-table))))
+      (let ((result (backtracking-search csp)))
+        (unless (failure? result)
+          (debug (hash-table->alist result)))))))
 
 ;; 6\.7:7 ends here
