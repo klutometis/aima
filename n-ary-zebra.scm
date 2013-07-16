@@ -146,56 +146,46 @@
 (define (applicable? scope variables)
   (lset<= eq? scope variables))
 
+(define alldiff (constraint-lambda x (equal? x (delete-duplicates x))))
+
+(define english-red (constraint-lambda (n c) (xor (and (eq? n 'english)
+                                                  (eq? c 'red))
+                                             (and (neq? n 'english)
+                                                  (neq? c 'red)))))
+
 (let ((domains (make-hash-table))
       (constraints (make-hash-table)))
-  (set-domains! domains '(a b c d e f) '(1 2 3))
-  (debug (expand '(constraint-set! constraints (b c a) (and (> b a) (> c b)))))
-  (constraint-set! constraints (b c a) (and (> b a) (> c b)))
-  ;; (constraint-set! constraints (e) (= e 4))
-  ;; (constraint-set! constraints (f) (= f 4))
-  (let ((alldiff (constraint-lambda x (equal? x (delete-duplicates x)))))
-    (constraint-set!/lambda constraints (a b) alldiff))
-  (debug (hash-table->alist constraints))
-  (debug (hash-table->alist (neighbors-from-constraints constraints)))
-  (let ((variable-values (zip-alist '(b c a) '(2 3 1))))
-    (debug
-           (apply
-            (hash-table-ref constraints (scope-order '(b c a)))
-            (map cdr (sort variable-values symbol-printname<? car)))))
-  (let ((variable-values (zip-alist '(b a) '(3 3))))
-    (debug
-           (apply
-            (hash-table-ref constraints (scope-order '(b a)))
-            (map cdr (sort variable-values symbol-printname<? car)))))
-  (debug ((constraint-lambda (b c a) (and (> b a) (> c b))) 1 2 3))
-  (let ((variable 'f)
-        (value 5))
-    (let* ((assignment (alist->hash-table (alist-cons
-                                           variable
-                                           value
-                                           '((a . 1)
-                                             (b . 2)
-                                             (c . 3)
-                                             (d . 4)))))
-           (variables (hash-table-keys assignment)))
-      (debug (filter (lambda (scope) (lset<= eq? scope variables))
-                     (hash-table-keys constraints)))
-      ;; (hash-table-fold constraints
-      ;;                  (lambda (scope constraint applicable-constraints)
-      ;;                    )
-      ;;                  '())
-      (debug
-       (let iter ((scopes (hash-table-keys constraints)))
-         (if (null? scopes)
-             #t
-             (let ((scope (car scopes)))
-               (if (applicable? scope variables)
-                   (let ((applicable-variables (lset-intersection eq? scope variables))
-                         (constraint (hash-table-ref constraints scope)))
-                     (if (constraint-apply constraint applicable-variables assignment)
-                         (iter (cdr scopes))
-                         #f))
-                   (iter (cdr scopes)))))))))
+  (set-domains! domains
+                '(n1)
+                '(norwegian))
+  (set-domains! domains
+                '(n2 n3 n4 n5)
+                '(english spanish japanese ukrainian))
+  (set-domains! domains
+                '(p1 p2 p3 p4 p5)
+                '(dog zebra snail fox horse))
+  (set-domains! domains
+                '(s1 s2 s3 s4 s5)
+                '(smarties snickers milky-way kit-kat hershey))
+  (set-domains! domains
+                '(c1 c2 c3 c4 c5)
+                '(blue yellow ivory red green))
+  (set-domains! domains
+                '(d1 d2 d4 d5) 
+                '(water coffee orange-juice tea))
+  (set-domains! domains
+                '(d3) 
+                '(milk))
+  (constraint-set!/lambda constraints (n1 n2 n3 n4 n5) alldiff)
+  (constraint-set!/lambda constraints (d1 d2 d3 d4 d5) alldiff)
+  (constraint-set!/lambda constraints (c1 c2 c3 c4 c5) alldiff)
+  (constraint-set!/lambda constraints (s1 s2 s3 s4 s5) alldiff)
+  (constraint-set!/lambda constraints (p1 p2 p3 p4 p5) alldiff)
+  (constraint-set!/lambda constraints (n1 c1) english-red)
+  (constraint-set!/lambda constraints (n2 c2) english-red)
+  (constraint-set!/lambda constraints (n3 c3) english-red)
+  (constraint-set!/lambda constraints (n4 c4) english-red)
+  (constraint-set!/lambda constraints (n5 c5) english-red)
   (let* ((neighbors (neighbors-from-constraints constraints))
          (csp (make-csp domains constraints neighbors)))
     (parameterize ((consistent? n-ary-consistent?)
