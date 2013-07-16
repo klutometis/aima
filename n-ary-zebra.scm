@@ -114,6 +114,7 @@
     neighbors))
 
 (define (n-ary-consistent? variable value assignment csp)
+  (debug variable value (hash-table->alist assignment))
   ;; Use the default case when there are no neighbors.
   (let* ((neighbors (hash-table-ref/default (csp-neighbors csp) variable '()))
          (assigned-neighbors (filter (lambda (neighbor) (assigned? (hash-table-ref assignment neighbor)))
@@ -148,10 +149,39 @@
 
 (define alldiff (constraint-lambda x (equal? x (delete-duplicates x))))
 
-(define english-red (constraint-lambda (n c) (xor (and (eq? n 'english)
-                                                  (eq? c 'red))
-                                             (and (neq? n 'english)
-                                                  (neq? c 'red)))))
+(define english-red
+  (constraint-lambda (n c) (xor (and (eq? n 'english)
+                                (eq? c 'red))
+                           (and (neq? n 'english)
+                                (neq? c 'red)))))
+
+(define coffee-green
+  (constraint-lambda (d c) (xor (and (eq? d 'coffee)
+                                (eq? c 'green))
+                           (and (neq? d 'coffee)
+                                (neq? c 'green)))))
+
+(define ivory-green
+  (constraint-lambda (c1 c2) (if (eq? c1 'ivory)
+                            (eq? c2 'green))))
+
+(define hershey-fox-middle
+  (constraint-lambda (s p1 p2) (if (eq? s 'hershey)
+                              (xor (eq? p1 'fox)
+                                   (eq? p2 'fox)))))
+
+(define hershey-fox-edge
+  (constraint-lambda (s p) (if (eq? s 'hershey)
+                          (eq? p 'fox))))
+
+(define norwegian-blue-middle
+  (constraint-lambda (n c1 c2) (if (eq? n 'norwegian)
+                              (xor (eq? c1 'blue)
+                                   (eq? c2 'blue)))))
+
+(define norwegian-blue-edge
+  (constraint-lambda (n c) (if (eq? n 'norwegian)
+                          (eq? c 'blue))))
 
 (define (backtracking-search/domains+constraints domains constraints)
   (let* ((neighbors (neighbors-from-constraints constraints))
@@ -168,7 +198,7 @@
                 '(english spanish japanese ukrainian))
   (set-domains! domains
                 '(p1 p2 p3 p4 p5)
-                '(dog zebra snail fox horse))
+                '(dog zebra snail blue horse))
   (set-domains! domains
                 '(s1 s2 s3 s4 s5)
                 '(smarties snickers milky-way kit-kat hershey))
@@ -181,6 +211,7 @@
   (set-domains! domains
                 '(d3) 
                 '(milk))
+
   (constraint-set!/lambda constraints (n1 n2 n3 n4 n5) alldiff)
   (constraint-set!/lambda constraints (d1 d2 d3 d4 d5) alldiff)
   (constraint-set!/lambda constraints (c1 c2 c3 c4 c5) alldiff)
@@ -192,6 +223,31 @@
   (constraint-set!/lambda constraints (n3 c3) english-red)
   (constraint-set!/lambda constraints (n4 c4) english-red)
   (constraint-set!/lambda constraints (n5 c5) english-red)
+
+  (constraint-set!/lambda constraints (d1 c1) coffee-green)
+  (constraint-set!/lambda constraints (d2 c2) coffee-green)
+  (constraint-set!/lambda constraints (d3 c3) coffee-green)
+  (constraint-set!/lambda constraints (d4 c4) coffee-green)
+  (constraint-set!/lambda constraints (d5 c5) coffee-green)
+
+  (constraint-set! constraints (n1) (lambda (n) (eq? n 'norwegian)))
+
+  (constraint-set!/lambda constraints (c1 c2) ivory-green)
+  (constraint-set!/lambda constraints (c2 c3) ivory-green)
+  (constraint-set!/lambda constraints (c3 c4) ivory-green)
+  (constraint-set!/lambda constraints (c4 c5) ivory-green)
+
+  (constraint-set!/lambda constraints (s2 p1 p3) hershey-fox-middle)
+  (constraint-set!/lambda constraints (s3 p2 p4) hershey-fox-middle)
+  (constraint-set!/lambda constraints (s4 p3 p5) hershey-fox-middle)
+  (constraint-set!/lambda constraints (s1 p2) hershey-fox-edge)
+  (constraint-set!/lambda constraints (s5 p4) hershey-fox-edge)
+
+  (constraint-set!/lambda constraints (n2 c1 c3) norwegian-blue-middle)
+  (constraint-set!/lambda constraints (n3 c2 c4) norwegian-blue-middle)
+  (constraint-set!/lambda constraints (n4 c3 c5) norwegian-blue-middle)
+  (constraint-set!/lambda constraints (n1 c2) norwegian-blue-edge)
+  (constraint-set!/lambda constraints (n5 c4) norwegian-blue-edge)
 
   (parameterize ((consistent? n-ary-consistent?)
                  (inference (lambda x (make-hash-table))))
