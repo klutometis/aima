@@ -7141,7 +7141,7 @@
 
   Pass partial assignments to the constraints so that we can fail
   early?
-* TODO 6.8
+* TODO 6.10
   #+BEGIN_SRC scheme
     (use aima-tessellation
          aima-csp
@@ -7173,10 +7173,28 @@
             (let iter ((points (sort-by-proximity point (delete point random-points))))
               (unless (null? points)
                 (let ((counter-point (car points)))
-                  (unless (memq counter-point (hash-table-ref connections point '()))
+                  (unless (memq counter-point (hash-table-ref/default connections point '()))
                     (let iter ((counter-counter-points (hash-table-keys connections)))
-                      (let iter ((counter-counter-counter-points (hash-table-ref/default connections counter-counter-point '()))))))))))
-        random-points))
+                      (unless (null? counter-counter-points)
+                        (let ((counter-counter-point (car counter-counter-points)))
+                          (let iter ((counter-counter-counter-points
+                                      (hash-table-ref/default connections counter-counter-point '())))
+                            (if (null? counter-counter-counter-points)
+                                (hash-table-update!/default
+                                 connections
+                                 point
+                                 (lambda (counter-points)
+                                   (lset-adjoin eq? counter-points counter-point))
+                                 '())
+                                (let ((counter-counter-counter-point
+                                       (car counter-counter-counter-points)))
+                                  (unless (intersect? point
+                                                      counter-point
+                                                      counter-counter-point
+                                                      counter-counter-counter-point)
+                                    (iter (cdr counter-counter-counter-points))))))))))))))
+        random-points)
+      (hash-table->alist connections))
     
   #+END_SRC
 * Meetups
