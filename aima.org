@@ -7141,6 +7141,44 @@
 
   Pass partial assignments to the constraints so that we can fail
   early?
+* TODO 6.8
+  #+BEGIN_SRC scheme
+    (use aima-tessellation
+         aima-csp
+         debug
+         random-bsd
+         srfi-1
+         srfi-95)
+    
+    (define (counter-clockwise? a b c)
+      (> (* (- (point-y c) (point-y a))
+            (- (point-x b) (point-x a)))
+         (* (- (point-y b) (point-y a))
+            (- (point-x c) (point-x a)))))
+    
+    (define (intersect? a b c d)
+      (and (xor (counter-clockwise? a c d) (counter-clockwise? b c d))
+           (xor (counter-clockwise? a b c) (counter-clockwise? a b d))))
+    
+    (define (random-points n)
+      (list-tabulate n (lambda (i) (make-point (random-real) (random-real)))))
+    
+    (define (sort-by-proximity point points)
+      (sort points < (lambda (sortiendum) (point-distance point sortiendum))))
+    
+    (let ((random-points (random-points 100))
+          (connections (make-hash-table)))
+      (for-each
+          (lambda (point)
+            (let iter ((points (sort-by-proximity point (delete point random-points))))
+              (unless (null? points)
+                (let ((counter-point (car points)))
+                  (unless (memq counter-point (hash-table-ref connections point '()))
+                    (let iter ((counter-counter-points (hash-table-keys connections)))
+                      (let iter ((counter-counter-counter-points (hash-table-ref/default connections counter-counter-point '()))))))))))
+        random-points))
+    
+  #+END_SRC
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
