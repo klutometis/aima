@@ -7166,35 +7166,47 @@
     (define (sort-by-proximity point points)
       (sort points < (lambda (sortiendum) (point-distance point sortiendum))))
     
-    (let ((random-points (random-points 100))
+    (let ((points (random-points 100))
           (connections (make-hash-table)))
-      (for-each
-          (lambda (point)
-            (let iter ((points (sort-by-proximity point (delete point random-points))))
-              (unless (null? points)
-                (let ((counter-point (car points)))
-                  (unless (memq counter-point (hash-table-ref/default connections point '()))
-                    (let iter ((counter-counter-points (hash-table-keys connections)))
-                      (unless (null? counter-counter-points)
-                        (let ((counter-counter-point (car counter-counter-points)))
-                          (let iter ((counter-counter-counter-points
-                                      (hash-table-ref/default connections counter-counter-point '())))
-                            (if (null? counter-counter-counter-points)
-                                (hash-table-update!/default
-                                 connections
-                                 point
-                                 (lambda (counter-points)
-                                   (lset-adjoin eq? counter-points counter-point))
-                                 '())
-                                (let ((counter-counter-counter-point
-                                       (car counter-counter-counter-points)))
-                                  (unless (intersect? point
-                                                      counter-point
-                                                      counter-counter-point
-                                                      counter-counter-counter-point)
-                                    (iter (cdr counter-counter-counter-points))))))))))))))
-        random-points)
-      (hash-table->alist connections))
+      (let iter ((points points))
+        (for-each
+           (lambda (point)
+             (let iter ((counter-points
+                         (sort-by-proximity point (delete point points))))
+               (unless (null? counter-points)
+                 (let ((counter-point (car counter-points)))
+                   (if (memq counter-point
+                             (hash-table-ref/default connections point '()))
+                       (iter (cdr counter-points))
+                       (hash-table-update!/default
+                        connections
+                        point
+                        (lambda (counter-points)
+                          (lset-adjoin eq? counter-points counter-point))
+                        '()))
+                   ;; (unless (memq counter-point (hash-table-ref/default connections point '()))
+                   ;;   (let iter ((counter-counter-points (hash-table-keys connections)))
+                   ;;     (unless (null? counter-counter-points)
+                   ;;       (let ((counter-counter-point (car counter-counter-points)))
+                   ;;         (let iter ((counter-counter-counter-points
+                   ;;                     (hash-table-ref/default connections counter-counter-point '())))
+                   ;;           (if (null? counter-counter-counter-points)
+                   ;;               (hash-table-update!/default
+                   ;;                connections
+                   ;;                point
+                   ;;                (lambda (counter-points)
+                   ;;                  (lset-adjoin eq? counter-points counter-point))
+                   ;;                '())
+                   ;;               (let ((counter-counter-counter-point
+                   ;;                      (car counter-counter-counter-points)))
+                   ;;                 (unless (intersect? point
+                   ;;                                     counter-point
+                   ;;                                     counter-counter-point
+                   ;;                                     counter-counter-counter-point)
+                   ;;                   (iter (cdr counter-counter-counter-points))))))))))
+                   ))))
+         points)
+       (debug (hash-table->alist connections))))
     
   #+END_SRC
 * Meetups
