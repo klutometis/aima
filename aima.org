@@ -7214,11 +7214,8 @@
                 (if (null? counter-points)
                     (iter-point (cdr points) modified?)
                     (let ((counter-point (car counter-points)))
-                      (if (or
-                           (memq counter-point
-                                 (hash-table-ref/default connections point '()))
-                           (memq point
-                                 (hash-table-ref/default connections counter-point '())))
+                      (if (memq point
+                                (hash-table-ref/default connections counter-point '()))
                           (iter-counter-point (cdr counter-points))
                           (if (intersects-other? connections point counter-point)
                               (iter-counter-point (cdr counter-points))
@@ -7228,6 +7225,12 @@
                                  point
                                  (lambda (counter-points)
                                    (lset-adjoin eq? counter-points counter-point))
+                                 '())
+                                (hash-table-update!/default
+                                 connections
+                                 counter-point
+                                 (lambda (points)
+                                   (lset-adjoin eq? points point))
                                  '())
                                 (iter-point (cdr points) #t))))))))))
       (with-output-to-file "harro.dot"
