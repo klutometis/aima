@@ -57,58 +57,5 @@
     (shuffle! vector)
     (vector->list vector)))
 
-(let ((random-points (random-points 100))
-      (connections (make-hash-table)))
-  ;; Randomize the random-points.
-  (let iter-point ((points random-points)
-                   (modified? #f))
-    ;; (debug 'points (length points))
-    (if (null? points)
-        (when modified?
-          (iter-point (shuffle random-points) #f))
-        (let ((point (car points)))
-          (let iter-counter-point
-              ((counter-points
-                (sort-by-proximity point (delete point random-points))))
-            ;; (debug 'counter-points (length counter-points))
-            (if (null? counter-points)
-                (iter-point (cdr points) modified?)
-                (let ((counter-point (car counter-points)))
-                  (if (member point
-                            (hash-table-ref/default connections counter-point '()))
-                      (iter-counter-point (cdr counter-points))
-                      (if (intersects-other? connections point counter-point)
-                          (iter-counter-point (cdr counter-points))
-                          (begin
-                            (hash-table-update!/default
-                             connections
-                             point
-                             (lambda (counter-points)
-                               (lset-adjoin eq? counter-points counter-point))
-                             '())
-                            (hash-table-update!/default
-                             connections
-                             counter-point
-                             (lambda (points)
-                               (lset-adjoin eq? points point))
-                             '())
-                            (iter-point (cdr points) #t))))))))))
-  (with-output-to-file "harro.dot"
-    (lambda () (write-dot-preamble)
-       (let ((labels (make-labels random-points)))
-         (for-each (lambda (point)
-                     (write-node (hash-table-ref labels point)
-                                 (point-x point)
-                                 (point-y point)))
-           random-points)
-         (hash-table-walk connections
-           (lambda (whence whithers)
-             (let ((whence-label (hash-table-ref labels whence)))
-               (for-each (lambda (whither)
-                           (let ((whither-label (hash-table-ref labels whither)))
-                             (write-edge whence-label whither-label)))
-                 whithers)))))
-       (write-dot-postscript)))
-  (run (neato -n1 -Tpng -o harro.png harro.dot "&&" sxiv harro.png)))
 
 ;; 6\.10:1 ends here
