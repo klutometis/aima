@@ -7173,7 +7173,6 @@
         (for-each (lambda (point) (hash-table-set! labels point (gensym))) points)
         labels))
     
-    (let ((random-points (random-points 10))
     (define (intersects-other? connections point counter-point)
       (call/cc
        (lambda (return)
@@ -7197,6 +7196,7 @@
         (shuffle! vector)
         (vector->list vector)))
     
+    (let ((random-points (random-points 100))
           (connections (make-hash-table)))
       ;; Randomize the random-points.
       (let iter-point ((points random-points)
