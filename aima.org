@@ -7233,7 +7233,10 @@
       (with-output-to-file "harro.dot"
         (lambda () (write-dot-preamble)
            (let ((labels (make-labels random-points)))
-             (for-each (lambda (point) (write-node (hash-table-ref labels point) (point-x point) (point-y point)))
+             (for-each (lambda (point)
+                         (write-node (hash-table-ref labels point)
+                                     (point-x point)
+                                     (point-y point)))
                random-points)
              (hash-table-walk connections
                (lambda (whence whithers)
