@@ -7387,7 +7387,7 @@
   Pass partial assignments to the constraints so that we can fail
   early?
 * TODO 6.10
-  #+BEGIN_SRC scheme
+  #+BEGIN_SRC scheme :comments link :tangle random-coloring.scm :shebang #!/usr/bin/env chicken-scheme
     (use aima-tessellation
          aima-csp
          debug
