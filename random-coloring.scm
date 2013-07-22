@@ -5,6 +5,7 @@
 (use aima-tessellation
      aima-csp
      debug
+     files
      graphviz
      random-bsd
      shell
