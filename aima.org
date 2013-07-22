@@ -7201,6 +7201,7 @@
       ;; Randomize the random-points.
       (let iter-point ((points random-points)
                        (modified? #f))
+        ;; (debug 'points (length points))
         (if (null? points)
             (if modified?
                 (iter-point (shuffle random-points) #f)
