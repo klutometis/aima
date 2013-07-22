@@ -118,5 +118,7 @@
                                '())
                               (iter-point (cdr points) #t))))))))))))
 
+(write-map-as-png (random-map 100) "harro.png")
+(run (sxiv "harro.png"))
 
 ;; 6\.10:1 ends here
