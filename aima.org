@@ -7210,6 +7210,7 @@
               (let iter-counter-point
                   ((counter-points
                     (sort-by-proximity point (delete point random-points))))
+                ;; (debug 'counter-points (length counter-points))
                 (if (null? counter-points)
                     (iter-point (cdr points) modified?)
                     (let ((counter-point (car counter-points)))
