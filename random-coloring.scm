@@ -139,6 +139,18 @@
            whithers)))
      (return #t))))
 
+(define (conflicted-variables assignment csp)
+  (hash-table-fold
+   (csp-constraints csp)
+   (lambda (scope constraint conflicts)
+     (let ((x (car scope))
+           (y (cdr scope)))
+       (if (constraint (hash-table-ref assignment x)
+                       (hash-table-ref assignment y))
+           conflicts
+           (lset-adjoin eq? conflicts x y))))
+   '()))
+
 (define (min-conflicts csp)
   (let ((assignment (hash-table-fold
                      (csp-domains csp)
