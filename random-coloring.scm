@@ -7,6 +7,7 @@
      debug
      files
      graphviz
+     matchable
      random-bsd
      shell
      srfi-1
