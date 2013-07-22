@@ -138,7 +138,7 @@
         whithers)))
   (let ((solution (backtracking-search (make-csp domains constraints map))))
     (when (success? solution)
-      (write-map-as-png map solution "harro.png")
-      (run (sxiv "harro.png")))))
+      (write-map-as-png map solution "random-coloring.png")
+      (run (sxiv "random-coloring.png")))))
 
 ;; 6\.10:1 ends here
