@@ -77,5 +77,10 @@
                   whithers)))))
         (write-dot-postscript)))))
 
+(define (write-map-as-png map png)
+  (let ((dot (create-temporary-file)))
+    (write-map-as-dot map dot)
+    (run (neato -n1 -Tpng -o ,png < ,dot))))
+
 
 ;; 6\.10:1 ends here
