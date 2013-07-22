@@ -57,9 +57,9 @@
     (shuffle! vector)
     (vector->list vector)))
 
-(define (write-map-as-dot map dot)
+(define (write-map-as-dot map solution dot)
   (with-output-to-file dot
-    (let ((points (hash-table-keys map)))
+    (let ((points (hash-table-keys map))
           (edges (make-hash-table)))
       (lambda ()
         (write-dot-preamble)
@@ -67,7 +67,8 @@
           (for-each (lambda (point)
                       (write-node (hash-table-ref labels point)
                                   (point-x point)
-                                  (point-y point)))
+                                  (point-y point)
+                                  (hash-table-ref solution point)))
             points)
           (hash-table-walk map
             (lambda (whence whithers)
@@ -80,9 +81,9 @@
                   whithers)))))
         (write-dot-postscript)))))
 
-(define (write-map-as-png map png)
+(define (write-map-as-png map solution png)
   (let ((dot (create-temporary-file)))
-    (write-map-as-dot map dot)
+    (write-map-as-dot map solution dot)
     (run (neato -n1 -Tpng -o ,png < ,dot))))
 
 (define (random-map n)
