@@ -7220,14 +7220,16 @@
                            (memq point
                                  (hash-table-ref/default connections counter-point '())))
                           (iter-counter-point (cdr counter-points))
-                          (begin
-                            (hash-table-update!/default
-                             connections
-                             point
-                             (lambda (counter-points)
-                               (lset-adjoin eq? counter-points counter-point))
-                             '())
-                            (iter-point (cdr points) #t)))))))))
+                          (if (intersects-other? connections point counter-point)
+                              (iter-counter-point (cdr counter-points))
+                              (begin
+                                (hash-table-update!/default
+                                 connections
+                                 point
+                                 (lambda (counter-points)
+                                   (lset-adjoin eq? counter-points counter-point))
+                                 '())
+                                (iter-point (cdr points) #t))))))))))
       (with-output-to-file "harro.dot"
         (lambda () (write-dot-preamble)
            (let ((labels (make-labels random-points)))
