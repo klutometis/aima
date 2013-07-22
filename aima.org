@@ -7214,8 +7214,11 @@
                 (if (null? counter-points)
                     (iter-point (cdr points) modified?)
                     (let ((counter-point (car counter-points)))
-                      (if (memq counter-point
-                                (hash-table-ref/default connections point '()))
+                      (if (or
+                           (memq counter-point
+                                 (hash-table-ref/default connections point '()))
+                           (memq point
+                                 (hash-table-ref/default connections counter-point '())))
                           (iter-counter-point (cdr counter-points))
                           (begin
                             (hash-table-update!/default
