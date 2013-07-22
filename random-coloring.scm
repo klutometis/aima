@@ -152,6 +152,8 @@
            (lset-adjoin eq? conflicts x y))))
    '()))
 
+(define max-steps (make-parameter 10000))
+
 (define (min-conflicts csp)
   (let ((assignment (hash-table-fold
                      (csp-domains csp)
