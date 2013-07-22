@@ -163,10 +163,13 @@
                    neq?
                    neq?))
         whithers)))
-  (let ((solution (backtracking-search (make-csp domains constraints map))))
-    (when (success? solution)
-      (let ((png (create-temporary-file ".png")))
-        (write-map-as-png map solution png)
-        (run (sxiv ,png))))))
+  (let ((csp (make-csp domains constraints map)))
+    (debug (hash-table->alist (min-conflicts csp)))
+    ;; (let ((solution (backtracking-search csp)))
+    ;;   (when (success? solution)
+    ;;     (let ((png (create-temporary-file ".png")))
+    ;;       (write-map-as-png map solution png)
+    ;;       (run (sxiv ,png)))))
+    ))
 
 ;; 6\.10:1 ends here
