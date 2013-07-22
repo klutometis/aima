@@ -125,6 +125,20 @@
 (define (random-element list)
   (list-ref list (random (length list))))
 
+(define (solution? assignment csp)
+  (call/cc
+   (lambda (return)
+     (hash-table-walk (csp-neighbors csp)
+       (lambda (whence whithers)
+         (for-each
+             (lambda (whither)
+               (let ((constraint (hash-table-ref (csp-constraints csp) (cons whence whither))))
+                 (unless (constraint (hash-table-ref assignment whence)
+                                     (hash-table-ref assignment whither))
+                   (return #f))))
+           whithers)))
+     (return #t))))
+
 
 (let ((map (random-map 10))
       (domains (make-hash-table))
