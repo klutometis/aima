@@ -57,5 +57,25 @@
     (shuffle! vector)
     (vector->list vector)))
 
+(define (write-map-as-dot map dot)
+  (with-output-to-file dot
+    (let ((points (hash-table-keys map)))
+      (lambda ()
+        (write-dot-preamble)
+        (let ((labels (make-labels points)))
+          (for-each (lambda (point)
+                      (write-node (hash-table-ref labels point)
+                                  (point-x point)
+                                  (point-y point)))
+            points)
+          (hash-table-walk map
+            (lambda (whence whithers)
+              (let ((whence-label (hash-table-ref labels whence)))
+                (for-each (lambda (whither)
+                            (let ((whither-label (hash-table-ref labels whither)))
+                              (write-edge whence-label whither-label)))
+                  whithers)))))
+        (write-dot-postscript)))))
+
 
 ;; 6\.10:1 ends here
