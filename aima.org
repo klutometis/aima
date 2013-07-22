@@ -7203,7 +7203,7 @@
                        (modified? #f))
         (if (null? points)
             (if modified?
-                (iter-point random-points #f)
+                (iter-point (shuffle random-points) #f)
                 (debug (hash-table->alist connections)))
             (let ((point (car points)))
               (let iter-counter-point
