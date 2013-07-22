@@ -60,6 +60,7 @@
 (define (write-map-as-dot map dot)
   (with-output-to-file dot
     (let ((points (hash-table-keys map)))
+          (edges (make-hash-table)))
       (lambda ()
         (write-dot-preamble)
         (let ((labels (make-labels points)))
@@ -72,8 +73,10 @@
             (lambda (whence whithers)
               (let ((whence-label (hash-table-ref labels whence)))
                 (for-each (lambda (whither)
-                            (let ((whither-label (hash-table-ref labels whither)))
-                              (write-edge whence-label whither-label)))
+                            (unless (hash-table-exists? edges (cons whither whence))
+                              (hash-table-set! edges (cons whence whither) #t)
+                              (let ((whither-label (hash-table-ref labels whither)))
+                                (write-edge whence-label whither-label))))
                   whithers)))))
         (write-dot-postscript)))))
 
