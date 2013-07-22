@@ -122,10 +122,11 @@
                                '())
                               (iter-point (cdr points) #t))))))))))))
 
-(let ((map (random-map 50))
 (define (random-element list)
   (list-ref list (random (length list))))
 
+
+(let ((map (random-map 10))
       (domains (make-hash-table))
       (constraints (make-hash-table)))
   (set-domains! domains (hash-table-keys map) '(red green blue yellow))
