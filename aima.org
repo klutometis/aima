@@ -7174,6 +7174,16 @@
         labels))
     
     (let ((random-points (random-points 10))
+    (define (intersects-other? connections point counter-point)
+      (call/cc
+       (lambda (return)
+         (hash-table-walk connections
+           (lambda (whence whithers)
+             (for-each (lambda (whither)
+                         (when (intersect? whence whither point counter-point)
+                           (return #t)))
+               whithers)))
+         (return #f))))
           (connections (make-hash-table)))
       ;; Randomize the random-points.
       (let iter-point ((points random-points)
