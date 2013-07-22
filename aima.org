@@ -7184,6 +7184,19 @@
                            (return #t)))
                whithers)))
          (return #f))))
+    
+    (define (shuffle! v)
+      (do ((n (vector-length v) (- n 1)))
+          ((zero? n) v)
+        (let* ((r (random n)) (t (vector-ref v r)))
+          (vector-set! v r (vector-ref v (- n 1)))
+          (vector-set! v (- n 1) t))))
+    
+    (define (shuffle list)
+      (let ((vector (list->vector list)))
+        (shuffle! vector)
+        (vector->list vector)))
+    
           (connections (make-hash-table)))
       ;; Randomize the random-points.
       (let iter-point ((points random-points)
