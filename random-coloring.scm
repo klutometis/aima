@@ -82,5 +82,41 @@
     (write-map-as-dot map dot)
     (run (neato -n1 -Tpng -o ,png < ,dot))))
 
+(define (random-map n)
+  (let ((random-points (random-points n))
+        (connections (make-hash-table)))
+    (let iter-point ((points random-points)
+                     (modified? #f))
+      (if (null? points)
+          (if modified?
+              (iter-point (shuffle random-points) #f)
+              connections)
+          (let ((point (car points)))
+            (let iter-counter-point
+                ((counter-points
+                  (sort-by-proximity point (delete point random-points))))
+              (if (null? counter-points)
+                  (iter-point (cdr points) modified?)
+                  (let ((counter-point (car counter-points)))
+                    (if (member point
+                                (hash-table-ref/default connections counter-point '()))
+                        (iter-counter-point (cdr counter-points))
+                        (if (intersects-other? connections point counter-point)
+                            (iter-counter-point (cdr counter-points))
+                            (begin
+                              (hash-table-update!/default
+                               connections
+                               point
+                               (lambda (counter-points)
+                                 (lset-adjoin eq? counter-points counter-point))
+                               '())
+                              (hash-table-update!/default
+                               connections
+                               counter-point
+                               (lambda (points)
+                                 (lset-adjoin eq? points point))
+                               '())
+                              (iter-point (cdr points) #t))))))))))))
+
 
 ;; 6\.10:1 ends here
