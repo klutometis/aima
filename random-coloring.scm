@@ -122,7 +122,23 @@
                                '())
                               (iter-point (cdr points) #t))))))))))))
 
-(write-map-as-png (random-map 100) "harro.png")
-(run (sxiv "harro.png"))
+(let ((map (random-map 50))
+      (domains (make-hash-table))
+      (constraints (make-hash-table)))
+  (set-domains! domains (hash-table-keys map) '(red green blue yellow))
+  (hash-table-walk map
+    (lambda (whence whithers)
+      (for-each (lambda (whither)
+                  (set-bidirectional-constraint!
+                   constraints
+                   whence
+                   whither
+                   neq?
+                   neq?))
+        whithers)))
+  (let ((solution (backtracking-search (make-csp domains constraints map))))
+    (when (success? solution)
+      (write-map-as-png map solution "harro.png")
+      (run (sxiv "harro.png")))))
 
 ;; 6\.10:1 ends here
