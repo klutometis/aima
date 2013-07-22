@@ -139,6 +139,15 @@
            whithers)))
      (return #t))))
 
+(define (min-conflicts csp)
+  (let ((assignment (hash-table-fold
+                     (csp-domains csp)
+                     (lambda (variable domain assignment)
+                       (hash-table-set! assignment variable (random-element domain))
+                       assignment)
+                     (make-hash-table))))
+    (debug (solution? assignment csp))
+    assignment))
 
 (let ((map (random-map 10))
       (domains (make-hash-table))
