@@ -164,7 +164,6 @@
     (debug (solution? assignment csp))
     assignment))
 
-(let ((map (random-map 10))
     (let iter ((variables (conflicted-variables assignment csp))
                (step (max-steps)))
       (cond ((null? variables) assignment)
@@ -209,6 +208,8 @@
                    (hash-table-set! assignment conflicted-variable min-conflicting-value)
                    (iter (conflicted-variables assignment csp) (sub1 step))))))))))
 
+
+(let ((map (random-map 50))
       (domains (make-hash-table))
       (constraints (make-hash-table)))
   (set-domains! domains (hash-table-keys map) '(red green blue yellow))
