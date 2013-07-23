@@ -217,6 +217,45 @@
              ,@(cdr expression)
              (vector-ref (##sys#stop-timer) 0)))))
 
+(with-output-to-file "random-coloring.csv"
+  (lambda ()
+    (format #t "n,minconflict,backtracking,forwardchecking~%")
+    (let iter ((n 2))
+      (let ((map (random-map n))
+            (domains (make-hash-table))
+            (constraints (make-hash-table)))
+        (set-domains! domains (hash-table-keys map) '(red green blue yellow))
+        (hash-table-walk map
+          (lambda (whence whithers)
+            (for-each (lambda (whither)
+                        (set-bidirectional-constraint!
+                         constraints
+                         whence
+                         whither
+                         neq?
+                         neq?))
+              whithers)))
+        (let ((csp (make-csp domains constraints map)))
+          (let ((min-conflicts-time
+                 (time (parameterize ((max-steps 100000)) (min-conflicts csp))))
+                ;; (backtracking-time
+                ;;  (time (parameterize ((inference (lambda x (make-hash-table))))
+                ;;          (backtracking-search csp))))
+                (backtracking-with-checking-time
+                 (time (backtracking-search csp))))
+            (format #t "~a,0,~a,~a~%" n min-conflicts-time backtracking-with-checking-time)
+            (debug min-conflicts-time ;; backtracking-time
+                   backtracking-with-checking-time))
+          ;; (let ((solution ;; (parameterize ((max-steps 10000)) (min-conflicts csp))
+          ;;        ;; (backtracking-search csp)
+          ;;        (parameterize ((inference (lambda x (make-hash-table))))
+          ;;          (backtracking-search csp))
+          ;;        ))
+          ;;   (unless (failure? solution)
+          ;;     (display-map-as-png map solution)
+          ;;     (debug (hash-table->alist solution))))
+          ))
+      (unless (> n 100) (iter (add1 n))))))
 
 ;; (let ((map (random-map 50))
 ;;       (domains (make-hash-table))
