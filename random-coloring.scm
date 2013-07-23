@@ -210,27 +210,6 @@
     (write-map-as-png map solution png)
     (run (sxiv ,png))))
 
-(let ((map (random-map 50))
-      (domains (make-hash-table))
-      (constraints (make-hash-table)))
-  (set-domains! domains (hash-table-keys map) '(red green blue yellow))
-  (hash-table-walk map
-    (lambda (whence whithers)
-      (for-each (lambda (whither)
-                  (set-bidirectional-constraint!
-                   constraints
-                   whence
-                   whither
-                   neq?
-                   neq?))
-        whithers)))
-  (let ((csp (make-csp domains constraints map)))
-    (let ((solution (parameterize ((max-steps 10000)) (min-conflicts csp))
-                    ;; (backtracking-search csp)
-                    ))
-      (unless (failure? solution)
-        (display-map-as-png map solution)
-        (debug (hash-table->alist solution))))))
 (define-syntax time
   (ir-macro-transformer
    (lambda (expression inject compare)
