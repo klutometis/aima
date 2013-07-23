@@ -1,0 +1,8 @@
+data <- read.csv('random-coloring.csv', header=T, sep=',')
+plot(minconflict ~ n, data, ylab='time', type='l', ylim=c(0, 20), col='blue')
+## par(new=T)
+## plot(backtracking ~ n, data, type='l', xlab='', ylab='')
+## par(new=F)
+lines(data$backtracking, col='red')
+lines(data$forwardchecking, col='green')
+legend(x=35, y=20, legend=c('Min-conflicts', 'Backtracking', 'Forward-checking'), col=c('blue', 'red', 'green'), lty=c(1, 1, 1))
