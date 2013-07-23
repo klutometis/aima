@@ -208,6 +208,10 @@
                    (hash-table-set! assignment conflicted-variable min-conflicting-value)
                    (iter (conflicted-variables assignment csp) (sub1 step))))))))))
 
+(define (display-map-as-png map solution)
+  (let ((png (create-temporary-file ".png")))
+    (write-map-as-png map solution png)
+    (run (sxiv ,png))))
 
 (let ((map (random-map 50))
       (domains (make-hash-table))
