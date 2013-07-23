@@ -225,12 +225,11 @@
                    neq?))
         whithers)))
   (let ((csp (make-csp domains constraints map)))
-    (debug (hash-table->alist (min-conflicts csp)))
-    ;; (let ((solution (backtracking-search csp)))
-    ;;   (when (success? solution)
-    ;;     (let ((png (create-temporary-file ".png")))
-    ;;       (write-map-as-png map solution png)
-    ;;       (run (sxiv ,png)))))
-    ))
+    (let ((solution (parameterize ((max-steps 10000)) (min-conflicts csp))
+                    ;; (backtracking-search csp)
+                    ))
+      (unless (failure? solution)
+        (display-map-as-png map solution)
+        (debug (hash-table->alist solution))))))
 
 ;; 6\.10:1 ends here
