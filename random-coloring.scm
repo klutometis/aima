@@ -161,9 +161,6 @@
                        (hash-table-set! assignment variable (random-element domain))
                        assignment)
                      (make-hash-table))))
-    (debug (solution? assignment csp))
-    assignment))
-
     (let iter ((variables (conflicted-variables assignment csp))
                (step (max-steps)))
       (cond ((null? variables) assignment)
