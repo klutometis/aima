@@ -165,6 +165,50 @@
     assignment))
 
 (let ((map (random-map 10))
+    (let iter ((variables (conflicted-variables assignment csp))
+               (step (max-steps)))
+      (cond ((null? variables) assignment)
+            ((zero? step) failure)
+            (else
+             (let ((conflicted-variable (random-element variables)))
+               (let ((neighbor-constraints
+                      (map (lambda (neighbor)
+                             (cons neighbor
+                                   (hash-table-ref
+                                    (csp-constraints csp)
+                                    (cons conflicted-variable neighbor))))
+                           (hash-table-ref (csp-neighbors csp) conflicted-variable)))
+                     (domain (hash-table-ref (csp-domains csp) conflicted-variable)))
+                 (let* ((value-conflicts
+                         (sort
+                          (map (lambda (value)
+                                 (cons value
+                                       (count (complement values)
+                                              (map (match-lambda
+                                                       ((neighbor . constraint)
+                                                        (constraint
+                                                         value
+                                                         (hash-table-ref
+                                                          assignment
+                                                          neighbor))))
+                                                   neighbor-constraints))))
+                               domain)
+                          <
+                          cdr))
+                        (min-conflict
+                         (cdar value-conflicts))
+                        (min-conflicts
+                         (take-while (lambda (conflict) (= (cdr conflict) min-conflict)) value-conflicts))
+                        (min-conflicting-value
+                         (car (random-element min-conflicts))))
+                   ;; (debug (hash-table->alist assignment)
+                   ;;        conflicted-variable
+                   ;;        value-conflicts
+                   ;;        min-conflicts
+                   ;;        min-conflicting-value)
+                   (hash-table-set! assignment conflicted-variable min-conflicting-value)
+                   (iter (conflicted-variables assignment csp) (sub1 step))))))))))
+
       (domains (make-hash-table))
       (constraints (make-hash-table)))
   (set-domains! domains (hash-table-keys map) '(red green blue yellow))
