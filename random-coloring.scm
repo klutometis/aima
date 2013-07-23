@@ -231,5 +231,12 @@
       (unless (failure? solution)
         (display-map-as-png map solution)
         (debug (hash-table->alist solution))))))
+(define-syntax time
+  (ir-macro-transformer
+   (lambda (expression inject compare)
+     `(begin (##sys#start-timer)
+             ,@(cdr expression)
+             (vector-ref (##sys#stop-timer) 0)))))
+
 
 ;; 6\.10:1 ends here
