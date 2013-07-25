@@ -2,16 +2,25 @@
 
 ;; [[file:~/prg/scm/aima/aima.org::*6.10][6\.10:1]]
 
-(use aima-tessellation
+(use ;; aima-tessellation
      aima-csp
+     call-with-environment-variables
      debug
+     define-record-and-printer
      files
+     format
      graphviz
      matchable
      random-bsd
      shell
      srfi-1
      srfi-95)
+
+(define-record-and-printer point x y)
+
+(define (point-distance p1 p2)
+  (sqrt (+ (expt (- (point-x p1) (point-x p2)) 2)
+           (expt (- (point-y p1) (point-y p2)) 2))))
 
 (define (counter-clockwise? a b c)
   (> (* (- (point-y c) (point-y a))
@@ -210,52 +219,49 @@
     (write-map-as-png map solution png)
     (run (sxiv ,png))))
 
-(define-syntax time
+(define-syntax time+value
   (ir-macro-transformer
    (lambda (expression inject compare)
      `(begin (##sys#start-timer)
-             ,@(cdr expression)
-             (vector-ref (##sys#stop-timer) 0)))))
+             (let ((value ,@(cdr expression)))
+               (values (vector-ref (##sys#stop-timer) 0) value))))))
 
-(with-output-to-file "random-coloring.csv"
-  (lambda ()
-    (format #t "n,minconflict,backtracking,forwardchecking~%")
-    (let iter ((n 2))
-      (let ((map (random-map n))
-            (domains (make-hash-table))
-            (constraints (make-hash-table)))
-        (set-domains! domains (hash-table-keys map) '(red green blue yellow))
-        (hash-table-walk map
-          (lambda (whence whithers)
-            (for-each (lambda (whither)
-                        (set-bidirectional-constraint!
-                         constraints
-                         whence
-                         whither
-                         neq?
-                         neq?))
-              whithers)))
-        (let ((csp (make-csp domains constraints map)))
-          (let ((min-conflicts-time
-                 (time (parameterize ((max-steps 100000)) (min-conflicts csp))))
-                ;; (backtracking-time
-                ;;  (time (parameterize ((inference (lambda x (make-hash-table))))
-                ;;          (backtracking-search csp))))
-                (backtracking-with-checking-time
-                 (time (backtracking-search csp))))
-            (format #t "~a,0,~a,~a~%" n min-conflicts-time backtracking-with-checking-time)
-            (debug min-conflicts-time ;; backtracking-time
-                   backtracking-with-checking-time))
-          ;; (let ((solution ;; (parameterize ((max-steps 10000)) (min-conflicts csp))
-          ;;        ;; (backtracking-search csp)
-          ;;        (parameterize ((inference (lambda x (make-hash-table))))
-          ;;          (backtracking-search csp))
-          ;;        ))
-          ;;   (unless (failure? solution)
-          ;;     (display-map-as-png map solution)
-          ;;     (debug (hash-table->alist solution))))
-          ))
-      (unless (> n 100) (iter (add1 n))))))
+(define (experiment name solution)
+  (let iter ((n 2))
+    (let ((map (random-map n))
+          (domains (make-hash-table))
+          (constraints (make-hash-table)))
+      (set-domains! domains (hash-table-keys map) '(red green blue yellow))
+      (hash-table-walk map
+        (lambda (whence whithers)
+          (for-each (lambda (whither)
+                      (set-bidirectional-constraint!
+                       constraints
+                       whence
+                       whither
+                       neq?
+                       neq?))
+            whithers)))
+      (let ((csp (make-csp domains constraints map)))
+        (call-with-values (lambda () (time+value (solution csp)))
+          (lambda (time value)
+            (unless (failure? value)
+              (let ((file (call-with-environment-variables
+                           '(("TMPDIR" . "random-coloring"))
+                           (lambda () (create-temporary-file)))))
+                (with-output-to-file file
+                  (lambda () (format #t "~a,~a,~a~%" name n time)))))
+            (debug name n time value)))))
+    (iter (add1 n))))
+
+;; (experiment "min-conflicts"
+;;             (parameterize ((max-steps 100000))
+;;               min-conflicts))
+;; (experiment "backtracking"
+;;             (parameterize ((inference (lambda x (make-hash-table))))
+;;               backtracking-search))
+(experiment "forward-checking"
+            backtracking-search)
 
 ;; (let ((map (random-map 50))
 ;;       (domains (make-hash-table))
