@@ -254,14 +254,14 @@
             (debug name n time value)))))
     (iter (add1 n))))
 
-;; (experiment "min-conflicts"
-;;             (parameterize ((max-steps 100000))
-;;               min-conflicts))
+(experiment "min-conflicts"
+            (parameterize ((max-steps 10000000))
+              min-conflicts))
 ;; (experiment "backtracking"
 ;;             (parameterize ((inference (lambda x (make-hash-table))))
 ;;               backtracking-search))
-(experiment "forward-checking"
-            backtracking-search)
+;; (experiment "forward-checking"
+;;             backtracking-search)
 
 ;; (let ((map (random-map 50))
 ;;       (domains (make-hash-table))
