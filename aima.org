@@ -7499,6 +7499,8 @@
   #+END_SRC
 
   See [[http://ktiml.mff.cuni.cz/~bartak/constraints/stochastic.html#MC][another explanation of min-conflicts]].
+
+  Make some observations, average them out.
 * TODO 6.17
   See [[http://ktiml.mff.cuni.cz/~bartak/constraints/nosearch.html][min-cutset heuristics]]; [[http://www.me.utexas.edu/~bard/IP/Handouts/cycles%0A][cycles in undirected graphs]].
 * Meetups
