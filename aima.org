@@ -7503,6 +7503,11 @@
   Make some observations, average them out.
 * TODO 6.17
   See [[http://ktiml.mff.cuni.cz/~bartak/constraints/nosearch.html][min-cutset heuristics]]; [[http://www.me.utexas.edu/~bard/IP/Handouts/cycles%0A][cycles in undirected graphs]].
+
+  Use partial information: order the nodes by cycles, do a
+  depth-first-search to identify whether the node is on a cycle; cache
+  the cycles for subsequent nodes? No: we have to identify whether
+  there are still cycles after deleting; don’t bother.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
