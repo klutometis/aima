@@ -7590,6 +7590,12 @@
              (hash-table->alist graph)))
     
   #+END_SRC
+
+  =Non-trivial-cycle?= that takes, e.g.: =graph=, =root=, =visited=;
+  if =root= has been visited, no; otherwise, commence =dfs=, etc. Do
+  this until cycle or no nodes left.
+
+  Damn, could use a =for-each-enumeration=.
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
