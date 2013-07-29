@@ -16,40 +16,6 @@
      srfi-1
      srfi-95)
 
-(define (make-labels points)
-  (let ((labels (make-hash-table)))
-    (for-each (lambda (point) (hash-table-set! labels point (gensym))) points)
-    labels))
-
-(define (write-map-as-dot map solution dot)
-  (with-output-to-file dot
-    (let ((points (hash-table-keys map))
-          (edges (make-hash-table)))
-      (lambda ()
-        (write-dot-preamble)
-        (let ((labels (make-labels points)))
-          (for-each (lambda (point)
-                      (write-node (hash-table-ref labels point)
-                                  (point-x point)
-                                  (point-y point)
-                                  (hash-table-ref solution point)))
-            points)
-          (hash-table-walk map
-            (lambda (whence whithers)
-              (let ((whence-label (hash-table-ref labels whence)))
-                (for-each (lambda (whither)
-                            (unless (hash-table-exists? edges (cons whither whence))
-                              (hash-table-set! edges (cons whence whither) #t)
-                              (let ((whither-label (hash-table-ref labels whither)))
-                                (write-edge whence-label whither-label))))
-                  whithers)))))
-        (write-dot-postscript)))))
-
-(define (write-map-as-png map solution png)
-  (let ((dot (create-temporary-file)))
-    (write-map-as-dot map solution dot)
-    (run (neato -n1 -Tpng -o ,png < ,dot))))
-
 (define (random-element list)
   (list-ref list (random (length list))))
 
@@ -132,11 +98,6 @@
                    (hash-table-set! assignment conflicted-variable min-conflicting-value)
                    (iter (conflicted-variables assignment csp) (sub1 step))))))))))
 
-(define (display-map-as-png map solution)
-  (let ((png (create-temporary-file ".png")))
-    (write-map-as-png map solution png)
-    (run (sxiv ,png))))
-
 (define-syntax time+value
   (ir-macro-transformer
    (lambda (expression inject compare)
@@ -175,36 +136,35 @@
 ;; (experiment "min-conflicts"
 ;;             (parameterize ((max-steps 10000000))
 ;;               min-conflicts))
-(experiment "backtracking"
-            (parameterize ((inference (lambda x (make-hash-table))))
-              backtracking-search))
+;; (experiment "backtracking"
+;;             (parameterize ((inference (lambda x (make-hash-table))))
+;;               backtracking-search))
 ;; (experiment "forward-checking"
 ;;             backtracking-search)
 
-;; (let ((map (random-map 50))
-;;       (domains (make-hash-table))
-;;       (constraints (make-hash-table)))
-;;   (set-domains! domains (hash-table-keys map) '(red green blue yellow))
-;;   (hash-table-walk map
-;;     (lambda (whence whithers)
-;;       (for-each (lambda (whither)
-;;                   (set-bidirectional-constraint!
-;;                    constraints
-;;                    whence
-;;                    whither
-;;                    neq?
-;;                    neq?))
-;;         whithers)))
-;;   (let ((csp (make-csp domains constraints map)))
-
-;;     (let ((solution (parameterize ((max-steps 10000)) (min-conflicts csp))
-;;            ;; (backtracking-search csp)
-;;            ;; (parameterize ((inference (lambda x (make-hash-table))))
-;;            ;;   (backtracking-search csp))
-;;            ))
-;;       (unless (failure? solution)
-;;         (display-map-as-png map solution)
-;;         (debug (hash-table->alist solution))))
-;;     ))
+(let ((map (random-map 10))
+      (domains (make-hash-table))
+      (constraints (make-hash-table)))
+  (set-domains! domains (hash-table-keys map) '(red green blue yellow))
+  (hash-table-walk map
+    (lambda (whence whithers)
+      (for-each (lambda (whither)
+                  (set-bidirectional-constraint!
+                   constraints
+                   whence
+                   whither
+                   neq?
+                   neq?))
+        whithers)))
+  (let ((csp (make-csp domains constraints map)))
+    (let ((solution (parameterize ((max-steps 10000)) (min-conflicts csp))
+           ;; (backtracking-search csp)
+           ;; (parameterize ((inference (lambda x (make-hash-table))))
+           ;;   (backtracking-search csp))
+           ))
+      (unless (failure? solution)
+        (display-map-as-png map solution)
+        (debug (hash-table->alist solution))))))
+    
 
 ;; 6\.10:1 ends here
