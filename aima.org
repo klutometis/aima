@@ -7523,10 +7523,7 @@
          debug
          srfi-95)
     
-    ;; (let ((map (random-map 10)))
-    ;;   (debug (hash-table->alist map)))
-    
-    (define graph
+    (define (australia)
       (alist->hash-table '((wa nt sa)
                            (nt wa sa)
                            (sa wa nt q nsw v)
@@ -7535,30 +7532,62 @@
                            (v nsw sa)
                            (t))))
     
-    (let (;; (graph (alist->hash-table '((a b d)
-          ;;                             (b a c)
-          ;;                             (c b d)
-          ;;                             (d c a))))
-          (visited (make-hash-table)))
-      (debug (sort (hash-table-keys graph) > (lambda (node) (length (hash-table-ref graph node)))))
-      (let iter ((nodes (hash-table-keys graph)))
-        (unless (null? nodes)
-          (let visit ((parent (car nodes))
-                      (path '()))
-            ;; (debug parent
-            ;;        path
-            ;;        (hash-table-ref/default visited parent #f))
-            (unless (hash-table-ref/default visited parent #f)
-              (hash-table-set! visited parent #t)
-              (for-each (lambda (child)
-                          ;; (debug child (hash-table-ref/default visited child #f))
-                          (when (and (hash-table-ref/default visited child #f)
-                                     (not (null? path))
-                                     (not (eq? child (car path))))
-                            (debug 'child-cycle parent child path))
-                          (visit child (cons parent path)))
-                (hash-table-ref/default graph parent '()))))
-          (iter (cdr nodes)))))
+    (define (visited? visited node)
+      (hash-table-ref/default visited node #f))
+    
+    (define (visited-set! visited node)
+      (hash-table-set! visited node #t))
+    
+    (define make-visited make-hash-table)
+    
+    (define (non-trivial-cycle? graph visited root)
+      (call/cc
+       (lambda (return)
+         (let visit ((parent root)
+                     (path '()))
+           (unless (visited? visited parent)
+             (visited-set! visited parent)
+             (for-each (lambda (child)
+                         (when (and (visited? visited child)
+                                    (not (null? path))
+                                    (not (eq? child (car path))))
+                           (return #t))
+                         (visit child (cons parent path)))
+               (graph-children graph parent))))
+         #f)))
+    
+    (define (sort-nodes-by-degree graph nodes)
+      (sort nodes > (lambda (node) (length (hash-table-ref graph node)))))
+    
+    (define graph-nodes hash-table-keys)
+    
+    (define (graph-children graph parent)
+      (hash-table-ref/default graph parent '()))
+    
+    ;;; Assuming that the graph is rigorously bidirectional.
+    (define (graph-remove! graph whence)
+      (let ((whithers (graph-children graph whence)))
+        (for-each (lambda (whither)
+                    (hash-table-update! graph whither (lambda (whences) (delete whence whences))))
+          whithers))
+      (hash-table-delete! graph whence))
+    
+    (define (cutset graph)
+      (let ((visited (make-visited)))
+        (let iter ((nodes (sort-nodes-by-degree graph (graph-nodes graph)))
+                   (cutset '()))
+          (if (null? nodes)
+              cutset
+              (let ((node (car nodes)))
+                (if (non-trivial-cycle? graph visited node)
+                    (begin
+                      (graph-remove! graph node)
+                      (iter (cdr nodes) (cons node cutset)))
+                    (iter (cdr nodes) cutset)))))))
+    
+    (let ((graph (random-map 10)))
+      (debug (length (cutset graph))
+             (hash-table->alist graph)))
     
   #+END_SRC
 * Meetups
