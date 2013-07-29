@@ -175,11 +175,11 @@
 ;; (experiment "min-conflicts"
 ;;             (parameterize ((max-steps 10000000))
 ;;               min-conflicts))
-;; (experiment "backtracking"
-;;             (parameterize ((inference (lambda x (make-hash-table))))
-;;               backtracking-search))
-(experiment "forward-checking"
-            backtracking-search)
+(experiment "backtracking"
+            (parameterize ((inference (lambda x (make-hash-table))))
+              backtracking-search))
+;; (experiment "forward-checking"
+;;             backtracking-search)
 
 ;; (let ((map (random-map 50))
 ;;       (domains (make-hash-table))
