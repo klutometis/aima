@@ -7,6 +7,7 @@
 
 (with-output-to-file "random-coloring-data.csv"
   (lambda ()
+    (format #t "index,n,time~%")
     (for-each
         (lambda (file)
           (match (string-split
