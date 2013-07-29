@@ -7501,6 +7501,11 @@
   See [[http://ktiml.mff.cuni.cz/~bartak/constraints/stochastic.html#MC][another explanation of min-conflicts]].
 
   Make some observations, average them out.
+
+  Should we do the experiment on a process-by-process basis to avoid
+  random garbage collection? Also, should stop any individual
+  experiment after a certain amount of time; some maps are nearly
+  insoluble, we should declare failure and move on.
 * TODO 6.17
   See [[http://ktiml.mff.cuni.cz/~bartak/constraints/nosearch.html][min-cutset heuristics]]; [[http://www.me.utexas.edu/~bard/IP/Handouts/cycles%0A][cycles in undirected graphs]].
 
