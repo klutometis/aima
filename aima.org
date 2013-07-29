@@ -7521,6 +7521,7 @@
   #+BEGIN_SRC scheme
     (use aima-csp
          debug
+         list-utils
          srfi-95)
     
     (define (australia)
@@ -7573,11 +7574,12 @@
       (hash-table-delete! graph whence))
     
     (define (cutset graph)
-      (let ((visited (make-visited)))
+      (let ((graph (hash-table-copy graph))
+            (visited (make-visited)))
         (let iter ((nodes (sort-nodes-by-degree graph (graph-nodes graph)))
                    (cutset '()))
           (if (null? nodes)
-              cutset
+              (values cutset graph)
               (let ((node (car nodes)))
                 (if (non-trivial-cycle? graph visited node)
                     (begin
@@ -7585,9 +7587,40 @@
                       (iter (cdr nodes) (cons node cutset)))
                     (iter (cdr nodes) cutset)))))))
     
-    (let ((graph (random-map 10)))
-      (debug (length (cutset graph))
-             (hash-table->alist graph)))
+    (define (subgraph graph nodes)
+      (let ((subgraph (make-hash-table)))
+        (for-each
+            (lambda (node)
+              (debug node (hash-table-keys graph))
+              (hash-table-set!
+               subgraph
+               node
+               (lset-intersection eq? nodes (hash-table-ref graph node))))
+          nodes)
+        subgraph))
+    
+    (let ((graph (random-map 20)))
+      (call-with-values (lambda () (cutset graph))
+        (lambda (cutset complement)
+          (let ((subgraph (subgraph graph cutset)))
+            (debug (length cutset)
+                   (hash-table->alist graph)
+                   (hash-table->alist subgraph))
+            (let ((nodes (hash-table-keys graph)))
+              (display-map-as-png
+               graph
+               (alist->hash-table
+                (zip-alist nodes
+                           (map (lambda (node)
+                                  (if (hash-table-exists? subgraph node)
+                                      'yellow
+                                      'blue))
+                                nodes))))
+              (display-map-as-png
+               complement
+               (alist->hash-table
+                (zip-alist (graph-nodes complement)
+                           (make-list (length (graph-nodes complement)) 'blue)))))))))
     
   #+END_SRC
 
