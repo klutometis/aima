@@ -8,5 +8,7 @@ ggplot(data=data, aes(x=n, y=time, col=index)) +
   scale_color_discrete(name="Method",
                        labels=c("Backtracking",
                          "Foward checking",
-                         "Min-conflicts"))
+                         "Min-conflicts")) +
+  scale_x_continuous(name="n") +
+  scale_y_continuous(name="Time (s)")
 dev.off()
