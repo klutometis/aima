@@ -7517,6 +7517,50 @@
   Partial info: depth first from highest node; cycles? No: continue
   depth first from all unvisited nodes; yes? Remove. Somehow to
   capture this notion of continuing to the next node.
+
+  #+BEGIN_SRC scheme
+    (use aima-csp
+         debug
+         srfi-95)
+    
+    ;; (let ((map (random-map 10)))
+    ;;   (debug (hash-table->alist map)))
+    
+    (define graph
+      (alist->hash-table '((wa nt sa)
+                           (nt wa sa)
+                           (sa wa nt q nsw v)
+                           (q nt sa nsw)
+                           (nsw q sa v)
+                           (v nsw sa)
+                           (t))))
+    
+    (let (;; (graph (alist->hash-table '((a b d)
+          ;;                             (b a c)
+          ;;                             (c b d)
+          ;;                             (d c a))))
+          (visited (make-hash-table)))
+      (debug (sort (hash-table-keys graph) > (lambda (node) (length (hash-table-ref graph node)))))
+      (let iter ((nodes (hash-table-keys graph)))
+        (unless (null? nodes)
+          (let visit ((parent (car nodes))
+                      (path '()))
+            ;; (debug parent
+            ;;        path
+            ;;        (hash-table-ref/default visited parent #f))
+            (unless (hash-table-ref/default visited parent #f)
+              (hash-table-set! visited parent #t)
+              (for-each (lambda (child)
+                          ;; (debug child (hash-table-ref/default visited child #f))
+                          (when (and (hash-table-ref/default visited child #f)
+                                     (not (null? path))
+                                     (not (eq? child (car path))))
+                            (debug 'child-cycle parent child path))
+                          (visit child (cons parent path)))
+                (hash-table-ref/default graph parent '()))))
+          (iter (cdr nodes)))))
+    
+  #+END_SRC
 * Meetups
 ** Mon Jun 11 2012
    - Had to redefine the rational from "exercizing reason" to
