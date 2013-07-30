@@ -7521,7 +7521,9 @@
   #+BEGIN_SRC scheme
     (use aima-csp
          debug
+         files
          list-utils
+         shell
          srfi-95)
     
     (define (australia)
@@ -7574,24 +7576,23 @@
       (hash-table-delete! graph whence))
     
     (define (cutset graph)
-      (let ((graph (hash-table-copy graph))
-            (visited (make-visited)))
+      (let ((graph (hash-table-copy graph)))
         (let iter ((nodes (sort-nodes-by-degree graph (graph-nodes graph)))
-                   (cutset '()))
+                   (cutset '())
+                   (visited (make-visited)))
           (if (null? nodes)
               (values cutset graph)
               (let ((node (car nodes)))
                 (if (non-trivial-cycle? graph visited node)
                     (begin
                       (graph-remove! graph node)
-                      (iter (cdr nodes) (cons node cutset)))
-                    (iter (cdr nodes) cutset)))))))
+                      (iter (cdr nodes) (cons node cutset) (make-visited)))
+                    (iter (cdr nodes) cutset visited)))))))
     
     (define (subgraph graph nodes)
       (let ((subgraph (make-hash-table)))
         (for-each
             (lambda (node)
-              (debug node (hash-table-keys graph))
               (hash-table-set!
                subgraph
                node
@@ -7599,28 +7600,100 @@
           nodes)
         subgraph))
     
-    (let ((graph (random-map 20)))
+    (define (compare-graph-and-complement-as-png graph subgraph complement-graph)
+      (let ((nodes (hash-table-keys graph))
+            (complement-nodes (hash-table-keys complement-graph))
+            (graph-png (create-temporary-file ".png"))
+            (complement-png (create-temporary-file ".png"))
+            (comparison-png (create-temporary-file ".png")))
+        (write-map-as-png
+         graph
+         (alist->hash-table
+          (zip-alist nodes
+                     (map (lambda (node)
+                            (if (hash-table-exists? subgraph node)
+                                'yellow
+                                'blue))
+                          nodes)))
+         graph-png)
+        (write-map-as-png
+         complement-graph
+         (alist->hash-table
+          (zip-alist complement-nodes
+                     (make-list (length complement-nodes) 'blue)))
+         complement-png)
+        (run (convert ,graph-png ,complement-png -append ,comparison-png "&&"
+                      sxiv ,comparison-png)))  )
+    
+    (define (make-csp-from-map map)
+      (let ((domains (make-hash-table))
+            (constraints (make-hash-table)))
+        (set-domains! domains
+                      (hash-table-keys map)
+                      '(red green blue yellow))
+        (hash-table-walk map
+          (lambda (whence whithers)
+            (for-each (lambda (whither)
+                        (set-bidirectional-constraint!
+                         constraints
+                         whence
+                         whither
+                         neq?
+                         neq?))
+              whithers)))
+        (make-csp domains constraints map)))
+    
+    (let* ((graph (random-map 40))
+           (csp (make-csp-from-map graph)))
       (call-with-values (lambda () (cutset graph))
-        (lambda (cutset complement)
-          (let ((subgraph (subgraph graph cutset)))
-            (debug (length cutset)
-                   (hash-table->alist graph)
-                   (hash-table->alist subgraph))
-            (let ((nodes (hash-table-keys graph)))
-              (display-map-as-png
-               graph
-               (alist->hash-table
-                (zip-alist nodes
-                           (map (lambda (node)
-                                  (if (hash-table-exists? subgraph node)
-                                      'yellow
-                                      'blue))
-                                nodes))))
-              (display-map-as-png
-               complement
-               (alist->hash-table
-                (zip-alist (graph-nodes complement)
-                           (make-list (length (graph-nodes complement)) 'blue)))))))))
+        (lambda (cutset complement-graph)
+          (let ((complement-csp (make-csp-from-map complement-graph)))
+            (let* ((subgraph (subgraph graph cutset))
+                   (subcsp (make-csp-from-map subgraph))
+                   (subsolution (backtracking-search subcsp)))
+              (call/cc (lambda (return)
+                         (for-each
+                             (lambda (subsolution)
+                               (let ((complement-csp (csp-copy complement-csp)))
+                                 (for-each (lambda (complement-node)
+                                             (let ((neighbors (lset-intersection
+                                                               eq?
+                                                               (hash-table-ref graph complement-node)
+                                                               cutset)))
+                                               (for-each
+                                                   (lambda (neighbor)
+                                                     (let ((constraint (hash-table-ref
+                                                                        (csp-constraints csp)
+                                                                        (cons complement-node neighbor)))
+                                                           (neighbor-value
+                                                            (hash-table-ref subsolution neighbor)))
+                                                       (let ((domain (filter (lambda (value)
+                                                                               ;; (debug value
+                                                                               ;;        neighbor-value
+                                                                               ;;        (constraint value neighbor-value))
+                                                                               (constraint value neighbor-value))
+                                                                             (hash-table-ref
+                                                                              (csp-domains complement-csp)
+                                                                              complement-node))))
+                                                         (hash-table-set! (csp-domains complement-csp)
+                                                                          complement-node
+                                                                          domain))))
+                                                 neighbors)))
+                                   (graph-nodes complement-graph)))
+                               ;; (debug (length cutset)
+                               ;;        (hash-table->alist graph)
+                               ;;        (hash-table->alist subgraph))
+                               ;; (compare-graph-and-complement-as-png graph subgraph complement-graph)
+                               ;; (display-map-as-png subgraph (backtracking-search subcsp))
+                               (debug ;; (hash-table->alist (csp-domains complement-csp))
+                                      (backtracking-search complement-csp))
+                               (display-map-as-png graph (hash-table-merge subsolution (backtracking-search complement-csp)))
+                               ;; (display-map-as-png graph (hash-table-merge subsolution (backtracking-search complement-csp)))
+                               )
+                           (backtracking-enumeration 10 subcsp))))
+               ;; (display-map-as-png complement-graph
+               ;;                     (backtracking-search (make-csp-from-map complement-graph)))
+               )))))
     
   #+END_SRC
 
