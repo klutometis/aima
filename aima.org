@@ -7643,6 +7643,9 @@
               whithers)))
         (make-csp domains constraints map)))
     
+    (define (random-element list)
+      (list-ref list (random (length list))))
+    
     (let* ((graph (random-map 40))
            (csp (make-csp-from-map graph)))
       (call-with-values (lambda () (cutset graph))
@@ -7651,7 +7654,9 @@
             (let* ((subgraph (subgraph graph cutset))
                    (subcsp (make-csp-from-map subgraph))
                    (subsolution (backtracking-search subcsp)))
-              (call/cc (lambda (return)
+              ;; (compare-graph-and-complement-as-png graph subgraph complement-graph)       
+              ;; (display-map-as-png subgraph (backtracking-search subcsp))
+       (call/cc (lambda (return)
                          (for-each
                              (lambda (subsolution)
                                (let ((complement-csp (csp-copy complement-csp)))
@@ -7679,15 +7684,27 @@
                                                                           complement-node
                                                                           domain))))
                                                  neighbors)))
-                                   (graph-nodes complement-graph)))
-                               ;; (debug (length cutset)
+                                   (graph-nodes complement-graph))
+                                                            ;; (debug (length cutset)
                                ;;        (hash-table->alist graph)
                                ;;        (hash-table->alist subgraph))
-                               ;; (compare-graph-and-complement-as-png graph subgraph complement-graph)
-                               ;; (display-map-as-png subgraph (backtracking-search subcsp))
-                               (debug ;; (hash-table->alist (csp-domains complement-csp))
-                                      (backtracking-search complement-csp))
-                               (display-map-as-png graph (hash-table-merge subsolution (backtracking-search complement-csp)))
+                               (let ((solution (backtracking-search complement-csp)))
+                                 (display-map-as-png
+                                  complement-graph
+                                  (alist->hash-table
+                                   (hash-table-map (csp-domains complement-csp)
+                                                   (lambda (variable domain)
+                                                     (cons variable (if (null? domain)
+                                                                        'black
+                                                                        (if (= (length domain) 1)
+                                                                            (car domain)
+                                                                            ;; (random-element domain)
+                                                                            'white)))))))
+                                 (debug solution (hash-table->alist (csp-domains complement-csp)))
+                                 (when (success? solution)
+                                   (display-map-as-png graph (hash-table-merge subsolution (backtracking-search complement-csp)))
+                                   (return))))
+    
                                ;; (display-map-as-png graph (hash-table-merge subsolution (backtracking-search complement-csp)))
                                )
                            (backtracking-enumeration 10 subcsp))))
