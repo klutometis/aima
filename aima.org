@@ -9602,6 +9602,46 @@
        combined
      - Value symmetry
      - Symmetry-breaking constraint
+** 7
+   - We develop logic as a genaral class of representations to support
+     knowledge-based agents.
+   - Knowledge base
+   - Sentences
+   - Knowledge representation language
+   - Axiom
+   - Tell, ask; inference
+   - The conclusion is guaranteed to be correct if the available
+     information is correct.
+   - Syntax, semantics: truth of each sentence w.r.t. each possible
+     world.
+   - Model, “possible world”
+   - If sentence \alpha is true in model $m$, we say that $m$
+     satisfies \alpha; $m$ is a model of \alpha.
+   - $M(\alpha)$, the set of all models of \alpha
+   - Logical entailment, a sentences follows logically: $\alpha
+     \models \beta$; $\alpha \models \beta iff M(\alpha) \subseteq
+     M(\beta)$.
+   - Stronger assertion: rules out more possible worlds
+   - These percepts, combined with an agent’s knowledge of the rules
+     of the wumpus world, constitute the KB.
+   - The KB is false in models that contradict what the agent knows.
+   - \alpha_1 = “There is no pit in [1,2].” \alpha_2 = “There is no
+     pit in [2,2].” Hence, KB \models \alpha_1; KB \nmodels \alpha_2.
+   - Model checking: $M(KB) \subseteq M(\alpha)$
+   - If an inference algorithm $i$ can derive \alpha from KB,
+     $KB\vdash_i \alpha$: “\alpha is derived from KB by $i$”, “$i$
+     derives $\alpha$ from KB.”
+   - Inference algorithm that derives only entailed sentences, sound
+     or truth-preserving.
+   - Completeness: inference algorithm complete derive any sentence
+     that is entailed.
+   - If KB is true is the real world, then any sentence \alpha
+     derived from KB by a sound inference procedure is also true in
+     the real world.
+   - “The world is everything that is the case.”
+   - Grounding: the connection between logical reasoning processes
+     and the real environment in which the agent exists.
+   - General rules, learning
 ** Lectures
 *** 1
     - AI: mapping from sensors to actuators
