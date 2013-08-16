@@ -9642,6 +9642,36 @@
    - Grounding: the connection between logical reasoning processes
      and the real environment in which the agent exists.
    - General rules, learning
+   - Syntax, allowable sentences; atomic sentences: a single
+     proposition symbol.
+   - The semantics for propositional logic must specify how to compute
+     the truth value of any sentence, given a model. This is done
+     recursively.
+   - Atomic sentences: True is true in every model, &c.
+     - [The biconditional is like exclusive nor (XAND); $P \to Q$
+       unless $P$ and $\neg Q$.]
+   - Latin /aut/!
+   - $B_{1,1} \equiv (P_{1,2} \vee P_{2,1})$
+   - Sentences:
+     #+BEGIN_EXAMPLE
+       R1: \neg P_{1,1}
+       R2: B_{1,1} \equiv (P_{1,2} \vee P_{2,1})
+       . . .
+       R4: \neg B_{1,1}
+     #+END_EXAMPLE
+   - With seven symbols, there are $2^7 = 128$ possible models; in
+     three of these KB is tree. In those three models, $\neg P_{1,2}$
+     is true, hence there is no pit in $[1,2]$. On the other hand
+     $P_{2,2}$ is true in two of the three models and false in one, so
+     we cannot yet tell whether there is a pit in $[2,2]$.
+   - Model checking: enumerating models and showing that the sentence
+     must hold in all models.
+   - Vs. theorem proving: applying rules of inference directly to the
+     sentences in our knowledge base to construct a proof of the
+     desired sentence without consulting models.
+   - Logical equivalence: $a \equiv b iff a \models b and b \models
+     a$.
+   - $a \models b iff a \equiv b$: check $a \equiv b$ in every model 
 ** Lectures
 *** 1
     - AI: mapping from sensors to actuators
@@ -9832,6 +9862,8 @@
      - Partially mapped crossover (PMX): selects two random cut points
        . . .
 * TODOs
+** TODO Wumpus-world web service
+   “Give me a 3x3 . . .”
 ** DONE 6.1
    CLOSED: [2013-06-28 Fri 01:14]
    [[http://en.wikipedia.org/wiki/Graph_coloring#Bounds_on_the_chromatic_number][Chromatic number]]: clique number is the lower bound; [[http://en.wikipedia.org/wiki/Graph_coloring#Chromatic_polynomial][chromatic
