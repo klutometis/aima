@@ -9671,7 +9671,62 @@
      desired sentence without consulting models.
    - Logical equivalence: $a \equiv b iff a \models b and b \models
      a$.
-   - $a \models b iff a \equiv b$: check $a \equiv b$ in every model 
+   - $a \models b iff a \to b$: check $a \to b$ in every model 
+   - Satisfiability: sentence true in some model
+   - The SAT problem: satisfiability of sentences, NP complete
+   - Constraint satisfaction: satisfiability problem
+   - $\alpha$ is valid iff $\neg \alpha$ is unsatisfiable
+   - $a \entails b$ iff $a \land \neg b$ is unsatisfiable: $reductio
+     ad absurdum$
+   - One assumes $b$ to be false and shows that this leads to a
+     contradiction with know $a$.
+   - Proof: chain of conclusions that leads to the desired goal. Modus
+     ponens: $a \to b, b; \therefore a$.
+   - $a \land b \therefore a$.
+   - We found this proof by hand, but we can apply any of the search
+     algorithms in Chapter 3 to find a sequence of steps that
+     constitutes a proof.
+   - Initial state: knowledge base; actions: inference rules applied;
+     result: add the sentence in the bottom half of the inference;
+     goal: state that contains the sentence we are trying to prove.
+   - Finding a proof can be more efficient because the proof can
+     ignore irrelevant propositions.
+   - Monotonicity: entailed sentences can only increase as information
+     is added to the knowledge base.
+   - If $KB \entails a$ then $KB \land b \entails a$.
+   - Completeness: iterative deepening complete, if inferences rules
+     are inadequate, the goal is not reachable.
+   - Resolution, yields a complete inference algorithm when coupled
+     with any complete search algorithm.
+   - $\neg P_{2,2}$ resolves with $P_{2,2}$ in $R_15$ to give the
+     resolvent R_16: $P_{1,1} \lor P_{3.1}$.
+   - Unit resolution inference rule: complementary literals;
+*** Shannon, A Mathematical Theory of Communication
+    - The fundamental problem of communication is that of reproducing
+      at one point either exactly or approximately a message selected
+      at another point. Frequencly the messages have meaning; that is
+      they refer to or are correlated according to some system with
+      certain physical or conceptual entities. The significant aspect
+      is that the actual message is one selected from a set of
+      possible messages.
+    - Logarithm: practical, intuitive, suitable.
+    - $C = log X_0$, where $C$ is the capacity of a discrete channel.
+    - We have represented a discrete information source as a Markoff
+      process.
+    - H should be continuous in the p_i (p. 392).
+    - If all the p_i are equal, p_i = 1 / n, H should be a monotonic
+      increasing function of n.
+    - If a choice be broken down into two successive choices, the
+      original H should be the weighted sum of the individual values
+      of H.
+    - $H = -K\Sum_{i=1}^n p_i log p_i$, where K is a positive
+      constant.
+    - $H$ is the $H$ in Boltzmann’s famous $H$ theorem.
+      - Entropy related to the number of distinguishable macrostates.
+    - $H = 0$ iff all the p_i but on are zero (p. 394).
+    - For a given n, H is a maximum and equal to log n when all the
+      p_i are equal.
+    - $H = \Sum P_i H_i$
 ** Lectures
 *** 1
     - AI: mapping from sensors to actuators
