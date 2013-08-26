@@ -9722,6 +9722,138 @@
      to produce a new clause
    - Resolution-based theorem prover can, for sentences $a$ and $b$ in
      propositional logic, decide whether $a \entails b$.
+   - Factoring: removing duplicates
+   - Resolution: $P_{1,1} \lor P_{3,1}, \neg P_{1,1} \lor \neg P_{2,2}
+     \therefore \P_{3,1} \lor \neg P_{2,2}$
+   - Resolution applies to clauses: disjunctions of literals
+   - Every sentence of propositional logic is logically equivalent to
+     a conjunction of clauses
+   - Resolution algorithm: to show that $KB \entails a$, show that $KB
+     \land \neg a$ is unsatisfiable.
+   - $KB \land \neg a$ is converted into CNF; resolution is applied to
+     the resulting clauses.
+   - Each pair that contains complementary literals is resolved to
+     produce a new clause, which is added to the set if it is not
+     already present.
+   - Either: there are no new clauses that can be added: $KB$ does not
+     entail $a$; or two clauses resolve to yeld the empty clause, in
+     which case $KB$ entails $a$.
+   - The empty clause, disjunction of no disjuncts, is false.
+   - The empty clause arises from resolving two complementary unit
+     clauses such as $P$ and $\neg P$.
+   - Ground resolution theorem: if a set of clauses is unsatisfiable,
+     then the resolution closuer of those clauses contains the empty
+     clause.
+   - Definite clause: disjunction of literals of which exactly one is
+     positive.
+   - Horn clause: disjunctions of literals of which at most one is
+     positive.
+   - Goal clauses: clauses with no positive literals.
+   - Horn clauses are closed under resolution: if you resolve two Horn
+     clauses, you get back a Horn clause.
+   - Every definite clause can be written as an implication whose
+     premise is a conjuction of positive literals and whose conclusion
+     is a single positive literal.
+   - In Horn form, the premise is called the /body/ and the conclusion
+     is called the /head/.
+   - A sentence consisting of a single positive literal is called a
+     /fact/.
+   - It can be written as $True \to L_{1,1}$.
+   - k-CNF: where each clause has at most $k$ literals.
+   - Inference with Horn clauses can be done through forward-chaining
+     and backward-chaining.
+   - Deciding entailment with Horn clauses can be done in time linear
+     in the size of the knowledge base.
+   - $pl-fc-entails?(KB, q)$ determines if a single proposition symbol
+     $q$ is entailed by a knowledge base of definite clauses.
+   - It begins from known facts; if all the premises of an implication
+     are known, then its conclusion as added to the set of known facts.
+   - Continues until $q$ is added or no further inferences can be made.
+   - Backward chaining: goal-directed reasoning; and-or graph search.
+   - Forward chaining: data-driven reasoning; Wumpus agent might
+     =tell= its percepts to the knowledge base using an incremental
+     forward-chaining algorithm in which new facts can be added to the
+     agenda to initiate now inferences.
+   - Checking satisfiability: the SAT problem.
+   - Based on backtracking, based on hill-climbing
+   - Connection between finding a satisfying model for a logical
+     sentence and finding a solution for a constraint satisfaction problem
+   - So many combinatorial problems in computer science can be reduced
+     to checking the satisfiability of a propositional sentence
+   - Davis-Putnam algorithm:
+     - Early termination
+     - Pure symbol heuristic
+     - Unit clause heuristic: unit propagation
+   - Scale SAT solvers:
+     - Component analysis (Tasmania)
+     - Variable and value ordering (degree heuristic)
+     - Intelligent backtracking (conflict clause learning)
+     - Random restarts
+     - Clever indexing (set of clauses in which $X_i$ appears as a
+       positive literal)
+   - =walk-sat=: picks an unsatisfied claue and picks a symbol to
+     flip; chooses between: min-conflict and random-walk for flipping
+     a symbol
+   - When =walk-sat= returns a model: satisfiable; failure:
+     unsatisfiable or not enough time.
+   - =walk-sat= is useful when we expect a solution to exist.
+   - n-queens is underconstrained
+   - An underconstrained problem is one with relatively few clauses
+     constraining the variables.
+   - Overconstrained: many clauses relative to the number of variables
+     and is likely to have no solutions
+   - $CNF_k(m, n)$: $k$-CNF cause whith $m$ clauses and $n$ symbols.
+   - Satisfiability threshold conjecture: for every $k \geq 3$, there
+     is a threshold ratio $r_k$ such that, as $n$ goes to infinity,
+     the probability that $CNF_k(n, rn)$ is satisfiablie becomes 1 for
+     all values fo $r$ below the threshold, and 0 for all values above.
+   - The probability drops fairly sharply around $m/n = 4.3$.
+   - Cliff stays in place for $k = 3$ and gets sharper and sharper as
+     $n$ increases.
+   - Deduce the state of the world given its percept history: writing
+     down logical model of the effects of actions
+   - Agent can keep track of the world efficiently without going back
+     into the percept history for each inference.
+   - Use logical inference to construct plans that are guaranteed to
+     achieve its goals.
+   - Logical agent operates by deducing what to do from a knowledge
+     base of sentences about the world.
+   - Knowledge base composed of axioms and percepts.
+   - Deducing the current state of the wumpus world: where am I, is
+     that square safe, &c.
+   - Agent knows rules for pits and wumpi
+   - Percept asserts something only about the current time
+   - =kb-agent=, =make-percept-sentence=
+   - $stench^4$, $\neg stench^3$
+   - $L^0_{1,1}$: agent is in square $[1,1]$ at time 0.
+   - Fluent: aspect of world that changes (state variable)
+   - Atemporal variables
+   - Location fluent: time step $t$ and square $[x, y]$:
+     - $L_{x,y}^t \to (Breeze^t \equiv B_{x,y})$
+     - $L_{x,y}^t \to (Stench^t \equiv S_{x,y})$
+   - Fluents change as a result of actions: transition model
+   - Proposition symbols, occurrences of actions: $forward^0$
+   - Effect axioms: specify the outcome of an action at the next time
+     step:
+     - $L_{1,1}^0 \land east^0 \land forward^0 \to (L_{2,1}^1 \land
+       \neg L_{1,1}^1$
+   - E.g. =ask(kb, L_{2,1}^1)= is true; =ask(kb, arrow^1)= is false:
+     effect axiom fails to state what remains unchanged as the result
+     of an action.
+   - The /frame problem/; add frame axioms explicitly asserting all
+     the propositions that remain the same:
+     - $forward^4 \to (havearrow^t \equiv havearrow^{t+1})
+     - $forward^4 \to (wumpusalive^t \equiv wumpusalive^{t+1})
+     - . . .
+   - Frame axioms of size $O(mn)$
+   - Representational frame problem
+   - Locality: action changes no more than some small number $k$ of
+     fluents
+   - Transition model with $O(mk)$ axioms
+   - Inferential frame problem: project forward the results of a $t$
+     step plan: $O(kt)$ rather than $O(nt)$.
+   - Changing one’s focus from writing axioms about actions to writing
+     axioms about fluents
 *** Shannon, A Mathematical Theory of Communication
     - The fundamental problem of communication is that of reproducing
       at one point either exactly or approximately a message selected
