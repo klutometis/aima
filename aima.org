@@ -9863,7 +9863,41 @@
    - $OK^t \equiv \neg P_{x,y} \and \neg (W_{x,y} \land WumpusAlive^t)$
    - Qualification problem: specifying enumerable exceptions that an
      action has a certain effect.
-   - Hybrid agent: deduce aspects
+   - Hybrid agent: deduce aspects of the state of the world:
+     condition-action rules, problem solving algorithms from chs. 3
+     and 4.
+   - Agent maintains and updates a knowledge base as well as a current
+     plan.
+   - Initial knowledge base contains atemporal axioms: those that
+     don’t depend on $t$; and relate the breeziness of squares to the
+     presence of pits.
+   - At each $t$, new percept sentence added along with all the axioms
+     that depend on $t$, such as the successor-state axioms.
+   - Agent uses logical inference, by =asking= questions of the
+     knowledge base to work out which square are safe and have yet to
+     be visited.
+   - Constructs plan based on a decreasing priority of goals.
+   - If glitter, plan to grab gold, follow route back, climb out.
+   - Otherwise, no current plan, program plans a route to the closest
+     safe square not visited yet.
+   - Route planning is done with $A^*$, not with =ask=.
+   - If there are no safe squares, try to make a safe square by
+     shooting at one of the possible wumpus locations: asking where
+     $ask(KB, \neg W_{x,y})$ is false, where it is not known that
+     there is not a wumpus.
+   - =plan-shot= uses =plan-route= to plan a sequence of actions that
+     will line up the shot. If it fails, looks for a square that is
+     not provably unsafe: $ask(KB, \neg OK^t_{x,y})$ is false. If no
+     square, retreats to $[1, 1]$ and leaves.
+   - As time goes by, computational expense in =ask= goes up.
+   - Constant update time independent of $t$; cache the results of
+     inference.
+   - Belief state: updating the belief state as new percepts arrive:
+     state estimation: $WumpusAlive^1 \land L^1_{2,1} \land B_{2,1}
+     \land (P_{3,1} \lor P_{2,2})$.
+   - If $n$ fluent symbols, $2^n$ physical states.
+   - Belief states, powerset of all subsets: $2^2^n$ belief states.
+   - 
 *** Shannon, A Mathematical Theory of Communication
     - The fundamental problem of communication is that of reproducing
       at one point either exactly or approximately a message selected
