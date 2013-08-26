@@ -9854,6 +9854,16 @@
      step plan: $O(kt)$ rather than $O(nt)$.
    - Changing one’s focus from writing axioms about actions to writing
      axioms about fluents
+   - Successor-state axiom: $F^{t+1} \equiv ActionCausesF^t \lor (F^t
+     \land \neg ActionCausesNotF^t$
+   - $HaveArrow^{t+1} \equiv (HaveArrow^t \land \neg Shoot^t)
+   - $L^{t+1}_{1,1} \equiv (L^t_{1,1} \land (\neg Forward^t \lor
+     Bump^{t+1})) \lor (L^t_{1,2} \land (South^t \land Forward^t))
+     \lor (L^t_{2,1} \land (West^t \land Forward^t))$
+   - $OK^t \equiv \neg P_{x,y} \and \neg (W_{x,y} \land WumpusAlive^t)$
+   - Qualification problem: specifying enumerable exceptions that an
+     action has a certain effect.
+   - Hybrid agent: deduce aspects
 *** Shannon, A Mathematical Theory of Communication
     - The fundamental problem of communication is that of reproducing
       at one point either exactly or approximately a message selected
