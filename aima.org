@@ -9701,6 +9701,27 @@
    - $\neg P_{2,2}$ resolves with $P_{2,2}$ in $R_15$ to give the
      resolvent R_16: $P_{1,1} \lor P_{3.1}$.
    - Unit resolution inference rule: complementary literals;
+     - Biconditional elimination: rules of inference, propositional
+       logic: infer a conditional from a biconditional. $P
+       \leftrightarrow Q$ gives $P \to Q$, $Q \to P$.
+   - And-elimination
+   - Logical equivalence for contrapositives
+   - We can apply any of the search algorithms in Chapter 3 to find a
+     sequence of stops that constitutes a proof:
+     - Initial state :: knowledge base
+     - Actions :: Inference rules applied to all the sentences that
+                  match the top half of the inference rule
+     - Result :: Add the sentence in the bottom half of the inference rule
+     - Goal :: State that contains the sentence we are trying to
+               prove.
+   - Resolution: yields a complete inference algorithm when coupled
+     with any complete search algorithm.
+   - A literal resolves with the literal to giv eth resolvent . . .
+   - Unit resolution inference rule
+   - Complementary literals: unit resolution takes clause and literal
+     to produce a new clause
+   - Resolution-based theorem prover can, for sentences $a$ and $b$ in
+     propositional logic, decide whether $a \entails b$.
 *** Shannon, A Mathematical Theory of Communication
     - The fundamental problem of communication is that of reproducing
       at one point either exactly or approximately a message selected
