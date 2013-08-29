@@ -9897,7 +9897,21 @@
      \land (P_{3,1} \lor P_{2,2})$.
    - If $n$ fluent symbols, $2^n$ physical states.
    - Belief states, powerset of all subsets: $2^2^n$ belief states.
-   - 
+   - Approximate state-representation: belief states as conjunctions
+     of literals, that is, 1-CNF formulas.
+   - Tries to prove $X^t$ and $\neg X^t$ for each symbol $X^t$ (as
+     well as each atemporal symbol whose truth value is not yet
+     known), given the belief state at $t - 1$.
+   - 1-CNF, conservative approximation; outer envelope around exact
+     belief state.
+   - Uses A* to make plans.
+   - Signifcant difference between the requirements for entailment (as
+     tested by Ask) and those for satisfiability.
+   - Needs preconditions
+   - Action exclusion axioms
+   - For any practical agent, these phrases have to be implemented by
+     code that generates instances of general sentence schema
+     automatically for insertion into the knowledge base.
 *** Shannon, A Mathematical Theory of Communication
     - The fundamental problem of communication is that of reproducing
       at one point either exactly or approximately a message selected
