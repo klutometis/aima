@@ -7991,6 +7991,9 @@
    - Expanding frontier
 ** Mon May  6 2013
    Plot the number of possible moves over $n$ games.
+** Mon Sep 16 2013
+   - Store as trees, e.g. lisp-expressions; not opaque like lambdas,
+     need to access the variables.
 * Notes
 ** 1
    - Two dimensions: thought vs. action, humanity vs. rationality.
