@@ -7723,8 +7723,10 @@
   #+BEGIN_SRC scheme
     (use alist-lib
          debug
+         define-record-and-printer
          filepath
          http-client
+         irregex
          medea
          srfi-1
          uri-common)
@@ -7766,6 +7768,43 @@
     (define (read-url-json url)
       (read-url url read-json))
     
+    (define-record-and-printer maybe)
+    (define maybe (make-maybe))
+    
+    (define-record-and-printer state breeze stench pit wumpus)
+    
+    (define (update-world! world x y state-sense-set! state-thing-set!)
+      (hash-table-update!/default world
+                                  (cons x y)
+                                  (lambda (state)
+                                    (state-sense-set! state #t)
+                                    state)
+                                  (make-state #f #f #f #f))
+      (hash-table-update!/default world
+                                  (cons (+ x 1) y)
+                                  (lambda (state)
+                                    (state-thing-set! state maybe)
+                                    state)
+                                  (make-state #f #f #f #f))
+      (hash-table-update!/default world
+                                  (cons (- x 1) y)
+                                  (lambda (state)
+                                    (state-thing-set! state maybe)
+                                    state)
+                                  (make-state #f #f #f #f))
+      (hash-table-update!/default world
+                                  (cons x (+ y 1))
+                                  (lambda (state)
+                                    (state-thing-set! state maybe)
+                                    state)
+                                  (make-state #f #f #f #f))
+      (hash-table-update!/default world
+                                  (cons x (- y 1))
+                                  (lambda (state)
+                                    (state-thing-set! state maybe)
+                                    state)
+                                  (make-state #f #f #f #f))  )
+    
     (parameterize ((token "1055751675"))
       (let* ((new-board-id
               (read-url (new-board-url)))
@@ -7777,12 +7816,22 @@
                 (actions (list (forward-url) (left-url) (right-url))))
             (let iter ((status (read-url-json (status-url)))
                        (time 0))
-              (unless (string=? (alist-ref status '|Action Senses|) "Dead")
-                (if (member "Glitter" (vector->list (alist-ref status '|Cell Senses|)) string=?)
-                    (debug (read-url-json grab-url))
-                    (debug (read-url-json (list-ref actions (random (length actions))))))
-                (iter (read-url-json (status-url))
-                      (add1 time))))))))
+              (if (or (string=? (alist-ref status '|Action Senses|) "Dead")
+                      (string=? (alist-ref status '|Action Senses|) "Game Over"))
+                  (debug (hash-table->alist world))
+                  (let ((position (irregex-match '(: alpha #\( (=> x (+ num)) #\, (=> y (+ num)) #\))
+                                                 (alist-ref status '|Actor State|))))
+                    (let ((x (string->number (irregex-match-substring position 'x)))
+                          (y (string->number (irregex-match-substring position 'y))))
+                      (when (member "Breeze" (vector->list (alist-ref status '|Cell Senses|)) string=?)
+                        (update-world! world x y state-breeze-set! state-pit-set!))
+                      (when (member "Stench" (vector->list (alist-ref status '|Cell Senses|)) string=?)
+                        (update-world! world x y state-stench-set! state-wumpus-set!)) 
+                      (if (member "Glitter" (vector->list (alist-ref status '|Cell Senses|)) string=?)
+                          (debug (read-url-json grab-url))
+                          (debug (read-url-json (list-ref actions (random (length actions)))))))
+                    (iter (read-url-json (status-url))
+                          (add1 time)))))))))
     
   #+END_SRC
 * Meetups
