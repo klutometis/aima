@@ -7721,22 +7721,69 @@
   Damn, could use a =for-each-enumeration=.
 * TODO 7
   #+BEGIN_SRC scheme
-    (use debug
+    (use alist-lib
+         debug
          filepath
          http-client
+         medea
+         srfi-1
          uri-common)
     
-    (define token (make-parameter "1055751675"))
+    (define token (make-parameter (get-environment-variable "TOKEN")))
+    (define board-id (make-parameter (get-environment-variable "BOARD_ID")))
+    (define game-id (make-parameter (get-environment-variable "GAME_ID")))
     
     (define base-url (make-parameter (uri-reference "http://wumpusworldserver.com")))
     
-    (define (add-token url)
-      )
+    (define (add-token uri) (update-uri uri query: `((token . ,(token)))))
     
-    (define new-board-url (make-parameter (filepath:path-join (base-url) "api/board/new")))
+    (define (new-board-url)
+      (update-uri (base-url) path: '("" "api" "board" "new" "5" "5")))
     
     (define (new-game-url board-id)
-      )
+      (update-uri (base-url) path: (list "" "api" "board" board-id "game" "new")))
+    
+    (define (action-url action)
+      (update-uri (base-url) path: (list "" "api" "board" (board-id) "game" (game-id) action)))
+    
+    (define (status-url) (action-url "status"))
+    (define (forward-url) (action-url "forward"))
+    (define (left-url) (action-url "left"))
+    (define (right-url) (action-url "right"))
+    (define (shoot-url) (action-url "shoot"))
+    (define (grab-url) (action-url "grab"))
+    
+    (define read-url
+      (case-lambda
+       ((url)
+        (read-url url read))
+       ((url read)
+        (with-input-from-request
+         (add-token url)
+         #f
+         read))))
+    
+    (define (read-url-json url)
+      (read-url url read-json))
+    
+    (parameterize ((token "1055751675"))
+      (let* ((new-board-id
+              (read-url (new-board-url)))
+             (new-game-id
+              (read-url (new-game-url new-board-id))))
+        (parameterize ((board-id new-board-id)
+                       (game-id new-game-id))
+          (let ((world (make-hash-table))
+                (actions (list (forward-url) (left-url) (right-url))))
+            (let iter ((status (read-url-json (status-url)))
+                       (time 0))
+              (unless (string=? (alist-ref status '|Action Senses|) "Dead")
+                (if (member "Glitter" (vector->list (alist-ref status '|Cell Senses|)) string=?)
+                    (debug (read-url-json grab-url))
+                    (debug (read-url-json (list-ref actions (random (length actions))))))
+                (iter (read-url-json (status-url))
+                      (add1 time))))))))
+    
   #+END_SRC
 * Meetups
 ** Mon Jun 11 2012
