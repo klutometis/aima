@@ -7719,7 +7719,12 @@
   this until cycle or no nodes left.
 
   Damn, could use a =for-each-enumeration=.
-* TODO 7
+* TODO Logical agents
+  The [[http://aima-python.googlecode.com/svn/trunk/logic.py][Python]] version is excellently documented: what, for instance,
+  CNF entails; not to mention the [[http://www.cs.berkeley.edu/~russell/code/doc/overview-LOGIC.html][Lisp]] one.
+
+  See [[http://w3.sista.arizona.edu/classes/ista450/spring13/projects/wumpus/][Arizona]].
+* TODO Random agent against wumpusworldserver.com
   #+BEGIN_SRC scheme
     (use alist-lib
          debug
