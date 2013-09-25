@@ -7723,7 +7723,21 @@
   The [[http://aima-python.googlecode.com/svn/trunk/logic.py][Python]] version is excellently documented: what, for instance,
   CNF entails; not to mention the [[http://www.cs.berkeley.edu/~russell/code/doc/overview-LOGIC.html][Lisp]] one.
 
-  See [[http://w3.sista.arizona.edu/classes/ista450/spring13/projects/wumpus/][Arizona]].
+  See [[http://w3.sista.arizona.edu/classes/ista450/spring13/projects/wumpus/][Arizona]]; see [[http://en.wikipedia.org/wiki/Satisfiability][satisfiability]]:
+
+  #+BEGIN_QUOTE
+  In mathematical logic, satisfiability and validity are elementary
+  concepts of semantics. A formula is satisfiable if it is possible
+  to find an interpretation (model) that makes the formula true. A
+  formula is valid if all interpretations make the formula true. The
+  opposites of these concepts are unsatisfiability and invalidity,
+  that is, a formula is unsatisfiable if none of the interpretations
+  make the formula true, and invalid if some such interpretation
+  makes the formula false.
+  #+END_QUOTE
+
+  Let’s understand Norvig’s =build-truth-table=, therefore
+  =compute-truth-entries=, =all-truth-interpretations=, &c.
 * TODO Random agent against wumpusworldserver.com
   #+BEGIN_SRC scheme
     (use alist-lib
