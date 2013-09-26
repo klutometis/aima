@@ -7800,7 +7800,29 @@
   #+END_SRC
 
   =Ands= that result from e.g. distribution or De Morgan’s should
-  become additional clauses instead of =and=-clauses.
+  become additional clauses instead of =and=-clauses; that way, the
+  representation is a list of literals (positive or negative).
+
+  From Gomes:
+
+  #+BEGIN_QUOTE
+  When every clause of F has k literals, we refer to F as a k-CNF
+  formula. The SAT problem restricted to 2-CNF formulas is solvable in
+  polynomial time, while for 3-CNF formulas, it is already
+  NP-complete.
+  #+END_QUOTE
+
+  Can we restrict ourselves to 2- or 3-CNF? Further Gomes:
+
+  #+BEGIN_QUOTE
+  For a partial assignment ρ for a CNF formula F, F|ρ denotes the
+  simplified formula obtained by replacing the variables appearing in
+  ρ with their specified values, removing all clauses with at least
+  one TRUE literal, and deleting all occurrences of FALSE literals
+  from the remaining clauses.
+  #+END_QUOTE
+
+  That sort of behavior depends or conjunction.
 * TODO Random agent against wumpusworldserver.com
   #+BEGIN_SRC scheme
     (use alist-lib
