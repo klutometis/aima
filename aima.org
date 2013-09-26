@@ -7763,6 +7763,41 @@
   Can we have [[http://en.wikipedia.org/wiki/Negation_normal_form][elementary propositions]] which are composite: e.g. breeze
   at time 0 in square $(x, y)$?
 
+  #+BEGIN_SRC scheme
+    (use debug
+         matchable)
+    
+    (define (->cnf formula)
+      (match formula
+        ;; ((? symbol? p) p)
+        ;; De Morgan's over `and'
+        (('not ('and . ps))
+         (->cnf `(or ,@(map (lambda (p) (->cnf `(not ,(->cnf p)))) ps))))
+        ;; De Morgan's over `or'.
+        (('not ('or . ps))
+         (->cnf `(and ,@(map (lambda (p) (->cnf `(not ,(->cnf p)))) ps))))
+        ;; Eliminate the conditional.
+        (('=> p q)
+         (->cnf `(or ,(->cnf `(not ,(->cnf p)))
+                     ,(->cnf q))))
+        ;; Eliminate the biconditional.
+        (('<=> p q)
+         (->cnf `(and ,(->cnf `(or ,(->cnf p) ,(->cnf `(not ,(->cnf q)))))
+                      ,(->cnf `(or ,(->cnf `(not ,(->cnf q))) ,(->cnf p))))))
+        ;; Double negative
+        (('not ('not p)) (->cnf p))
+        ;; Distribution of conjuction over disjunction
+        (('or p ('and . qs))
+         (->cnf `(and ,@(map (lambda (q) (->cnf `(or ,(->cnf p) ,(->cnf q)))) qs))))
+        ;; Literals
+        (p p)))
+    
+    (debug (->cnf '(not (or p (=> q r))))
+           (->cnf '(not (and p q)))
+           (->cnf '(=> p q))
+           (->cnf '(<=> p q))
+           (->cnf '(or p (and q r s))))
+  #+END_SRC
 * TODO Random agent against wumpusworldserver.com
   #+BEGIN_SRC scheme
     (use alist-lib
