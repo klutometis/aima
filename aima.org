@@ -7798,6 +7798,9 @@
            (->cnf '(<=> p q))
            (->cnf '(or p (and q r s))))
   #+END_SRC
+
+  =Ands= that result from e.g. distribution or De Morgan’s should
+  become additional clauses instead of =and=-clauses.
 * TODO Random agent against wumpusworldserver.com
   #+BEGIN_SRC scheme
     (use alist-lib
