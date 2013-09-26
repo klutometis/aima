@@ -7752,7 +7752,17 @@
     - Deduction cannot necessarily be fully automated.
   #+END_QUOTE
 
-  Let’s do [[http://en.wikipedia.org/wiki/DPLL_algorithm][DPLL]]? See this [[http://www.cs.rochester.edu/u/kautz/Courses/444au2010/program-sat-solver.html][assignment]].
+  Let’s do [[http://en.wikipedia.org/wiki/DPLL_algorithm][DPLL]]? See this [[http://www.cs.rochester.edu/u/kautz/Courses/444au2010/program-sat-solver.html][assignment]]; also, [[http://en.wikipedia.org/wiki/Unit_propagation][unit propagation]]: based on
+  CNF where clauses are disjunctions.
+
+  [[http://en.wikipedia.org/wiki/Conjunctive_normal_form][CNF]] is a “conjuction of clauses, where a clause is a disjunction of
+  literals.” [[http://en.wikipedia.org/wiki/DPLL_algorithm][DPLL]] is for CNF-SAT. “There exist transformations into
+  CNF that avoid an exponential increase in size by preserving
+  satisfiability rather than equivalence” (i.e. equisatisfiability).
+
+  Can we have [[http://en.wikipedia.org/wiki/Negation_normal_form][elementary propositions]] which are composite: e.g. breeze
+  at time 0 in square $(x, y)$?
+
 * TODO Random agent against wumpusworldserver.com
   #+BEGIN_SRC scheme
     (use alist-lib
