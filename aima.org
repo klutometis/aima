@@ -7738,6 +7738,21 @@
 
   Let’s understand Norvig’s =build-truth-table=, therefore
   =compute-truth-entries=, =all-truth-interpretations=, &c.
+
+  See this [[http://www-i2.informatik.rwth-aachen.de/i2/fileadmin/user_upload/pictures/Hybrid_Systems/Lectures/SATChecking/sat3a_propositional.pdf][high-level overview]]:
+
+  #+BEGIN_QUOTE
+  - Question: Is φ satisfiable? (Is ¬φ valid?)
+  - Complexity: NP-Complete (Cook’s theorem)
+  - Two classes of algorithms for finding out:
+    - Enumeration of possible solutions (Truth tables etc.)
+    - Deduction
+  - More generally (beyond propositional logic):
+    - Enumeration is possible only in some logics.
+    - Deduction cannot necessarily be fully automated.
+  #+END_QUOTE
+
+  Let’s do [[http://en.wikipedia.org/wiki/DPLL_algorithm][DPLL]]? See this [[http://www.cs.rochester.edu/u/kautz/Courses/444au2010/program-sat-solver.html][assignment]].
 * TODO Random agent against wumpusworldserver.com
   #+BEGIN_SRC scheme
     (use alist-lib
