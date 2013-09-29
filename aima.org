@@ -7823,6 +7823,64 @@
   #+END_QUOTE
 
   That sort of behavior depends or conjunction.
+
+  Take a look at Norvig’s =->cnf=, by the way:
+
+  #+BEGIN_SRC lisp
+    (defun ->cnf (p &optional vars)
+      "Convert a sentence p to conjunctive normal form [p 279-280]."
+      ;; That is, return (and (or ...) ...) where 
+      ;; each of the conjuncts has all literal disjuncts.
+      ;; VARS is a list of universally quantified variables that P is in scope of.
+      (setf p (eliminate-implications (logic p)))
+      (case (op p)
+        (NOT (let ((p2 (move-not-inwards (arg1 p))))
+           (if (literal-clause? p2) p2 (->cnf p2 vars))))
+        (AND (conjunction (mappend #'(lambda (q) (conjuncts (->cnf q vars)))
+                    (args p))))
+        (OR  (merge-disjuncts (mapcar #'(lambda (q) (->cnf q vars))
+                      (args p))))
+        (FORALL (let ((new-vars (mapcar #'new-variable  (mklist (arg1 p)))))
+           (->cnf (sublis (mapcar #'cons  (mklist (arg1 p)) new-vars)
+                  (arg2 p))
+              (append new-vars vars))))
+        (EXISTS (->cnf (skolemize (arg2 p) (arg1 p) vars) vars))
+        (t   p) ; p is atomic
+        ))
+  #+END_SRC
+
+  He also has a minimal version:
+
+  #+BEGIN_SRC lisp
+    (defun ->minimal-cnf (sentence)
+      "Convert a logical sentence to minimal CNF (no and/or connectives)."
+      ;; E.g., (and (or P (not Q) R) S) becomes ((P (not Q) R) (S))
+      ;; Everything internal in the FOL module uses minimal-cnf
+      ;; Only tell, retract, and ask-* use the regular logical form.
+      (mapcar #'disjuncts (conjuncts (->cnf sentence))))
+  #+END_SRC
+
+  He eliminates implications first, so =->cnf= can do its work; has
+  =move-not-inwards= in its own function (and which handles e.g. =#t=
+  and =#f=); has =merge-disjuncts=, which does some magic (e.g.
+  becomes =#f= without arguments). He’s sensitive at every stage to
+  returning e.g. =nil= when conjoining =#t=, =nil= when disjoining
+  =#f=.
+
+  =merge-disjuncts= is distributing conjunction over disjunction,
+  isn’t it?
+
+  This is an interesting case, and shows that our version isn’t quite
+  sufficient:
+
+  #+BEGIN_SRC lisp
+    (->cnf '(AND (OR B (AND C (OR M N) F) D) (OR W(AND P (OR Q(AND X Y) X A)))))
+    
+    (AND (OR B C D) (OR B M N D) (OR B F D) (OR W P) (OR W Q X X A) (OR W Q Y X A))
+  #+END_SRC
+
+  This is the meaning of =merge-disjuncts=, etc.; our primitive
+  pattern matching isn’t sufficient.
 * TODO Random agent against wumpusworldserver.com
   #+BEGIN_SRC scheme
     (use alist-lib
