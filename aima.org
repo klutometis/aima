@@ -7881,6 +7881,39 @@
 
   This is the meaning of =merge-disjuncts=, etc.; our primitive
   pattern matching isn’t sufficient.
+
+  #+BEGIN_SRC scheme
+    (use debug)
+    
+    
+  #+END_SRC
+
+  For the time being, let’s assume the input is CNF; we’ll write a
+  robust =->cnf= later.
+
+  The input to DPLL is a single formula F; therefore, the world is
+  just a conjunct of disjuncts.
+
+  See [[http://www.mpi-inf.mpg.de/~sofronie/lecture-ar-09/slides/lecture-14-may.pdf][here]]:
+
+  #+BEGIN_QUOTE
+  - Unit clause ($N$ contains a clause $C$ such that all literals but
+    one in $C$ are false under $A$)
+  - Unit literal ($N$ contains a clause $C$ such that all literals but
+    one in $C$ are false under $A$)
+  - Pure literal (occurs only positively (or only negatively))
+  #+END_QUOTE
+
+  Can we therefore simply delete false literals? And can we delete
+  clauses after assigning true? Yes (as we saw above):
+
+  #+BEGIN_QUOTE
+  For a partial assignment ρ for a CNF formula F, F|ρ denotes the
+  simplified formula obtained by replacing the variables appearing in
+  ρ with their specified values, removing all clauses with at least
+  one TRUE literal, and deleting all occurrences of FALSE literals
+  from the remaining clauses.
+  #+END_QUOTE
 * TODO Random agent against wumpusworldserver.com
   #+BEGIN_SRC scheme
     (use alist-lib
