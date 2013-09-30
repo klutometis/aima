@@ -7884,29 +7884,35 @@
 
   #+BEGIN_SRC scheme
     (use debug
+         matchable
          srfi-1)
     
     (define (satisfy formula)
-      (let ((all-variables (all-variables formula)))
-        (let ((clauses (clauses formula))
-              (assignment '()))
+      (let* ((clauses (map clauses (clauses formula)))
+             (all-variables (all-variables clauses)))
+        (let iter ((clauses clauses)
+                   (assignment '()))
           (call-with-values (lambda () (propagate-unit-clauses clauses assignment))
             (lambda (clauses assignment)
               (cond ((exists-empty-clause? clauses) #f)
                     ;; This is where we'd do some dynamic shit and maybe a
                     ;; call-cc.
-                    ((null? formula) (debug assignment) #t)
+                    ((null? clauses) (debug assignment) #t)
                     (else
                      (let ((variable (select-variable all-variables assignment)))
-                       (or (iter (simplify formula variable)
+                       (or (iter (simplify clauses variable)
                                  (cons variable assignment))
-                           (iter (simplify formula (negate variable))
+                           (iter (simplify clauses (negate variable))
                                  (cons (negate variable) assignment)))))))))))
     
-    (define clauses cdr)
+    (define (clauses formula)
+      (match formula
+        (('and . conjuncts) conjuncts)
+        (('or . disjuncts) disjuncts)
+        (p (list p))))
     
     (define (select-variable all-variables assignment)
-      (let ((candidates (lset-difference eq? all-variables (variables assigment))))
+      (let ((candidates (lset-difference eq? all-variables (variables assignment))))
         (list-ref candidates (random (length candidates)))))
     
     (define (propagate-unit-clauses clauses assignment)
@@ -7917,7 +7923,7 @@
             (let ((unit-literals (unit-literals clauses)))
               (if (null? unit-literals)
                   (values clauses assignment)
-                  (iter (simpify* clauses unit-literals)
+                  (iter (simplify* clauses unit-literals)
                         (append unit-literals assignment)))))))
     
     (define (simplify clauses literal)
@@ -7933,12 +7939,50 @@
       (filter (lambda (clause) (not (memq variable clause))) clauses))
     
     (define (unit-clauses clauses)
-      (filter (lambda (clause) (= (length clause) 1))))
+      (filter (lambda (clause) (= (length clause) 1)) clauses))
     
     (define (unit-literals clauses)
       (map car (unit-clauses clauses)))
     
+    (define (variable literal)
+      (match literal
+        (('not p) p)
+        (p p)))
     
+    (define (variables clauses)
+      (map variable clauses))
+    
+    (define (negative? literal)
+      (match literal
+        (('not p) #t)
+        (_ #f)))
+    
+    (define (exists-empty-clause? clauses)
+      (if (null? clauses)
+          #f
+          (if (null? (car clauses))
+              #t
+              (exists-empty-clause? (cdr clauses)))))
+    
+    (define (simplify* clauses literals)
+      (fold-right (lambda (literal clauses)
+                    (simplify clauses literal))
+                  clauses
+                  literals))
+    
+    (define (negate literal)
+      `(not ,literal))
+    
+    (define (all-variables clauses)
+      (delete-duplicates
+       (fold-right
+        (lambda (clause all-variables)
+          (append (variables clause) all-variables))
+        '()
+        clauses)))
+    
+    (satisfy '(and s (not s)))
+    (satisfy '(and s))
   #+END_SRC
 
   For the time being, let’s assume the input is CNF; we’ll write a
