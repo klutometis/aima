@@ -7888,6 +7888,7 @@
          srfi-1)
     
     (define (satisfy formula)
+      (debug formula)
       (let* ((clauses (map clauses (clauses formula)))
              (all-variables (all-variables clauses)))
         (let iter ((clauses clauses)
@@ -7981,8 +7982,75 @@
         '()
         clauses)))
     
+    (define (->cnf formula)
+      ;; (debug formula)
+      (match formula
+        ;; ((? symbol? p) p)
+        ;; De Morgan's over `and'
+        (('not ('and . ps))
+         (->cnf `(or ,@(map (lambda (p) (->cnf `(not ,(->cnf p)))) ps))))
+        ;; De Morgan's over `or'.
+        (('not ('or . ps))
+         (->cnf `(and ,@(map (lambda (p) (->cnf `(not ,(->cnf p)))) ps))))
+        ;; Eliminate the conditional.
+        (('=> p q)
+         (->cnf `(or ,(->cnf `(not ,(->cnf p)))
+                     ,(->cnf q))))
+        ;; Eliminate the biconditional.
+        (('<=> p q)
+         (->cnf `(and ,(->cnf `(or ,(->cnf p) ,(->cnf `(not ,(->cnf q)))))
+                      ,(->cnf `(or ,(->cnf `(not ,(->cnf q))) ,(->cnf p))))))
+        ;; Double negative
+        (('not ('not p)) (->cnf p))
+        ;; Distribution of conjuction over disjunction
+        (('or p ('and . qs))
+         (->cnf `(and ,@(map (lambda (q) (->cnf `(or ,(->cnf p) ,(->cnf q)))) qs))))
+        ;; Literals
+        (p p)))
+    
+    (define (tell knowledge-base p)
+      (append knowledge-base (clauses (->cnf p))))
+    
+    (define (tell* knowledge-base . ps)
+      (fold-right (lambda (p knowledge-base)
+                    ;; (debug p (->cnf p))
+                    (tell knowledge-base (->cnf p)))
+                  knowledge-base
+                  ps))
+    
+    (let ((knowledge-base '()))
+      (satisfy
+       (tell* knowledge-base
+              '(and (not s11)
+                    (not s21)
+                    s12
+                    (not b11)
+                    b21
+                    (not b12))
+              '(=> (not s11) (and (not w11)
+                                  (not w12)
+                                  (not w13)))
+              '(=> (not s21) (and (not w11)
+                                  (not w21)
+                                  (not w22)
+                                  (not w31)))
+              '(=> (not s12) (and (not w11)
+                                  (not w12)
+                                  (not w22)
+                                  (not w13)))
+              '(=> s12 (or w13
+                           w12
+                           w22
+                           w11)))))
+    
     (satisfy '(and s (not s)))
     (satisfy '(and s))
+    (satisfy '(AND (OR W13 W12 W22 W11) (OR S12 (NOT W11)) (OR S12 (NOT W12))
+                   (OR S12 (NOT W22)) (OR S12 (NOT W13)) (OR S21 (NOT W11))
+                   (OR S21 (NOT W21)) (OR S21 (NOT W22)) (OR S21 (NOT W31))
+                   (OR S11 (NOT W11)) (OR S11 (NOT W12)) (OR S11 (NOT W13)) (NOT S11)
+                   (NOT S21) S12 (NOT B11) B21 (NOT B12)))
+    
   #+END_SRC
 
   For the time being, let’s assume the input is CNF; we’ll write a
