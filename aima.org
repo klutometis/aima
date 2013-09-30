@@ -7883,7 +7883,60 @@
   pattern matching isn’t sufficient.
 
   #+BEGIN_SRC scheme
-    (use debug)
+    (use debug
+         srfi-1)
+    
+    (define (satisfy formula)
+      (let ((all-variables (all-variables formula)))
+        (let ((clauses (clauses formula))
+              (assignment '()))
+          (call-with-values (lambda () (propagate-unit-clauses clauses assignment))
+            (lambda (clauses assignment)
+              (cond ((exists-empty-clause? clauses) #f)
+                    ;; This is where we'd do some dynamic shit and maybe a
+                    ;; call-cc.
+                    ((null? formula) (debug assignment) #t)
+                    (else
+                     (let ((variable (select-variable all-variables assignment)))
+                       (or (iter (simplify formula variable)
+                                 (cons variable assignment))
+                           (iter (simplify formula (negate variable))
+                                 (cons (negate variable) assignment)))))))))))
+    
+    (define clauses cdr)
+    
+    (define (select-variable all-variables assignment)
+      (let ((candidates (lset-difference eq? all-variables (variables assigment))))
+        (list-ref candidates (random (length candidates)))))
+    
+    (define (propagate-unit-clauses clauses assignment)
+      (let iter ((clauses clauses)
+                 (assignment assignment))
+        (if (exists-empty-clause? clauses)
+            (values clauses assignment)
+            (let ((unit-literals (unit-literals clauses)))
+              (if (null? unit-literals)
+                  (values clauses assignment)
+                  (iter (simpify* clauses unit-literals)
+                        (append unit-literals assignment)))))))
+    
+    (define (simplify clauses literal)
+      (let ((variable (variable literal)))
+        (if (negative? literal)
+            (remove-variable clauses variable)
+            (filter-clauses clauses variable))))
+    
+    (define (remove-variable clauses variable)
+      (map (lambda (clause) (delete variable clause)) clauses))
+    
+    (define (filter-clauses clauses variable)
+      (filter (lambda (clause) (not (memq variable clause))) clauses))
+    
+    (define (unit-clauses clauses)
+      (filter (lambda (clause) (= (length clause) 1))))
+    
+    (define (unit-literals clauses)
+      (map car (unit-clauses clauses)))
     
     
   #+END_SRC
