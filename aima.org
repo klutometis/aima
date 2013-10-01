@@ -7892,14 +7892,16 @@
       (debug formula)
       (let* ((clauses (map clauses (clauses formula)))
              (all-variables (all-variables clauses)))
+        (debug clauses)
         (let iter ((clauses clauses)
                    (assignment '()))
           (call-with-values (lambda () (propagate-unit-clauses clauses assignment))
             (lambda (clauses assignment)
+              (debug clauses assignment)
               (cond ((exists-empty-clause? clauses) #f)
                     ;; This is where we'd do some dynamic shit and maybe a
                     ;; call-cc.
-                    ((null? clauses) (debug assignment) #t)
+                    ((null? clauses) assignment #t)
                     (else
                      (let ((variable (select-variable all-variables assignment)))
                        (or (iter (simplify clauses variable)
@@ -8022,7 +8024,7 @@
          `(or ,@(map move-not-inwards ps)))
         (('or . ps)
          `(and ,@(map move-not-inwards ps)))
-        (p p)))
+        (p `(not ,p))))
     
     (define (merge-disjuncts clauses)
       (case (length clauses)
@@ -8044,7 +8046,8 @@
     (define (->cnf formula)
       (let ((formula (eliminate-implications formula)))
         (match formula
-          (('not p) (move-not-inwards p))
+          (('not p) (let ((q (move-not-inwards p)))
+                      (if (literal-clause? q) q (->cnf q))))
           (('and . ps)
            `(and ,@(append-map (lambda (p) (conjuncts (->cnf p))) ps)))
           (('or . ps)
@@ -8056,46 +8059,46 @@
     
     (define (tell* knowledge-base . ps)
       (fold-right (lambda (p knowledge-base)
-                    (debug p (->cnf p))
+                    ;; (debug p (->cnf p))
                     (tell knowledge-base (->cnf p)))
                   knowledge-base
                   ps))
     
-    ;; (let ((knowledge-base '()))
-    ;;   (satisfy
-    ;;    (tell* knowledge-base
-    ;;           '(and (not s11)
-    ;;                 (not s21)
-    ;;                 s12
-    ;;                 (not b11)
-    ;;                 b21
-    ;;                 (not b12))
-    ;;           '(=> (not s11) (and (not w11)
-    ;;                               (not w12)
-    ;;                               (not w13)))
-    ;;           '(=> (not s21) (and (not w11)
-    ;;                               (not w21)
-    ;;                               (not w22)
-    ;;                               (not w31)))
-    ;;           '(=> (not s12) (and (not w11)
-    ;;                               (not w12)
-    ;;                               (not w22)
-    ;;                               (not w13)))
-    ;;           '(=> s12 (or w13
-    ;;                        w12
-    ;;                        w22
-    ;;                        w11)))))
+    (test (->cnf '(and (or B (and C (or M N) F) D) (or W(and P (or Q (and X Y) X A)))))
+          '(and (or D C B) (or D N M B) (or D F B) (or A X Y Q W) (or A X X Q W) (or P W)))
+    
+    (let ((knowledge-base '(and)))
+      (satisfy
+       (tell* knowledge-base
+              '(and (not s11)
+                    (not s21)
+                    s12
+                    (not b11)
+                    b21
+                    (not b12))
+              '(=> (not s11) (and (not w11)
+                                  (not w12)
+                                  (not w13)))
+              '(=> (not s21) (and (not w11)
+                                  (not w21)
+                                  (not w22)
+                                  (not w31)))
+              '(=> (not s12) (and (not w11)
+                                  (not w12)
+                                  (not w22)
+                                  (not w13)))
+              '(=> s12 (or w13
+                           w12
+                           w22
+                           w11)))))
     
     ;; (satisfy '(and s (not s)))
     ;; (satisfy '(and s))
-    ;; (satisfy '(AND (OR W13 W12 W22 W11) (OR S12 (NOT W11)) (OR S12 (NOT W12))
-    ;;                (OR S12 (NOT W22)) (OR S12 (NOT W13)) (OR S21 (NOT W11))
-    ;;                (OR S21 (NOT W21)) (OR S21 (NOT W22)) (OR S21 (NOT W31))
-    ;;                (OR S11 (NOT W11)) (OR S11 (NOT W12)) (OR S11 (NOT W13)) (NOT S11)
-    ;;                (NOT S21) S12 (NOT B11) B21 (NOT B12)))
-    
-    (test (->cnf '(and (or B (and C (or M N) F) D) (or W(and P (or Q (and X Y) X A)))))
-          '(and (or D C B) (or D N M B) (or D F B) (or A X Y Q W) (or A X X Q W) (or P W)))
+    ;; (satisfy '(and (or W13 W12 W22 W11) (or S12 (not W11)) (or S12 (not W12))
+    ;;                (or S12 (not W22)) (or S12 (not W13)) (or S21 (not W11))
+    ;;                (or S21 (not W21)) (or S21 (not W22)) (or S21 (not W31))
+    ;;                (or S11 (not W11)) (or S11 (not W12)) (or S11 (not W13)) (not S11)
+    ;;                (not S21) S12 (not B11) B21 (not B12)))
     
   #+END_SRC
 
