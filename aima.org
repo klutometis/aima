@@ -8132,6 +8132,9 @@
   [[http://www.cs.unm.edu/~mccune/mace4/manual/2009-02A/syntax.html][This guy]] talks about the difference between terms, atomic formulas,
   literals, clauses, formulas. Formulas are more general than clauses;
   clauses seem to be a specific part of a CNF.
+
+  We’re running into problems where we assume that a clause is a list;
+  we have these naked clauses. Maybe that’s why they call disjuncts.
 * TODO Random agent against wumpusworldserver.com
   #+BEGIN_SRC scheme
     (use alist-lib

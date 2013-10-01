@@ -8,10 +8,9 @@
      test)
 
 (define (satisfy formula)
-  (debug formula)
-  (let* ((clauses (map clauses (clauses formula)))
+  (let* ((clauses (conjuncts formula))
          (all-variables (all-variables clauses)))
-    (debug clauses)
+    (debug clauses all-variables)
     (let iter ((clauses clauses)
                (assignment '()))
       (call-with-values (lambda () (propagate-unit-clauses clauses assignment))
@@ -53,39 +52,65 @@
              (assignment assignment))
     (if (exists-empty-clause? clauses)
         (values clauses assignment)
-        (let ((unit-literals (unit-literals clauses)))
-          (if (null? unit-literals)
+        (let ((unit-clauses (unit-clauses clauses)))
+          (if (null? unit-clauses)
               (values clauses assignment)
-              (iter (simplify* clauses unit-literals)
-                    (append unit-literals assignment)))))))
+              (iter (simplify* clauses unit-clauses)
+                    (append unit-clauses assignment)))))))
+
+(define-syntax
+  xor
+  (lambda (expression rename compare)
+    (match expression
+      ((_ x y)
+       (let ((%or (rename 'or)) (%and (rename 'and)) (%not (rename 'not)))
+                       `(,%and (,%or ,x ,y) (,%not (,%and ,x ,y))))))))
 
 (define (simplify clauses literal)
-  (let ((variable (variable literal)))
-    (if (negative? literal)
-        (remove-variable clauses variable)
-        (filter-clauses clauses variable))))
+  (let ((literal-variable (variable literal))
+        (negative? (negative-clause? literal)))
+    (fold-right (lambda (clause simplifications)
+                  (cons 'or
+                        (let iter ((clause (disjuncts clause))
+                                   (simplification '()))
+                          (if (null? clause)
+                              (cons simplification simplifications)
+                              (let* ((term (car clause))
+                                     (negative-term? (negative-clause? term)))
+                                (if (eq? literal-variable (variable term))
+                                    (if (or (and negative? negative-term?)
+                                            (and (not negative?) (not negative-term?)))
+                                        simplifications
+                                        (iter (cdr clause)
+                                              simplification))
+                                    (iter (cdr clause)
+                                          (cons term simplification))))))))
+                '()
+                clauses)
+    ;; (if (negative-clause? literal)
+    ;;     (remove-variable clauses variable)
+    ;;     (filter-clauses clauses variable))
+    ))
 
-(define (remove-variable clauses variable)
-  (map (lambda (clause) (delete variable clause)) clauses))
+(trace simplify)
+
+;;; This also needs to handle e.g. negatives.
+;; (define (remove-variable clauses variable)
+;;   (map (lambda (clause)
+;;          (filter (lambda (terms) )
+;;                  (disjuncts clause)))
+;;        clauses))
 
 (define (filter-clauses clauses variable)
   (filter (lambda (clause) (not (memq variable clause))) clauses))
 
 (define (unit-clauses clauses)
-  (filter (lambda (clause) (= (length clause) 1)) clauses))
+  (filter literal-clause? clauses))
 
 (define (unit-literals clauses)
-  (map car (unit-clauses clauses)))
+  (map variable (unit-clauses clauses)))
 
-(define (variable literal)
-  (match literal
-    (('not p) p)
-    (p p)))
-
-(define (variables clauses)
-  (map variable clauses))
-
-(define (negative? literal)
+(define (negative-clause? literal)
   (match literal
     (('not p) #t)
     (_ #f)))
@@ -106,6 +131,18 @@
 (define (negate literal)
   `(not ,literal))
 
+(define (variable literal)
+  (match literal
+    (('not p) p)
+    (p p)))
+
+(define args cdr)
+
+(define (variables clause)
+  (if (atomic-clause? clause)
+      (list (variable clause))
+      (map variable (args clause))))
+
 (define (all-variables clauses)
   (delete-duplicates
    (fold-right
@@ -124,7 +161,7 @@
 
 (define (literal-clause? clause)
   (or (atomic-clause? clause)
-      (and (negative? clause)
+      (and (negative-clause? clause)
            (atomic-clause? (car (clauses clause))))))
 
 (define (eliminate-implications formula)
