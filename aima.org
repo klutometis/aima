@@ -7882,7 +7882,7 @@
   This is the meaning of =merge-disjuncts=, etc.; our primitive
   pattern matching isn’t sufficient.
 
-  #+BEGIN_SRC scheme
+  #+BEGIN_SRC scheme :comments link :tangle satisfy.scm :shebang #!/usr/bin/env chicken-scheme
     (use debug
          matchable
          srfi-1
