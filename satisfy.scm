@@ -27,6 +27,8 @@
                        (iter (simplify clauses (negate variable))
                              (cons (negate variable) assignment)))))))))))
 
+(trace satisfy)
+
 (define (conjuncts formula)
   (match formula
     (('and . ps) ps)
@@ -58,6 +60,8 @@
               (iter (simplify* clauses unit-clauses)
                     (append unit-clauses assignment)))))))
 
+(trace propagate-unit-clauses)
+
 (define-syntax
   xor
   (lambda (expression rename compare)
@@ -70,21 +74,21 @@
   (let ((literal-variable (variable literal))
         (negative? (negative-clause? literal)))
     (fold-right (lambda (clause simplifications)
-                  (cons 'or
-                        (let iter ((clause (disjuncts clause))
-                                   (simplification '()))
-                          (if (null? clause)
-                              (cons simplification simplifications)
-                              (let* ((term (car clause))
-                                     (negative-term? (negative-clause? term)))
-                                (if (eq? literal-variable (variable term))
-                                    (if (or (and negative? negative-term?)
-                                            (and (not negative?) (not negative-term?)))
-                                        simplifications
-                                        (iter (cdr clause)
-                                              simplification))
-                                    (iter (cdr clause)
-                                          (cons term simplification))))))))
+                  (let iter ((clause (disjuncts clause))
+                             (simplification '()))
+                    (debug clause simplification)
+                    (if (null? clause)
+                        (cons simplification simplifications)
+                        (let* ((term (car clause))
+                               (negative-term? (negative-clause? term)))
+                          (if (eq? literal-variable (variable term))
+                              (if (or (and negative? negative-term?)
+                                      (and (not negative?) (not negative-term?)))
+                                  simplifications
+                                  (iter (cdr clause)
+                                        simplification))
+                              (iter (cdr clause)
+                                    (cons term simplification)))))))
                 '()
                 clauses)
     ;; (if (negative-clause? literal)
@@ -223,30 +227,36 @@
 (test (->cnf '(and (or B (and C (or M N) F) D) (or W(and P (or Q (and X Y) X A)))))
       '(and (or D C B) (or D N M B) (or D F B) (or A X Y Q W) (or A X X Q W) (or P W)))
 
+;; (let ((knowledge-base '(and)))
+;;   (satisfy
+;;    (tell* knowledge-base
+;;           '(and (not s11)
+;;                 (not s21)
+;;                 s12
+;;                 (not b11)
+;;                 b21
+;;                 (not b12))
+;;           '(=> (not s11) (and (not w11)
+;;                               (not w12)
+;;                               (not w13)))
+;;           '(=> (not s21) (and (not w11)
+;;                               (not w21)
+;;                               (not w22)
+;;                               (not w31)))
+;;           '(=> (not s12) (and (not w11)
+;;                               (not w12)
+;;                               (not w22)
+;;                               (not w13)))
+;;           '(=> s12 (or w13
+;;                        w12
+;;                        w22
+;;                        w11)))))
+
 (let ((knowledge-base '(and)))
   (satisfy
    (tell* knowledge-base
-          '(and (not s11)
-                (not s21)
-                s12
-                (not b11)
-                b21
-                (not b12))
-          '(=> (not s11) (and (not w11)
-                              (not w12)
-                              (not w13)))
-          '(=> (not s21) (and (not w11)
-                              (not w21)
-                              (not w22)
-                              (not w31)))
-          '(=> (not s12) (and (not w11)
-                              (not w12)
-                              (not w22)
-                              (not w13)))
-          '(=> s12 (or w13
-                       w12
-                       w22
-                       w11)))))
+          't
+          '(not s))))
 
 ;; (satisfy '(and s (not s)))
 ;; (satisfy '(and s))
