@@ -277,6 +277,8 @@
           's
           '(not t)
           't)))
+(debug (literal-clause? '((not w13) s12))
+       (negative-clause? '((not w13) s12)))
 
 ;; (satisfy '(and s (not s)))
 ;; (satisfy '(and s))
