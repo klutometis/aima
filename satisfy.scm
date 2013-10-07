@@ -10,7 +10,7 @@
 (define (satisfy formula)
   (let* ((clauses (conjuncts formula))
          (all-variables (all-variables clauses)))
-    ;; (debug clauses all-variables)
+    (debug clauses all-variables)
     (let iter ((clauses clauses)
                (assignment '()))
       (call-with-values (lambda () (propagate-unit-clauses clauses assignment))
@@ -21,6 +21,7 @@
                 ;; call-cc.
                 ((null? clauses) assignment)
                 (else
+                 (debug clauses)
                  (let ((variable (select-variable all-variables assignment)))
                    (or (iter (simplify clauses variable)
                              (cons variable assignment))
@@ -46,8 +47,11 @@
     (p (list p))))
 
 (define (select-variable all-variables assignment)
+  (debug assignment (variables assignment))
   (let ((candidates (lset-difference eq? all-variables (variables assignment))))
     (list-ref candidates (random (length candidates)))))
+
+(trace select-variable)
 
 (define (propagate-unit-clauses clauses assignment)
   (let iter ((clauses clauses)
@@ -56,14 +60,14 @@
     (if (exists-empty-clause? clauses)
         (values clauses assignment)
         (let ((unit-clauses (unit-clauses clauses)))
-          ;; (debug unit-clauses)
+          (debug unit-clauses)
           (if (null? unit-clauses)
               (values clauses assignment)
               (let ((unit-clause (car unit-clauses)))
                 (iter (simplify clauses unit-clause)
                       (cons unit-clause assignment))))))))
 
-;; (trace propagate-unit-clauses)
+(trace propagate-unit-clauses)
 
 (define-syntax
   xor
@@ -80,14 +84,14 @@
            (fold-right (lambda (clause simplifications)
                          (let iter ((clause (disjuncts clause))
                                     (simplification '()))
-                           ;; (debug clause simplification)
+                           (debug clause simplification)
                            (if (null? clause)
                                (cons (if (= (length simplification) 1)
                                          (car simplification)
                                          simplification) simplifications)
                                (let* ((term (car clause))
                                       (negative-term? (negative-clause? term)))
-                                 ;; (debug term negative-term? (variable term))
+                                 (debug term negative-term? (variable term))
                                  (if (eq? literal-variable (variable term))
                                      (if (or (and negative? negative-term?)
                                              (and (not negative?) (not negative-term?)))
@@ -100,7 +104,7 @@
                        clauses)))
       simplification)))
 
-;; (trace simplify)
+(trace simplify)
 
 ;;; This also needs to handle e.g. negatives.
 ;; (define (remove-variable clauses variable)
@@ -114,6 +118,8 @@
 
 (define (unit-clauses clauses)
   (filter literal-clause? clauses))
+
+(trace unit-clauses)
 
 (define (unit-literals clauses)
   (map variable (unit-clauses clauses)))
@@ -149,6 +155,7 @@
 (define args cdr)
 
 (define (variables clause)
+  (debug clause (atomic-clause? clause))
   (if (atomic-clause? clause)
       (list (variable clause))
       (map variable (args clause))))
@@ -161,6 +168,8 @@
     '()
     clauses)))
 
+(trace all-variables)
+
 (define (atomic-clause? clause)
   (match clause
     (('and . p) #f)
@@ -168,6 +177,8 @@
     (('=> . p) #f)
     (('<=> . p) #f)
     (_ #t)))
+
+;; (trace atomic-clause?)
 
 (define (literal-clause? clause)
   (or (atomic-clause? clause)
