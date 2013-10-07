@@ -100,7 +100,7 @@
                          ;; we've put it in a minimalist form.
                          (let iter ((clause ;; (disjuncts clause)
                                      (cond ((symbol? clause) (list clause))
-                                           ((negative-clause? clause) clause)
+                                           ((negative-clause? clause) (list clause))
                                            (else clause)))
                                     (simplification '()))
                            (debug clause simplification)
@@ -289,18 +289,18 @@
 ;; (test-assert (not (satisfy '(and s (not s)))))
 ;; (test '((not t) s) (satisfy '(and s (not t))))
 
-(debug (atomic-clause? '(x y z)))
+;; (debug (atomic-clause? '(x y z)))
 
-(let ((knowledge-base '(and)))
-  (debug
-   (satisfy
-    (tell* knowledge-base
-           's
-           ;; '(not t)
-           't
-           ;; '(not x)
-           '(=> x y)
-           '(or (not x) y)))))
+;; (let ((knowledge-base '(and)))
+;;   (debug
+;;    (satisfy
+;;     (tell* knowledge-base
+;;            's
+;;            ;; '(not t)
+;;            't
+;;            ;; '(not x)
+;;            '(=> x y)
+;;            '(or (not x) y)))))
 
 ;; (debug (literal-clause? '((not w13) s12))
 ;;        (negative-clause? '((not w13) s12))
@@ -308,31 +308,31 @@
 ;;        (literal-clause? (disjunction 't))
 ;;        (literal-clause? (disjunction '((not w13) s12))))
 
-;; (let ((knowledge-base '(and)))
-;;   (debug
-;;    (satisfy
-;;     (tell* knowledge-base
-;;            '(and (not s11)
-;;                  (not s21)
-;;                  s12
-;;                  (not b11)
-;;                  b21
-;;                  (not b12))
-;;            '(=> (not s11) (and (not w11)
-;;                                (not w12)
-;;                                (not w13)))
-;;            '(=> (not s21) (and (not w11)
-;;                                (not w21)
-;;                                (not w22)
-;;                                (not w31)))
-;;            '(=> (not s12) (and (not w11)
-;;                                (not w12)
-;;                                (not w22)
-;;                                (not w13)))
-;;            '(=> s12 (or w13
-;;                         w12
-;;                         w22
-;;                         w11))))))
+(let ((knowledge-base '(and)))
+  (debug
+   (satisfy
+    (tell* knowledge-base
+           '(and (not s11)
+                 (not s21)
+                 s12
+                 (not b11)
+                 b21
+                 (not b12))
+           '(=> (not s11) (and (not w11)
+                               (not w12)
+                               (not w13)))
+           '(=> (not s21) (and (not w11)
+                               (not w21)
+                               (not w22)
+                               (not w31)))
+           '(=> (not s12) (and (not w11)
+                               (not w12)
+                               (not w22)
+                               (not w13)))
+           '(=> s12 (or w13
+                        w12
+                        w22
+                        w11))))))
 
 ;; (satisfy '(and s (not s)))
 ;; (satisfy '(and s))
