@@ -136,7 +136,11 @@
   (filter (lambda (clause) (not (memq variable clause))) clauses))
 
 (define (unit-clauses clauses)
-  (filter literal-clause? clauses))
+  (filter (lambda (clause)
+            (or (not (list? clause))
+                (= (length clause) 1)
+                (negative-clause? clause)))
+          clauses))
 
 (trace unit-clauses)
 
