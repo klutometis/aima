@@ -40,6 +40,20 @@
     (('or . ps) ps)
     (p (list p))))
 
+(define (disjunction clause)
+  (if (list? clause)
+      (if (= (length clause) 1)
+          (car clause)
+          (cons 'or clause))
+      clause))
+
+(define (conjunction clause)
+  (if (list? clause)
+      (if (= (length clause) 1)
+          (car clause)
+          (cons 'and clause))
+      clause))
+
 (define (clauses formula)
   (match formula
     (('and . conjuncts) conjuncts)
