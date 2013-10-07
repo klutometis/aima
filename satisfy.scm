@@ -180,7 +180,10 @@
 (define (variables clause)
   (debug clause (atomic-clause? clause))
   (if (atomic-clause? clause)
-      (list (variable clause))
+      (if (and (list? clause)
+               (not (negative-clause? clause)))
+          (map variable clause)
+          (list (variable clause)))
       (map variable (args clause))))
 
 (define (all-variables clauses)
