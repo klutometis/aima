@@ -273,55 +273,66 @@
               knowledge-base
               ps))
 
-(test (->cnf '(and (or B (and C (or M N) F) D) (or W(and P (or Q (and X Y) X A)))))
-      '(and (or D C B) (or D N M B) (or D F B) (or A X Y Q W) (or A X X Q W) (or P W)))
+;; (test (->cnf '(and (or B (and C (or M N) F) D) (or W(and P (or Q (and X Y) X A)))))
+;;       '(and (or D C B) (or D N M B) (or D F B) (or A X Y Q W) (or A X X Q W) (or P W)))
 
-;; (let ((knowledge-base '(and)))
-;;   (satisfy
-;;    (tell* knowledge-base
-;;           '(and (not s11)
-;;                 (not s21)
-;;                 s12
-;;                 (not b11)
-;;                 b21
-;;                 (not b12))
-;;           '(=> (not s11) (and (not w11)
-;;                               (not w12)
-;;                               (not w13)))
-;;           '(=> (not s21) (and (not w11)
-;;                               (not w21)
-;;                               (not w22)
-;;                               (not w31)))
-;;           '(=> (not s12) (and (not w11)
-;;                               (not w12)
-;;                               (not w22)
-;;                               (not w13)))
-;;           '(=> s12 (or w13
-;;                        w12
-;;                        w22
-;;                        w11)))))
+;; (test '(() t) (simplify '((not s) t) 's))
+;; (test '(t) (simplify '((not s) t) '(not s)))
+;; (test '(t) (simplify '(s t) 's))
+;; (test '(() t) (simplify '(s t) '(not s)))
+;; (test '(()) (simplify '((not s) s) 's))
+;; (test '(()) (propagate-unit-clauses '((not s) s) '()))
+;; (call-with-values (lambda () (propagate-unit-clauses '((not s) s) '()))
+;;   (lambda (clauses assignment)
+;;     (test clauses '(()))
+;;     (test assignment '((not s)))))
+;; (test-assert (not (satisfy '(and s (not s)))))
+;; (test '((not t) s) (satisfy '(and s (not t))))
 
-(test '(() t) (simplify '((not s) t) 's))
-(test '(t) (simplify '((not s) t) '(not s)))
-(test '(t) (simplify '(s t) 's))
-(test '(() t) (simplify '(s t) '(not s)))
-(test '(()) (simplify '((not s) s) 's))
-(test '(()) (propagate-unit-clauses '((not s) s) '()))
-(call-with-values (lambda () (propagate-unit-clauses '((not s) s) '()))
-  (lambda (clauses assignment)
-    (test clauses '(()))
-    (test assignment '((not s)))))
-(test-assert (not (satisfy '(and s (not s)))))
-(test '((not t) s) (satisfy '(and s (not t))))
+(debug (atomic-clause? '(x y z)))
 
 (let ((knowledge-base '(and)))
-  (satisfy
-   (tell* knowledge-base
-          's
-          '(not t)
-          't)))
-(debug (literal-clause? '((not w13) s12))
-       (negative-clause? '((not w13) s12)))
+  (debug
+   (satisfy
+    (tell* knowledge-base
+           's
+           ;; '(not t)
+           't
+           ;; '(not x)
+           '(=> x y)
+           '(or (not x) y)))))
+
+;; (debug (literal-clause? '((not w13) s12))
+;;        (negative-clause? '((not w13) s12))
+;;        (unit-clauses '((not w13) s12))
+;;        (literal-clause? (disjunction 't))
+;;        (literal-clause? (disjunction '((not w13) s12))))
+
+;; (let ((knowledge-base '(and)))
+;;   (debug
+;;    (satisfy
+;;     (tell* knowledge-base
+;;            '(and (not s11)
+;;                  (not s21)
+;;                  s12
+;;                  (not b11)
+;;                  b21
+;;                  (not b12))
+;;            '(=> (not s11) (and (not w11)
+;;                                (not w12)
+;;                                (not w13)))
+;;            '(=> (not s21) (and (not w11)
+;;                                (not w21)
+;;                                (not w22)
+;;                                (not w31)))
+;;            '(=> (not s12) (and (not w11)
+;;                                (not w12)
+;;                                (not w22)
+;;                                (not w13)))
+;;            '(=> s12 (or w13
+;;                         w12
+;;                         w22
+;;                         w11))))))
 
 ;; (satisfy '(and s (not s)))
 ;; (satisfy '(and s))
