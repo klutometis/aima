@@ -98,10 +98,7 @@
                                            (cons term simplification)))))))
                        '()
                        clauses)))
-      (debug simplification)
-      (if (= (length simplification) 1)
-          (car simplification)
-          simplification))))
+      simplification)))
 
 ;; (trace simplify)
 
