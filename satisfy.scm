@@ -10,12 +10,12 @@
 (define (satisfy formula)
   (let* ((clauses (conjuncts formula))
          (all-variables (all-variables clauses)))
-    (debug clauses all-variables)
+    ;; (debug clauses all-variables)
     (let iter ((clauses clauses)
                (assignment '()))
       (call-with-values (lambda () (propagate-unit-clauses clauses assignment))
         (lambda (clauses assignment)
-          (debug clauses assignment)
+          ;; (debug clauses assignment)
           (cond ((exists-empty-clause? clauses) #f)
                 ;; This is where we'd do some dynamic shit and maybe a
                 ;; call-cc.
@@ -27,7 +27,7 @@
                        (iter (simplify clauses (negate variable))
                              (cons (negate variable) assignment)))))))))))
 
-(trace satisfy)
+;; (trace satisfy)
 
 (define (conjuncts formula)
   (match formula
@@ -52,17 +52,17 @@
 (define (propagate-unit-clauses clauses assignment)
   (let iter ((clauses clauses)
              (assignment assignment))
-    (debug clauses assignment)
+    ;; (debug clauses assignment)
     (if (exists-empty-clause? clauses)
         (values clauses assignment)
         (let ((unit-clauses (unit-clauses clauses)))
-          (debug unit-clauses)
+          ;; (debug unit-clauses)
           (if (null? unit-clauses)
               (values clauses assignment)
               (iter (simplify* clauses unit-clauses)
                     (append unit-clauses assignment)))))))
 
-(trace propagate-unit-clauses)
+;; (trace propagate-unit-clauses)
 
 (define-syntax
   xor
@@ -100,7 +100,7 @@
           (car simplification)
           simplification))))
 
-(trace simplify)
+;; (trace simplify)
 
 ;;; This also needs to handle e.g. negatives.
 ;; (define (remove-variable clauses variable)
@@ -129,6 +129,8 @@
       (if (null? (car clauses))
           #t
           (exists-empty-clause? (cdr clauses)))))
+
+;; (trace exists-empty-clause?)
 
 (define (simplify* clauses literals)
   (fold-right (lambda (literal clauses)
