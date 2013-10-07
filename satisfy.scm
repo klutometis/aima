@@ -202,8 +202,12 @@
   (match clause
     (('and . p) #f)
     (('or . p) #f)
+    ;; (('not . p) #f)
     (('=> . p) #f)
     (('<=> . p) #f)
+    ;; (p (or (not (list? p))
+    ;;        (or (negative-clause? p)
+    ;;            (= (length p) 1))))
     (_ #t)))
 
 ;; (trace atomic-clause?)
