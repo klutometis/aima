@@ -19,7 +19,7 @@
           (cond ((exists-empty-clause? clauses) #f)
                 ;; This is where we'd do some dynamic shit and maybe a
                 ;; call-cc.
-                ((null? clauses) assignment #t)
+                ((null? clauses) assignment)
                 (else
                  (let ((variable (select-variable all-variables assignment)))
                    (or (iter (simplify clauses variable)
