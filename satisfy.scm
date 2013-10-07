@@ -96,7 +96,12 @@
         (negative? (negative-clause? literal)))
     (let ((simplification
            (fold-right (lambda (clause simplifications)
-                         (let iter ((clause (disjuncts clause))
+                         ;; It's not going to be a disjunct, because
+                         ;; we've put it in a minimalist form.
+                         (let iter ((clause ;; (disjuncts clause)
+                                     (cond ((symbol? clause) (list clause))
+                                           ((negative-clause? clause) clause)
+                                           (else clause)))
                                     (simplification '()))
                            (debug clause simplification)
                            (if (null? clause)
