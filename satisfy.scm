@@ -186,6 +186,8 @@
           (list (variable clause)))
       (map variable (args clause))))
 
+(trace variables)
+
 (define (all-variables clauses)
   (delete-duplicates
    (fold-right
