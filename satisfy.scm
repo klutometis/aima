@@ -52,9 +52,11 @@
 (define (propagate-unit-clauses clauses assignment)
   (let iter ((clauses clauses)
              (assignment assignment))
+    (debug clauses assignment)
     (if (exists-empty-clause? clauses)
         (values clauses assignment)
         (let ((unit-clauses (unit-clauses clauses)))
+          (debug unit-clauses)
           (if (null? unit-clauses)
               (values clauses assignment)
               (iter (simplify* clauses unit-clauses)
@@ -73,28 +75,30 @@
 (define (simplify clauses literal)
   (let ((literal-variable (variable literal))
         (negative? (negative-clause? literal)))
-    (fold-right (lambda (clause simplifications)
-                  (let iter ((clause (disjuncts clause))
-                             (simplification '()))
-                    (debug clause simplification)
-                    (if (null? clause)
-                        (cons simplification simplifications)
-                        (let* ((term (car clause))
-                               (negative-term? (negative-clause? term)))
-                          (if (eq? literal-variable (variable term))
-                              (if (or (and negative? negative-term?)
-                                      (and (not negative?) (not negative-term?)))
-                                  simplifications
-                                  (iter (cdr clause)
-                                        simplification))
-                              (iter (cdr clause)
-                                    (cons term simplification)))))))
-                '()
-                clauses)
-    ;; (if (negative-clause? literal)
-    ;;     (remove-variable clauses variable)
-    ;;     (filter-clauses clauses variable))
-    ))
+    (let ((simplification
+           (fold-right (lambda (clause simplifications)
+                         (let iter ((clause (disjuncts clause))
+                                    (simplification '()))
+                           ;; (debug clause simplification)
+                           (if (null? clause)
+                               (cons simplification simplifications)
+                               (let* ((term (car clause))
+                                      (negative-term? (negative-clause? term)))
+                                 ;; (debug term negative-term? (variable term))
+                                 (if (eq? literal-variable (variable term))
+                                     (if (or (and negative? negative-term?)
+                                             (and (not negative?) (not negative-term?)))
+                                         simplifications
+                                         (iter (cdr clause)
+                                               simplification))
+                                     (iter (cdr clause)
+                                           (cons term simplification)))))))
+                       '()
+                       clauses)))
+      (debug simplification)
+      (if (= (length simplification) 1)
+          (car simplification)
+          simplification))))
 
 (trace simplify)
 
@@ -252,11 +256,22 @@
 ;;                        w22
 ;;                        w11)))))
 
-(let ((knowledge-base '(and)))
-  (satisfy
-   (tell* knowledge-base
-          't
-          '(not s))))
+;; (let ((knowledge-base '(and)))
+;;   (satisfy
+;;    (tell* knowledge-base
+;;           's
+;;           '(not s))))
+
+;; (test (simplify '((not s) t) 's) '(() (t)))
+;; (test (simplify '((not s) t) '(not s)) '(t))
+;; (test (simplify '(s t) 's) '(t))
+;; (test (simplify '(s t) '(not s)) '(() (t)))
+
+;; (debug (propagate-unit-clauses '((not s) s) '()))
+(debug (simplify '((not s) s) 's))
+
+;; (debug (call-with-values (lambda () (propagate-unit-clauses '((not s) s) '()))
+;;          (lambda x x)))
 
 ;; (satisfy '(and s (not s)))
 ;; (satisfy '(and s))

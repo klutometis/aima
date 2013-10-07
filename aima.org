@@ -8135,6 +8135,11 @@
 
   We’re running into problems where we assume that a clause is a list;
   we have these naked clauses. Maybe that’s why they call disjuncts.
+
+  Use a special object for a null-clause instead of the null-list?
+  Makes debugging easier. Make some visualization instead?
+
+  Need some unit tests for =simplify=.
 * TODO Random agent against wumpusworldserver.com
   #+BEGIN_SRC scheme
     (use alist-lib
