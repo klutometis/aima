@@ -258,22 +258,25 @@
 ;;                        w22
 ;;                        w11)))))
 
-;; (let ((knowledge-base '(and)))
-;;   (satisfy
-;;    (tell* knowledge-base
-;;           's
-;;           '(not s))))
+(test '(() t) (simplify '((not s) t) 's))
+(test '(t) (simplify '((not s) t) '(not s)))
+(test '(t) (simplify '(s t) 's))
+(test '(() t) (simplify '(s t) '(not s)))
+(test '(()) (simplify '((not s) s) 's))
+(test '(()) (propagate-unit-clauses '((not s) s) '()))
+(call-with-values (lambda () (propagate-unit-clauses '((not s) s) '()))
+  (lambda (clauses assignment)
+    (test clauses '(()))
+    (test assignment '((not s)))))
+(test-assert (not (satisfy '(and s (not s)))))
+(test '((not t) s) (satisfy '(and s (not t))))
 
-;; (test (simplify '((not s) t) 's) '(() (t)))
-;; (test (simplify '((not s) t) '(not s)) '(t))
-;; (test (simplify '(s t) 's) '(t))
-;; (test (simplify '(s t) '(not s)) '(() (t)))
-
-;; (debug (propagate-unit-clauses '((not s) s) '()))
-(debug (simplify '((not s) s) 's))
-
-;; (debug (call-with-values (lambda () (propagate-unit-clauses '((not s) s) '()))
-;;          (lambda x x)))
+(let ((knowledge-base '(and)))
+  (satisfy
+   (tell* knowledge-base
+          's
+          '(not t)
+          't)))
 
 ;; (satisfy '(and s (not s)))
 ;; (satisfy '(and s))
