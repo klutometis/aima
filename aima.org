@@ -8140,6 +8140,9 @@
   Makes debugging easier. Make some visualization instead?
 
   Need some unit tests for =simplify=.
+
+  In retrospect, should have rendered all clauses a list of at least
+  length one; this symbol exception is a pain-in-the-ass.
 * TODO Random agent against wumpusworldserver.com
   #+BEGIN_SRC scheme
     (use alist-lib
