@@ -59,8 +59,9 @@
           ;; (debug unit-clauses)
           (if (null? unit-clauses)
               (values clauses assignment)
-              (iter (simplify* clauses unit-clauses)
-                    (append unit-clauses assignment)))))))
+              (let ((unit-clause (car unit-clauses)))
+                (iter (simplify clauses unit-clause)
+                      (cons unit-clause assignment))))))))
 
 ;; (trace propagate-unit-clauses)
 
