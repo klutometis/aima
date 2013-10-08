@@ -99,9 +99,15 @@
                          ;; It's not going to be a disjunct, because
                          ;; we've put it in a minimalist form.
                          (let iter ((clause ;; (disjuncts clause)
-                                     (cond ((symbol? clause) (list clause))
-                                           ((negative-clause? clause) (list clause))
-                                           (else clause)))
+                                     (match clause
+                                       ((? symbol?) (list clause))
+                                       ((? negative-clause?) (list clause))
+                                       ((or . ps) ps)
+                                       (p p))
+                                     ;; (cond ((symbol? clause) (list clause))
+                                     ;;       ((negative-clause? clause) (list clause))
+                                     ;;       (else clause))
+                                     )
                                     (simplification '()))
                            (debug clause simplification)
                            (if (null? clause)
@@ -121,7 +127,7 @@
                                            (cons term simplification)))))))
                        '()
                        clauses)))
-      simplification)))
+      (delete-duplicates simplification))))
 
 (trace simplify)
 
@@ -217,9 +223,15 @@
       (and (negative-clause? clause)
            (atomic-clause? (car (clauses clause))))))
 
+;; (trace literal-clause?)
+
 (define (eliminate-implications formula)
   (match formula
     ((? literal-clause?) formula)
+    ;; (('=> p . qs) `(or (not ,p) ,@qs))
+    ;; (('<=> p . qs)
+    ;;  `(and (or ,p (not ,@qs))
+    ;;        (or (not ,@qs) ,p)))
     (('=> p q) `(or (not ,p) ,q))
     (('<=> p q)
      `(and (or ,p (not ,q))
@@ -253,6 +265,7 @@
                (result))))))
 
 (define (->cnf formula)
+  (debug formula (eliminate-implications formula))
   (let ((formula (eliminate-implications formula)))
     (match formula
       (('not p) (let ((q (move-not-inwards p)))
@@ -262,6 +275,8 @@
       (('or . ps)
        (merge-disjuncts (map ->cnf ps)))
       (p p))))
+
+(trace ->cnf)
 
 (define (tell knowledge-base p)
   (append knowledge-base (clauses (->cnf p))))
@@ -308,31 +323,55 @@
 ;;        (literal-clause? (disjunction 't))
 ;;        (literal-clause? (disjunction '((not w13) s12))))
 
-(let ((knowledge-base '(and)))
-  (debug
-   (satisfy
-    (tell* knowledge-base
-           '(and (not s11)
-                 (not s21)
-                 s12
-                 (not b11)
-                 b21
-                 (not b12))
-           '(=> (not s11) (and (not w11)
-                               (not w12)
-                               (not w13)))
-           '(=> (not s21) (and (not w11)
-                               (not w21)
-                               (not w22)
-                               (not w31)))
-           '(=> (not s12) (and (not w11)
-                               (not w12)
-                               (not w22)
-                               (not w13)))
-           '(=> s12 (or w13
-                        w12
-                        w22
-                        w11))))))
+;; (let ((knowledge-base '(and)))
+;;   (debug
+;;    (satisfy
+;;     (tell* knowledge-base
+;;            '(and (not s11)
+;;                  (not s21)
+;;                  s12
+;;                  (not b11)
+;;                  b21
+;;                  (not b12))
+;;            '(=> (not s11) (and (not w11)
+;;                                (not w12)
+;;                                (not w13)))
+;;            '(=> (not s21) (and (not w11)
+;;                                (not w21)
+;;                                (not w22)
+;;                                (not w31)))
+;;            '(=> (not s12) (and (not w11)
+;;                                (not w12)
+;;                                (not w22)
+;;                                (not w13)))
+;;            '(=> s12 (or w13
+;;                         w12
+;;                         w22
+;;                         w11))))))
+
+;; (debug
+;;  (tell* '(and)
+;;         '(and (not s11)
+;;               (not s21)
+;;               s12
+;;               (not b11)
+;;               b21
+;;               (not b12))
+;;         '(=> (not s11) (and (not w11)
+;;                             (not w12)
+;;                             (not w13)))
+;;         '(=> (not s21) (and (not w11)
+;;                             (not w21)
+;;                             (not w22)
+;;                             (not w31)))
+;;         '(=> (not s12) (and (not w11)
+;;                             (not w12)
+;;                             (not w22)
+;;                             (not w13)))
+;;         '(=> s12 (or w13
+;;                      w12
+;;                      w22
+;;                      w11))))
 
 ;; (satisfy '(and s (not s)))
 ;; (satisfy '(and s))
@@ -341,5 +380,33 @@
 ;;                (or S21 (not W21)) (or S21 (not W22)) (or S21 (not W31))
 ;;                (or S11 (not W11)) (or S11 (not W12)) (or S11 (not W13)) (not S11)
 ;;                (not S21) S12 (not B11) B21 (not B12)))
+
+(define (make-knowledge-base) '(and))
+
+(define (ask knowledge-base query)
+  (and (satisfy (tell knowledge-base query)) #t))
+
+(let ((knowledge-base (tell* (make-knowledge-base)
+                             '(not b11)
+                             '(=> (not b11) (and (not p12) (not p21)))
+
+                             ;; '(not s11)
+                             ;; '(=> (not s11) (and (not w12) (not w21)))
+
+                             ;; '(not p11)
+                             ;; '(not w11)
+
+                             ;; 'b21
+                             '(=> b21 (or p11 p22 p31))
+
+                             ;; '(not s21)
+                             ;; '(=> (not s21) (and (not w11) (not w22) (not w31)))
+
+                             ;; '(not p21)
+                             ;; '(not w21)
+                             )))
+  (debug (satisfy knowledge-base)
+         (ask knowledge-base '(not p11))
+         (ask knowledge-base 'p11)))
 
 ;; Logical-agents:5 ends here
