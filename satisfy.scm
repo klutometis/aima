@@ -389,6 +389,18 @@
 (define (ask knowledge-base query)
   (and (satisfy (tell knowledge-base query)) #t))
 
+;; (let ((knowledge-base (tell* (make-knowledge-base)
+;;                              '(not b11)
+;;                              '(=> (not b11) (and (not p12) (not p21)))
+;;                              'b21
+;;                              '(=> b21 (or p11 p22 p31)))))
+;;   (test knowledge-base
+;;         '(and (or (not b21) p11 p22 p31)
+;;               b21
+;;               (or b11 (not p21))
+;;               (or b11 (not p12))
+;;               (not b11))))
+
 (let ((knowledge-base (tell* (make-knowledge-base)
                              '(not b11)
                              '(=> (not b11) (and (not p12) (not p21)))
