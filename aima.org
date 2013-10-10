@@ -8143,6 +8143,10 @@
 
   In retrospect, should have rendered all clauses a list of at least
   length one; this symbol exception is a pain-in-the-ass.
+
+  We’re suffering from inconsistent representation, and should choose
+  one over the other; =simplify=, for instance, receives =or’d=
+  clauses but returns naked ones.
 * TODO Random agent against wumpusworldserver.com
   #+BEGIN_SRC scheme
     (use alist-lib
