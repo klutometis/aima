@@ -23,10 +23,12 @@
                 (else
                  (debug clauses)
                  (let ((variable (select-variable all-variables assignment)))
-                   (or (iter (simplify clauses variable)
-                             (cons variable assignment))
-                       (iter (simplify clauses (negate variable))
-                             (cons (negate variable) assignment)))))))))))
+                   (if variable
+                       (or (iter (simplify clauses variable)
+                                 (cons variable assignment))
+                           (iter (simplify clauses (negate variable))
+                                 (cons (negate variable) assignment)))
+                       assignment)))))))))
 
 ;; (trace satisfy)
 
