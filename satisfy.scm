@@ -8,6 +8,7 @@
      test)
 
 (define (satisfy formula)
+  (debug formula)
   (let* ((clauses (conjuncts formula))
          (all-variables (all-variables clauses)))
     (debug clauses all-variables)
@@ -268,7 +269,7 @@
                (result))))))
 
 (define (->cnf formula)
-  (debug formula (eliminate-implications formula))
+  ;; (debug formula (eliminate-implications formula))
   (let ((formula (eliminate-implications formula)))
     (match formula
       (('not p) (let ((q (move-not-inwards p)))
@@ -279,7 +280,7 @@
        (merge-disjuncts (map ->cnf ps)))
       (p p))))
 
-(trace ->cnf)
+;; (trace ->cnf)
 
 (define (tell knowledge-base p)
   (append knowledge-base (clauses (->cnf p))))
