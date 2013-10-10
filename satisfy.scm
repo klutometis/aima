@@ -421,7 +421,10 @@
                              ;; '(not w21)
                              )))
   (debug (satisfy knowledge-base)
-         (ask knowledge-base '(not p11))
-         (ask knowledge-base 'p11)))
+         ;; (ask knowledge-base '(not p11))
+         ;; (ask knowledge-base 'p11)
+         ;; (ask knowledge-base 'b21)
+         ;; knowledge-base
+         ))
 
 ;; Logical-agents:5 ends here
