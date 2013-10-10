@@ -65,7 +65,8 @@
 (define (select-variable all-variables assignment)
   (debug assignment (variables assignment))
   (let ((candidates (lset-difference eq? all-variables (variables assignment))))
-    (list-ref candidates (random (length candidates)))))
+    (and (not (null? candidates))
+         (list-ref candidates (random (length candidates))))))
 
 (trace select-variable)
 
