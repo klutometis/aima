@@ -98,6 +98,7 @@
 (define (simplify clauses literal)
   (let ((literal-variable (variable literal))
         (negative? (negative-clause? literal)))
+    (debug clauses literal literal-variable negative?)
     (let ((simplification
            (fold-right (lambda (clause simplifications)
                          ;; It's not going to be a disjunct, because
@@ -120,8 +121,13 @@
                                          simplification) simplifications)
                                (let* ((term (car clause))
                                       (negative-term? (negative-clause? term)))
-                                 (debug term negative-term? (variable term))
+                                 ;; (debug term negative-term? (variable term))
                                  (if (eq? literal-variable (variable term))
+                                     ;; It's not sufficient to return
+                                     ;; simplifications: need to check
+                                     ;; for opposite, too. No, wait a
+                                     ;; minute: (or #t #f) is
+                                     ;; true.
                                      (if (or (and negative? negative-term?)
                                              (and (not negative?) (not negative-term?)))
                                          simplifications
@@ -131,9 +137,10 @@
                                            (cons term simplification)))))))
                        '()
                        clauses)))
+      (debug (delete-duplicates simplification))
       (delete-duplicates simplification))))
 
-(trace simplify)
+;; (trace simplify)
 
 ;;; This also needs to handle e.g. negatives.
 ;; (define (remove-variable clauses variable)
@@ -188,7 +195,7 @@
 (define args cdr)
 
 (define (variables clause)
-  (debug clause (atomic-clause? clause))
+  ;; (debug clause (atomic-clause? clause))
   (if (atomic-clause? clause)
       (if (and (list? clause)
                (not (negative-clause? clause)))
@@ -196,7 +203,7 @@
           (list (variable clause)))
       (map variable (args clause))))
 
-(trace variables)
+;; (trace variables)
 
 (define (all-variables clauses)
   (delete-duplicates
@@ -206,7 +213,7 @@
     '()
     clauses)))
 
-(trace all-variables)
+;; (trace all-variables)
 
 (define (atomic-clause? clause)
   (match clause
@@ -387,9 +394,6 @@
 
 (define (make-knowledge-base) '(and))
 
-(define (ask knowledge-base query)
-  (and (satisfy (tell knowledge-base query)) #t))
-
 ;; (let ((knowledge-base (tell* (make-knowledge-base)
 ;;                              '(not b11)
 ;;                              '(=> (not b11) (and (not p12) (not p21)))
@@ -401,6 +405,11 @@
 ;;               (or b11 (not p21))
 ;;               (or b11 (not p12))
 ;;               (not b11))))
+
+(define (ask knowledge-base query)
+  (and (satisfy (tell knowledge-base query)) #t)
+  (debug (->cnf `(=> ,knowledge-base ,query)))
+  (satisfy (->cnf `(=> ,knowledge-base ,query))))
 
 (let ((knowledge-base (tell* (make-knowledge-base)
                              '(not b11)
@@ -421,9 +430,46 @@
                              ;; '(not p21)
                              ;; '(not w21)
                              )))
-  (debug (satisfy knowledge-base)
+(debug (equal?
+        '(and
+         (or b11 b11 p12 (not b11) (not b21) b21)
+         (or b11 b11 p12 (not b11) (not b21) (not p11))
+         (or b11 b11 p12 (not b11) (not b21) (not p22))
+         (or b11 b11 p12 (not b11) (not b21) (not p31))
+         (or b11 b11 p12 p21 (not b21) b21)
+         (or b11 b11 p12 p21 (not b21) (not p11))
+         (or b11 b11 p12 p21 (not b21) (not p22))
+         (or b11 b11 p12 p21 (not b21) (not p31))
+         (or b11 b11 (not b11) (not b11) (not b21) b21)
+         (or b11 b11 (not b11) (not b11) (not b21) (not p11))
+         (or b11 b11 (not b11) (not b11) (not b21) (not p22))
+         (or b11 b11 (not b11) (not b11) (not b21) (not p31))
+         (or b11 b11 (not b11) p21 (not b21) b21)
+         (or b11 b11 (not b11) p21 (not b21) (not p11))
+         (or b11 b11 (not b11) p21 (not b21) (not p22))
+         (or b11 b11 (not b11) p21 (not b21) (not p31))
+         )
+          '(and
+           (or b11 (not p11) (not b21) p12 p21 b11)
+           (or b11 (not p22) (not b21) p12 p21 b11)
+           (or b11 (not p31) (not b21) p12 p21 b11)
+           (or b11 b21 (not b21) p12 p21 b11)
+           (or b11 (not p11) (not b21) (not b11) p21 b11)
+           (or b11 (not p22) (not b21) (not b11) p21 b11)
+           (or b11 (not p31) (not b21) (not b11) p21 b11)
+           (or b11 b21 (not b21) (not b11) p21 b11)
+           (or b11 (not p11) (not b21) p12 (not b11) b11)
+           (or b11 (not p22) (not b21) p12 (not b11) b11)
+           (or b11 (not p31) (not b21) p12 (not b11) b11)
+           (or b11 b21 (not b21) p12 (not b11) b11)
+           (or b11 (not p11) (not b21) (not b11) (not b11) b11)
+           (or b11 (not p22) (not b21) (not b11) (not b11) b11)
+           (or b11 (not p31) (not b21) (not b11) (not b11) b11)
+           (or b11 b21 (not b21) (not b11) (not b11) b11)
+           )))
+  (debug ;; (satisfy knowledge-base)
          ;; (ask knowledge-base '(not p11))
-         ;; (ask knowledge-base 'p11)
+         (ask knowledge-base 'b11)
          ;; (ask knowledge-base 'b21)
          ;; knowledge-base
          ))
