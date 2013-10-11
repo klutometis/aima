@@ -106,7 +106,7 @@
                                      (match clause
                                        ((? symbol?) (list clause))
                                        ((? negative-clause?) (list clause))
-                                       ((or . ps) ps)
+                                       (('or . ps) ps)
                                        (p p))
                                      ;; (cond ((symbol? clause) (list clause))
                                      ;;       ((negative-clause? clause) (list clause))
