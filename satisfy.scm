@@ -283,21 +283,22 @@
                              '(=> (not b11) (and (not p12) (not p21)))
                              'b21
                              '(=> b21 (or p11 p22 p31)))))
-
-  (debug (ask knowledge-base 'b11)))
+  (test-assert (not (ask knowledge-base 'b11))))
 
 (let ((kb (tell* (make-knowledge-base)
                  'a)))
-  (debug (ask kb '(not a))
-         (satisfy kb)))
+  (test-assert (not (ask kb '(not a))))
+  (test-assert (satisfy kb)))
 
 (let ((kb (tell* (make-knowledge-base)
                  'b11
                  '(=> b11 (or p01 p10 p12 p21))
                  '(not b00)
                  '(=> (not b00) (and (not p10) (not p01))))))
-  (debug (ask kb 'p01)
-         (ask kb '(not p01))
-         (satisfy kb)))
+  (test-assert (not (ask kb 'p01)))
+  (test-assert (ask kb '(not p01)))
+  (test-assert (satisfy kb))
+  (test-assert (not (ask kb '(not p12))))
+  (test-assert (not (ask kb 'p12))))
 
 ;; Logical-agents:5 ends here
