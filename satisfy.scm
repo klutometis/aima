@@ -406,10 +406,9 @@
 ;;               (or b11 (not p12))
 ;;               (not b11))))
 
+;;; "a entails b iff (and a (not b)) is unsatisfiable."
 (define (ask knowledge-base query)
-  (and (satisfy (tell knowledge-base query)) #t)
-  (debug (->cnf `(=> ,knowledge-base ,query)))
-  (satisfy (->cnf `(=> ,knowledge-base ,query))))
+  (not (satisfy (tell knowledge-base `(not ,query)))))
 
 (let ((knowledge-base (tell* (make-knowledge-base)
                              '(not b11)
