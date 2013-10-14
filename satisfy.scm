@@ -94,11 +94,7 @@
                                        ((? symbol?) (list clause))
                                        ((? negative-clause?) (list clause))
                                        (('or . ps) ps)
-                                       (p p))
-                                     ;; (cond ((symbol? clause) (list clause))
-                                     ;;       ((negative-clause? clause) (list clause))
-                                     ;;       (else clause))
-                                     )
+                                       (p p)))
                                     (simplification '()))
                            (if (null? clause)
                                (cons (if (= (length simplification) 1)
@@ -107,11 +103,6 @@
                                (let* ((term (car clause))
                                       (negative-term? (negative-clause? term)))
                                  (if (eq? literal-variable (variable term))
-                                     ;; It's not sufficient to return
-                                     ;; simplifications: need to check
-                                     ;; for opposite, too. No, wait a
-                                     ;; minute: (or #t #f) is
-                                     ;; true.
                                      (if (or (and negative? negative-term?)
                                              (and (not negative?) (not negative-term?)))
                                          simplifications
@@ -122,13 +113,6 @@
                        '()
                        clauses)))
       (delete-duplicates simplification))))
-
-;;; This also needs to handle e.g. negatives.
-;; (define (remove-variable clauses variable)
-;;   (map (lambda (clause)
-;;          (filter (lambda (terms) )
-;;                  (disjuncts clause)))
-;;        clauses))
 
 (define (filter-clauses clauses variable)
   (filter (lambda (clause) (not (memq variable clause))) clauses))
