@@ -473,4 +473,18 @@
          ;; knowledge-base
          ))
 
+(let ((kb (tell* (make-knowledge-base)
+                 'a)))
+  (debug (ask kb '(not a))
+         (satisfy kb)))
+
+(let ((kb (tell* (make-knowledge-base)
+                 'b11
+                 '(=> b11 (or p01 p10 p12 p21))
+                 '(not b00)
+                 '(=> (not b00) (and (not p10) (not p01))))))
+  (debug (ask kb 'p01)
+         (ask kb '(not p01))
+         (satisfy kb)))
+
 ;; Logical-agents:5 ends here
