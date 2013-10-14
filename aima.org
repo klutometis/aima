@@ -8150,6 +8150,21 @@
 
   Use the Russell-Norvigian “a entails b iff (and a (not b)) is
   unsatisfiable.”
+
+  “The problem of determining the satisfiability of sentences in
+  propositional logic-the SAT problem-was the first problem proved to
+  be NP-complete. Many problems in computer science are really
+  satisfiability problems. For example, all the constraint
+  satisfaction problems in Chapter 6 ask whether the constraints are
+  satisfiable by some assignment.”
+
+  I suspected this to be the case; should have done the problems in
+  the back.
+
+  Things like the state of the wumpus as state-variables? Let’s fold
+  them into the knowledge base.
+
+  Initial simplification: teleportation.
 * TODO Random agent against wumpusworldserver.com
   #+BEGIN_SRC scheme
     (use alist-lib
