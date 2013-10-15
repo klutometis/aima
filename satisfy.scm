@@ -353,9 +353,41 @@
     n m)
    n m))
 
-(let ((kb (make-wumpus-kb 3 3)))
-  (debug kb 
-         (ask (tell kb `(not ,(var 'B 1 1)))
-              `(not ,(var 'P 0 1)))))
+;; (let ((kb (make-wumpus-kb 3 3)))
+;;   (debug kb 
+;;          (ask (tell kb `(not ,(var 'B 1 1)))
+;;               `(not ,(var 'P 0 1)))))
+
+(define (make-wumpus-agent n m)
+  (let ((kb (make-parameter
+             (tell* (make-wumpus-kb n m)
+                    (var 'north 0)
+                    (var 'location 0 0)
+                    (var 'arrow 0)
+                    (var 'wumpus-alive 0))))
+        (time (make-parameter 0))
+        (plan (make-parameter '()))
+        (x (make-parameter 0))
+        (y (make-parameter 0)))
+    (lambda (stench breeze glitter bump scream)
+      (kb (tell* (kb)
+                 (if stench
+                     (var 'stench (x) (y))
+                     (not-var 'stench (x) (y)))
+                 (if breeze
+                     (var 'breeze (x) (y))
+                     (not-var 'breeze (x) (y)))
+                 (if glitter
+                     (var 'glitter (x) (y))
+                     (not-var 'glitter (x) (y)))
+                 `(<=> ,(var 'arrow (+ (time) 1))
+                       (and ,(var 'arrow (time))
+                            ,(not-var 'shoot (time))))))
+      (values (var 'forward (time)) (kb)))))
+
+(let ((agent (make-wumpus-agent 3 3)))
+  (call-with-values (lambda () (agent #f #t #f #f #f))
+    (lambda (action kb)
+      (debug action kb))))
 
 ;; Logical-agents:5 ends here
