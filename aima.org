@@ -8168,6 +8168,8 @@
   Initial simplification: teleportation.
 
   Some operation for the merging of KBs.
+
+  Successor-state axioms
 * TODO Random agent against wumpusworldserver.com
   #+BEGIN_SRC scheme
     (use alist-lib
