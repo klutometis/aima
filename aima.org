@@ -8162,9 +8162,12 @@
   the back.
 
   Things like the state of the wumpus as state-variables? Let’s fold
-  them into the knowledge base.
+  them into the knowledge base. (Time variables as state variables: a
+  little cheating.)
 
   Initial simplification: teleportation.
+
+  Some operation for the merging of KBs.
 * TODO Random agent against wumpusworldserver.com
   #+BEGIN_SRC scheme
     (use alist-lib
