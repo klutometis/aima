@@ -2,7 +2,8 @@
 
 ;; [[file:~/prg/scm/aima/aima.org::*Logical%20agents][Logical-agents:5]]
 
-(use debug
+(use combinatorics
+     debug
      matchable
      srfi-1
      test)
@@ -191,7 +192,7 @@
     (('=> p q) `(or (not ,p) ,q))
     (('<=> p q)
      `(and (or ,p (not ,q))
-           (or (not ,q) ,p)))
+           (or (not ,p) ,q)))
     ((op . ps) `(,op ,@(map eliminate-implications ps)))))
 
 (define (move-not-inwards formula)
@@ -284,5 +285,74 @@
   (test-assert (satisfy kb))
   (test-assert (not (ask kb '(not p12))))
   (test-assert (not (ask kb 'p12))))
+
+(define (var . name-subscripts)
+  (string->symbol (string-join (map ->string name-subscripts) ",")))
+
+(define (subscripts symbol)
+  (let ((name-subscripts (string-split (symbol->string symbol) ",")))
+    (cons (string->symbol (car name-subscripts)) (map string->number (cdr name-subscripts)))))
+
+(define (wumpus-physics kb n m)
+  (let iter-n ((n n)
+               (kb kb))
+    (if (negative? n)
+        kb
+        (let iter-m ((m m)
+                     (kb kb))
+          (if (negative? m)
+              (iter-n (- n 1) kb)
+              (iter-m (- m 1)
+                      (tell* kb
+                             `(<=> ,(var 'B n m)
+                                   (or ,(var 'P (- n 1) m)
+                                       ,(var 'P n (- m 1))
+                                       ,(var 'P (+ n 1) m)
+                                       ,(var 'P n (+ m 1))))
+                             `(<=> (not ,(var 'B n m))
+                                   (and (not ,(var 'P (- n 1) m))
+                                        (not ,(var 'P n (- m 1)))
+                                        (not ,(var 'P (+ n 1) m))
+                                        (not ,(var 'P n (+ m 1)))))
+                             `(<=> ,(var 'S n m)
+                                   (or ,(var 'W (- n 1) m)
+                                       ,(var 'W n (- m 1))
+                                       ,(var 'W (+ n 1) m)
+                                       ,(var 'W n (+ m 1))))
+                             `(<=> (not ,(var 'S n m))
+                                   (and (not ,(var 'W (- n 1) m))
+                                        (not ,(var 'W n (- m 1)))
+                                        (not ,(var 'W (+ n 1) m))
+                                        (not ,(var 'W n (+ m 1))))))))))))
+
+(define (wumpi n m)
+  (append-map
+   (lambda (i)
+     (map (lambda (j)
+            (var 'W i j))
+          (iota m)))
+   (iota n)))
+
+(define (there-exists-a-wumpus kb n m)
+  (tell kb `(or ,@(wumpi n m))))
+
+(define (there-is-only-one-wumpus kb n m)
+  (unordered-subset-fold
+   (lambda (x-y kb) (match x-y ((x y) (tell kb `(or (not ,x) (not ,y))))))
+   kb
+   (wumpi n m)
+   2))
+
+(define (make-wumpus-kb n m)
+  (there-is-only-one-wumpus
+   (there-exists-a-wumpus
+    (wumpus-physics (make-knowledge-base) n m)
+    n m)
+   n m))
+
+(let ((kb (make-wumpus-kb 3 3)))
+  (debug kb 
+         (ask (tell kb `(not ,(var 'B 1 1)))
+              `(not ,(var 'P 0 1)))))
 
 ;; Logical-agents:5 ends here
