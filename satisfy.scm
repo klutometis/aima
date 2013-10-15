@@ -289,6 +289,9 @@
 (define (var . name-subscripts)
   (string->symbol (string-join (map ->string name-subscripts) ",")))
 
+(define (not-var . name-subscripts)
+  `(not ,(apply var name-subscripts)))
+
 (define (subscripts symbol)
   (let ((name-subscripts (string-split (symbol->string symbol) ",")))
     (cons (string->symbol (car name-subscripts)) (map string->number (cdr name-subscripts)))))
