@@ -356,19 +356,21 @@
 ;; (let ((kb (make-wumpus-kb 3 3)))
 ;;   (debug kb 
 ;;          (ask (tell kb `(not ,(var 'B 1 1)))
-;;               `(not ,(var 'P 0 1)))))
+;;               `(not ,(var 'P 0 1)))
+;;          (ask (tell kb (var 'B 1 1))
+;;               (not-var 'P 2 1))
+;;          (ask (tell kb (var 'B 1 1))
+;;               (var 'P 2 1))))
 
 (define (make-wumpus-agent n m)
   (let ((kb (make-parameter
              (tell* (make-wumpus-kb n m)
                     (var 'north 0)
-                    (var 'location 0 0)
+                    (var 'location 0 0 0)
                     (var 'arrow 0)
                     (var 'wumpus-alive 0))))
         (time (make-parameter 0))
-        (plan (make-parameter '()))
-        (x (make-parameter 0))
-        (y (make-parameter 0)))
+        (plan (make-parameter '())))
     (lambda (stench breeze glitter bump scream)
       (kb (tell* (kb)
                  (if stench
