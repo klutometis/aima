@@ -8173,6 +8173,9 @@
 
   Make $n$ and $m$ parameters. Do we have to explicate the
   not-actions? I hope not.
+
+  Wow, if the database becomes inconsistent: you can ask it anything
+  you want!
 * TODO Random agent against wumpusworldserver.com
   #+BEGIN_SRC scheme
     (use alist-lib
