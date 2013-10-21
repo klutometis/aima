@@ -296,87 +296,102 @@
   (let ((name-subscripts (string-split (symbol->string symbol) ",")))
     (cons (string->symbol (car name-subscripts)) (map string->number (cdr name-subscripts)))))
 
-(define (wumpus-tell kb n m tell)
-  (let iter-n ((n n)
+(define (wumpus-tell kb tell)
+  (let iter-n ((n (n))
                (kb kb))
     (if (negative? n)
         kb
-        (let iter-m ((m m)
+        (let iter-m ((m (m))
                      (kb kb))
           (if (negative? m)
               (iter-n (- n 1) kb)
               (iter-m (- m 1)
                       (tell kb n m)))))))
 
-(define (wumpus-tell-physics kb n m)
-  (wumpus-tell kb
-               n
-               m
-               (lambda (kb n m)
-                 (tell* kb
-                        `(<=> ,(var 'breeze n m)
-                              (or ,(var 'pit (- n 1) m)
-                                  ,(var 'pit n (- m 1))
-                                  ,(var 'pit (+ n 1) m)
-                                  ,(var 'pit n (+ m 1))))
-                        `(<=> (not ,(var 'breeze n m))
-                              (and (not ,(var 'pit (- n 1) m))
-                                   (not ,(var 'pit n (- m 1)))
-                                   (not ,(var 'pit (+ n 1) m))
-                                   (not ,(var 'pit n (+ m 1)))))
-                        `(<=> ,(var 'stench n m)
-                              (or ,(var 'wumpus (- n 1) m)
-                                  ,(var 'wumpus n (- m 1))
-                                  ,(var 'wumpus (+ n 1) m)
-                                  ,(var 'wumpus n (+ m 1))))
-                        `(<=> (not ,(var 'stench n m))
-                              (and (not ,(var 'wumpus (- n 1) m))
-                                   (not ,(var 'wumpus n (- m 1)))
-                                   (not ,(var 'wumpus (+ n 1) m))
-                                   (not ,(var 'wumpus n (+ m 1)))))))))
+(define (wumpus-ask kb question)
+  (let iter-i ((i (- (n) 1))
+               (answers '()))
+    (if (negative? i)
+        answers
+        (let iter-j ((j (- (m) 1))
+                     (answers answers))
+          (if (negative? j)
+              (iter-i (- i 1) answers)
+              (iter-j (- j 1)
+                      (let ((question (question i j)))
+                        (if (ask kb question)
+                            (cons question answers)
+                            answers))))))))
 
-(define (wumpi n m)
+(define (wumpus-tell-physics kb)
+  (wumpus-tell
+   kb
+   (lambda (kb i j)
+     (tell* kb
+            `(<=> ,(var 'breeze i j)
+                  (or ,(var 'pit (- i 1) j)
+                      ,(var 'pit i (- j 1))
+                      ,(var 'pit (+ i 1) j)
+                      ,(var 'pit i (+ j 1))))
+            `(<=> (not ,(var 'breeze i j))
+                  (and (not ,(var 'pit (- i 1) j))
+                       (not ,(var 'pit i (- j 1)))
+                       (not ,(var 'pit (+ i 1) j))
+                       (not ,(var 'pit i (+ j 1)))))
+            `(<=> ,(var 'stench i j)
+                  (or ,(var 'wumpus (- i 1) j)
+                      ,(var 'wumpus i (- j 1))
+                      ,(var 'wumpus (+ i 1) j)
+                      ,(var 'wumpus i (+ j 1))))
+            `(<=> (not ,(var 'stench i j))
+                  (and (not ,(var 'wumpus (- i 1) j))
+                       (not ,(var 'wumpus i (- j 1)))
+                       (not ,(var 'wumpus (+ i 1) j))
+                       (not ,(var 'wumpus i (+ j 1)))))))))
+
+(define (wumpi)
   (append-map
    (lambda (i)
      (map (lambda (j)
             (var 'wumpus i j))
-          (iota m)))
-   (iota n)))
+          (iota (m))))
+   (iota (n))))
 
 ;;; Might need to make this time-sensitive: either I haven't detected
 ;;; a stench yet, or &c.
-(define (there-exists-a-wumpus kb n m)
-  (tell kb `(or ,@(wumpi n m))))
+(define (there-exists-a-wumpus kb)
+  (tell kb `(or ,@(wumpi))))
 
-(define (there-is-at-most-one-wumpus kb n m)
+(define (there-is-at-most-one-wumpus kb)
   (unordered-subset-fold
    (lambda (x-y kb) (match x-y ((x y) (tell kb `(or (not ,x) (not ,y))))))
    kb
-   (wumpi n m)
+   (wumpi)
    2))
 
 ;;; This version causes an inconsistency: I can't say there's a wumpus
 ;;; anywhere: don't have enough information. The KB fails trivially.
-(define (make-wumpus-kb n m)
+(define (make-wumpus-kb)
   (there-is-at-most-one-wumpus
    (there-exists-a-wumpus
-    (wumpus-tell-physics (make-knowledge-base) n m)
-    n m)
-   n m))
+    (wumpus-tell-physics
+     (make-knowledge-base)))))
 
-;; (define (make-wumpus-kb n m)
-;;   (there-is-at-most-one-wumpus
-;;    (wumpus-tell-physics (make-knowledge-base) n m)
-;;    n m))
+(define (make-wumpus-kb)
+  (there-is-at-most-one-wumpus
+   (wumpus-tell-physics
+    (make-knowledge-base))))
 
-(define (wumpus-tell-location kb n m t)
-  (wumpus-tell kb
-               n
-               m
-               (lambda (kb n m)
-                 (tell* kb
-                        `(<=> ,(var 'location (+ t 1) n m)
-                              ,(var 'teleport t n m))))))
+(define n (make-parameter 2))
+(define m (make-parameter 2)) 
+
+(define (wumpus-tell-location kb t)
+  (wumpus-tell
+   kb
+   (lambda (kb i j)
+     (tell* kb
+            `(<=> ,(var 'location (+ t 1) i j)
+                  ,(var 'teleport t i j))))))
 
 ;; (let ((kb (make-wumpus-kb 3 3)))
 ;;   (debug kb 
@@ -387,44 +402,46 @@
 ;;          (ask (tell kb (var 'breeze 1 1))
 ;;               (var 'pit 2 1))))
 
-(define (wumpus-tell-ok kb n m t)
-  (wumpus-tell kb
-               n
-               m
-               (lambda (kb n m)
-                 (tell kb
-                       `(<=> ,(var 'ok t n m)
-                             (and ,(not-var 'pit n m)
-                                  (not (and ,(var 'wumpus n m)
-                                            ,(var 'wumpus-alive t)))))))))
+(define (wumpus-tell-ok kb t)
+  (wumpus-tell 
+   kb
+   (lambda (kb i j)
+     (tell kb
+           `(<=> ,(var 'ok t i j)
+                 (and ,(not-var 'pit i j)
+                      (not (and ,(var 'wumpus i j)
+                                ,(var 'wumpus-alive t)))))))))
 
-(define (wumpus-tell-stench kb n m t)
-  (wumpus-tell kb
-               n
-               m
-               (lambda (kb n m)
-                 (tell kb
-                       `(<=> (and ,(var 'stench t)
-                                  ,(var 'location t n m))
-                             ,(var 'stench n m))))))
+(define (wumpus-tell-stench kb t)
+  (wumpus-tell
+   kb
+   (lambda (kb i j)
+     (tell kb
+           `(<=> (and ,(var 'stench t)
+                      ,(var 'location t i j))
+                 ,(var 'stench i j))))))
 
-(define (wumpus-tell-breeze kb n m t)
-  (wumpus-tell kb
-               n
-               m
-               (lambda (kb n m)
-                 (tell kb
-                       `(<=> (and ,(var 'breeze t)
-                                  ,(var 'location t n m))
-                             ,(var 'breeze n m))))))
+(define (wumpus-tell-breeze kb t)
+  (wumpus-tell
+   kb
+   (lambda (kb i j)
+     (tell kb
+           `(<=> (and ,(var 'breeze t)
+                      ,(var 'location t i j))
+                 ,(var 'breeze i j))))))
 
-(define (make-wumpus-agent n m)
+;; (define (wumpus-ask-ok kb)
+;;   )
+
+;; (define (safe-square kb n m))
+
+(define (make-wumpus-agent)
   (let ((kb (make-parameter
-             (tell* (make-wumpus-kb n m)
+             (tell* (make-wumpus-kb)
                     (var 'location 0 0 0)
                     (var 'arrow 0)
                     (var 'wumpus-alive 0))))
-        (time (make-parameter 0))
+        (t (make-parameter 0))
         (plan (make-parameter '())))
     (lambda (stench breeze glitter scream)
       ;; (kb (wumpus-tell-stench
@@ -462,29 +479,21 @@
              (wumpus-tell-location
               (tell* (kb)
                      (if stench
-                         (var 'stench (time))
-                         (not-var 'stench (time)))
+                         (var 'stench (t))
+                         (not-var 'stench (t)))
                      (if breeze
-                         (var 'breeze (time))
-                         (not-var 'breeze (time)))
+                         (var 'breeze (t))
+                         (not-var 'breeze (t)))
                      (if glitter
-                         (var 'glitter (time))
-                         (not-var 'glitter (time)))
-                     `(<=> ,(var 'arrow (+ (time) 1))
-                           (and ,(var 'arrow (time))
-                                ,(not-var 'shoot (time)))))
-              n
-              m
-              (time))
-             n
-             m
-             (time))
-            n
-            m
-            (time))
-           n
-           m
-           (time)))
+                         (var 'glitter (t))
+                         (not-var 'glitter (t)))
+                     `(<=> ,(var 'arrow (+ (t) 1))
+                           (and ,(var 'arrow (t))
+                                ,(not-var 'shoot (t)))))
+              (t))
+             (t))
+            (t))
+           (t)))
       (debug (ask (kb) (var 'ok 0 0 0)))
       (debug (ask (kb) (var 'ok 0 0 1)))
       (debug (ask (kb) (var 'ok 0 1 0)))
@@ -511,10 +520,11 @@
       (debug (ask (kb) (var 'location 0 1 0)))
       (debug (ask (kb) (var 'location 0 0 1)))
       (debug (ask (kb) (var 'location 0 1 1)))
-      (values (var 'forward (time)) (kb)))))
+      (debug (wumpus-ask (kb) (lambda (i j) (var 'ok (t) i j))))
+      (values (var 'forward (t)) (kb)))))
 
-(let ((agent (make-wumpus-agent 2 2)))
-  (call-with-values (lambda () (agent #t #t #f #f))
+(let ((agent (make-wumpus-agent)))
+  (call-with-values (lambda () (agent #f #f #f #f))
     (lambda (action kb)
       (debug action
              ;; kb
