@@ -343,22 +343,31 @@
           (iota m)))
    (iota n)))
 
+;;; Might need to make this time-sensitive: either I haven't detected
+;;; a stench yet, or &c.
 (define (there-exists-a-wumpus kb n m)
   (tell kb `(or ,@(wumpi n m))))
 
-(define (there-is-only-one-wumpus kb n m)
+(define (there-is-at-most-one-wumpus kb n m)
   (unordered-subset-fold
    (lambda (x-y kb) (match x-y ((x y) (tell kb `(or (not ,x) (not ,y))))))
    kb
    (wumpi n m)
    2))
 
+;;; This version causes an inconsistency: I can't say there's a wumpus
+;;; anywhere: don't have enough information. The KB fails trivially.
 (define (make-wumpus-kb n m)
-  (there-is-only-one-wumpus
+  (there-is-at-most-one-wumpus
    (there-exists-a-wumpus
     (wumpus-tell-physics (make-knowledge-base) n m)
     n m)
    n m))
+
+;; (define (make-wumpus-kb n m)
+;;   (there-is-at-most-one-wumpus
+;;    (wumpus-tell-physics (make-knowledge-base) n m)
+;;    n m))
 
 (define (wumpus-tell-location kb n m t)
   (wumpus-tell kb
@@ -447,22 +456,26 @@
       ;;      n
       ;;      m
       ;;      (time)))
-      (kb (wumpus-tell-breeze
-           (wumpus-tell-ok
-            (wumpus-tell-location
-             (tell* (kb)
-                    (if stench
-                        (var 'stench (time))
-                        (not-var 'stench (time)))
-                    (if breeze
-                        (var 'breeze (time))
-                        (not-var 'breeze (time)))
-                    (if glitter
-                        (var 'glitter (time))
-                        (not-var 'glitter (time)))
-                    `(<=> ,(var 'arrow (+ (time) 1))
-                          (and ,(var 'arrow (time))
-                               ,(not-var 'shoot (time)))))
+      (kb (wumpus-tell-stench
+           (wumpus-tell-breeze
+            (wumpus-tell-ok
+             (wumpus-tell-location
+              (tell* (kb)
+                     (if stench
+                         (var 'stench (time))
+                         (not-var 'stench (time)))
+                     (if breeze
+                         (var 'breeze (time))
+                         (not-var 'breeze (time)))
+                     (if glitter
+                         (var 'glitter (time))
+                         (not-var 'glitter (time)))
+                     `(<=> ,(var 'arrow (+ (time) 1))
+                           (and ,(var 'arrow (time))
+                                ,(not-var 'shoot (time)))))
+              n
+              m
+              (time))
              n
              m
              (time))
@@ -480,8 +493,10 @@
       (debug (ask (kb) (var 'pit 1 0)))
       (debug (ask (kb) (var 'wumpus 0 1)))
       (debug (ask (kb) (var 'wumpus 1 0)))
+      (debug (ask (kb) (var 'wumpus 1 1)))
       (debug (ask (kb) (not-var 'wumpus 0 1)))
       (debug (ask (kb) (not-var 'wumpus 1 0)))
+      (debug (ask (kb) (not-var 'wumpus 1 1)))
       (debug (ask (kb) (var 'wumpus-alive 0)))
       (debug (ask (kb) (not-var 'pit 1 0)))
       (debug (ask (kb) (not-var 'pit 0 1)))
@@ -489,12 +504,20 @@
       (debug (ask (kb) (var 'breeze 0 0)))
       (debug (ask (kb) (not-var 'breeze 0 0)))
       (debug (ask (kb) (var 'breeze 0)))
+      (debug (ask (kb) (var 'stench 0 0)))
+      (debug (ask (kb) (not-var 'stench 0 0)))
+      (debug (ask (kb) (var 'stench 0)))
+      (debug (ask (kb) (var 'location 0 0 0)))
+      (debug (ask (kb) (var 'location 0 1 0)))
+      (debug (ask (kb) (var 'location 0 0 1)))
+      (debug (ask (kb) (var 'location 0 1 1)))
       (values (var 'forward (time)) (kb)))))
 
 (let ((agent (make-wumpus-agent 2 2)))
-  (call-with-values (lambda () (agent #f #f #f #f))
+  (call-with-values (lambda () (agent #t #t #f #f))
     (lambda (action kb)
-      (debug action ;; kb
-             ))))
+      (debug action
+             ;; kb
+             (and (satisfy kb) #t)))))
 
 ;; Logical-agents:5 ends here
