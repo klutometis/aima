@@ -8170,6 +8170,9 @@
   Some operation for the merging of KBs.
 
   Successor-state axioms
+
+  Make $n$ and $m$ parameters. Do we have to explicate the
+  not-actions? I hope not.
 * TODO Random agent against wumpusworldserver.com
   #+BEGIN_SRC scheme
     (use alist-lib
