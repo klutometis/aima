@@ -387,11 +387,11 @@
 
 ;;; This version causes an inconsistency: I can't say there's a wumpus
 ;;; anywhere: don't have enough information. The KB fails trivially.
-(define (make-wumpus-kb)
-  (there-is-at-most-one-wumpus
-   (there-exists-a-wumpus
-    (wumpus-tell-physics
-     (make-knowledge-base)))))
+;; (define (make-wumpus-kb)
+;;   (there-is-at-most-one-wumpus
+;;    (there-exists-a-wumpus
+;;     (wumpus-tell-physics
+;;      (make-knowledge-base)))))
 
 (define (make-wumpus-kb)
   (there-is-at-most-one-wumpus
