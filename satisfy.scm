@@ -455,6 +455,31 @@
            (('ok t i j) (cons i j))))
        (wumpus-ask kb (lambda (i j) (var 'ok t i j)))))
 
+(define (unvisited-squares kb t)
+  (let ((unvisited-squares (make-hash-table)))
+    (let iter ((t t))
+      (unless (negative? t)
+          (for-each
+              (match-lambda (('location t i j)
+                        (hash-table-set! unvisited-squares (cons i j) #t)))
+            (map
+             subscripts
+             (wumpus-ask-not
+              kb
+              (lambda (i j) (var 'location t i j)))))
+          (iter (- t 1))))
+    (let iter ((t t))
+      (unless (negative? t)
+          (for-each
+              (match-lambda (('location t i j)
+                        (hash-table-delete! unvisited-squares (cons i j))))
+            (map
+             subscripts
+             (wumpus-ask
+              kb
+              (lambda (i j) (var 'location t i j)))))
+          (iter (- t 1))))
+    (hash-table-keys unvisited-squares)))
 
 (define (make-wumpus-agent)
   (let ((kb (make-parameter
