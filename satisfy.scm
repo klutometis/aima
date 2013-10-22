@@ -449,7 +449,12 @@
 ;; (define (wumpus-ask-ok kb)
 ;;   )
 
-;; (define (safe-square kb n m))
+(define (safe-squares kb t)
+  (map (lambda (ok)
+         (match (subscripts ok)
+           (('ok t i j) (cons i j))))
+       (wumpus-ask kb (lambda (i j) (var 'ok t i j)))))
+
 
 (define (make-wumpus-agent)
   (let ((kb (make-parameter
