@@ -490,35 +490,6 @@
         (t (make-parameter 0))
         (plan (make-parameter '())))
     (lambda (stench breeze glitter scream)
-      ;; (kb (wumpus-tell-stench
-      ;;      (wumpus-tell-breeze
-      ;;       (wumpus-tell-ok
-      ;;        (wumpus-tell-location
-      ;;         (tell* (kb)
-      ;;                (if stench
-      ;;                    (var 'stench (time))
-      ;;                    (not-var 'stench (time)))
-      ;;                (if breeze
-      ;;                    (var 'breeze (time))
-      ;;                    (not-var 'breeze (time)))
-      ;;                (if glitter
-      ;;                    (var 'glitter (time))
-      ;;                    (not-var 'glitter (time)))
-      ;;                `(<=> ,(var 'arrow (+ (time) 1))
-      ;;                      (and ,(var 'arrow (time))
-      ;;                           ,(not-var 'shoot (time)))))
-      ;;         n
-      ;;         m
-      ;;         (time))
-      ;;        n
-      ;;        m
-      ;;        (time))
-      ;;       n
-      ;;       m
-      ;;       (time))
-      ;;      n
-      ;;      m
-      ;;      (time)))
       (kb (wumpus-tell-stench
            (wumpus-tell-breeze
             (wumpus-tell-ok
