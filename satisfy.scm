@@ -324,6 +324,21 @@
                             (cons question answers)
                             answers))))))))
 
+(define (wumpus-ask-not kb question)
+  (let iter-i ((i (- (n) 1))
+               (answers '()))
+    (if (negative? i)
+        answers
+        (let iter-j ((j (- (m) 1))
+                     (answers answers))
+          (if (negative? j)
+              (iter-i (- i 1) answers)
+              (iter-j (- j 1)
+                      (let ((question (question i j)))
+                        (if (not (ask kb question))
+                            (cons question answers)
+                            answers))))))))
+
 (define (wumpus-tell-physics kb)
   (wumpus-tell
    kb
