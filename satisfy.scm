@@ -6,6 +6,7 @@
      debug
      matchable
      srfi-1
+     srfi-69
      test)
 
 (define (satisfy formula)
