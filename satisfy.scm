@@ -567,13 +567,15 @@
                    (unless (null? route)
                      (stack-push! (plan) route))))))
         (when (stack-empty? (plan))
-          (stack-push! (plan) (var 'move 0 1)))
+          (stack-push! (plan) (var 'climb)))
         (debug (stack->list (plan)))
         (let ((action (subscripts (stack-pop! (plan)))))
           (debug action)
           (match action
             (('move i j)
-             (kb (tell (kb) (var 'move (t) i j)))))
+             (kb (tell (kb) (var 'move (t) i j))))
+            (('climb)
+             (kb (tell (kb) (var 'climb (t))))))
           (t (+ (t) 1))
           (values action (kb)))))))
 
@@ -581,24 +583,35 @@
       (world (alist->hash-table
               `(((0 . 0) . (#f #f #f #f))
                 ((0 . 1) . (#f #t #f #f))
-                ((0 . 2) . (#f #f #f #f))
+                ((0 . 2) . (#t #f #f #f))
                 ((1 . 0) . (#f #t #f #f))
-                ((1 . 1) . (#f #f #f #f))
+                ((1 . 1) . (#t #f #f #f))
                 ((1 . 2) . (#f #t #f #f)))))
       (location (make-parameter (cons 0 0)))
       (wumpus-alive? (make-parameter #t)))
   ;; (debug (hash-table->alist world)
   ;;        (hash-table-ref world (cons 0 0)))
-  (until (or (equal? (location) (cons 1 1))
-             ;; (and (equal? (location) (cons 1 2))
-             ;;      (wumpus-alive?))
-             )
+  (let iter ()
     (call-with-values
         (lambda () (apply agent (hash-table-ref world (location))))
       (lambda (action kb)
         (debug action (and (satisfy kb) #t))
         (match action
-          (('move i j) (location (cons i j)))
-          (_))))))
+          (('move i j)
+           (location (cons i j))
+           (unless (or (equal? (location) (cons 1 1))
+                       (and (equal? (location) (cons 1 2))
+                            (wumpus-alive?)))
+             (iter)))
+          (('climb))))))
+  ;; (until 
+  ;;   (call-with-values
+  ;;       (lambda () (apply agent (hash-table-ref world (location))))
+  ;;     (lambda (action kb)
+  ;;       (debug action (and (satisfy kb) #t))
+  ;;       (match action
+  ;;         (('move i j) (location (cons i j)))
+  ;;         (_)))))
+  )
 
 ;; Logical-agents:5 ends here
