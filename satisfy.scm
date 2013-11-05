@@ -485,6 +485,11 @@
   (match (car goals)
     ((i . j) (var 'move i j))))
 
+(define (current-location kb t)
+  (debug (wumpus-ask kb (lambda (i j) (var 'location t i j))))
+  (match (subscripts (car (wumpus-ask kb (lambda (i j) (var 'location t i j)))))
+    (('location t i j) (cons i j))))
+
 (define (make-wumpus-agent)
   (let ((kb (make-parameter
              (tell* (make-wumpus-kb)
