@@ -503,28 +503,52 @@
         (t (make-parameter 0))
         (plan (make-parameter (make-stack))))
     (lambda (stench breeze glitter scream)
-      (kb (wumpus-tell-stench
-           (wumpus-tell-breeze
-            (wumpus-tell-ok
-             (wumpus-tell-location
-              (tell* (kb)
-                     (if stench
-                         (var 'stench (t))
-                         (not-var 'stench (t)))
-                     (if breeze
-                         (var 'breeze (t))
-                         (not-var 'breeze (t)))
-                     (if glitter
-                         (var 'glitter (t))
-                         (not-var 'glitter (t)))
-                     `(<=> ,(var 'arrow (+ (t) 1))
-                           (and ,(var 'arrow (t))
-                                ,(not-var 'shoot (t)))))
-              (t))
-             (t))
-            (t))
-           (t)))
+      ;; (kb (wumpus-tell-stench
+      ;;      (wumpus-tell-breeze
+      ;;       (wumpus-tell-ok
+      ;;        (wumpus-tell-location
+      ;;         (tell* (kb)
+      ;;                (if stench
+      ;;                    (var 'stench (t))
+      ;;                    (not-var 'stench (t)))
+      ;;                (if breeze
+      ;;                    (var 'breeze (t))
+      ;;                    (not-var 'breeze (t)))
+      ;;                (if glitter
+      ;;                    (var 'glitter (t))
+      ;;                    (not-var 'glitter (t)))
+      ;;                `(<=> ,(var 'arrow (t))
+      ;;                      (and ,(var 'arrow (- (t) 1))
+      ;;                           ,(not-var 'shoot (- (t) 1)))))
+      ;;         (t))
+      ;;        (t))
+      ;;       (t))
+      ;;      (t)))
+      (kb (wumpus-tell-location (kb) (t)))
+      (kb (tell (kb) `(<=> ,(var 'arrow (t))
+                           (and ,(var 'arrow (- (t) 1))
+                                ,(not-var 'shoot (- (t) 1))))))
+      (let ((current-location (current-location (kb) (t))))
+        (match current-location
+          ((i . j)
+           (if stench
+               (unless (ask (kb) (var 'stench i j))
+                 (kb (tell (kb) (var 'stench i j))))
+               (unless (ask (kb) (not-var 'stench i j))
+                 (kb (tell (kb) (not-var 'stench i j)))))
+           (if breeze
+               (unless (ask (kb) (var 'breeze i j))
+                 (kb (tell (kb) (var 'breeze i j))))
+               (unless (ask (kb) (not-var 'breeze i j))
+                 (kb (tell (kb) (not-var 'breeze i j)))))
+           (if glitter
+               (unless (ask (kb) (var 'glitter i j))
+                 (kb (tell (kb) (var 'glitter i j))))
+               (unless (ask (kb) (not-var 'glitter i j))
+                 (kb (tell (kb) (not-var 'glitter i j))))))))
+      (kb (wumpus-tell-ok (kb) (t)))
       (let ((safe-squares (safe-squares (kb) (t))))
+        (debug safe-squares (and (satisfy (kb)) #t))
         (cond ((ask (kb) (var 'glitter (t)))
                (plan (list->stack (var 'grab (t))
                                   (var 'move (t) 0 0)
