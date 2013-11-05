@@ -485,8 +485,9 @@
     (hash-table-keys unvisited-squares)))
 
 (define (plan-route current goals allowed)
-  (match (car goals)
-    ((i . j) (var 'move i j))))
+  (match goals
+    (() '())
+    (((i . j) . rest) (var 'move i j))))
 
 (define (current-location kb t)
   (debug (wumpus-ask kb (lambda (i j) (var 'location t i j))))
