@@ -404,6 +404,7 @@
 (define m (make-parameter 3))
 
 (define (wumpus-tell-location kb t)
+  (debug (wumpus-ask kb (lambda (i j) (var 'move (- t 1) i j))))
   (if (null? (wumpus-ask kb (lambda (i j) (var 'move (- t 1) i j))))
       (wumpus-tell
        kb
@@ -428,6 +429,7 @@
                       (not (and ,(var 'wumpus i j)
                                 ,(var 'wumpus-alive t)))))))))
 
+;;; This would have to be for all time t.
 (define (wumpus-tell-stench kb t)
   (wumpus-tell
    kb
@@ -437,6 +439,7 @@
                       ,(var 'location t i j))
                  ,(var 'stench i j))))))
 
+;;; This would have to be for all time t.
 (define (wumpus-tell-breeze kb t)
   (wumpus-tell
    kb
