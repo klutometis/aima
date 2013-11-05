@@ -548,5 +548,23 @@
           (t (+ (t) 1))
           (values action (kb)))))))
 
+(let ((agent (make-wumpus-agent))
+      (world (alist->hash-table
+              `(((0 . 0) . (#f #f #f #f))
+                ((0 . 1) . (#f #f #f #f))
+                ((1 . 1) . (#f #f #f #f))
+                ((1 . 0) . (#f #f #f #f)))))
+      (location (make-parameter (cons 0 0))))
+  ;; (debug (hash-table->alist world)
+  ;;        (hash-table-ref world (cons 0 0)))
+  (until (equal? (location) (cons 1 0))
+    (call-with-values
+        (lambda () (apply agent (hash-table-ref world (location))))
+      (lambda (action kb)
+        ;; (debug action ;; (kb)
+        ;;        )
+        (match action
+          (('move i j) (location (cons i j)))
+          (_))))))
 
 ;; Logical-agents:5 ends here
