@@ -522,19 +522,31 @@
            (t)))
       (let ((safe-squares (safe-squares (kb) (t))))
         (cond ((ask (kb) (var 'glitter (t)))
-               (plan (list (var 'grab (t))
-                           (var 'teleport (t) 0 0)
-                           (var 'climb (t)))))
-              ((null? (plan))
-               (let ((unvisited-squares (unvisited-squares (kb) (t))))
-                 (debug (lset-intersection equal? unvisited-squares safe-squares))))))
-      (values (var 'forward (t)) (kb)))))
+               (plan (list->stack (var 'grab (t))
+                                  (var 'move (t) 0 0)
+                                  (var 'climb (t)))))
+              ((stack-empty? (plan))
+               (let* ((unvisited-squares (unvisited-squares (kb) (t)))
+                      (safe-unvisited-squares
+                       (lset-intersection equal? unvisited-squares safe-squares)))
+                 (debug (current-location (kb) (t))
+                        (t))
+                 (stack-push! (plan)
+                              (plan-route current-location
+                                          safe-unvisited-squares
+                                          safe-squares))))
+              (else
+               (stack-push! (plan) (var 'move 0 1))))
+        ;; (debug (stack->list (plan)))
+        (let ((action (subscripts (stack-pop! (plan)))))
+          (debug action)
+          (match action
+            (('move i j)
+             (debug (var 'move (t) i j))
+             (kb (tell (kb) (var 'move (t) i j))))
+            (action (kb (tell (kb) action))))
+          (t (+ (t) 1))
+          (values action (kb)))))))
 
-(let ((agent (make-wumpus-agent)))
-  (call-with-values (lambda () (agent #f #f #f #f))
-    (lambda (action kb)
-      (debug action
-             ;; kb
-             (and (satisfy kb) #t)))))
 
 ;; Logical-agents:5 ends here
