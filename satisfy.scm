@@ -497,7 +497,7 @@
                     (var 'arrow 0)
                     (var 'wumpus-alive 0))))
         (t (make-parameter 0))
-        (plan (make-parameter '())))
+        (plan (make-parameter (make-stack))))
     (lambda (stench breeze glitter scream)
       (kb (wumpus-tell-stench
            (wumpus-tell-breeze
