@@ -481,6 +481,10 @@
           (iter (- t 1))))
     (hash-table-keys unvisited-squares)))
 
+(define (plan-route current goals allowed)
+  (match (car goals)
+    ((i . j) (var 'move i j))))
+
 (define (make-wumpus-agent)
   (let ((kb (make-parameter
              (tell* (make-wumpus-kb)
