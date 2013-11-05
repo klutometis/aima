@@ -558,21 +558,22 @@
                       (safe-unvisited-squares
                        (lset-intersection equal? unvisited-squares safe-squares)))
                  (debug (current-location (kb) (t))
-                        (t))
-                 (stack-push! (plan)
-                              (plan-route current-location
+                        (t)
+                        safe-unvisited-squares
+                        safe-squares)
+                 (let ((route (plan-route current-location
                                           safe-unvisited-squares
-                                          safe-squares))))
-              (else
-               (stack-push! (plan) (var 'move 0 1))))
-        ;; (debug (stack->list (plan)))
+                                          safe-squares)))
+                   (unless (null? route)
+                     (stack-push! (plan) route))))))
+        (when (stack-empty? (plan))
+          (stack-push! (plan) (var 'move 0 1)))
+        (debug (stack->list (plan)))
         (let ((action (subscripts (stack-pop! (plan)))))
           (debug action)
           (match action
             (('move i j)
-             (debug (var 'move (t) i j))
-             (kb (tell (kb) (var 'move (t) i j))))
-            (action (kb (tell (kb) action))))
+             (kb (tell (kb) (var 'move (t) i j)))))
           (t (+ (t) 1))
           (values action (kb)))))))
 
