@@ -404,21 +404,19 @@
 (define m (make-parameter 2)) 
 
 (define (wumpus-tell-location kb t)
-  (wumpus-tell
-   kb
-   (lambda (kb i j)
-     (tell* kb
-            `(<=> ,(var 'location (+ t 1) i j)
-                  ,(var 'teleport t i j))))))
-
-;; (let ((kb (make-wumpus-kb 3 3)))
-;;   (debug kb 
-;;          (ask (tell kb `(not ,(var 'breeze 1 1)))
-;;               `(not ,(var 'pit 0 1)))
-;;          (ask (tell kb (var 'breeze 1 1))
-;;               (not-var 'pit 2 1))
-;;          (ask (tell kb (var 'breeze 1 1))
-;;               (var 'pit 2 1))))
+  (if (null? (wumpus-ask kb (lambda (i j) (var 'move (- t 1) i j))))
+      (wumpus-tell
+       kb
+       (lambda (kb i j)
+         (tell* kb
+                `(<=> ,(var 'location t i j)
+                      ,(var 'location (- t 1) i j)))))
+      (wumpus-tell
+       kb
+       (lambda (kb i j)
+         (tell* kb
+                `(<=> ,(var 'location t i j)
+                      ,(var 'move (- t 1) i j)))))))
 
 (define (wumpus-tell-ok kb t)
   (wumpus-tell 
