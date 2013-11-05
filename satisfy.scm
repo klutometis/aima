@@ -5,8 +5,10 @@
 (use combinatorics
      debug
      matchable
+     miscmacros
      srfi-1
      srfi-69
+     stack
      test)
 
 (define (satisfy formula)
