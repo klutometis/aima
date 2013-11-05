@@ -401,7 +401,7 @@
     (make-knowledge-base))))
 
 (define n (make-parameter 2))
-(define m (make-parameter 2)) 
+(define m (make-parameter 3))
 
 (define (wumpus-tell-location kb t)
   (if (null? (wumpus-ask kb (lambda (i j) (var 'move (- t 1) i j))))
