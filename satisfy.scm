@@ -595,7 +595,7 @@
     (call-with-values
         (lambda () (apply agent (hash-table-ref world (location))))
       (lambda (action kb)
-        (debug action (and (satisfy kb) #t))
+        (debug action (and (satisfy kb) #t) (length kb))
         (match action
           (('move i j)
            (location (cons i j))
