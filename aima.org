@@ -10513,6 +10513,30 @@
     - For a given n, H is a maximum and equal to log n when all the
       p_i are equal.
     - $H = \Sum P_i H_i$
+** 8
+   - What programming languages lack is any general mechanism for
+     deriving facts from other facts.
+   - Declarative nature of propositional logic: knowledge and
+     inference are separate; inference is domain-independent.
+   - Data structures in programs . . . lack the expressiveness
+     required to handle partial information.
+   - Propositional logic . . . has sufficient expressive power to deal
+     with partial information, using disjunction and negation.
+   - Compositionality: meaning of a sentence is a function of the
+     meaning of its parts.
+   - Sapir-Whorf hypothesis
+   - For nondeductive tasks such as learning from experience, outcomes
+     are necessarily dependent on the form of the representations used.
+     - [Never got a chance to do walksat.]
+   - Adopt the foundation of propositional - a declarative,
+     compositional semantics that is context-independent and
+     unambigiuous - and build a more expressive logic on that
+     foundation, borrowing representatial ideas from natural language
+     while avoiding its brawbacks.
+   - Objects: nouns
+   - Relations: verbs; unary relations, i.e. properties
+   - Functions: relations in which there is only one value for a given
+     input.
 ** Lectures
 *** 1
     - AI: mapping from sensors to actuators
