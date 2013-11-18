@@ -10537,6 +10537,11 @@
    - Relations: verbs; unary relations, i.e. properties
    - Functions: relations in which there is only one value for a given
      input.
+   - First-order logic is built around objects and relations.
+   - First-order logic can express facts about some or all of the
+     objects in the universe.
+   - Primary difference between propositional and first-order logic
+     lies in the ontological commitment made by each language.
 ** Lectures
 *** 1
     - AI: mapping from sensors to actuators
