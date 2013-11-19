@@ -10542,6 +10542,145 @@
      objects in the universe.
    - Primary difference between propositional and first-order logic
      lies in the ontological commitment made by each language.
+   - Ontological commitment expressed through the nature of the formal
+     models with respect to which the truth of sentences is defined.
+   - Propositional: each model assigns true or false to each
+     proposition symbol.
+   - First order logic assumes: the world consists of objects with
+     certain relations that do or do not hold.
+   - Special-purpose logics make still further ontological
+     commitments: temporal logic assumes that facts hold at particular
+     times and that those times are ordered.
+   - Special-purpose logics give certain kinds of objects (and the
+     axioms about them) first-class status within the logic, rather
+     than simply defining them within the knowledge base.
+   - Higher-order logic views the relations and functions referred to
+     by first-order logic as objects in themselves.
+   - Epistemological commitments: possible states of knowledge that
+     it allows with respect to each fact.
+   - Probability theory, on the other hand, can have any degree of
+     belief.
+     - Don’t confuse the degree of belief in probability theory with
+       degree of truth in fuzzy logic.
+   - Models for first-order logic
+     - Domain model is the set of objects or domain elements it
+       contains.
+     - A relation is just the set of tuples of objects that are
+       related.
+     - Brotherhood-relation
+       - {<Richard, John>, <John, Richard>}
+     - Unary relations, e.g. person
+       - {<Richard>, <John>}
+     - Functions, e.g. left-leg
+       - <Richard> \to Richard’s left leg
+       - <Crown> \to No left leg
+   - Symbols
+     - Constant symbols, predicate symbols, function symbols
+     - Predicate and functions symbols have arity
+     - As in propositional, every model must provide the information
+       required to determine if any given sentence is true or false.
+     - Each model includes an interpretation that specifies exactly
+       which objects, relations and functions are referred to by the
+       constant, predicate, function symbols.
+     - Interpretation under which e.g. Richard refers to the crown.
+     - Entailment, validity defined in terms of all possible worlds.
+     - When there are more objects than constant symbols, some of the
+       objects will have no names.
+     - Because the number of possible models is unbounded, checking
+       entailment by the enumeration of all possible models is not
+       feasible for first-order logic (unlike propositional logic).
+   - Terms
+     - Term is a logical expression that refers to an object.
+     - Constant symbols are terms.
+     - Complex terms, e.g. $LeftLeg(John)$, formed by a function
+       symbol and arguments.
+     - $f(t_1, ..., t_n)$, where $f$ refers to a function in the
+       model; the argument terms refer to objects in the domain; the
+       term as a whole refers to the object.
+     - Complex terms are complicated names, not subroutines that
+       return a value.
+     - Reason about left-legs without defining left-legs; nothing a
+       subroutine could do.
+   - Atomic sentences
+     - Atom: predicate symbol optionally followed by a list of terms,
+       e.g. $Brother(Richard, John)$, $Married(Father(Richard),
+       Mother(John))$.
+     - An atomic sentence is true in a given model if the relation
+       referred to by the predicate symbol holds among the objects
+       referred to by the arguments.
+   - Complex sentences
+     - Logical connectives
+       - $(not (brother (left-leg richard) john))$
+       - $(and (brother richard john) (brother john richard))$
+   - Quantifiers
+     - Express properties of entire collections of objects, instead
+       of enumerating objects by name.
+     - Universal, existential
+     - Universal
+       - $(all (x) (=> (king x) (person x)))$
+       - $x$ is called a variable.
+       - A term with no variables: ground term
+       - $\forall x P$ is true for every object $x$.
+       - Also, extended interpretations constructed from the
+         interpretation given in the model, where each extended
+         interpretation specifies a domain object to which $x$ refers.
+       - End up asserting the conclusion of the rule just for those
+         objects for whom the premise is true and saying nothing at
+         all about those invidiuals for whom the premise is false.
+     - Existential
+       - E.g. $\exists x Crown(x) \land OnHead(x, John)$
+       - $\exists x P$, $P$ is true for at least one object $x$;
+         i.e., is true in at least one extended interpretation that
+         assigns $x$ to a domain element.
+       - $\exists!$: there exists exactly one.
+       - Just as \to is the natural connective to use with $\forall$,
+         $\land$ is the natural connective to use with $\exists$.
+     - Nested quantifiers
+       - $(all (x y) (=> (brother x y) (sibling x y)))$
+       - $(all (x) (all (y) ...))$
+       - $(all (x y) (<=> (sibling x y) (sibling y x)))$
+       - $(all (x) (or (crown x) (exists (x) (brother (richard x)))))$
+         - Innermost
+     - Relation between $\exists$ and $\forall$
+       - De Morgan’s, since $\forall$ is a conjunction over the
+         universe of objects and $\exists$ is a disjunction.
+       - $(<=> (all (x) (not P)) (not (exists (x) P)))$
+       - $(<=> (not (all (x) P)) (exists (x) (not P)))$
+       - $(<=> (all (x) P) (not (exists (x) (not P))))$
+       - $(<=> (exists (x) P) (not (all (x) (not P))))$
+       - “Readibility more import than parsimony.”
+     - Equality
+       - $Father(John) = Henry$
+       - $(exists (x y) (and (brother x richard) (brother y richard)
+         (not (= x y))))$
+       - $(and (brother john richard) (brother geoffrey richard) (not
+         (= john geoffrey)) (all (x) (=> (brother x richard) (or (= x
+         john) (= x geoffrey)))))$
+     - Database semantics (distinguished from first-order semantics)
+       - Unique-names assumption
+         - Every constant symbol refer to a distinct object
+       - Closed-world assumption
+         - Atomic sentences not known to be true are false
+       - Domain closure
+         - Each model contains no more domain elements than those
+           named by the constant symbols
+     - Sentences add to KB by =tell=: assertions
+       - =(tell kb (king john))=
+       - =(tell kb (person richard))=
+       - =(tell kb (all (x) (=> (king x) (person x))))=
+     - Ask questions of the knowledge base using =ask=; questions
+       with =ask= are queries or goals.
+     - Any query entailed by the knowledge base should be answered
+       affirmatively.
+     - =(ask kb (exists (x) (person x))) => #t=.
+     - =(ask-vars kb (person x)) => <stream of vars>=
+     - Substitution or binding list: =((x . john) (x . richard))=
+     - =ask-vars= reserved for knowledge bases consisting solely of
+       [[http://en.wikipedia.org/wiki/Horn_clause][Horn clauses]], every way of making the query true will bind the
+       variables to specific values.
+     - That is not the case with FOL: =(or (king john) (king
+       richard))=: no binding $x$ for =(exists (x) (king x))=, even
+       though true.
 ** Lectures
 *** 1
     - AI: mapping from sensors to actuators
