@@ -10649,38 +10649,38 @@
        - $(<=> (all (x) P) (not (exists (x) (not P))))$
        - $(<=> (exists (x) P) (not (all (x) (not P))))$
        - “Readibility more import than parsimony.”
-     - Equality
-       - $Father(John) = Henry$
-       - $(exists (x y) (and (brother x richard) (brother y richard)
-         (not (= x y))))$
-       - $(and (brother john richard) (brother geoffrey richard) (not
-         (= john geoffrey)) (all (x) (=> (brother x richard) (or (= x
-         john) (= x geoffrey)))))$
-     - Database semantics (distinguished from first-order semantics)
-       - Unique-names assumption
-         - Every constant symbol refer to a distinct object
-       - Closed-world assumption
-         - Atomic sentences not known to be true are false
-       - Domain closure
-         - Each model contains no more domain elements than those
-           named by the constant symbols
-     - Sentences add to KB by =tell=: assertions
-       - =(tell kb (king john))=
-       - =(tell kb (person richard))=
-       - =(tell kb (all (x) (=> (king x) (person x))))=
-     - Ask questions of the knowledge base using =ask=; questions
-       with =ask= are queries or goals.
-     - Any query entailed by the knowledge base should be answered
-       affirmatively.
-     - =(ask kb (exists (x) (person x))) => #t=.
-     - =(ask-vars kb (person x)) => <stream of vars>=
-     - Substitution or binding list: =((x . john) (x . richard))=
-     - =ask-vars= reserved for knowledge bases consisting solely of
-       [[http://en.wikipedia.org/wiki/Horn_clause][Horn clauses]], every way of making the query true will bind the
-       variables to specific values.
-     - That is not the case with FOL: =(or (king john) (king
-       richard))=: no binding $x$ for =(exists (x) (king x))=, even
-       though true.
+   - Equality
+     - $Father(John) = Henry$
+     - $(exists (x y) (and (brother x richard) (brother y richard)
+       (not (= x y))))$
+     - $(and (brother john richard) (brother geoffrey richard) (not
+       (= john geoffrey)) (all (x) (=> (brother x richard) (or (= x
+       john) (= x geoffrey)))))$
+   - Database semantics (distinguished from first-order semantics)
+     - Unique-names assumption
+       - Every constant symbol refer to a distinct object
+     - Closed-world assumption
+       - Atomic sentences not known to be true are false
+     - Domain closure
+       - Each model contains no more domain elements than those
+         named by the constant symbols
+   - Sentences add to KB by =tell=: assertions
+     - =(tell kb (king john))=
+     - =(tell kb (person richard))=
+     - =(tell kb (all (x) (=> (king x) (person x))))=
+   - Ask questions of the knowledge base using =ask=; questions
+     with =ask= are queries or goals.
+   - Any query entailed by the knowledge base should be answered
+     affirmatively.
+   - =(ask kb (exists (x) (person x))) => #t=.
+   - =(ask-vars kb (person x)) => <stream of vars>=
+   - Substitution or binding list: =((x . john) (x . richard))=
+   - =ask-vars= reserved for knowledge bases consisting solely of
+     [[http://en.wikipedia.org/wiki/Horn_clause][Horn clauses]], every way of making the query true will bind the
+     variables to specific values.
+   - That is not the case with FOL: =(or (king john) (king
+     richard))=: no binding $x$ for =(exists (x) (king x))=, even
+     though true.
 ** Lectures
 *** 1
     - AI: mapping from sensors to actuators
