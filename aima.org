@@ -10681,6 +10681,21 @@
    - That is not the case with FOL: =(or (king john) (king
      richard))=: no binding $x$ for =(exists (x) (king x))=, even
      though true.
+   - Using first-order logic
+     - ~(for-all (m c) (<=> (= (mother c) m) (and (female m) (parent m c))))~
+     - =(for-all (x) (<=> (male x) (not (female x))))=
+     - =(for-all (p c) (<=> (parent p c) (child c p)))=
+     - Axiom of the kinship domain: basic factual information, from
+       which useful conclusions are derived.
+     - Definitions bottom out at a basic set of predicates.
+     - Not all logical sentences about a domain are axioms; some are
+       theorems: they are entailed by the axioms.
+     - Logical point of niew, KB need contain only axioms but no
+       theorems. Practically, theorems are essential to reduce the
+       cost of deriving new sentences.
+     - Without them, physicist has to rederive calculus.
+       - [Feynman: Greek vs. Babylonian mathematics.]
+     - 
 ** Lectures
 *** 1
     - AI: mapping from sensors to actuators
