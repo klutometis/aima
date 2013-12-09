@@ -10695,7 +10695,26 @@
        cost of deriving new sentences.
      - Without them, physicist has to rederive calculus.
        - [Feynman: Greek vs. Babylonian mathematics.]
-     - 
+     - Substitution/binding-list
+     - Not all axioms are definitions
+     - First-order logic allows us to make use of the $Person$
+       predicate without completely definiting it.
+     - Write partial specifications of properties that every person
+       has and properties that make something a porsen.
+     - Axioms: plain facts: $Male(Jim)$.
+   - Numbers, sets, lists
+     - 0 and successor
+     - Peano axioms
+       - $NatNum(0)$
+       - $(for-all (n) (=> (nat-num n) (nat-num (s n))))$
+     - $(for-all (n) (not (= 0 (s n))))$
+     - $(for-all (n m) (=> (not (= m n)) (not (= (s m) (s n)))))$
+     - $(for-all (m) (=> (nat-num m) (= (+ 0 m) m)))$
+     - $(for-all (m n) (=> (and (nat-num m) (nat-num n)) (= (+ (s m)
+       n) (s (+ m n)))))$
+     - Thus, tho whole of number theory (including cryptography) can
+       be built up from one constant, one function, one predicate and
+       four axioms.
 ** Lectures
 *** 1
     - AI: mapping from sensors to actuators
