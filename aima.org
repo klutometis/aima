@@ -10700,21 +10700,59 @@
      - First-order logic allows us to make use of the $Person$
        predicate without completely definiting it.
      - Write partial specifications of properties that every person
-       has and properties that make something a porsen.
+       has and properties that make something a person.
      - Axioms: plain facts: $Male(Jim)$.
    - Numbers, sets, lists
      - 0 and successor
      - Peano axioms
-       - $NatNum(0)$
-       - $(for-all (n) (=> (nat-num n) (nat-num (s n))))$
-     - $(for-all (n) (not (= 0 (s n))))$
-     - $(for-all (n m) (=> (not (= m n)) (not (= (s m) (s n)))))$
-     - $(for-all (m) (=> (nat-num m) (= (+ 0 m) m)))$
-     - $(for-all (m n) (=> (and (nat-num m) (nat-num n)) (= (+ (s m)
-       n) (s (+ m n)))))$
+       - =(nat-num 0)=
+       - =(for-all (n) (=> (nat-num n) (nat-num (s n))))=
+     - =(for-all (n) (not (= 0 (s n))))=
+     - =(for-all (n m) (=> (not (= m n)) (not (= (s m) (s n)))))=
+     - =(for-all (m) (=> (nat-num m) (= (+ 0 m) m)))=
+     - =(for-all (m n) (=> (and (nat-num m) (nat-num n)) (= (+ (s m)
+       n) (s (+ m n)))))=
      - Thus, tho whole of number theory (including cryptography) can
        be built up from one constant, one function, one predicate and
        four axioms.
+     - Empty set, union, intersection
+     - =(for-all (<=> (set s) (or (= s {}) (exists (x s2) (and (set
+       s2) (= s (cons x s2)))))))=
+     - =(not (exists (x s) (= (cons x s) nil)))=
+   - Wumpus
+     - =(percept (stench breeze glitter none none) 5)=
+     - =(turn right)=, =forward=
+     - =(ask-vars (exists a (best-action a 5)))=
+     - =(for-all (=> (t s g m c) (percept (s breeze g m c) t) (breeze t)))$
+       - Reasoning process called perception.
+       - Quantification over time t.
+       - Reflex behavior: =(for-all t (=> (glitter t) (best-action
+         grab t)))=.
+       - =(for-all (x y a b) (<=> (adjacent ((x y) (a b)) (or (and (= x a)
+         (or (= y (- b 1)) (= y (+ b 1)))) (and (= y b) (or (= x (-
+         a 1)) (= x (+ a 1))))))))=
+       - =(at (agent s t))=
+       - =(for-all (t) (at (wumpus (2 2) t)))=
+       - =(for-all (x s1 s2 t) (=> (and (at x s1 t) (at x s2 t)) (= s1 2)))=
+       - =(for-all (s t) (=> (and (at (agent s t)) (breeze t))))=
+       - =(for-all (<=> (breezy s) (exists (r) (and (adjacent r s)
+         (pit r)))))=
+       - =(for-all (t) (<=> (have-arrow (+ t 1)) (and (have-arrow t)
+         (not (action (shoot t))))))=
+   - Knowledge engineering
+     - Special-purpose knowledge bases
+     - General-purpose knowledge bases, e.g. NLP
+     - Identify task
+       - Will sensor facts include the current location?
+       - Analogous to PEAS
+     - Assemble relevant knowledge
+       - Scope
+     - Vocabulary of predicates, functions, constants
+       - Like programming style, this can have a significant impact on
+         the eventual success of a project
+       - Ontology of the domain
+     - Encode general knowledge about domain
+       - 
 ** Lectures
 *** 1
     - AI: mapping from sensors to actuators
