@@ -10823,24 +10823,37 @@
                                                 parents)))
                           parent-children)))))))
       
-      (let ((spouse (spouses (george mum)
-                             (elizabeth philip)
-                             (spencer kydd))))
-        (run* (r)
-          (fresh (x y)
-            (conde ((spouse x y) (== r (cons x y)))))))
       
       (define (grand-parent parent pp c)
         (fresh (p)
           (parent pp p)
           (parent p c)))
       
-      (let ((parent (parents ((george mum) (elizabeth margaret))
+      (define (sibling parent x y)
+        (fresh (p)
+          (parent p x)
+          (parent p y)))
+      
+      (let ((spouse (spouses (george mum)
+                             (elizabeth philip)
+                             (spencer kydd)))
+            (parent (parents ((george mum) (elizabeth margaret))
                              ((elizabeth philip) (charles anne andrew edward)))))
-        (run* (r)
-          (fresh (gp c)
-            (grand-parent parent gp c)
-            (== r (cons gp c)))))
+        (debug
+         (run* (r)
+           (fresh (x y)
+             (conde ((spouse x y) (== r (cons x y))))))
+         (run* (r)
+           (fresh (gp c)
+             (grand-parent parent gp c)
+             (== r (cons gp c))))
+         (run* (r)
+           (fresh (s1 s2)
+             (sibling parent s1 s2)
+             (== r (cons s1 s2)))))) 
+      
+      
+      
     #+END_SRC
 ** Lectures
 *** 1
