@@ -10753,6 +10753,95 @@
        - Ontology of the domain
      - Encode general knowledge about domain
        - 
+*** Testing mini-kanren
+    #+BEGIN_SRC scheme
+      (use debug
+           mini-kanren
+           srfi-1)
+      (import-for-syntax matchable)
+      
+      (define (spouse x y)
+        (conde ((== x 'george) (== y 'mum))
+               ((== y 'george) (== x 'mum))))
+      
+      (define (parent p c)
+        (conde ((== p 'george) (== c 'elizabeth))
+               ((== p 'mum) (== c 'elizabeth))
+               ((== p 'george) (== c 'margaret))
+               ((== p 'mum) (== c 'margaret))
+               ((== p 'elizabeth) (== c 'charles))
+               ((== p 'elizabeth) (== c 'anne))
+               ((== p 'elizabeth) (== c 'andrew))
+               ((== p 'elizabeth) (== c 'edward))
+               ((== p 'philip) (== c 'charles))
+               ((== p 'philip) (== c 'anne))
+               ((== p 'philip) (== c 'andrew))
+               ((== p 'philip) (== c 'edward))))
+      
+      (define (grand-parent pp c)
+        (fresh (p)
+          (parent pp p)
+          (parent p c)))
+      
+      (run* (r)
+        (fresh (x y)
+          (conde ((spouse x y) (== r (cons x y))))))
+      
+      (run* (r)
+        (fresh (p c)
+          (conde ((parent p c) (== r (cons p c))))))
+      
+      (run* (r)
+        (fresh (pp c)
+          (conde ((grand-parent pp c) (== r (cons pp c))))))
+      
+      (define-syntax spouses
+        (ir-macro-transformer
+         (lambda (expression inject compare)
+           (let ((spouses (cdr expression)))
+             `(lambda (x y)
+                (conde ,@(append-map
+                          (match-lambda ((x y)
+                                    (list `((== x ',x) (== y ',y))
+                                          `((== y ',x) (== x ',y)))))
+                          spouses)))))))
+      
+      (define-syntax parents
+        (ir-macro-transformer
+         (lambda (expression inject compare)
+           (let ((parent-children (cdr expression)))
+             `(for-each (match-lambda ((parents children) (debug parents children)))
+                ,parent-children)
+             `(lambda (p c)
+                (conde ,@(append-map
+                          (match-lambda ((parents children)
+                                    (append-map (lambda (parent)
+                                                  (append-map (lambda (child)
+                                                                `(((== p ',parent)
+                                                                   (== c ',child))))
+                                                              children))
+                                                parents)))
+                          parent-children)))))))
+      
+      (let ((spouse (spouses (george mum)
+                             (elizabeth philip)
+                             (spencer kydd))))
+        (run* (r)
+          (fresh (x y)
+            (conde ((spouse x y) (== r (cons x y)))))))
+      
+      (define (grand-parent parent pp c)
+        (fresh (p)
+          (parent pp p)
+          (parent p c)))
+      
+      (let ((parent (parents ((george mum) (elizabeth margaret))
+                             ((elizabeth philip) (charles anne andrew edward)))))
+        (run* (r)
+          (fresh (gp c)
+            (grand-parent parent gp c)
+            (== r (cons gp c)))))
+    #+END_SRC
 ** Lectures
 *** 1
     - AI: mapping from sensors to actuators
